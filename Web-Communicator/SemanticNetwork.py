@@ -4,9 +4,10 @@ import os
 import csv
 import sqlite3
 import pickle
-from tkinter import *
-from tkinter.ttk import *
-from tkinter import filedialog
+import remi.gui as gui
+##from tkinter import *
+##from tkinter.ttk import *
+##from tkinter import filedialog
 
 from Expr_Table_Def import *
 from Gellish_file import Gellish_file
@@ -336,59 +337,6 @@ class Semantic_Network():
 ##                        obj.candidate_names[:] = []
 ##            
 ##                self.undefined_objects.remove(obj)
-
-    def read_verify_and_merge_files(self):
-        ''' Read one or more files, verify their content
-            and combine them with the semantic network
-        '''
-
-        self.combine_files_with_network()
-        addition = 'n'  # 'y' means option for importing more input files
-        while addition == 'y':
-            addition = input("More import files? (y/n):")
-            if addition == 'y':
-                self.combine_files_with_network()
-
-    def combine_files_with_network(self):
-        """ Select one or more Gellish files in a dialog
-            and import the files,
-            after syntactic verification.
-            The merge the file content in the semantic network
-        """
-        # Select one or more files to be imported
-        file_path_names = filedialog.askopenfilenames(
-            filetypes=[("CSV files","*.csv"),("JSON files","*.json"), ("All files","*.*")], \
-            title="Select file")
-        #print('Selected file(s):',modelFiles)
-        if file_path_names == '':
-            Message(self.GUI_lang_index,
-                'The file name is blank or the inclusion is cancelled. There is no file read.',\
-                'De file naam is blanco of het inlezen is gecancelled. Er is geen file ingelezen.')
-            return
-
-        # Read file(s)
-        for file_path_and_name in file_path_names:
-            # Split file_path_and_name in file path and file name
-            path_name = file_path_and_name.rsplit('/', maxsplit=1)
-            if len(path_name) == 2:
-                Message(self.GUI_lang_index,
-                    'Reading file <{}> from directory {}.'.format(path_name[1], path_name[0]),\
-                    'Lees file <{}> van directory {}.'.format(path_name[1], path_name[0]))
-                file_name = path_name[1]
-                file_path = path_name[0]
-            else:
-                Message(self.GUI_lang_index,
-                    'Reading file <{}> from current directory.'.format(file_path_and_name),\
-                    'Lees file <{}> van actuele directory.'.format(file_path_and_name))
-                file_name = file_path_and_name
-                file_path = ''
-
-            # Create file object
-            self.current_file = Gellish_file(file_path_and_name, self)
-            self.Gellish_files.append(self.current_file)
-
-            # Import expressions from file
-            self.current_file.Import_Gellish_from_file()
 
     def Add_name_in_context(self, lang_uid, comm_uid, name, naming_uid, description):
         ''' Add a name_in_context and description to object.names_in_contexts

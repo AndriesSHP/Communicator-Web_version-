@@ -1,8 +1,9 @@
 import os
 
-from tkinter import *
-from tkinter.ttk import *
-from tkinter import messagebox, filedialog
+##from tkinter import *
+##from tkinter.ttk import *
+##from tkinter import messagebox, filedialog
+import remi.gui as gui
 from operator import itemgetter
 
 from Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
@@ -2181,12 +2182,11 @@ class Display_views():
             Starting in grid on row 1.
         """
         # Define the overall views_notebook
-        self.views_noteb = Notebook(self.user_interface.main_frame, \
-                                    height=600) # width=1000)
-        self.views_noteb.grid(column=0, row=1,sticky=NSEW, columnspan=2)
-        self.views_noteb.columnconfigure(0,weight=1)
-        self.views_noteb.rowconfigure(0,weight=1)
-        #self.views_noteb.rowconfigure(1,weight=1)
+        self.views_noteb = gui.TabBox(height=600, width=1000)
+        self.user_interface.main_frame.append(self.views_noteb)
+##        self.views_noteb.grid(column=0, row=1,sticky=NSEW, columnspan=2)
+##        self.views_noteb.columnconfigure(0,weight=1)
+##        self.views_noteb.rowconfigure(0,weight=1)
 
         self.Define_log_sheet()
 
@@ -2284,23 +2284,26 @@ class Display_views():
             self.expr_tree.insert('', index='end', values=query_line, tags='val_tag')
 
     def Define_log_sheet(self):
-        ''' Define a frame for errors and warnings'''
-        self.log_frame = Frame(self.views_noteb)
-        self.log_frame.grid (column=0, row=0,sticky=NSEW)
-        self.log_frame.columnconfigure(0, weight=1)
-        self.log_frame.rowconfigure(0, weight=1)
-        log_head = ['Messages and warnings','Berichten en foutmeldingen']
-        self.views_noteb.add(self.log_frame, text=log_head[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end", self.log_frame, sticky=NSEW)
+        ''' Define a tab and frame for errors and warnings'''
+        log_head = ['Messages','Berichten']
+        self.log_frame = gui.ListView(width=1000, height=20)
+        tab_cb = ''
+        self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], tab_cb)
+##        self.log_frame.grid (column=0, row=0,sticky=NSEW)
+##        self.log_frame.columnconfigure(0, weight=1)
+##        self.log_frame.rowconfigure(0, weight=1)
+        
+##        self.views_noteb.add(self.log_frame, text=log_head[self.GUI_lang_index], sticky=NSEW)
+##        self.views_noteb.insert("end", self.log_frame, sticky=NSEW)
 
         # Messages area - text widget definition
-        self.log_message = Text(self.log_frame, width = 40, background='#efc') # height = 10,
-        log_mess_scroll  = ttk.Scrollbar(self.log_frame,orient=VERTICAL,\
-                                         command=self.log_message.yview)
-        self.log_message.config(yscrollcommand=log_mess_scroll.set)
-
-        self.log_message.grid(column=0, row=0, columnspan=1, rowspan=1, sticky=NSEW)
-        log_mess_scroll.grid(column=0, row=0, sticky=NS+E)
+##        self.log_message = Text(self.log_frame, width = 40, background='#efc') # height = 10,
+##        log_mess_scroll  = ttk.Scrollbar(self.log_frame,orient=VERTICAL,\
+##                                         command=self.log_message.yview)
+##        self.log_message.config(yscrollcommand=log_mess_scroll.set)
+##
+##        self.log_message.grid(column=0, row=0, columnspan=1, rowspan=1, sticky=NSEW)
+##        log_mess_scroll.grid(column=0, row=0, sticky=NS+E)
 
     def Display_message(self, text_en, text_nl):
         if self.GUI_lang_index == 1:
@@ -2713,7 +2716,7 @@ class Display_views():
             (indiv_model, a list of indiv_rows)
             for display in a tab of Notebook
         '''
-        self.indiv_frame  = Frame(self.views_noteb)
+        self.indiv_frame = Frame(self.views_noteb)
         self.indiv_frame.grid (column=0, row=0,sticky=NSEW) #pack(fill=BOTH, expand=1)
         self.indiv_frame.columnconfigure(0, weight=1)
         self.indiv_frame.rowconfigure(0,weight=1)
@@ -2990,7 +2993,7 @@ class Display_views():
 
     def Define_kind_model_sheet(self):
         ''' Kind_model View tab sheet for a kind in Notebook'''
-        self.kind_frame  = Frame(self.views_noteb)
+        self.kind_frame = Frame(self.views_noteb)
         self.kind_frame.grid (column=0, row=0,sticky=NSEW) #pack(fill=BOTH, expand=1)
         self.kind_frame.columnconfigure(0,weight=1)
         self.kind_frame.rowconfigure(0,weight=1)

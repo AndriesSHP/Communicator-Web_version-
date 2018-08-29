@@ -22,6 +22,7 @@ class Communicator(App):
 
     def __init__(self, *args):
         super(Communicator, self).__init__(*args)
+        self.unknown_quid = None
 
     # Define the main window
     def main(self):
@@ -104,14 +105,14 @@ class Communicator(App):
 ##        self.main_menu.add_command(label=search[self.GUI_lang_index],
 ##                                   command=self.search_net)
         self.search_tag = gui.MenuItem(search[self.GUI_lang_index], width=100, height=20)
-        self.search_tag.onclick.connect(self.search_net)
+        self.search_tag.onclick.connect(self.search_net())
         self.menubar.append(self.search_tag)
 ##        self.main_menu.add_command(label=query[self.GUI_lang_index],
 ##                                   command=self.query_net)
 ##        self.main_menu.add_command(label=manual[self.GUI_lang_index],
 ##                                   command=self.user_manual)
         self.manual_tag = gui.MenuItem(manual[self.GUI_lang_index], width=100, height=20)
-        self.manual_tag.onclick.connect(self.user_manual)
+        self.manual_tag.onclick.connect(self.user_manual())
         self.menubar.append(self.manual_tag)
 
         self.admin_tag = gui.MenuItem(admin[self.GUI_lang_index], width=100, height=20)
@@ -119,7 +120,7 @@ class Communicator(App):
 ##        self.menubar.add_cascade(menu=self.db_menu,
 ##                                 label=admin[self.GUI_lang_index])
         self.new_net_tag = gui.MenuItem(new_net[self.GUI_lang_index], width=100, height=20)
-        self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network)
+        self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network())
         self.admin_tag.append(self.new_net_tag)
         
 ##        self.db_menu.add_command(label=new_net[self.GUI_lang_index],
@@ -166,7 +167,7 @@ class Communicator(App):
         self.unknown_quid = 0   # start UID for unknowns in queries
 
         # Create display views object and initialize notebook
-##        self.views = Display_views(self.gel_net, self)
+        self.views = Display_views(self.gel_net, self)
 
         return self.container
 
@@ -281,9 +282,10 @@ class Communicator(App):
 ##        file_path_names = filedialog.askopenfilenames(
 ##            filetypes=[("CSV files","*.csv"),("JSON files","*.json"), ("All files","*.*")], \
 ##            title="Select file")
-        dialog = gui.FileSelectionDialog(title='File selection dialog', message='Select one or more files',
-                                                  multiple_selection=True, selection_folder='.',
-                                                  allow_file_selection=True, allow_folder_selection=False)
+        dialog = gui.FileSelectionDialog(title='File selection dialog',
+                                         message='Select one or more files',
+                                         multiple_selection=True, selection_folder='.',
+                                         allow_file_selection=True, allow_folder_selection=False)
         dialog.confirm_value.connect(self.on_fileselection_dialog_confirm)
         dialog.show(self)
         file_path_names = ''
@@ -333,25 +335,25 @@ class Communicator(App):
         else:
             print(mess_text_EN)
 
-    def user_manual(self, event):
+    def user_manual(self):
         ''' Open the user manual wiki. '''
 
         url = 'http://wiki.gellish.net/'
         # Open URL in a new tab, if a browser window is already open.
         webbrowser.open_new_tab(url)
 
-    def login_reg(self, event):
+    def login_reg(self):
         ''' Enable a user to log in after being recognized as registered
             or register a new user and enable to login after authentication.
         '''
         pass
 
-    def search_net(self, event):
+    def search_net(self):
         ''' Initiate the execution of a simple query as a search for an object.'''
         self.extended_query = False
         self.query_the_network()
 
-    def query_net(self, event):
+    def query_net(self):
         ''' Initiate the execution of a complex query
             with a spec as expression(s) that may include conditions.
         '''
