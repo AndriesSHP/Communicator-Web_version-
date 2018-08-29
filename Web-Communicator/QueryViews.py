@@ -75,24 +75,29 @@ class Query_view():
             query_text = ["Query","Vraag"]
         else:
             query_text = ["Search","Zoek"]
-        self.QWindow = gui.Widget()
-##        self.QWindow.title(query_text[self.GUI_lang_index])
-##        self.QWindow.columnconfigure(0, weight=1)
-##        self.QWindow.rowconfigure(0, weight=1)
+        self.query_widget = gui.Widget(height='100%', width='100%',
+                                       style={'display': 'block'})
+        self.user_interface.views_noteb.add_tab(self.query_widget, query_text[self.GUI_lang_index],
+                                                self.user_interface.tab_cb)
+##        self.query_frame.title(query_text[self.GUI_lang_index])
+##        self.query_frame.columnconfigure(0, weight=1)
+##        self.query_frame.rowconfigure(0, weight=1)
 
         # Specify query_frame
-        self.query_frame = gui.VBox(width=1000, height=600)
-        self.QWindow.append(self.query_frame)
+        self.query_frame = gui.VBox(height='100%', width='100%',
+                                    style={'display': 'block', 'text-align':'left'})
+        self.query_widget.append(self.query_frame)
+        
+        self.first_line_widget = gui.HBox(height=20, width='100%')
+        self.query_frame.append(self.first_line_widget)
 
     # Define reply language with language selector
         lang_text = ['Reply language:', 'Antwoordtaal:']
-        self.reply_lang_label = gui.Label(lang_text[self.GUI_lang_index])
-        self.query_frame.append(self.reply_lang_label)
+        self.reply_lang_label = gui.Label(lang_text[self.GUI_lang_index], width=100, height=20)
 
         # Set default language: reply_lang_names[0] = English, [1] = Nederlands
         self.rep_lang_default = self.GUI_lang_name
-        self.reply_lang_box = gui.DropDown(self.reply_lang_names, width=15, height=20)
-        self.query_frame.append(self.reply_lang_box)
+        self.reply_lang_box = gui.DropDown(self.reply_lang_names, width=100, height=20)
         
         # Binding reply language choice
         self.reply_lang_box.onchange.connect(self.Determine_reply_language)
@@ -119,32 +124,45 @@ class Query_view():
 ##        CaseSensitive = ttk.Checkbutton(self.query_frame, text=caseText[self.GUI_lang_index], \
 ##                                        variable = self.case_sensitive_var, onvalue = True)
         case_sensitive_box = gui.CheckBox(checked = True)
-        self.query_frame.append(case_sensitive_box)
+        case_sensitive_text = gui.Label(caseText[self.GUI_lang_index], width=100, height=20)
 ##        FirstCharMatch = ttk.Checkbutton(self.query_frame, text=firstText[self.GUI_lang_index], \
 ##                                         variable = self.first_char_match_var, onvalue = True)
+        first_char_box = gui.CheckBox(checked = True)
+        first_char_text = gui.Label(firstText[self.GUI_lang_index], width=100, height=20)
         #ExactMatch = ttk.Checkbutton(self.query_frame, text=exactText[self.GUI_lang_index], \
         #                             variable = ExactMatchVar, onvalue = True)
-        exact_match_box = gui.CheckBox(checked = True)
-        self.query_frame.append(exact_match_box)
+        #exact_match_box = gui.CheckBox(checked = True)
+        #exact_match_text = gui.Label(caseText[self.GUI_lang_index])
         # Include searching in descriptions
         #IncludeDescr = ttk.Checkbutton(self.query_frame, text="Include Description", \
         #                               variable = IncludeDescrVar, onvalue = True)
-        
+
     # Buttons definition
         confirm = ['Confirm','Bevestig']
         close = ['Close'  ,'Sluit']
         #verify = ['Verify model' ,'Verifieer model']
-        confirm_button = gui.Button(confirm[self.GUI_lang_index])
+        confirm_button = gui.Button(confirm[self.GUI_lang_index], width=100, height=20)
         confirm_button.onclick.connect(self.Formulate_query_spec)
-        self.query_frame.append(confirm_button)
-        close_button = gui.Button(close[self.GUI_lang_index])
+
+        close_button = gui.Button(close[self.GUI_lang_index], width=100, height=20)
         close_button.onclick.connect(self.Close_query)
-        self.query_frame.append(close_button)
+
         #verifyBut = gui.Button(verify[self.GUI_lang_index])
         #verifyBut.onclick.connect(self.query.Verify_model)
         #self.query_frame.append(verifyBut)
 
-    # Buttons location in grid
+    # Widget locations in grid
+        self.first_line_widget.append(case_sensitive_box)
+        self.first_line_widget.append(case_sensitive_text)
+        self.first_line_widget.append(self.reply_lang_label)
+        self.first_line_widget.append(self.reply_lang_box)
+        self.first_line_widget.append(confirm_button)
+        self.first_line_widget.append(close_button)
+
+        self.second_line_widget = gui.HBox(height=20, width=100)
+        self.query_frame.append(self.second_line_widget)
+        self.second_line_widget.append(first_char_box)
+        self.second_line_widget.append(first_char_text)
 ##        #ImmediateSearch.grid(column=0, columnspan=2, row=1, sticky=W)
 ##        CaseSensitive.grid(column=0, columnspan=2, row=1, sticky=W)
 ##        FirstCharMatch.grid(column=0, columnspan=2, row=2, sticky=W)
@@ -207,65 +225,84 @@ class Query_view():
         rh_term = ["Right hand term", "Rechter term"]
         uom_term = ["Unit of measure", "Meeteenheid"]
 
-    # Query variables widgets definition   
-        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index])
-        self.query_frame.append(lhNameLbl)
-        lhUIDLbl = gui.Label('UID:')
-        self.query_frame.append(lhUIDLbl)
-        if self.user_interface.extended_query:
-            relNameLbl = gui.Label(rel_term[self.GUI_lang_index])
-            rhNameLbl = gui.Label(self.query_frame, text=rh_term[self.GUI_lang_index])
-            uomNameLbl = gui.Label(self.query_frame, text=uom_term[self.GUI_lang_index])
-            self.query_frame.append(relNameLbl)
-            self.query_frame.append(rhNameLbl)
-            self.query_frame.append(uomNameLbl)
-        self.q_lh_name_widget = gui.DropDown(self.lh_terms, width=30)
-        self.query_frame.append(self.q_lh_name_widget)
-        #if self.user_interface.extended_query:
-        self.q_rel_name_widget = gui.DropDown(self.rel_terms, width=40)
-        self.query_frame.append(self.q_rel_name_widget)
-        self.q_rh_name_widget = gui.DropDown(self.rh_terms, width=30)
-        self.query_frame.append(self.q_rh_name_widget)
-        self.q_uom_name_widget = gui.DropDown(self.uoms, width=10)
-        self.query_frame.append(self.q_uom_name_widget)
+    # Query variables widgets definition
+        self.third_line_widget = gui.HBox(height=20, width='60%')
+        self.query_frame.append(self.third_line_widget)
         
-        self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, width=10)
-        self.query_frame.append(self.q_lh_uid_widget)
-        #if self.user_interface.extended_query:
-        self.q_rel_uid_widget = gui.TextInput(self.q_rel_uid_str, width=10)
-        self.query_frame.append(self.q_rel_uid_widget)
-        self.q_rh_uid_widget = gui.TextInput(self.q_rh_uid_str, width=10)
-        self.query_frame.append(self.q_rh_uid_widget)
-        self.q_uom_uid_widget = gui.TextInput(self.q_uom_uid_str, width=10)
-        self.query_frame.append(self.q_uom_uid_widget)
+        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width='30%')
+        lhUIDLbl = gui.Label('UID:', height=20, width='20%')
+        
+        self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width='50%')
+        self.third_line_widget.append(lhNameLbl)
+        self.third_line_widget.append(lhUIDLbl)
+        self.third_line_widget.append(self.q_lh_uid_widget)
+##        if self.user_interface.extended_query:
+##            self.q_rel_uid_widget = gui.TextInput(self.q_rel_uid_str, width=10)
+##            self.query_frame.append(self.q_rel_uid_widget)
+##            self.q_rh_uid_widget = gui.TextInput(self.q_rh_uid_str, width=10)
+##            self.query_frame.append(self.q_rh_uid_widget)
+##            self.q_uom_uid_widget = gui.TextInput(self.q_uom_uid_str, width=10)
+##            self.query_frame.append(self.q_uom_uid_widget)
+
+##        if self.user_interface.extended_query:
+##            relNameLbl = gui.Label(rel_term[self.GUI_lang_index])
+##            rhNameLbl = gui.Label(self.query_frame, text=rh_term[self.GUI_lang_index])
+##            uomNameLbl = gui.Label(self.query_frame, text=uom_term[self.GUI_lang_index])
+##            self.query_frame.append(relNameLbl)
+##            self.query_frame.append(rhNameLbl)
+##            self.query_frame.append(uomNameLbl)
+        self.fourth_line_widget = gui.HBox(height=20, width=300)
+        self.query_frame.append(self.fourth_line_widget)
+        
+        self.q_lh_name_widget = gui.DropDown(self.lh_terms, height=20, width=300)
+        self.fourth_line_widget.append(self.q_lh_name_widget)
+##        if self.user_interface.extended_query:
+##            self.q_rel_name_widget = gui.DropDown(self.rel_terms, width=40)
+##            self.query_frame.append(self.q_rel_name_widget)
+##            self.q_rh_name_widget = gui.DropDown(self.rh_terms, width=30)
+##            self.query_frame.append(self.q_rh_name_widget)
+##            self.q_uom_name_widget = gui.DropDown(self.uoms, width=10)
+##            self.query_frame.append(self.q_uom_name_widget)
 
     # Bindings for search uid and search string fields and for extended query fields
         self.q_lh_uid_widget.onkeyup.connect(self.Lh_uid_command)
         self.q_lh_name_widget.onkeyup.connect(self.Lh_search_cmd)
-        if self.user_interface.extended_query:
-            self.q_rel_name_widget.onkeyup.connect(self.Rel_search_cmd)
-            self.q_rh_name_widget.onkeyup.connect(self.Rh_search_cmd)
+##        if self.user_interface.extended_query:
+##            self.q_rel_name_widget.onkeyup.connect(self.Rel_search_cmd)
+##            self.q_rh_name_widget.onkeyup.connect(self.Rh_search_cmd)
 
     # Definition display widget
+        self.fifth_line_widget = gui.HBox(height=60, width='100%')
+        self.query_frame.append(self.fifth_line_widget)
+        
         def_text = ['Def. of left hand object:', 'Definitie van linker object:']
-        fullDefQLbl = gui.Label(def_text[self.GUI_lang_index])
-        self.query_frame.append(fullDefQLbl)
+        fullDefQLbl = gui.Label(def_text[self.GUI_lang_index], height=60, width=300)
         fullDefQStr = ''
-        self.q_full_def_widget = gui.ListView(width=60, height=3)
-        self.query_frame.append(self.q_full_def_widget)
+        self.q_full_def_widget = gui.ListView(width='100%', height=20)
+        self.fifth_line_widget.append(fullDefQLbl)
+        self.fifth_line_widget.append(self.q_full_def_widget)
         
 ##        defQScroll = ttk.Scrollbar(self.query_frame, orient=VERTICAL, \
 ##                                   command=self.q_full_def_widget.yview)
 ##        self.q_full_def_widget.config(yscrollcommand=defQScroll.set)
 
+        self.sixth_line_HBox = gui.HBox(height='100%', width='100%')
+        self.query_frame.append(self.sixth_line_HBox)
+
     # Aliases display widget
-        #aliasText = ['Aliases:','Aliases:']
-        #alias_label = ttk.Label(self.query_frame, text=aliasText[self.GUI_lang_index])
-        self.alias_tree = gui.TreeView()
+        self.sixth_line_left_widget = gui.VBox(height='100%', width='60%')
+        aspect_frame = gui.VBox(height='100%', width='40%') #borderwidth=3, relief='ridge')
+        self.sixth_line_HBox.append(self.sixth_line_left_widget)
+        self.sixth_line_HBox.append(aspect_frame)
+
+        aliasText = ['Aliases:','Aliases:']
+        self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width='100%')
+        self.sixth_line_left_widget.append(self.alias_label)
+        self.alias_tree = gui.TreeView(height=120, width='100%')
 ##                                       columns=('Term', 'Alias_type'),\
 ##                                       displaycolumns=('Alias_type'),\
 ##                                       selectmode='none', height=4)
-        self.query_frame.append(self.alias_tree)
+        self.sixth_line_left_widget.append(self.alias_tree)
         term_text = ('     Term', '     Term')
         alias_text = ('Alias type', 'Aliastype')
         #lang_text = ('Language', 'Taal')
@@ -275,56 +312,9 @@ class Query_view():
 ##        alias_scroll = ttk.Scrollbar(self.query_frame, orient=VERTICAL, \
 ##                                     command=self.alias_tree.yview)
 ##        self.alias_tree.config(yscrollcommand=alias_scroll.set)
-        self.alias_head = gui.TreeItem(alias_text[self.GUI_lang_index])
+        head_text = term_text[self.GUI_lang_index] + alias_text[self.GUI_lang_index]
+        self.alias_head = gui.TreeItem(head_text[self.GUI_lang_index])
         self.alias_tree.append(self.alias_head)
-
-    # Aspect frame widget
-        nr_of_rows = 24
-        if self.user_interface.extended_query:
-            nr_of_rows = 4
-        aspect_frame = gui.VBox() #borderwidth=3, relief='ridge')
-        self.query_frame.append(aspect_frame)
-##        aspect_frame.grid(column=6, row=6, columnspan=2, rowspan=nr_of_rows, sticky=NSEW)
-##        aspect_frame.columnconfigure(0, minsize=10, weight=1)
-##        aspect_frame.rowconfigure(0, minsize=10, weight=1)
-##        tree_style = ttk.Style()
-##        #tree_style.configure(".", font=('Helvetica', 8), foreground="white")
-##        #tree_style.configure("Treeview", foreground='red')
-##        tree_style.configure("Treeview.Heading", foreground='blue', background='#cfc')
-
-        # Aspects treeview for selection on aspect value(s)
-        aspect_col = ['Aspect', 'Aspect']
-        eq_col = ['>=<', '>=<']
-        value_col = ['Value', 'Waarde']
-        uom_col = ['UoM', 'Eenheid']
-        self.aspects_tree = gui.Treeview()
-        aspect_frame.append(self.aspects_tree)
-        self.aspect_heading = TreeItem(aspect_col[self.GUI_lang_index] + ' ' +
-                                       eq_col[self.GUI_lang_index] + ' ' +
-                                       value_col[self.GUI_lang_index] + ' ' +
-                                       uom_col[self.GUI_lang_index])
-        self.aspects_tree.append(self.aspect_heading)
-##                                         columns=('UID','Name','Rel_uid','UID-2','Parent',\
-##                                                  'Equality','Value','UoM'),\
-##                                         displaycolumns=('Equality','Value','UoM'),\
-##                                         selectmode='extended', height=3)
-##        self.aspects_tree.heading('#0', text=aspect_col[self.GUI_lang_index], anchor=W)
-##        self.aspects_tree.heading('Equality', text=eq_col[self.GUI_lang_index], anchor=W)
-##        self.aspects_tree.heading('Value', text=value_col[self.GUI_lang_index], anchor=W)
-##        self.aspects_tree.heading('UoM', text=uom_col[self.GUI_lang_index], anchor=W)
-##
-##        self.aspects_tree.column ('#0', width=200)
-##        self.aspects_tree.column ('Equality', width=30)
-##        self.aspects_tree.column ('Value', width=80)
-##        self.aspects_tree.column ('UoM', width=60)
-##        self.aspects_tree.grid(column=0, row=0, sticky=NSEW)
-##
-##        aspect_scroll = ttk.Scrollbar(aspect_frame, orient=VERTICAL, \
-##                                      command=self.aspects_tree.yview)
-##        aspect_scroll.grid(column=0, row=0, sticky=NS+E)
-##        self.aspects_tree.config(yscrollcommand=aspect_scroll.set)
-##        self.aspects_tree.bind(sequence='<ButtonRelease-1>', \
-##                               func=self.Determine_selected_aspects)
     
 ##    # Widgets locations in grid
 ##        lhNameLbl.grid(column=0, row=3, sticky=W)
@@ -392,8 +382,8 @@ class Query_view():
     # Options for selection widgets definition
         select_term = ["Select one of the following options:", \
                        "Kies één van de volgende opties:"]
-        opt_label = gui.Label(select_term[self.GUI_lang_index])
-        self.query_frame.append(opt_label)
+        opt_label = gui.Label(select_term[self.GUI_lang_index], height=20, width=300)
+        self.sixth_line_left_widget.append(opt_label)
     # Option label widget location
 ##        opt_label.grid(column=0, row=15, columnspan=3, rowspan=1, sticky=EW)
 
@@ -401,7 +391,8 @@ class Query_view():
         nr_cols = 6
 ##        if self.user_interface.extended_query:
 ##            nr_cols = 8
-##        lh_opt_frame = ttk.Frame(self.query_frame, borderwidth=3, relief='ridge')
+        lh_opt_frame = gui.VBox(height='100%', width='60%') #, borderwidth=3, relief='ridge')
+        self.sixth_line_left_widget.append(lh_opt_frame)
 ##        lh_opt_frame.grid(column=0, row=16, columnspan=nr_cols, rowspan=1, sticky=NSEW)
 ##        lh_opt_frame.columnconfigure(0, minsize=10, weight=1)
 ##        lh_opt_frame.rowconfigure(0, minsize=3, weight=1)
@@ -422,12 +413,13 @@ class Query_view():
         tree_height = 15
         if self.user_interface.extended_query:
             tree_height = 5
-        self.lh_options_tree = gui.TreeView()
+        self.lh_options_tree = gui.TreeView(width='100%', height=300)
         lh_opt_frame.append(self.lh_options_tree)
-        lh_option_heading = nameCol[self.GUI_lang_index] + ' ' +\
-                            kindCol[self.GUI_lang_index] + ' ' +\
-                            commCol[self.GUI_lang_index] + ' ' +\
-                            langCol[self.GUI_lang_index]
+        lh_option_heading = gui.TreeItem(nameCol[self.GUI_lang_index] + ' ' +\
+                                         kindCol[self.GUI_lang_index] + ' ' +\
+                                         commCol[self.GUI_lang_index] + ' ' +\
+                                         langCol[self.GUI_lang_index])
+        self.lh_options_tree.append(lh_option_heading)
 ##                                            columns=('UID', 'Name','Kind','Comm','Lang'),\
 ##                                            displaycolumns=('Name','Kind','Comm','Lang'),\
 ##                                            selectmode='browse', height=tree_height)
@@ -460,7 +452,6 @@ class Query_view():
 ##
 ##        self.lh_options_tree.bind(sequence='<ButtonRelease-1>', \
 ##                                  func=self.Set_selected_q_lh_term)
-        self.lh_options_tree.onmouseup(0,0)(self.Set_selected_q_lh_term)
 
 ##        if self.user_interface.extended_query:
 ##        # rel Options frame in query_frame for rel options Treeview
@@ -550,6 +541,53 @@ class Query_view():
 ##
 ##            self.rh_options_tree.bind(sequence='<ButtonRelease-1>', \
 ##                                      func=self.Set_selected_q_rh_term)
+        
+    # Aspect frame widget
+##        nr_of_rows = 24
+##        if self.user_interface.extended_query:
+##            nr_of_rows = 4
+
+##        aspect_frame.grid(column=6, row=6, columnspan=2, rowspan=nr_of_rows, sticky=NSEW)
+##        aspect_frame.columnconfigure(0, minsize=10, weight=1)
+##        aspect_frame.rowconfigure(0, minsize=10, weight=1)
+##        tree_style = ttk.Style()
+##        #tree_style.configure(".", font=('Helvetica', 8), foreground="white")
+##        #tree_style.configure("Treeview", foreground='red')
+##        tree_style.configure("Treeview.Heading", foreground='blue', background='#cfc')
+
+        # Aspects treeview for selection on aspect value(s)
+        aspect_col = ['Aspect', 'Aspect']
+        eq_col = ['>=<', '>=<']
+        value_col = ['Value', 'Waarde']
+        uom_col = ['UoM', 'Eenheid']
+        self.aspects_tree = gui.TreeView(height='100%', width='100%')
+        aspect_frame.append(self.aspects_tree)
+        self.aspect_heading = gui.TreeItem(aspect_col[self.GUI_lang_index] + '   ' +
+                                       eq_col[self.GUI_lang_index] + '   ' +
+                                       value_col[self.GUI_lang_index] + '   ' +
+                                       uom_col[self.GUI_lang_index])
+        self.aspects_tree.append(self.aspect_heading)
+##                                         columns=('UID','Name','Rel_uid','UID-2','Parent',\
+##                                                  'Equality','Value','UoM'),\
+##                                         displaycolumns=('Equality','Value','UoM'),\
+##                                         selectmode='extended', height=3)
+##        self.aspects_tree.heading('#0', text=aspect_col[self.GUI_lang_index], anchor=W)
+##        self.aspects_tree.heading('Equality', text=eq_col[self.GUI_lang_index], anchor=W)
+##        self.aspects_tree.heading('Value', text=value_col[self.GUI_lang_index], anchor=W)
+##        self.aspects_tree.heading('UoM', text=uom_col[self.GUI_lang_index], anchor=W)
+##
+##        self.aspects_tree.column ('#0', width=200)
+##        self.aspects_tree.column ('Equality', width=30)
+##        self.aspects_tree.column ('Value', width=80)
+##        self.aspects_tree.column ('UoM', width=60)
+##        self.aspects_tree.grid(column=0, row=0, sticky=NSEW)
+##
+##        aspect_scroll = ttk.Scrollbar(aspect_frame, orient=VERTICAL, \
+##                                      command=self.aspects_tree.yview)
+##        aspect_scroll.grid(column=0, row=0, sticky=NS+E)
+##        self.aspects_tree.config(yscrollcommand=aspect_scroll.set)
+##        self.aspects_tree.bind(sequence='<ButtonRelease-1>', \
+##                               func=self.Determine_selected_aspects)
 
         # Set the reply language initially identical to the GUI language
         self.user_interface.Set_reply_language(self.GUI_lang_name)
@@ -1496,7 +1534,7 @@ class Query_view():
         self.views.Display_notebook_views()
 
     def Close_query(self):
-        self.QWindow.destroy()
+        self.query_frame.destroy()
         
 #------------------------------------------------------
 class User_interface():

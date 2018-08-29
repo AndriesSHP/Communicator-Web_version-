@@ -89,9 +89,6 @@ class Display_views():
 
         self.modification = None
 
-        # Define a notebook in window
-        self.Define_notebook()
-
     def empty_models(self):
         ''' Make models empty enabling the creation of new models'''
         self.network_model[:] = []
@@ -2177,19 +2174,6 @@ class Display_views():
                 part_level = occ_level + 1
                 self.PartOfOccur(part_occ, part_level)
 
-    def Define_notebook(self):
-        """ Defines a Notebook with various view layouts and displays view contents.
-            Starting in grid on row 1.
-        """
-        # Define the overall views_notebook
-        self.views_noteb = gui.TabBox(height=600, width=1000)
-        self.user_interface.main_frame.append(self.views_noteb)
-##        self.views_noteb.grid(column=0, row=1,sticky=NSEW, columnspan=2)
-##        self.views_noteb.columnconfigure(0,weight=1)
-##        self.views_noteb.rowconfigure(0,weight=1)
-
-        self.Define_log_sheet()
-
     def Display_notebook_views(self):
         ''' For non-empty models define and display a treeview in a notebook tab.'''
 
@@ -2283,33 +2267,13 @@ class Display_views():
         for query_line in self.expr_table:
             self.expr_tree.insert('', index='end', values=query_line, tags='val_tag')
 
-    def Define_log_sheet(self):
-        ''' Define a tab and frame for errors and warnings'''
-        log_head = ['Messages','Berichten']
-        self.log_frame = gui.ListView(width=1000, height=20)
-        tab_cb = ''
-        self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], tab_cb)
-##        self.log_frame.grid (column=0, row=0,sticky=NSEW)
-##        self.log_frame.columnconfigure(0, weight=1)
-##        self.log_frame.rowconfigure(0, weight=1)
-        
-##        self.views_noteb.add(self.log_frame, text=log_head[self.GUI_lang_index], sticky=NSEW)
-##        self.views_noteb.insert("end", self.log_frame, sticky=NSEW)
-
-        # Messages area - text widget definition
-##        self.log_message = Text(self.log_frame, width = 40, background='#efc') # height = 10,
-##        log_mess_scroll  = ttk.Scrollbar(self.log_frame,orient=VERTICAL,\
-##                                         command=self.log_message.yview)
-##        self.log_message.config(yscrollcommand=log_mess_scroll.set)
-##
-##        self.log_message.grid(column=0, row=0, columnspan=1, rowspan=1, sticky=NSEW)
-##        log_mess_scroll.grid(column=0, row=0, sticky=NS+E)
-
     def Display_message(self, text_en, text_nl):
         if self.GUI_lang_index == 1:
-            self.log_message.insert(END, '\n' + text_nl)
+            self.user_interface.log_frame.append(text_nl)
+##            self.log_message.insert(END, '\n' + text_nl)
         else:
-            self.log_message.insert(END, '\n' + text_en)
+            self.user_interface.log_frame.append(text_en)
+##            self.log_message.insert(END, '\n' + text_en)
 
     def Define_and_display_network(self):
         # Destroy earlier network_frame
@@ -4447,6 +4411,6 @@ if __name__ == "__main__":
     views.lang_name = 'English'
     views.categoryInFocus = 'kind'
 
-    views.Define_notebook()
+    views.user_interface.Define_notebook()
     views.Display_notebook_views()
     root.mainloop()

@@ -22,7 +22,6 @@ class Communicator(App):
 
     def __init__(self, *args):
         super(Communicator, self).__init__(*args)
-        self.unknown_quid = None
 
     # Define the main window
     def main(self):
@@ -71,7 +70,7 @@ class Communicator(App):
         # Define main GUI window
         #self.root = Tk()
         self.container = gui.Widget(margin='0px auto')
-        self.container.set_size(1020, 600)
+        self.container.set_size('100%', '100%')
         self.container.attributes['title'] = 'Communicator'
 ##        self.container.title("Gellish Communicator")
 ##        max_width, max_height = self.container.winfo_screenwidth(), \
@@ -87,7 +86,7 @@ class Communicator(App):
 ##        self.container.option_add('*tearOff', False)
 
         # Menu bar
-        self.menubar = gui.MenuBar(height=20, width=1020)
+        self.menubar = gui.MenuBar(height=20, width='100%')
         self.container.append(self.menubar)
 
 ##        self.menubar.add_cascade(menu=self.main_menu,
@@ -99,20 +98,20 @@ class Communicator(App):
 ##        self.main_menu.add_command(label=read_file[self.GUI_lang_index],
 ##                                   command=self.read_file)
         self.read_file_tag = gui.MenuItem(read_file[self.GUI_lang_index], width=100, height=20)
-        self.read_file_tag.onclick.connect(self.read_verify_and_merge_files())
+        self.read_file_tag.onclick.connect(self.read_verify_and_merge_files)
         self.menubar.append(self.read_file_tag)
         
 ##        self.main_menu.add_command(label=search[self.GUI_lang_index],
 ##                                   command=self.search_net)
         self.search_tag = gui.MenuItem(search[self.GUI_lang_index], width=100, height=20)
-        self.search_tag.onclick.connect(self.search_net())
+        self.search_tag.onclick.connect(self.search_net)
         self.menubar.append(self.search_tag)
 ##        self.main_menu.add_command(label=query[self.GUI_lang_index],
 ##                                   command=self.query_net)
 ##        self.main_menu.add_command(label=manual[self.GUI_lang_index],
 ##                                   command=self.user_manual)
         self.manual_tag = gui.MenuItem(manual[self.GUI_lang_index], width=100, height=20)
-        self.manual_tag.onclick.connect(self.user_manual())
+        self.manual_tag.onclick.connect(self.user_manual)
         self.menubar.append(self.manual_tag)
 
         self.admin_tag = gui.MenuItem(admin[self.GUI_lang_index], width=100, height=20)
@@ -120,7 +119,7 @@ class Communicator(App):
 ##        self.menubar.add_cascade(menu=self.db_menu,
 ##                                 label=admin[self.GUI_lang_index])
         self.new_net_tag = gui.MenuItem(new_net[self.GUI_lang_index], width=100, height=20)
-        self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network())
+        self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network)
         self.admin_tag.append(self.new_net_tag)
         
 ##        self.db_menu.add_command(label=new_net[self.GUI_lang_index],
@@ -149,7 +148,7 @@ class Communicator(App):
         self.lang_select.onchange.connect(self.Determine_GUI_language)
 
         # Main Frame
-        self.main_frame = gui.VBox(width=1020, height=570)
+        self.main_frame = gui.VBox(width='100%', height='100%')
         self.container.append(self.main_frame)
         self.main_frame.attributes['color'] = 'green'
         
@@ -166,10 +165,50 @@ class Communicator(App):
         self.unknown = ['unknown', 'onbekend']
         self.unknown_quid = 0   # start UID for unknowns in queries
 
-        # Create display views object and initialize notebook
+        # Create display views object
         self.views = Display_views(self.gel_net, self)
+        
+        # Define a notebook in window
+        self.Define_notebook()
 
         return self.container
+    
+    def Define_notebook(self):
+        """ Defines a Notebook with various view layouts and displays view contents.
+            Starting in grid on row 1.
+        """
+        # Define the overall views_notebook
+        self.views_noteb = gui.TabBox(height='100%', width='100%')
+        self.main_frame.append(self.views_noteb)
+##        self.views_noteb.grid(column=0, row=1,sticky=NSEW, columnspan=2)
+##        self.views_noteb.columnconfigure(0,weight=1)
+##        self.views_noteb.rowconfigure(0,weight=1)
+
+        self.Define_log_sheet()
+    
+    def Define_log_sheet(self):
+        ''' Define a tab and frame for errors and warnings'''
+        log_head = ['Messages','Berichten']
+        self.log_frame = gui.ListView(width='100%', height='100%')
+        self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], self.tab_cb)
+##        self.log_frame.grid (column=0, row=0,sticky=NSEW)
+##        self.log_frame.columnconfigure(0, weight=1)
+##        self.log_frame.rowconfigure(0, weight=1)
+        
+##        self.views_noteb.add(self.log_frame, text=log_head[self.GUI_lang_index], sticky=NSEW)
+##        self.views_noteb.insert("end", self.log_frame, sticky=NSEW)
+
+        # Messages area - text widget definition
+##        self.log_message = Text(self.log_frame, width = 40, background='#efc') # height = 10,
+##        log_mess_scroll  = ttk.Scrollbar(self.log_frame,orient=VERTICAL,\
+##                                         command=self.log_message.yview)
+##        self.log_message.config(yscrollcommand=log_mess_scroll.set)
+##
+##        self.log_message.grid(column=0, row=0, columnspan=1, rowspan=1, sticky=NSEW)
+##        log_mess_scroll.grid(column=0, row=0, sticky=NS+E)
+    
+    def tab_cb(self):
+        return
 
     def start_up(self, user_db):
         party = 'Andries'   #input("User name: ")
@@ -261,7 +300,7 @@ class Communicator(App):
             'The user interface language is {}.'.format(self.GUI_lang_name),
             'De GUI taal is {}.'.format(self.GUI_lang_name))
 
-    def read_verify_and_merge_files(self):
+    def read_verify_and_merge_files(self, widget):
         ''' Read one or more files, verify their content
             and combine them with the semantic network
         '''
@@ -287,7 +326,7 @@ class Communicator(App):
                                          multiple_selection=True, selection_folder='.',
                                          allow_file_selection=True, allow_folder_selection=False)
         dialog.confirm_value.connect(self.on_fileselection_dialog_confirm)
-        dialog.show(self)
+
         file_path_names = ''
         print('Selected file(s):',file_path_names)
         if file_path_names == '':
@@ -332,28 +371,30 @@ class Communicator(App):
     def Message_UI(self, mess_text_EN, mess_text_NL):
         if self.GUI_lang_index == 1:
             print(mess_text_NL)
+            self.log_frame.append(mess_text_NL)
         else:
             print(mess_text_EN)
+            self.log_frame.append(mess_text_EN)
 
-    def user_manual(self):
+    def user_manual(self, widget):
         ''' Open the user manual wiki. '''
 
         url = 'http://wiki.gellish.net/'
         # Open URL in a new tab, if a browser window is already open.
         webbrowser.open_new_tab(url)
 
-    def login_reg(self):
+    def login_reg(self, widget):
         ''' Enable a user to log in after being recognized as registered
             or register a new user and enable to login after authentication.
         '''
         pass
 
-    def search_net(self):
+    def search_net(self, widget):
         ''' Initiate the execution of a simple query as a search for an object.'''
         self.extended_query = False
         self.query_the_network()
 
-    def query_net(self):
+    def query_net(self, widget):
         ''' Initiate the execution of a complex query
             with a spec as expression(s) that may include conditions.
         '''
