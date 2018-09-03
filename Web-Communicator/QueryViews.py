@@ -248,7 +248,7 @@ class Query_view():
         lhUIDLbl.attributes['title'] = 'A unique identifier of the searched object (specified or found)'
         
         self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width='50%')
-        self.q_lh_uid_widget.attributes['title'] = 'A text string as (part of) the name of an object to be searched'
+        self.q_lh_uid_widget.attributes['title'] = 'A unique identifier of the searched object (specified or found'
         self.third_line_widget.append(lhNameLbl)
         self.third_line_widget.append(lhUIDLbl)
         self.third_line_widget.append(self.q_lh_uid_widget)
@@ -270,7 +270,9 @@ class Query_view():
         self.fourth_line_widget = gui.HBox(height=20, width=300)
         self.query_frame.append(self.fourth_line_widget)
         
-        self.q_lh_name_widget = gui.DropDown(self.lh_terms, height=20, width=300)
+        self.q_lh_name_widget = gui.TextInput(height=20, width=300) #self.lh_terms
+        #self.q_lh_name_widget.set_value('')
+        self.q_lh_name_widget.attributes['title'] = 'A text string that is (part of) a name of the searched object'
         self.fourth_line_widget.append(self.q_lh_name_widget)
 ##        if self.user_interface.extended_query:
 ##            self.q_rel_name_widget = gui.DropDown(self.rel_terms, width=40)
@@ -673,7 +675,7 @@ of the name of the selected object'
         except KeyError:
             pass
 
-    def Lh_search_cmd(self, event):
+    def Lh_search_cmd(self, event, new_value):
         """ Search or Query in semantic network
             An entry in QueryWindow can be just a name (lhString
             (for search on UID see Lh_uid_command)
@@ -1382,7 +1384,7 @@ of the name of the selected object'
         self.q_rh_uid_str.set(str(self.query.q_rh_uid))
         self.q_rh_name_str.set(self.query.q_rh_name)
 
-    def Formulate_query_spec(self):
+    def Formulate_query_spec(self, event):
         """Formulte a query_spec on the network for the relation type and its subtypes.
            Store resulting query expressions in candids table with the same table definition.
         """
