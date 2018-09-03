@@ -21,28 +21,12 @@ class Communicator(App):
     '''
 
     def __init__(self, *args):
-        super(Communicator, self).__init__(*args)
-
-    # Define the main window
-    def main(self):
-        """ Define a main_window with select options and GUI language choice.
-        """
         self.net_name = "Gellish semantic network"
         self.pickle_file_name = "Gellish_net_db"
 
         self.gel_net = None
         self.user = None
         self.user_interface = None
-        
-        main_menu = ['Main Menu', 'Hoofdmenu']
-        login = ['Login/Register', 'Login/Registreer']
-        read_file = ['Read file', 'Lees file']
-        search = ['Search', 'Zoek']
-        query = ['Query', 'Vraag']
-        admin = ['DB Admin', 'DB Admin']
-        new_net = ['New network', 'Nieuw netwerk']
-        save_as = ['Save net', 'Opslaan']
-        manual = ['User manual', 'Handleiding']
 
         self.GUI_lang_name_dict = {"English":'910036', \
                                    "Nederlands":'910037'}
@@ -58,6 +42,23 @@ class Communicator(App):
                                      'Deutsch':'910038', \
                                      'Francais':'910039'}
         self.comm_pref_uids = ['492014', 'any'] # Default: 492014 = 'Gellish'
+        
+        super(Communicator, self).__init__(*args)
+
+    # Define the main window
+    def main(self):
+        """ Define a main_window with select options and GUI language choice.
+        """
+        main_menu = ['Main Menu', 'Hoofdmenu']
+        login = ['Login/Register', 'Login/Registreer']
+        read_file = ['Read file', 'Lees file']
+        search = ['Search', 'Zoek']
+        query = ['Query', 'Vraag']
+        admin = ['DB Admin', 'DB Admin']
+        new_net = ['New network', 'Nieuw netwerk']
+        save_as = ['Save net', 'Opslaan']
+        manual = ['User manual', 'Handleiding']
+        wiki = ['Gellish wiki', 'Gellish wiki']
 
         # Initialize user_db and start up
         user_db = SU.UserDb()
@@ -69,7 +70,7 @@ class Communicator(App):
 
         # Define main GUI window
         #self.root = Tk()
-        self.container = gui.Widget(margin='0px auto')
+        self.container = gui.Widget(margin='2px', style='background-color:#eeffdd')
         self.container.set_size('100%', '100%')
         self.container.attributes['title'] = 'Communicator'
 ##        self.container.title("Gellish Communicator")
@@ -97,13 +98,16 @@ class Communicator(App):
         #self.menubar.append(login_tag)
 ##        self.main_menu.add_command(label=read_file[self.GUI_lang_index],
 ##                                   command=self.read_file)
+        import_text = ['Import one or more Gellish files', 'Lees een of meer Gellish files']
         self.read_file_tag = gui.MenuItem(read_file[self.GUI_lang_index], width=100, height=20)
+        self.read_file_tag.attributes['title'] = import_text[self.GUI_lang_index]
         self.read_file_tag.onclick.connect(self.read_verify_and_merge_files)
         self.menubar.append(self.read_file_tag)
         
 ##        self.main_menu.add_command(label=search[self.GUI_lang_index],
 ##                                   command=self.search_net)
         self.search_tag = gui.MenuItem(search[self.GUI_lang_index], width=100, height=20)
+        self.search_tag.attributes['title'] = 'Open a search window'
         self.search_tag.onclick.connect(self.search_net)
         self.menubar.append(self.search_tag)
 ##        self.main_menu.add_command(label=query[self.GUI_lang_index],
@@ -111,24 +115,33 @@ class Communicator(App):
 ##        self.main_menu.add_command(label=manual[self.GUI_lang_index],
 ##                                   command=self.user_manual)
         self.manual_tag = gui.MenuItem(manual[self.GUI_lang_index], width=100, height=20)
+        self.manual_tag.attributes['title'] = 'Open the Communicator user manual'
         self.manual_tag.onclick.connect(self.user_manual)
         self.menubar.append(self.manual_tag)
 
+        self.wiki_tag = gui.MenuItem(wiki[self.GUI_lang_index], width=100, height=20)
+        self.wiki_tag.attributes['title'] = 'Open the Gellish languages wiki'
+        self.wiki_tag.onclick.connect(self.user_manual)
+        self.menubar.append(self.wiki_tag)
+
         self.admin_tag = gui.MenuItem(admin[self.GUI_lang_index], width=100, height=20)
+        self.admin_tag.attributes['title'] = 'Save network on file or delete old and create new network'
         self.menubar.append(self.admin_tag)
 ##        self.menubar.add_cascade(menu=self.db_menu,
 ##                                 label=admin[self.GUI_lang_index])
-        self.new_net_tag = gui.MenuItem(new_net[self.GUI_lang_index], width=100, height=20)
-        self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network)
-        self.admin_tag.append(self.new_net_tag)
-        
-##        self.db_menu.add_command(label=new_net[self.GUI_lang_index],
-##                                 command=self.gel_net.reset_and_build_network)
-        self.save_as_tag = gui.MenuItem(save_as[self.GUI_lang_index], width=100, height=20)
-        self.save_as_tag.onclick.connect(self.gel_net.save_pickle_db)
-        self.admin_tag.append(self.save_as_tag)
 ##        self.db_menu.add_command(label=save_as[self.GUI_lang_index],
 ##                                 command=self.gel_net.save_pickle_db)
+        self.save_as_tag = gui.MenuItem(save_as[self.GUI_lang_index], width=100, height=20)
+        self.save_as_tag.attributes['title'] = 'Save semantic network on binary file'
+        self.save_as_tag.onclick.connect(self.gel_net.save_pickle_db)
+        self.admin_tag.append(self.save_as_tag)
+
+##        self.db_menu.add_command(label=new_net[self.GUI_lang_index],
+##                                 command=self.gel_net.reset_and_build_network)
+        self.new_net_tag = gui.MenuItem(new_net[self.GUI_lang_index], width=100, height=20)
+        self.new_net_tag.attributes['title'] = 'Delete old and create new semantic network'
+        self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network)
+        self.admin_tag.append(self.new_net_tag)
 
         # Define language selector 
         self.lang_container = gui.HBox(width=180, height=20)
@@ -136,10 +149,12 @@ class Communicator(App):
         
         lang_text = ['Language:', 'Taal:']
         self.lang_label = gui.Label(lang_text[self.GUI_lang_index], width=80, height=20)
+        self.lang_label.attributes['title'] = 'Select a language for specification of a search'
         self.lang_container.append(self.lang_label) #self.main_frame, width=10)
         # Set default language: GUI_lang_names[0] = English, [1] = Nederlands
         self.lang_default = self.GUI_lang_names[0]
         self.lang_select = gui.DropDown(self.GUI_lang_names, width=100, height=20) #margin='10px'
+        self.lang_select.attributes['title'] = 'The language used for specification of a search'
         self.lang_container.append(self.lang_select)
 ##        self.lang_label.grid(column=0, row=0, sticky=NW)
 ##        self.lang_box.grid(column=1, row=0, sticky=NW)
@@ -188,8 +203,9 @@ class Communicator(App):
     
     def Define_log_sheet(self):
         ''' Define a tab and frame for errors and warnings'''
-        log_head = ['Messages','Berichten']
+        log_head = ['Messages and warnings','Berichten en foutmeldingen']
         self.log_frame = gui.ListView(width='100%', height='100%')
+        self.log_frame.attributes['title'] = 'Display messages and warnings'
         self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], self.tab_cb)
 ##        self.log_frame.grid (column=0, row=0,sticky=NSEW)
 ##        self.log_frame.columnconfigure(0, weight=1)
@@ -292,7 +308,9 @@ class Communicator(App):
         return GUI_set
 
     def Determine_GUI_language(self, event, selection):
-        ''' Determine which user interface language is spacified by the user. '''
+        ''' Determine which language for the user interface and query specification
+            is spacified by the user.
+        '''
         GUI_lang_name = selection #self.lang_box.get()
         self.Set_GUI_language(GUI_lang_name)
 
@@ -378,6 +396,13 @@ class Communicator(App):
 
     def user_manual(self, widget):
         ''' Open the user manual wiki. '''
+
+        url = 'http://usermanual.gellish.net/'
+        # Open URL in a new tab, if a browser window is already open.
+        webbrowser.open_new_tab(url)
+
+    def wiki(self, widget):
+        ''' Open the Gellish wiki. '''
 
         url = 'http://wiki.gellish.net/'
         # Open URL in a new tab, if a browser window is already open.
@@ -570,4 +595,4 @@ if __name__ == "__main__":
     sys.setrecursionlimit(100000)
     
     net = Network()
-    start(Communicator)
+    start(Communicator, title="Gellish Communicator")

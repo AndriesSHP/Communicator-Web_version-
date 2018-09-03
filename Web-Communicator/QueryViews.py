@@ -85,19 +85,25 @@ class Query_view():
 
         # Specify query_frame
         self.query_frame = gui.VBox(height='100%', width='100%',
-                                    style={'display': 'block', 'text-align':'left'})
+                                    style={'display': 'block', 'text-align':'left',
+                                           'background-color':'#eeffdd'})
         self.query_widget.append(self.query_frame)
         
-        self.first_line_widget = gui.HBox(height=20, width='100%')
+        self.first_line_widget = gui.HBox(height=20, width=650, style='position:relative',
+                                          margin='5px')
         self.query_frame.append(self.first_line_widget)
 
     # Define reply language with language selector
         lang_text = ['Reply language:', 'Antwoordtaal:']
+        reply_text = ['The language used for display of search results',
+                      'De taal waarin zoekresultaten weergegeven worden']
         self.reply_lang_label = gui.Label(lang_text[self.GUI_lang_index], width=100, height=20)
+        self.reply_lang_label.attributes['title'] = reply_text[self.GUI_lang_index]
 
         # Set default language: reply_lang_names[0] = English, [1] = Nederlands
         self.rep_lang_default = self.GUI_lang_name
         self.reply_lang_box = gui.DropDown(self.reply_lang_names, width=100, height=20)
+        self.reply_lang_box.attributes['title'] = reply_text[self.GUI_lang_index]
         
         # Binding reply language choice
         self.reply_lang_box.onchange.connect(self.Determine_reply_language)
@@ -123,12 +129,17 @@ class Query_view():
         #                                  variable = ImmediateSearchVar, onvalue = True)
 ##        CaseSensitive = ttk.Checkbutton(self.query_frame, text=caseText[self.GUI_lang_index], \
 ##                                        variable = self.case_sensitive_var, onvalue = True)
-        case_sensitive_box = gui.CheckBox(checked = True)
-        case_sensitive_text = gui.Label(caseText[self.GUI_lang_index], width=100, height=20)
+        case_sensitive_box = gui.CheckBox(checked = True, width=10, height=20)
+        case_sensitive_box.attributes['title'] = 'Tick when search string is case sensitive'
+        case_sensitive_text = gui.Label(caseText[self.GUI_lang_index], width=150, height=20,
+                                        style={'margin-right':'20px'})
+        case_sensitive_text.attributes['title'] = 'Tick when search string is case sensitive'
 ##        FirstCharMatch = ttk.Checkbutton(self.query_frame, text=firstText[self.GUI_lang_index], \
 ##                                         variable = self.first_char_match_var, onvalue = True)
-        first_char_box = gui.CheckBox(checked = True)
-        first_char_text = gui.Label(firstText[self.GUI_lang_index], width=100, height=20)
+        first_char_box = gui.CheckBox(checked = True, width=10, height=20)
+        first_char_box.attributes['title'] = 'Tick when search string shall match with first character(s) of found string'
+        first_char_text = gui.Label(firstText[self.GUI_lang_index], width=150, height=20)
+        first_char_text.attributes['title'] = 'Tick when search string shall match with first character(s) of found string'
         #ExactMatch = ttk.Checkbutton(self.query_frame, text=exactText[self.GUI_lang_index], \
         #                             variable = ExactMatchVar, onvalue = True)
         #exact_match_box = gui.CheckBox(checked = True)
@@ -142,9 +153,11 @@ class Query_view():
         close = ['Close'  ,'Sluit']
         #verify = ['Verify model' ,'Verifieer model']
         confirm_button = gui.Button(confirm[self.GUI_lang_index], width=100, height=20)
+        confirm_button.attributes['title'] = 'Confirm that selected option is searched for'
         confirm_button.onclick.connect(self.Formulate_query_spec)
 
         close_button = gui.Button(close[self.GUI_lang_index], width=100, height=20)
+        close_button.attributes['title'] = 'Close the search window'
         close_button.onclick.connect(self.Close_query)
 
         #verifyBut = gui.Button(verify[self.GUI_lang_index])
@@ -159,7 +172,7 @@ class Query_view():
         self.first_line_widget.append(confirm_button)
         self.first_line_widget.append(close_button)
 
-        self.second_line_widget = gui.HBox(height=20, width=100)
+        self.second_line_widget = gui.HBox(height=20, width=170, margin='5px')
         self.query_frame.append(self.second_line_widget)
         self.second_line_widget.append(first_char_box)
         self.second_line_widget.append(first_char_text)
@@ -226,13 +239,16 @@ class Query_view():
         uom_term = ["Unit of measure", "Meeteenheid"]
 
     # Query variables widgets definition
-        self.third_line_widget = gui.HBox(height=20, width='60%')
+        self.third_line_widget = gui.HBox(height=20, width=400)
         self.query_frame.append(self.third_line_widget)
         
         lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width='30%')
+        lhNameLbl.attributes['title'] = 'Specify a text string as part of the name of an object to be searched'
         lhUIDLbl = gui.Label('UID:', height=20, width='20%')
+        lhUIDLbl.attributes['title'] = 'A unique identifier of the searched object (specified or found)'
         
         self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width='50%')
+        self.q_lh_uid_widget.attributes['title'] = 'A text string as (part of) the name of an object to be searched'
         self.third_line_widget.append(lhNameLbl)
         self.third_line_widget.append(lhUIDLbl)
         self.third_line_widget.append(self.q_lh_uid_widget)
@@ -275,10 +291,10 @@ class Query_view():
         self.fifth_line_widget = gui.HBox(height=60, width='100%')
         self.query_frame.append(self.fifth_line_widget)
         
-        def_text = ['Def. of left hand object:', 'Definitie van linker object:']
+        def_text = ['Definition of the selected object:', 'Definitie van het geselecteerde object:']
         fullDefQLbl = gui.Label(def_text[self.GUI_lang_index], height=60, width=300)
         fullDefQStr = ''
-        self.q_full_def_widget = gui.ListView(width='100%', height=20)
+        self.q_full_def_widget = gui.ListView(width='100%', height=60)
         self.fifth_line_widget.append(fullDefQLbl)
         self.fifth_line_widget.append(self.q_full_def_widget)
         
@@ -290,19 +306,15 @@ class Query_view():
         self.query_frame.append(self.sixth_line_HBox)
 
     # Aliases display widget
-        self.sixth_line_left_widget = gui.VBox(height='100%', width='60%')
+        self.sixth_line_left_widget = gui.VBox(height=160, width='60%')
         aspect_frame = gui.VBox(height='100%', width='40%') #borderwidth=3, relief='ridge')
         self.sixth_line_HBox.append(self.sixth_line_left_widget)
         self.sixth_line_HBox.append(aspect_frame)
 
         aliasText = ['Aliases:','Aliases:']
         self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width='100%')
-        self.sixth_line_left_widget.append(self.alias_label)
-        self.alias_tree = gui.TreeView(height=120, width='100%')
-##                                       columns=('Term', 'Alias_type'),\
-##                                       displaycolumns=('Alias_type'),\
-##                                       selectmode='none', height=4)
-        self.sixth_line_left_widget.append(self.alias_tree)
+        self.alias_label.attributes['title'] = 'Synonyms, abbreviations and translations \
+of the name of the selected object'
         term_text = ('     Term', '     Term')
         alias_text = ('Alias type', 'Aliastype')
         #lang_text = ('Language', 'Taal')
@@ -313,9 +325,15 @@ class Query_view():
 ##                                     command=self.alias_tree.yview)
 ##        self.alias_tree.config(yscrollcommand=alias_scroll.set)
         head_text = term_text[self.GUI_lang_index] + alias_text[self.GUI_lang_index]
-        self.alias_head = gui.TreeItem(head_text[self.GUI_lang_index])
-        self.alias_tree.append(self.alias_head)
-    
+        self.alias_head = gui.Label(head_text[self.GUI_lang_index], height=20, width='100%')
+        self.alias_tree = gui.TreeView(height=120, width='100%')
+##                                       columns=('Term', 'Alias_type'),\
+##                                       displaycolumns=('Alias_type'),\
+##                                       selectmode='none', height=4)
+        self.sixth_line_left_widget.append(self.alias_label)
+        self.sixth_line_left_widget.append(self.alias_head)
+        self.sixth_line_left_widget.append(self.alias_tree)
+
 ##    # Widgets locations in grid
 ##        lhNameLbl.grid(column=0, row=3, sticky=W)
 ##        lhUIDLbl.grid(column=0, row=3, sticky=E)
@@ -562,9 +580,9 @@ class Query_view():
         uom_col = ['UoM', 'Eenheid']
         self.aspects_tree = gui.TreeView(height='100%', width='100%')
         aspect_frame.append(self.aspects_tree)
-        self.aspect_heading = gui.TreeItem(aspect_col[self.GUI_lang_index] + '   ' +
-                                       eq_col[self.GUI_lang_index] + '   ' +
-                                       value_col[self.GUI_lang_index] + '   ' +
+        self.aspect_heading = gui.TreeItem(aspect_col[self.GUI_lang_index] + ' ' +
+                                       eq_col[self.GUI_lang_index] + ' ' +
+                                       value_col[self.GUI_lang_index] + ' ' +
                                        uom_col[self.GUI_lang_index])
         self.aspects_tree.append(self.aspect_heading)
 ##                                         columns=('UID','Name','Rel_uid','UID-2','Parent',\
