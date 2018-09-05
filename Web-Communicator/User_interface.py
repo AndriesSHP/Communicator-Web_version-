@@ -193,7 +193,7 @@ class Communicator(App):
             Starting in grid on row 1.
         """
         # Define the overall views_notebook
-        self.views_noteb = gui.TabBox(height='100%', width='100%')
+        self.views_noteb = gui.TabBox(height='100%', width='100%', style='background-color:#eeffdd')
         self.main_frame.append(self.views_noteb)
 ##        self.views_noteb.grid(column=0, row=1,sticky=NSEW, columnspan=2)
 ##        self.views_noteb.columnconfigure(0,weight=1)

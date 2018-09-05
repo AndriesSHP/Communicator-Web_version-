@@ -239,14 +239,15 @@ class Query_view():
         uom_term = ["Unit of measure", "Meeteenheid"]
 
         # Query variables widgets definition
-        self.third_line_widget = gui.HBox(height=20, width=400)
+        self.third_line_widget = gui.HBox(height=20, width=300)
         
         lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width=100)
         lhNameLbl.attributes['title'] = 'Specify a text string as part of the name of an object to be searched'
         lhUIDLbl = gui.Label('UID:', height=20, width=50)
         lhUIDLbl.attributes['title'] = 'A unique identifier of the searched object (specified or found)'
         
-        self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width=200)
+        self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width=150,\
+                                             style={'background-color':'#ffdddd'})
         self.q_lh_uid_widget.attributes['title'] = 'A unique identifier of the searched object (specified or found'
         self.third_line_widget.append(lhNameLbl)
         self.third_line_widget.append(lhUIDLbl)
@@ -270,7 +271,8 @@ class Query_view():
         self.fourth_line_widget = gui.HBox(height=20, width=300)
         self.query_widget.append(self.fourth_line_widget)
         
-        self.q_lh_name_widget = gui.TextInput(height=20, width='100%') #self.lh_terms
+        self.q_lh_name_widget = gui.TextInput(height=20, width='100%',\
+                                              style={'background-color':'#ffdddd'}) #self.lh_terms
         #self.q_lh_name_widget.set_value('')
         self.q_lh_name_widget.attributes['title'] = 'A text string that is (part of) a name of the searched object'
         self.fourth_line_widget.append(self.q_lh_name_widget)
@@ -305,7 +307,8 @@ class Query_view():
 ##        self.full_def_widget.config(yscrollcommand=defQScroll.set)
 
         # Aliases label and aspects label on sixth line
-        self.sixth_line_labels = gui.HBox(height=20, width='100%')
+        self.sixth_line_labels = gui.HBox(height=20, width='100%',
+                                          style={'background-color':'#eeffdd'})
 
         self.query_widget.append(self.sixth_line_labels)
         self.sixth_line_labels.style['justify-content'] = 'flex-start'
