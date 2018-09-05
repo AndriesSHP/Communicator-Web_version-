@@ -204,7 +204,7 @@ class Communicator(App):
     def Define_log_sheet(self):
         ''' Define a tab and frame for errors and warnings'''
         log_head = ['Messages and warnings','Berichten en foutmeldingen']
-        self.log_frame = gui.ListView(width='100%', height='100%')
+        self.log_frame = gui.ListView(width='100%', height='100%', style='background-color:#eeffdd')
         self.log_frame.attributes['title'] = 'Display messages and warnings'
         self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], self.tab_cb)
 ##        self.log_frame.grid (column=0, row=0,sticky=NSEW)

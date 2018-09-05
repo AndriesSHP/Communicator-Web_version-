@@ -76,7 +76,7 @@ class Query_view():
         else:
             query_text = ["Search","Zoek"]
         self.query_widget = gui.Widget(height='100%', width='100%',
-                                       style={'display': 'block'})
+                                       style={'display': 'block', 'background-color':'#eeffdd'})
         self.user_interface.views_noteb.add_tab(self.query_widget, query_text[self.GUI_lang_index],
                                                 self.user_interface.tab_cb)
 ##        self.query_frame.title(query_text[self.GUI_lang_index])
@@ -84,16 +84,15 @@ class Query_view():
 ##        self.query_frame.rowconfigure(0, weight=1)
 
         # Specify query_frame
-        self.query_frame = gui.VBox(height='100%', width='100%',
-                                    style={'display': 'block', 'text-align':'left',
-                                           'background-color':'#eeffdd'})
-        self.query_widget.append(self.query_frame)
+##        self.query_frame = gui.VBox(height='100%', width='100%',
+##                                    style={'display': 'block', 'text-align':'left',
+##                                           'background-color':'#eeffdd'})
+##        self.query_widget.append(self.query_frame)
         
         self.first_line_widget = gui.HBox(height=20, width=650, style='position:relative',
                                           margin='5px')
-        self.query_frame.append(self.first_line_widget)
 
-    # Define reply language with language selector
+        # Define reply language with language selector
         lang_text = ['Reply language:', 'Antwoordtaal:']
         reply_text = ['The language used for display of search results',
                       'De taal waarin zoekresultaten weergegeven worden']
@@ -108,7 +107,7 @@ class Query_view():
         # Binding reply language choice
         self.reply_lang_box.onchange.connect(self.Determine_reply_language)
 
-    # String commonality buttons
+        # String commonality buttons
 ##        #ImmediateSearchVar = BooleanVar()
 ##        self.case_sensitive_var = BooleanVar()
 ##        self.first_char_match_var = BooleanVar()
@@ -129,14 +128,14 @@ class Query_view():
         #                                  variable = ImmediateSearchVar, onvalue = True)
 ##        CaseSensitive = ttk.Checkbutton(self.query_frame, text=caseText[self.GUI_lang_index], \
 ##                                        variable = self.case_sensitive_var, onvalue = True)
-        case_sensitive_box = gui.CheckBox(checked = True, width=10, height=20)
+        case_sensitive_box = gui.CheckBox(checked=True, width=10, height=20)
         case_sensitive_box.attributes['title'] = 'Tick when search string is case sensitive'
         case_sensitive_text = gui.Label(caseText[self.GUI_lang_index], width=150, height=20,
                                         style={'margin-right':'20px'})
         case_sensitive_text.attributes['title'] = 'Tick when search string is case sensitive'
 ##        FirstCharMatch = ttk.Checkbutton(self.query_frame, text=firstText[self.GUI_lang_index], \
 ##                                         variable = self.first_char_match_var, onvalue = True)
-        first_char_box = gui.CheckBox(checked = True, width=10, height=20)
+        first_char_box = gui.CheckBox(checked=True, width=10, height=20)
         first_char_box.attributes['title'] = 'Tick when search string shall match with first character(s) of found string'
         first_char_text = gui.Label(firstText[self.GUI_lang_index], width=150, height=20)
         first_char_text.attributes['title'] = 'Tick when search string shall match with first character(s) of found string'
@@ -148,7 +147,7 @@ class Query_view():
         #IncludeDescr = ttk.Checkbutton(self.query_frame, text="Include Description", \
         #                               variable = IncludeDescrVar, onvalue = True)
 
-    # Buttons definition
+        # Buttons definition
         confirm = ['Confirm','Bevestig']
         close = ['Close'  ,'Sluit']
         #verify = ['Verify model' ,'Verifieer model']
@@ -164,18 +163,19 @@ class Query_view():
         #verifyBut.onclick.connect(self.query.Verify_model)
         #self.query_frame.append(verifyBut)
 
-    # Widget locations in grid
+        # Widget locations in grid
         self.first_line_widget.append(case_sensitive_box)
         self.first_line_widget.append(case_sensitive_text)
         self.first_line_widget.append(self.reply_lang_label)
         self.first_line_widget.append(self.reply_lang_box)
         self.first_line_widget.append(confirm_button)
         self.first_line_widget.append(close_button)
+        self.query_widget.append(self.first_line_widget)
 
         self.second_line_widget = gui.HBox(height=20, width=170, margin='5px')
-        self.query_frame.append(self.second_line_widget)
         self.second_line_widget.append(first_char_box)
         self.second_line_widget.append(first_char_text)
+        self.query_widget.append(self.second_line_widget)
 ##        #ImmediateSearch.grid(column=0, columnspan=2, row=1, sticky=W)
 ##        CaseSensitive.grid(column=0, columnspan=2, row=1, sticky=W)
 ##        FirstCharMatch.grid(column=0, columnspan=2, row=2, sticky=W)
@@ -187,7 +187,7 @@ class Query_view():
 ##        close_button.grid(column=7, row=1 ,sticky=EW)
 ##        #verifyBut.grid(column=7, row=2 ,sticky=N+EW)
 
-    # Define English and Dutch example values (initial options) for query
+        # Define English and Dutch example values (initial options) for query
         lhTermListEN = ['?','Paris', 'Eiffel tower', 'France']
         relTermListEN = ['?','is related to (a)','is related to', 'is classified as a', \
                          'is located in', 'has as part']
@@ -238,20 +238,20 @@ class Query_view():
         rh_term = ["Right hand term", "Rechter term"]
         uom_term = ["Unit of measure", "Meeteenheid"]
 
-    # Query variables widgets definition
+        # Query variables widgets definition
         self.third_line_widget = gui.HBox(height=20, width=400)
-        self.query_frame.append(self.third_line_widget)
         
-        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width='30%')
+        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width=100)
         lhNameLbl.attributes['title'] = 'Specify a text string as part of the name of an object to be searched'
-        lhUIDLbl = gui.Label('UID:', height=20, width='20%')
+        lhUIDLbl = gui.Label('UID:', height=20, width=50)
         lhUIDLbl.attributes['title'] = 'A unique identifier of the searched object (specified or found)'
         
-        self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width='50%')
+        self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width=200)
         self.q_lh_uid_widget.attributes['title'] = 'A unique identifier of the searched object (specified or found'
         self.third_line_widget.append(lhNameLbl)
         self.third_line_widget.append(lhUIDLbl)
         self.third_line_widget.append(self.q_lh_uid_widget)
+        self.query_widget.append(self.third_line_widget)
 ##        if self.user_interface.extended_query:
 ##            self.q_rel_uid_widget = gui.TextInput(self.q_rel_uid_str, width=10)
 ##            self.query_frame.append(self.q_rel_uid_widget)
@@ -268,9 +268,9 @@ class Query_view():
 ##            self.query_frame.append(rhNameLbl)
 ##            self.query_frame.append(uomNameLbl)
         self.fourth_line_widget = gui.HBox(height=20, width=300)
-        self.query_frame.append(self.fourth_line_widget)
+        self.query_widget.append(self.fourth_line_widget)
         
-        self.q_lh_name_widget = gui.TextInput(height=20, width=300) #self.lh_terms
+        self.q_lh_name_widget = gui.TextInput(height=20, width='100%') #self.lh_terms
         #self.q_lh_name_widget.set_value('')
         self.q_lh_name_widget.attributes['title'] = 'A text string that is (part of) a name of the searched object'
         self.fourth_line_widget.append(self.q_lh_name_widget)
@@ -282,41 +282,49 @@ class Query_view():
 ##            self.q_uom_name_widget = gui.DropDown(self.uoms, width=10)
 ##            self.query_frame.append(self.q_uom_name_widget)
 
-    # Bindings for search uid and search string fields and for extended query fields
+        # Bindings for search uid and search string fields and for extended query fields
         self.q_lh_uid_widget.onkeyup.connect(self.Lh_uid_command)
         self.q_lh_name_widget.onkeyup.connect(self.Lh_search_cmd)
 ##        if self.user_interface.extended_query:
 ##            self.q_rel_name_widget.onkeyup.connect(self.Rel_search_cmd)
 ##            self.q_rh_name_widget.onkeyup.connect(self.Rh_search_cmd)
 
-    # Definition display widget
+        # Definition display widget
         self.fifth_line_widget = gui.HBox(height=60, width='100%')
-        self.query_frame.append(self.fifth_line_widget)
-        
         def_text = ['Definition of the selected object:', 'Definitie van het geselecteerde object:']
-        fullDefQLbl = gui.Label(def_text[self.GUI_lang_index], height=60, width=300)
+        def_label = gui.Label(def_text[self.GUI_lang_index], height=60, width=300)
+        def_label.attributes['title'] = 'First select an object below, then its definition will appear'
         fullDefQStr = ''
-        self.q_full_def_widget = gui.ListView(width='100%', height=60)
-        self.fifth_line_widget.append(fullDefQLbl)
-        self.fifth_line_widget.append(self.q_full_def_widget)
+        self.full_def_widget = gui.ListView(width='100%', height=60)
+        self.fifth_line_widget.append(def_label)
+        self.fifth_line_widget.append(self.full_def_widget)
+        self.query_widget.append(self.fifth_line_widget)
         
 ##        defQScroll = ttk.Scrollbar(self.query_frame, orient=VERTICAL, \
-##                                   command=self.q_full_def_widget.yview)
-##        self.q_full_def_widget.config(yscrollcommand=defQScroll.set)
+##                                   command=self.full_def_widget.yview)
+##        self.full_def_widget.config(yscrollcommand=defQScroll.set)
 
-        self.sixth_line_HBox = gui.HBox(height='100%', width='100%')
-        self.query_frame.append(self.sixth_line_HBox)
+        # Aliases label and aspects label on sixth line
+        self.sixth_line_labels = gui.HBox(height=20, width='100%')
 
-    # Aliases display widget
-        self.sixth_line_left_widget = gui.VBox(height=160, width='60%')
-        aspect_frame = gui.VBox(height='100%', width='40%') #borderwidth=3, relief='ridge')
-        self.sixth_line_HBox.append(self.sixth_line_left_widget)
-        self.sixth_line_HBox.append(aspect_frame)
+        self.query_widget.append(self.sixth_line_labels)
+        self.sixth_line_labels.style['justify-content'] = 'flex-start'
+        
+        # Aliases and aspects on seventh_line_box
+        self.seventh_line_box = gui.HBox(height=600, width='100%')
+        self.query_widget.append(self.seventh_line_box)
+        self.seventh_line_left_VBox = gui.VBox(height='100%', width=600)
+        self.seventh_line_box.append(self.seventh_line_left_VBox)
 
+        # Aliases display label
         aliasText = ['Aliases:','Aliases:']
-        self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width='100%')
+        self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width=100)
         self.alias_label.attributes['title'] = 'Synonyms, abbreviations and translations \
 of the name of the selected object'
+        self.sixth_line_labels.append(self.alias_label)
+        # Aliases display widget
+        self.aliases_widget = gui.VBox(height=160, width='60%')
+        
         term_text = ('     Term', '     Term')
         alias_text = ('Alias type', 'Aliastype')
         #lang_text = ('Language', 'Taal')
@@ -332,11 +340,11 @@ of the name of the selected object'
 ##                                       columns=('Term', 'Alias_type'),\
 ##                                       displaycolumns=('Alias_type'),\
 ##                                       selectmode='none', height=4)
-        self.sixth_line_left_widget.append(self.alias_label)
-        self.sixth_line_left_widget.append(self.alias_head)
-        self.sixth_line_left_widget.append(self.alias_tree)
+        self.aliases_widget.append(self.alias_head)
+        self.aliases_widget.append(self.alias_tree)
+        self.seventh_line_left_VBox.append(self.aliases_widget)
 
-##    # Widgets locations in grid
+##        # Widgets locations in grid
 ##        lhNameLbl.grid(column=0, row=3, sticky=W)
 ##        lhUIDLbl.grid(column=0, row=3, sticky=E)
 ##        if self.user_interface.extended_query:
@@ -354,17 +362,17 @@ of the name of the selected object'
 ##            self.q_rh_name_widget.grid(column=4, row=4, columnspan=2, rowspan=1, sticky=EW)
 ##            self.q_uom_name_widget.grid(column=6, row=4, columnspan=2, rowspan=1, sticky=EW)
 
-        # Definition location in grid
-##        fullDefQLbl.grid(column=0, row=5, rowspan=1, sticky=EW)
-##        self.q_full_def_widget.grid(column=1, row=5, columnspan=7, rowspan=1, sticky=EW)
+          # Definition location in grid
+##        def_label.grid(column=0, row=5, rowspan=1, sticky=EW)
+##        self.full_def_widget.grid(column=1, row=5, columnspan=7, rowspan=1, sticky=EW)
 ##        defQScroll.grid(column=7, row=5, rowspan=1, sticky=NS+E)
 
-        # Alias location in grid
+          # Alias location in grid
 ##        #alias_label.grid(column=0, row=6, rowspan=1, sticky=EW)
 ##        self.alias_tree.grid(column=0, row=6, columnspan=5, rowspan=1, sticky=EW)
 ##        alias_scroll.grid(column=4, row=6, rowspan=1, sticky=NS+E)
         
-##    # Conditions widgets definition
+##        # Conditions widgets definition
 ##        if self.user_interface.extended_query:
 ##            condit = ["Conditions:", "Voorwaarden:"]
 ##            condLbl = ttk.Label(self.query_frame, text=condit[self.GUI_lang_index])
@@ -385,7 +393,7 @@ of the name of the selected object'
 ##                                                          textvariable=uomCondQStr[i],\
 ##                                                          values=self.uoms, \
 ##                                                          width=10))
-##    # Conditions widgets location
+##        # Conditions widgets location
 ##        if self.user_interface.extended_query:
 ##            condLbl.grid  (column=0, row=8, columnspan=1, sticky=W)
 ##            for i in range(0,3):
@@ -399,20 +407,22 @@ of the name of the selected object'
 ##                self.query.uomCondVal[i].grid(column=6, row=rowNr, \
 ##                                              columnspan=2, rowspan=1, sticky=EW)
         
-    # Options for selection widgets definition
+        # Options for selection widgets definition
         select_term = ["Select one of the following options:", \
                        "Kies één van de volgende opties:"]
         opt_label = gui.Label(select_term[self.GUI_lang_index], height=20, width=300)
-        self.sixth_line_left_widget.append(opt_label)
-    # Option label widget location
+        self.options_widget = gui.VBox(height='100%', width='60%')
+        self.options_widget.append(opt_label)
+        # Option label widget location
 ##        opt_label.grid(column=0, row=15, columnspan=3, rowspan=1, sticky=EW)
 
-    # lh Options frame in query_frame for lh options Treeview
+        # lh Options frame in query_frame for lh options Treeview
         nr_cols = 6
 ##        if self.user_interface.extended_query:
 ##            nr_cols = 8
         lh_opt_frame = gui.VBox(height='100%', width='60%') #, borderwidth=3, relief='ridge')
-        self.sixth_line_left_widget.append(lh_opt_frame)
+        self.options_widget.append(lh_opt_frame)
+        self.seventh_line_left_VBox.append(self.options_widget)
 ##        lh_opt_frame.grid(column=0, row=16, columnspan=nr_cols, rowspan=1, sticky=NSEW)
 ##        lh_opt_frame.columnconfigure(0, minsize=10, weight=1)
 ##        lh_opt_frame.rowconfigure(0, minsize=3, weight=1)
@@ -562,14 +572,21 @@ of the name of the selected object'
 ##            self.rh_options_tree.bind(sequence='<ButtonRelease-1>', \
 ##                                      func=self.Set_selected_q_rh_term)
         
-    # Aspect frame widget
+        # Aspects label widget
+        aspect_text = ['Aspects:', 'Aspecten:']
+        self.aspect_label = gui.Label(aspect_text[self.GUI_lang_index], height=20, width=100, style={'margin-left':'500px'})
+        self.aspect_label.attributes['title'] = 'Aspects of the selected object and their possible values'
+        self.sixth_line_labels.append(self.aspect_label)
+        
+        # Aspect frame widget
+        self.aspect_frame = gui.VBox(height=480, width='40%') #borderwidth=3, relief='ridge')
 ##        nr_of_rows = 24
 ##        if self.user_interface.extended_query:
 ##            nr_of_rows = 4
 
-##        aspect_frame.grid(column=6, row=6, columnspan=2, rowspan=nr_of_rows, sticky=NSEW)
-##        aspect_frame.columnconfigure(0, minsize=10, weight=1)
-##        aspect_frame.rowconfigure(0, minsize=10, weight=1)
+##        self.aspect_frame.grid(column=6, row=6, columnspan=2, rowspan=nr_of_rows, sticky=NSEW)
+##        self.aspect_frame.columnconfigure(0, minsize=10, weight=1)
+##        self.aspect_frame.rowconfigure(0, minsize=10, weight=1)
 ##        tree_style = ttk.Style()
 ##        #tree_style.configure(".", font=('Helvetica', 8), foreground="white")
 ##        #tree_style.configure("Treeview", foreground='red')
@@ -580,13 +597,14 @@ of the name of the selected object'
         eq_col = ['>=<', '>=<']
         value_col = ['Value', 'Waarde']
         uom_col = ['UoM', 'Eenheid']
-        self.aspects_tree = gui.TreeView(height='100%', width='100%')
-        aspect_frame.append(self.aspects_tree)
         self.aspect_heading = gui.TreeItem(aspect_col[self.GUI_lang_index] + ' ' +
                                        eq_col[self.GUI_lang_index] + ' ' +
                                        value_col[self.GUI_lang_index] + ' ' +
                                        uom_col[self.GUI_lang_index])
-        self.aspects_tree.append(self.aspect_heading)
+        self.aspect_frame.append(self.aspect_heading)
+        self.aspects_tree = gui.TreeView(height='100%', width='100%')
+        self.aspect_frame.append(self.aspects_tree)
+        self.seventh_line_box.append(self.aspect_frame)
 ##                                         columns=('UID','Name','Rel_uid','UID-2','Parent',\
 ##                                                  'Equality','Value','UoM'),\
 ##                                         displaycolumns=('Equality','Value','UoM'),\
@@ -602,7 +620,7 @@ of the name of the selected object'
 ##        self.aspects_tree.column ('UoM', width=60)
 ##        self.aspects_tree.grid(column=0, row=0, sticky=NSEW)
 ##
-##        aspect_scroll = ttk.Scrollbar(aspect_frame, orient=VERTICAL, \
+##        aspect_scroll = ttk.Scrollbar(self.aspect_frame, orient=VERTICAL, \
 ##                                      command=self.aspects_tree.yview)
 ##        aspect_scroll.grid(column=0, row=0, sticky=NS+E)
 ##        self.aspects_tree.config(yscrollcommand=aspect_scroll.set)
@@ -669,9 +687,9 @@ of the name of the selected object'
                 self.q_lh_uid_str.set(str(lh_uid))
                 
             # delete earlier definition text. Then replace by new definition text
-            self.q_full_def_widget.delete('1.0', END)
+            self.full_def_widget.delete('1.0', END)
             # Display full definition
-            self.q_full_def_widget.insert('1.0',full_def)
+            self.full_def_widget.insert('1.0',full_def)
         except KeyError:
             pass
 
@@ -753,7 +771,7 @@ of the name of the selected object'
             self.q_lh_uid_str.set(str(self.query.q_lh_uid))
             
         # Delete earlier definition text. Then replace by new definition text
-        self.q_full_def_widget.delete('1.0', END)
+        self.full_def_widget.delete('1.0', END)
         full_def = ''
         int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
         if integer is False or int_q_lh_uid >= 100:
@@ -764,7 +782,7 @@ of the name of the selected object'
             lang_name, comm_name, preferred_name, full_def = \
                        self.user_interface.Determine_name_in_context(obj)
         # Display full definition
-        self.q_full_def_widget.insert('1.0',full_def)
+        self.full_def_widget.insert('1.0',full_def)
             
 #----------------------------------------------------------------------
     def Rel_search_cmd(self, event):
@@ -1123,7 +1141,7 @@ of the name of the selected object'
         self.query.q_lh_name = self.query.lhSel[4]
         self.q_lh_uid_str.set(str(self.query.q_lh_uid))
         self.q_lh_name_str.set(self.query.q_lh_name)
-        self.q_full_def_widget.delete('1.0',END)
+        self.full_def_widget.delete('1.0',END)
         
         full_def = ''
         # Determine the selected object via its uid
@@ -1139,7 +1157,7 @@ of the name of the selected object'
             #print('FullDef:',self.query.q_lh_uid, self.query.q_lh_name,\
             #      self.query.q_lh_category,full_def)
         # Display full definition
-        self.q_full_def_widget.insert('1.0', full_def)
+        self.full_def_widget.insert('1.0', full_def)
 
         self.q_aspects[:] = []
         # If the lh_object is known,
@@ -1422,7 +1440,7 @@ of the name of the selected object'
         self.query.query_expr = [self.query.q_lh_uid, self.query.q_lh_name]
 
         # Delete earlier definition text in query_window.
-        self.q_full_def_widget.delete('1.0', END)
+        self.full_def_widget.delete('1.0', END)
         
         # If lh_object is known then determine and display its full definition
         int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
@@ -1435,7 +1453,7 @@ of the name of the selected object'
                        self.user_interface.Determine_name_in_context(self.query.q_lh_obj)
             #print('Full def:', self.query.q_lh_uid, lhString, self.query.q_lh_category, full_def)
             # Display full definition
-            self.q_full_def_widget.insert('1.0',full_def)
+            self.full_def_widget.insert('1.0',full_def)
             
         # Rel: Selected relation type option
         # Verify whether kind of relation is specified or only lh option is selected.
@@ -1554,7 +1572,7 @@ of the name of the selected object'
         self.views.Display_notebook_views()
 
     def Close_query(self):
-        self.query_frame.destroy()
+        self.query_widget.destroy()
         
 #------------------------------------------------------
 class User_interface():
