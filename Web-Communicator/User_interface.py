@@ -42,6 +42,7 @@ class Communicator(App):
                                      'Deutsch':'910038', \
                                      'Francais':'910039'}
         self.comm_pref_uids = ['492014', 'any'] # Default: 492014 = 'Gellish'
+        self.file_path_names = []
         
         super(Communicator, self).__init__(*args)
 
@@ -148,12 +149,14 @@ class Communicator(App):
         self.container.append(self.lang_container)
         
         lang_text = ['Language:', 'Taal:']
-        self.lang_label = gui.Label(lang_text[self.GUI_lang_index], width=80, height=20)
+        self.lang_label = gui.Label(lang_text[self.GUI_lang_index], width=80, height=20,
+                                    style='background-color:#eeffdd')
         self.lang_label.attributes['title'] = 'Select a language for specification of a search'
         self.lang_container.append(self.lang_label) #self.main_frame, width=10)
         # Set default language: GUI_lang_names[0] = English, [1] = Nederlands
         self.lang_default = self.GUI_lang_names[0]
-        self.lang_select = gui.DropDown(self.GUI_lang_names, width=100, height=20) #margin='10px'
+        self.lang_select = gui.DropDown(self.GUI_lang_names, width=100, height=20,
+                                        style='background-color:#ffffc0') #margin='10px'
         self.lang_select.attributes['title'] = 'The language used for specification of a search'
         self.lang_container.append(self.lang_select)
 ##        self.lang_label.grid(column=0, row=0, sticky=NW)
@@ -339,22 +342,26 @@ class Communicator(App):
 ##        file_path_names = filedialog.askopenfilenames(
 ##            filetypes=[("CSV files","*.csv"),("JSON files","*.json"), ("All files","*.*")], \
 ##            title="Select file")
-        dialog = gui.FileSelectionDialog(title='File selection dialog',
-                                         message='Select one or more files',
-                                         multiple_selection=True, selection_folder='.',
-                                         allow_file_selection=True, allow_folder_selection=False)
-        dialog.confirm_value.connect(self.on_fileselection_dialog_confirm)
+        # Attributes: title=, message=, multiple_selection=, selection_folder=,
+        #             allow_file_selection=True, allow_folder_selection=True
+        self.dialog = gui.FileSelectionDialog('File selection dialog',
+                                              'Select one or more files',
+                                              False, '.')
+        self.dialog.confirm_value.connect(self.on_fileselection_dialog_confirm)
+        self.dialog.cancel_dialog.connect(self.on_dialog_cancel)
 
-        file_path_names = ''
-        print('Selected file(s):',file_path_names)
-        if file_path_names == '':
+        self.dialog.show(self)
+
+        #self.file_path_names = ''
+        print('Selected file(s):',self.file_path_names)
+        if self.file_path_names == []:
             self.Message_UI(
                 'The file name is blank or the inclusion is cancelled. There is no file read.',\
                 'De file naam is blanco of het inlezen is gecancelled. Er is geen file ingelezen.')
             return
 
         # Read file(s)
-        for file_path_and_name in file_path_names:
+        for file_path_and_name in self.file_path_names:
             # Split file_path_and_name in file path and file name
             path_name = file_path_and_name.rsplit('/', maxsplit=1)
             if len(path_name) == 2:
@@ -380,11 +387,16 @@ class Communicator(App):
     def on_fileselection_dialog_confirm(self, widget, filelist):
         # a list() of filenames and folders is returned
         self.lbl.set_text('Selected files: %s' % ','.join(filelist))
+        print('File list:', filelist)
+        self.file_path_names = filelist
         if len(filelist):
             f = filelist[0]
             # replace the last download link
             fdownloader = gui.FileDownloader("download selected", f, width=200, height=30)
-            self.subContainerRight.append(fdownloader, key='file_downloader') 
+            self.subContainerRight.append(fdownloader, key='file_downloader')
+
+    def on_dialog_cancel(self, widget):
+        self.set_root_widget(self.container)
 
     def Message_UI(self, mess_text_EN, mess_text_NL):
         if self.GUI_lang_index == 1:

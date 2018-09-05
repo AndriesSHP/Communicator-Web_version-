@@ -89,8 +89,8 @@ class Query_view():
 ##                                           'background-color':'#eeffdd'})
 ##        self.query_widget.append(self.query_frame)
         
-        self.first_line_widget = gui.HBox(height=20, width=650, style='position:relative',
-                                          margin='5px')
+        self.first_line_widget = gui.HBox(height=20, width=650, margin='5px',
+                                          style='position:relative; background-color:#eeffdd')
 
         # Define reply language with language selector
         lang_text = ['Reply language:', 'Antwoordtaal:']
@@ -101,7 +101,8 @@ class Query_view():
 
         # Set default language: reply_lang_names[0] = English, [1] = Nederlands
         self.rep_lang_default = self.GUI_lang_name
-        self.reply_lang_box = gui.DropDown(self.reply_lang_names, width=100, height=20)
+        self.reply_lang_box = gui.DropDown(self.reply_lang_names, width=100, height=20,
+                                           style='background-color:#ffffc0')
         self.reply_lang_box.attributes['title'] = reply_text[self.GUI_lang_index]
         
         # Binding reply language choice
@@ -172,7 +173,8 @@ class Query_view():
         self.first_line_widget.append(close_button)
         self.query_widget.append(self.first_line_widget)
 
-        self.second_line_widget = gui.HBox(height=20, width=170, margin='5px')
+        self.second_line_widget = gui.HBox(height=20, width=190, margin='5px',
+                                           style='background-color:#eeffdd')
         self.second_line_widget.append(first_char_box)
         self.second_line_widget.append(first_char_text)
         self.query_widget.append(self.second_line_widget)
@@ -241,13 +243,16 @@ class Query_view():
         # Query variables widgets definition
         self.third_line_widget = gui.HBox(height=20, width=300)
         
-        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width=100)
+        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width=100,
+                              style='background-color:#eeffdd')
         lhNameLbl.attributes['title'] = 'Specify a text string as part of the name of an object to be searched'
-        lhUIDLbl = gui.Label('UID:', height=20, width=50)
+        lhUIDLbl = gui.Label('UID:', height=20, width=50,
+                             style='background-color:#eeffdd')
         lhUIDLbl.attributes['title'] = 'A unique identifier of the searched object (specified or found)'
         
         self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width=150,\
-                                             style={'background-color':'#ffdddd'})
+                                             style={'background-color':'#ffffc0',
+                                                    "border-width":"1px","border-style":"solid"})
         self.q_lh_uid_widget.attributes['title'] = 'A unique identifier of the searched object (specified or found'
         self.third_line_widget.append(lhNameLbl)
         self.third_line_widget.append(lhUIDLbl)
@@ -268,11 +273,12 @@ class Query_view():
 ##            self.query_frame.append(relNameLbl)
 ##            self.query_frame.append(rhNameLbl)
 ##            self.query_frame.append(uomNameLbl)
-        self.fourth_line_widget = gui.HBox(height=20, width=300)
+        self.fourth_line_widget = gui.HBox(height=20, width=300,\
+                                           style={"border-width":"1px","border-style":"solid"})
         self.query_widget.append(self.fourth_line_widget)
         
         self.q_lh_name_widget = gui.TextInput(height=20, width='100%',\
-                                              style={'background-color':'#ffdddd'}) #self.lh_terms
+                                              style={'background-color':'#ffffb0'}) #self.lh_terms
         #self.q_lh_name_widget.set_value('')
         self.q_lh_name_widget.attributes['title'] = 'A text string that is (part of) a name of the searched object'
         self.fourth_line_widget.append(self.q_lh_name_widget)
@@ -294,10 +300,11 @@ class Query_view():
         # Definition display widget
         self.fifth_line_widget = gui.HBox(height=60, width='100%')
         def_text = ['Definition of the selected object:', 'Definitie van het geselecteerde object:']
-        def_label = gui.Label(def_text[self.GUI_lang_index], height=60, width=300)
+        def_label = gui.Label(def_text[self.GUI_lang_index], height=60, width=300,
+                              style='background-color:#eeffdd')
         def_label.attributes['title'] = 'First select an object below, then its definition will appear'
         fullDefQStr = ''
-        self.full_def_widget = gui.ListView(width='100%', height=60)
+        self.full_def_widget = gui.ListView(width='98%', height=60)
         self.fifth_line_widget.append(def_label)
         self.fifth_line_widget.append(self.full_def_widget)
         self.query_widget.append(self.fifth_line_widget)
@@ -306,27 +313,27 @@ class Query_view():
 ##                                   command=self.full_def_widget.yview)
 ##        self.full_def_widget.config(yscrollcommand=defQScroll.set)
 
-        # Aliases label and aspects label on sixth line
-        self.sixth_line_labels = gui.HBox(height=20, width='100%',
-                                          style={'background-color':'#eeffdd'})
+        # Aliases, options and aspects boxes on sixth line
+        self.sixth_line_box = gui.HBox(height=600, width='100%',
+                                       style={'background-color':'#eeffdd'})
+        self.sixth_line_box.style['justify-content'] = 'flex-start'
 
-        self.query_widget.append(self.sixth_line_labels)
-        self.sixth_line_labels.style['justify-content'] = 'flex-start'
+        self.query_widget.append(self.sixth_line_box)
         
-        # Aliases and aspects on seventh_line_box
-        self.seventh_line_box = gui.HBox(height=600, width='100%')
-        self.query_widget.append(self.seventh_line_box)
-        self.seventh_line_left_VBox = gui.VBox(height='100%', width=600)
-        self.seventh_line_box.append(self.seventh_line_left_VBox)
+        # Aliases and options in sixth_line_left_box
+        self.sixth_line_left_box = gui.VBox(height='99%', width='60%',
+                                            style={'background-color':'#eeffaa', \
+                                                   "border-width":"3px","border-style":"solid"})
+        self.sixth_line_left_box.style['justify-content'] = 'flex-start'
+        self.sixth_line_left_box.style['align-items'] = 'flex-start'
+        self.sixth_line_box.append(self.sixth_line_left_box)
 
         # Aliases display label
         aliasText = ['Aliases:','Aliases:']
         self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width=100)
         self.alias_label.attributes['title'] = 'Synonyms, abbreviations and translations \
 of the name of the selected object'
-        self.sixth_line_labels.append(self.alias_label)
-        # Aliases display widget
-        self.aliases_widget = gui.VBox(height=160, width='60%')
+        self.sixth_line_left_box.append(self.alias_label)
         
         term_text = ('     Term', '     Term')
         alias_text = ('Alias type', 'Aliastype')
@@ -337,15 +344,14 @@ of the name of the selected object'
 ##        alias_scroll = ttk.Scrollbar(self.query_frame, orient=VERTICAL, \
 ##                                     command=self.alias_tree.yview)
 ##        self.alias_tree.config(yscrollcommand=alias_scroll.set)
-        head_text = term_text[self.GUI_lang_index] + alias_text[self.GUI_lang_index]
-        self.alias_head = gui.Label(head_text[self.GUI_lang_index], height=20, width='100%')
+        head_text = str(term_text[self.GUI_lang_index] + alias_text[self.GUI_lang_index])
+        self.alias_head = gui.Label(head_text, height=20, width='100%')
         self.alias_tree = gui.TreeView(height=120, width='100%')
 ##                                       columns=('Term', 'Alias_type'),\
 ##                                       displaycolumns=('Alias_type'),\
 ##                                       selectmode='none', height=4)
-        self.aliases_widget.append(self.alias_head)
-        self.aliases_widget.append(self.alias_tree)
-        self.seventh_line_left_VBox.append(self.aliases_widget)
+        self.sixth_line_left_box.append(self.alias_head)
+        self.sixth_line_left_box.append(self.alias_tree)
 
 ##        # Widgets locations in grid
 ##        lhNameLbl.grid(column=0, row=3, sticky=W)
@@ -413,22 +419,19 @@ of the name of the selected object'
         # Options for selection widgets definition
         select_term = ["Select one of the following options:", \
                        "Kies één van de volgende opties:"]
-        opt_label = gui.Label(select_term[self.GUI_lang_index], height=20, width=300)
-        self.options_widget = gui.VBox(height='100%', width='60%')
-        self.options_widget.append(opt_label)
+        options_heading = gui.Label(select_term[self.GUI_lang_index], height=20, width=300)
+        self.sixth_line_left_box.append(options_heading)
         # Option label widget location
-##        opt_label.grid(column=0, row=15, columnspan=3, rowspan=1, sticky=EW)
+##        options_heading.grid(column=0, row=15, columnspan=3, rowspan=1, sticky=EW)
 
         # lh Options frame in query_frame for lh options Treeview
         nr_cols = 6
 ##        if self.user_interface.extended_query:
 ##            nr_cols = 8
-        lh_opt_frame = gui.VBox(height='100%', width='60%') #, borderwidth=3, relief='ridge')
-        self.options_widget.append(lh_opt_frame)
-        self.seventh_line_left_VBox.append(self.options_widget)
-##        lh_opt_frame.grid(column=0, row=16, columnspan=nr_cols, rowspan=1, sticky=NSEW)
-##        lh_opt_frame.columnconfigure(0, minsize=10, weight=1)
-##        lh_opt_frame.rowconfigure(0, minsize=3, weight=1)
+        ##self.lh_opt_frame = gui.VBox(height='100%', width='60%') #, borderwidth=3, relief='ridge')
+##        self.lh_opt_frame.grid(column=0, row=16, columnspan=nr_cols, rowspan=1, sticky=NSEW)
+##        self.lh_opt_frame.columnconfigure(0, minsize=10, weight=1)
+##        self.lh_opt_frame.rowconfigure(0, minsize=3, weight=1)
 
         uid_text = ('UID', 'UID')
         left_uid_text = ['Left UID', 'Linker UID']
@@ -443,16 +446,32 @@ of the name of the selected object'
         relaCol = ['Relation UID', 'Relatie UID']
         righCol = ['Right UID', 'Rechter UID']
 
-        tree_height = 15
+        tree_height = 10
         if self.user_interface.extended_query:
             tree_height = 5
+            
+        self.options_table = gui.TableWidget(tree_height, 5, True, True, width='100%', height=300,\
+                                             style={"overflow":"auto","background-color":"#d6ffb0",\
+                                                    "border-width":"3px","border-style":"solid",\
+                                                    "font-size":"8px"})
+        self.options_table.item_at(0, 0).set_text(uid_text[self.GUI_lang_index])
+        self.options_table.item_at(0, 1).set_text(nameCol[self.GUI_lang_index])
+        self.options_table.item_at(0, 2).set_text(kindCol[self.GUI_lang_index])
+        self.options_table.item_at(0, 3).set_text(commCol[self.GUI_lang_index])
+        self.options_table.item_at(0, 4).set_text(langCol[self.GUI_lang_index])
+        self.sixth_line_left_box.append(self.options_table)
+        
         self.lh_options_tree = gui.TreeView(width='100%', height=300)
-        lh_opt_frame.append(self.lh_options_tree)
-        lh_option_heading = gui.TreeItem(nameCol[self.GUI_lang_index] + ' ' +\
-                                         kindCol[self.GUI_lang_index] + ' ' +\
-                                         commCol[self.GUI_lang_index] + ' ' +\
-                                         langCol[self.GUI_lang_index])
-        self.lh_options_tree.append(lh_option_heading)
+        lh_option_heading = uid_text[self.GUI_lang_index] + ' '\
+                            + nameCol[self.GUI_lang_index] + ' '\
+                            + kindCol[self.GUI_lang_index] + ' '\
+                            + commCol[self.GUI_lang_index] + ' '\
+                            + langCol[self.GUI_lang_index]
+        self.tree_heading = gui.TreeItem(lh_option_heading)
+        self.sixth_line_left_box.append(self.tree_heading)
+        self.sixth_line_left_box.append(self.lh_options_tree)
+        
+        ##self.sixth_line_left_box.append(self.lh_opt_frame)
 ##                                            columns=('UID', 'Name','Kind','Comm','Lang'),\
 ##                                            displaycolumns=('Name','Kind','Comm','Lang'),\
 ##                                            selectmode='browse', height=tree_height)
@@ -478,7 +497,7 @@ of the name of the selected object'
 ##        self.lh_options_tree.columnconfigure(4, weight=1)
 ##        self.lh_options_tree.rowconfigure(0, weight=1)
 
-##        lhOptScroll = ttk.Scrollbar(lh_opt_frame, orient=VERTICAL, \
+##        lhOptScroll = ttk.Scrollbar(self.lh_opt_frame, orient=VERTICAL, \
 ##                                    command=self.lh_options_tree.yview)
 ##        lhOptScroll.grid (column=0, row=0, sticky=NS+E)
 ##        self.lh_options_tree.config(yscrollcommand=lhOptScroll.set)
@@ -574,15 +593,18 @@ of the name of the selected object'
 ##
 ##            self.rh_options_tree.bind(sequence='<ButtonRelease-1>', \
 ##                                      func=self.Set_selected_q_rh_term)
-        
+        # Aspect frame widget
+        self.aspect_frame = gui.VBox(height='99%', width='39%',\
+                                     style={'background-color':'#eeffee',\
+                                            "border-width":"3px","border-style":"solid"}) #relief='ridge')
+        self.aspect_frame.style['justify-content'] = 'flex-start'
+        self.aspect_frame.style['align-items'] = 'flex-start'
         # Aspects label widget
         aspect_text = ['Aspects:', 'Aspecten:']
-        self.aspect_label = gui.Label(aspect_text[self.GUI_lang_index], height=20, width=100, style={'margin-left':'500px'})
+        self.aspect_label = gui.Label(aspect_text[self.GUI_lang_index], height=20, width=100)
         self.aspect_label.attributes['title'] = 'Aspects of the selected object and their possible values'
-        self.sixth_line_labels.append(self.aspect_label)
+        self.aspect_frame.append(self.aspect_label)
         
-        # Aspect frame widget
-        self.aspect_frame = gui.VBox(height=480, width='40%') #borderwidth=3, relief='ridge')
 ##        nr_of_rows = 24
 ##        if self.user_interface.extended_query:
 ##            nr_of_rows = 4
@@ -607,7 +629,7 @@ of the name of the selected object'
         self.aspect_frame.append(self.aspect_heading)
         self.aspects_tree = gui.TreeView(height='100%', width='100%')
         self.aspect_frame.append(self.aspects_tree)
-        self.seventh_line_box.append(self.aspect_frame)
+        self.sixth_line_box.append(self.aspect_frame)
 ##                                         columns=('UID','Name','Rel_uid','UID-2','Parent',\
 ##                                                  'Equality','Value','UoM'),\
 ##                                         displaycolumns=('Equality','Value','UoM'),\
@@ -698,7 +720,7 @@ of the name of the selected object'
 
     def Lh_search_cmd(self, event, new_value):
         """ Search or Query in semantic network
-            An entry in QueryWindow can be just a name (lhString
+            An entry in QueryWindow can be just a name (lhString)
             (for search on UID see Lh_uid_command)
             or a full question with possible condition expressions:
             (lhString,relString,rhString optionally followed by one or more conditions):
@@ -717,7 +739,7 @@ of the name of the selected object'
         #print('Lh name entry:',event.char)
         #if event.keysym not in ['Shift_L', 'Shift_R']:
                                     
-        case_sens   = self.case_sensitive_var.get()
+        case_sens = self.case_sensitive_var.get()
         if case_sens:
             cs = 'cs'   # case sensitive
         else:
