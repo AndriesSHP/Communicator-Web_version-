@@ -32,6 +32,9 @@ class Query_view():
         self.GUI_lang_uid = self.user_interface.GUI_lang_uid
         self.GUI_lang_index = self.user_interface.GUI_lang_index
 
+        self.cs = 'cs'  # case sensitive
+        self.fe = 'fi'  # front end identical
+
         self.lh_options = []
         self.rh_options = []
         self.rel_options = []
@@ -111,39 +114,41 @@ class Query_view():
         # String commonality buttons
 ##        #ImmediateSearchVar = BooleanVar()
 ##        self.case_sensitive_var = BooleanVar()
-##        self.first_char_match_var = BooleanVar()
+##        self.front_end_match_var = BooleanVar()
 ##        #ExactMatchVar = BooleanVar()
 ##        #IncludeDescrVar = BooleanVar()
 
         #ImmediateSearchVar.set(True)
         self.case_sensitive = True
-        self.first_char_match = True
+        self.front_end_match = True
         #ExactMatchVar.set(False)
         #IncludeDescrVar.set(False)
 
         #immText = ["Immediate Search", "Direct zoeken"]
-        caseText = ["Case Sensitive", "Hoofdletter gevoelig"]
-        firstText = ["First Char Match", "Eerste letter klopt"]
+        case_text = ["Case sensitive", "Hoofdletter gevoelig"]
+        front_end = ["Front end match", "Beginletter(s) kloppen"]
         #exactText = ["Exact Match", "Preciese overeenstemming"]
         #ImmediateSearch = ttk.Checkbutton(self.query_frame, text=immText[self.GUI_lang_index], \
         #                                  variable = ImmediateSearchVar, onvalue = True)
-##        CaseSensitive = ttk.Checkbutton(self.query_frame, text=caseText[self.GUI_lang_index], \
+##        CaseSensitive = ttk.Checkbutton(self.query_frame, text=case_text[self.GUI_lang_index], \
 ##                                        variable = self.case_sensitive_var, onvalue = True)
         case_sensitive_box = gui.CheckBox(checked=True, width=10, height=20)
         case_sensitive_box.attributes['title'] = 'Tick when search string is case sensitive'
-        case_sensitive_text = gui.Label(caseText[self.GUI_lang_index], width=150, height=20,
+        case_sensitive_box.onchange.connect(self.set_case)
+        case_sensitive_text = gui.Label(case_text[self.GUI_lang_index], width=150, height=20,
                                         style={'margin-right':'20px'})
         case_sensitive_text.attributes['title'] = 'Tick when search string is case sensitive'
-##        FirstCharMatch = ttk.Checkbutton(self.query_frame, text=firstText[self.GUI_lang_index], \
-##                                         variable = self.first_char_match_var, onvalue = True)
-        first_char_box = gui.CheckBox(checked=True, width=10, height=20)
-        first_char_box.attributes['title'] = 'Tick when search string shall match with first character(s) of found string'
-        first_char_text = gui.Label(firstText[self.GUI_lang_index], width=150, height=20)
-        first_char_text.attributes['title'] = 'Tick when search string shall match with first character(s) of found string'
+##        FirstCharMatch = ttk.Checkbutton(self.query_frame, text=front_end[self.GUI_lang_index], \
+##                                         variable = self.front_end_match_var, onvalue = True)
+        front_end_box = gui.CheckBox(checked=True, width=10, height=20)
+        front_end_box.attributes['title'] = 'Tick when search string shall match with first character(s) of found string'
+        front_end_box.onchange.connect(self.set_front_end)
+        front_end_text = gui.Label(front_end[self.GUI_lang_index], width=150, height=20)
+        front_end_text.attributes['title'] = 'Tick when search string shall match with first character(s) of found string'
         #ExactMatch = ttk.Checkbutton(self.query_frame, text=exactText[self.GUI_lang_index], \
         #                             variable = ExactMatchVar, onvalue = True)
         #exact_match_box = gui.CheckBox(checked = True)
-        #exact_match_text = gui.Label(caseText[self.GUI_lang_index])
+        #exact_match_text = gui.Label(case_text[self.GUI_lang_index])
         # Include searching in descriptions
         #IncludeDescr = ttk.Checkbutton(self.query_frame, text="Include Description", \
         #                               variable = IncludeDescrVar, onvalue = True)
@@ -175,8 +180,8 @@ class Query_view():
 
         self.second_line_widget = gui.HBox(height=20, width=190, margin='5px',
                                            style='background-color:#eeffdd')
-        self.second_line_widget.append(first_char_box)
-        self.second_line_widget.append(first_char_text)
+        self.second_line_widget.append(front_end_box)
+        self.second_line_widget.append(front_end_text)
         self.query_widget.append(self.second_line_widget)
 ##        #ImmediateSearch.grid(column=0, columnspan=2, row=1, sticky=W)
 ##        CaseSensitive.grid(column=0, columnspan=2, row=1, sticky=W)
@@ -658,7 +663,7 @@ of the name of the selected object'
                 'The reply language is {}'.format(self.user_interface.reply_lang_name),\
                 'De antwoordtaal is {}'.format(self.user_interface.reply_lang_name))
 
-    def Determine_reply_language(self, event):
+    def Determine_reply_language(self, widget):
         ''' Get the user specified reply language and report it '''
         
         reply_lang_name = self.reply_lang_box.get()
@@ -667,7 +672,7 @@ of the name of the selected object'
                 'The reply language is {}'.format(self.user_interface.reply_lang_name),\
                 'De antwoordtaal is {}'.format(self.user_interface.reply_lang_name))
 
-    def Lh_uid_command(self, event):
+    def Lh_uid_command(self, widget):
         """ Search for UID in semantic network
             Search in vocabulary for left hand uid.
             == OptionsTable: optionNr,whetherKnown,langUIDres,commUIDres,
@@ -718,7 +723,21 @@ of the name of the selected object'
         except KeyError:
             pass
 
-    def Lh_search_cmd(self, event, new_value):
+    def set_case(self, widget, new_value):
+        case_sens = new_value #self.case_sensitive_var.get()
+        if case_sens:
+            self.cs = 'cs'   # case sensitive
+        else:
+            self.cs = 'ci'   # case insensitive
+
+    def set_front_end(self, widget, new_value):
+        front_end = self.front_end_match_var.get()
+        if front_end:
+            self.fe = 'fi'   # front end identical
+        else:
+            self.fe = 'pi'   # part identical
+
+    def Lh_search_cmd(self, widget, new_value):
         """ Search or Query in semantic network
             An entry in QueryWindow can be just a name (lhString)
             (for search on UID see Lh_uid_command)
@@ -738,18 +757,8 @@ of the name of the selected object'
 
         #print('Lh name entry:',event.char)
         #if event.keysym not in ['Shift_L', 'Shift_R']:
-                                    
-        case_sens = self.case_sensitive_var.get()
-        if case_sens:
-            cs = 'cs'   # case sensitive
-        else:
-            cs = 'ci'   # case insensitive
-        front_end = self.first_char_match_var.get()
-        if front_end:
-            fe = 'fi'   # front end identical
-        else:
-            fe = 'pi'   # part identical
-        string_commonality = cs + fe
+
+        self.string_commonality = self.cs + self.fe
 
         self.query.q_lh_uid = 0
         self.lh_options[:] = []
@@ -759,9 +768,9 @@ of the name of the selected object'
         for item in x: self.lh_options_tree.delete(item)
         
         # Determine lh_options for lh term in query
-        lhString = self.q_lh_name_widget.get()
+        lhString = new_value #self.q_lh_name_widget.get()
         self.found_lh_uid, self.lh_options = \
-                           self.Solve_unknown(lhString, string_commonality)
+                           self.Solve_unknown(lhString)
         #print("  Found lh: ", lhString, self.unknown_quid, \
         #      self.lh_options[0:3])
 
@@ -810,7 +819,7 @@ of the name of the selected object'
         self.full_def_widget.insert('1.0',full_def)
             
 #----------------------------------------------------------------------
-    def Rel_search_cmd(self, event):
+    def Rel_search_cmd(self, widget):
         """ Search or Query in Ontology and Model
             Entry in QueryWindow is a question with possible condition expressions
             (lhString,relString,rhString):
@@ -829,7 +838,7 @@ of the name of the selected object'
         #print('Rel Entry:',event.char)
         if event.keysym not in ['Shift_L', 'Shift_R']:
 
-            front_end = self.first_char_match_var.get()
+            front_end = self.front_end_match_var.get()
             case_sens = self.case_sensitive_var.get()
 
             # Delete previous list of rel_options in tree
@@ -848,9 +857,9 @@ of the name of the selected object'
                 self.q_rel_name_widget.set(relString)
             if relString == '':
                 relString = 'binary relation'
-            string_commonality = 'csfi'
+            self.string_commonality = 'csfi'
             self.foundRel, self.rel_options = \
-                           self.Solve_unknown(relString, string_commonality)
+                           self.Solve_unknown(relString)
             #print('  OptRel:',self.rel_options)
             
             # == rel_opions: optionNr,whetherKnown,langUIDres,commUIDres,
@@ -877,7 +886,7 @@ of the name of the selected object'
                     opt = [option[5], option[4], option[8], comm_name, lang_name]
                     self.rel_options_tree.insert('', index='end', values=opt)        
 #------------------------------------------------------------------
-    def Rh_search_cmd(self, event):
+    def Rh_search_cmd(self, widget):
         """ Search or Query in Ontology and Model
             An entry in QueryWindow (lhString,relString,rhString)
             is a question with possible condition expressions:
@@ -894,17 +903,17 @@ of the name of the selected object'
         #print('Rh Entry:',event.char)
         if event.keysym not in ['Shift_L', 'Shift_R']:
 
-            case_sens = self.case_sensitive_var.get()
-            front_end = self.first_char_match_var.get()
-            if case_sens:
-                cs = 'cs'   # case sensitive
-            else:
-                cs = 'ci'   # case insensitive
-            if front_end:
-                fe = 'fi'   # front end identical
-            else:
-                fe = 'pi'   # part identical
-            string_commonality = cs + fe
+##            case_sens = self.case_sensitive_var.get()
+##            front_end = self.front_end_match_var.get()
+##            if case_sens:
+##                self.cs = 'cs'   # case sensitive
+##            else:
+##                self.cs = 'ci'   # case insensitive
+##            if front_end:
+##                self.fe = 'fi'   # front end identical
+##            else:
+##                self.fe = 'pi'   # part identical
+##            self.string_commonality = self.cs + self.fe
 
             # Delete previous items in the rh_options in tree
             self.rh_options[:]  = []
@@ -914,7 +923,7 @@ of the name of the selected object'
             # Get the rh_string and search for options in the dictionary
             rhString = self.q_rh_name_widget.get()
             self.foundRh, self.rh_options = \
-                          self.Solve_unknown(rhString, string_commonality)
+                          self.Solve_unknown(rhString)
             #print('  OptRh:',self.rh_options);
 
             # == rh_options: optionNr,whetherKnown,langUIDres,commUIDres,
@@ -941,7 +950,7 @@ of the name of the selected object'
                     opt = [option[5],option[4],option[8],comm_name,lang_name]
                     self.rh_options_tree.insert('', index='end', values=opt)
 
-    def Determine_selected_aspects(self, event):
+    def Determine_selected_aspects(self, widget):
         ''' Determine one or more selected aspects and their values
             and add them to the query.
             Note: values for the same aspects are alternative options (or)
@@ -957,14 +966,14 @@ of the name of the selected object'
                 print('Query aspects:', aspect_values)
                 self.query.aspect_values.append(aspect_values)
 
-    def Solve_unknown(self, search_string, string_commonality):
+    def Solve_unknown(self, search_string):
         """ Determine the available options (UIDs and names) in the dictionary
             that match the search_string.
             Collect options in lh, rel and rh optionsTables for display and selection.
 
             - search_string = the string to be found in Gel_dict
               with corresponding lang_uid and comm_uid.
-            - string_commonality is one of:
+            - self.string_commonality is one of:
               cipi, cspi, cii, csi, cifi, csfi
               (case (in)sensitive partial/front end identical
 
@@ -1031,7 +1040,7 @@ of the name of the selected object'
             return found_uid, options
         
         # Search for full search_string in GellishDict
-        candidates = self.gel_net.Query_network_dict(search_string, string_commonality)
+        candidates = self.gel_net.Query_network_dict(search_string, self.string_commonality)
 
         # Collect found option in 'options' list for display and selection
         if len(candidates) > 0:
@@ -1427,7 +1436,7 @@ of the name of the selected object'
         self.q_rh_uid_str.set(str(self.query.q_rh_uid))
         self.q_rh_name_str.set(self.query.q_rh_name)
 
-    def Formulate_query_spec(self, event):
+    def Formulate_query_spec(self, widget):
         """Formulte a query_spec on the network for the relation type and its subtypes.
            Store resulting query expressions in candids table with the same table definition.
         """
