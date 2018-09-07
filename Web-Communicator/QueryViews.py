@@ -764,8 +764,8 @@ of the name of the selected object'
         self.lh_options[:] = []
         
         # Remove possible earlier options
-        x = self.lh_options_tree.get_children()
-        for item in x: self.lh_options_tree.delete(item)
+##        x = self.lh_options_tree.get_children()
+##        for item in x: self.lh_options_tree.delete(item)
         
         # Determine lh_options for lh term in query
         lhString = new_value #self.q_lh_name_widget.get()
