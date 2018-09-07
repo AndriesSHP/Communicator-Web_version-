@@ -309,7 +309,7 @@ class Query_view():
                               style='background-color:#eeffdd')
         def_label.attributes['title'] = 'First select an object below, then its definition will appear'
         fullDefQStr = ''
-        self.full_def_widget = gui.ListView(width='98%', height=60)
+        self.full_def_widget = gui.TextInput(single_line=False, width='98%', height=60)
         self.fifth_line_widget.append(def_label)
         self.fifth_line_widget.append(self.full_def_widget)
         self.query_widget.append(self.fifth_line_widget)
@@ -672,7 +672,7 @@ of the name of the selected object'
                 'The reply language is {}'.format(self.user_interface.reply_lang_name),\
                 'De antwoordtaal is {}'.format(self.user_interface.reply_lang_name))
 
-    def Lh_uid_command(self, widget):
+    def Lh_uid_command(self, widget, new_value):
         """ Search for UID in semantic network
             Search in vocabulary for left hand uid.
             == OptionsTable: optionNr,whetherKnown,langUIDres,commUIDres,
@@ -682,11 +682,11 @@ of the name of the selected object'
 
         # Delete previous options
         self.lh_options[:] = []
-        x = self.lh_options_tree.get_children()
-        for item in x: self.lh_options_tree.delete(item)
+##        x = self.lh_options_tree.get_children()
+##        for item in x: self.lh_options_tree.delete(item)
         
         # Determine lh_options for lh uid in query
-        lh_uid = self.q_lh_uid_widget.get()
+        lh_uid = new_value #self.q_lh_uid_widget.get()
 ##        if lh_uid_string.isdecimal():
 ##            lh_uid = lh_uid_string
 ##        else:
@@ -714,12 +714,12 @@ of the name of the selected object'
 
                 # Display lh_object uid
                 self.query.q_lh_uid = lh_uid
-                self.q_lh_uid_str.set(str(lh_uid))
+##                self.q_lh_uid_str.set(str(lh_uid))
                 
             # delete earlier definition text. Then replace by new definition text
-            self.full_def_widget.delete('1.0', END)
+##            self.full_def_widget.delete('1.0', END)
             # Display full definition
-            self.full_def_widget.insert('1.0',full_def)
+            self.full_def_widget.set_text(full_def)
         except KeyError:
             pass
 
@@ -797,15 +797,19 @@ of the name of the selected object'
                     comm_name = self.gel_net.community_dict[option[3]]
 
                 # Display option in lh_options_tree
+                uid = option[5]
+                name = option[4]
+                kind = option[8]
                 opt = [option[5], option[4], option[8], comm_name, lang_name]
-                self.lh_options_tree.insert('',index='end',values=opt, text=opt[0])
+                option = gui.TreeItem(opt[0])
+##                self.lh_options_tree.insert('',index='end',values=opt, text=opt[0])
 
             # Display lh_object uid
             self.query.q_lh_uid = self.lh_options[0][5]
-            self.q_lh_uid_str.set(str(self.query.q_lh_uid))
+##            self.q_lh_uid_str.set(str(self.query.q_lh_uid))
             
         # Delete earlier definition text. Then replace by new definition text
-        self.full_def_widget.delete('1.0', END)
+##        self.full_def_widget.delete('1.0', END)
         full_def = ''
         int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
         if integer is False or int_q_lh_uid >= 100:
@@ -816,7 +820,7 @@ of the name of the selected object'
             lang_name, comm_name, preferred_name, full_def = \
                        self.user_interface.Determine_name_in_context(obj)
         # Display full definition
-        self.full_def_widget.insert('1.0',full_def)
+        self.full_def_widget.set_text(full_def)
             
 #----------------------------------------------------------------------
     def Rel_search_cmd(self, widget):
@@ -1175,7 +1179,7 @@ of the name of the selected object'
         self.query.q_lh_name = self.query.lhSel[4]
         self.q_lh_uid_str.set(str(self.query.q_lh_uid))
         self.q_lh_name_str.set(self.query.q_lh_name)
-        self.full_def_widget.delete('1.0',END)
+        self.full_def_widget.set_text('')
         
         full_def = ''
         # Determine the selected object via its uid
@@ -1191,7 +1195,7 @@ of the name of the selected object'
             #print('FullDef:',self.query.q_lh_uid, self.query.q_lh_name,\
             #      self.query.q_lh_category,full_def)
         # Display full definition
-        self.full_def_widget.insert('1.0', full_def)
+        self.full_def_widget.set_text(full_def)
 
         self.q_aspects[:] = []
         # If the lh_object is known,
@@ -1474,7 +1478,7 @@ of the name of the selected object'
         self.query.query_expr = [self.query.q_lh_uid, self.query.q_lh_name]
 
         # Delete earlier definition text in query_window.
-        self.full_def_widget.delete('1.0', END)
+        self.full_def_widget.set_text('')
         
         # If lh_object is known then determine and display its full definition
         int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
@@ -1487,7 +1491,7 @@ of the name of the selected object'
                        self.user_interface.Determine_name_in_context(self.query.q_lh_obj)
             #print('Full def:', self.query.q_lh_uid, lhString, self.query.q_lh_category, full_def)
             # Display full definition
-            self.full_def_widget.insert('1.0',full_def)
+            self.full_def_widget.set_text(full_def)
             
         # Rel: Selected relation type option
         # Verify whether kind of relation is specified or only lh option is selected.
