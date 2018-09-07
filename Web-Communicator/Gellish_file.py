@@ -113,11 +113,11 @@ class Gellish_file:
         if self.header[0] != "Gellish":
             Message(self.gel_net.GUI_lang_index,
                 "File {} is not in Gellish expression format, "\
-                "because the first field has not as content 'Gellish'.".\
-                format(self.name), \
+                "because the first field <{}> has not as content 'Gellish'.".\
+                format(self.name, self.header[0]), \
                 "File {} is niet in Gellish expressie formaat, "\
-                "want het eerste veld heeft niet als inhoud 'Gellish'.".\
-                format(self.name))
+                "want het eerste veld <{}> heeft niet als inhoud 'Gellish'.".\
+                format(self.name, self.header[0]))
             if self.extension == 'json':
                 self.Interpret_non_gellish_JSON_file()
         else:
