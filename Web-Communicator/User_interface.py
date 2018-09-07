@@ -338,6 +338,9 @@ class Communicator(App):
             after syntactic verification.
             The merge the file content in the semantic network
         """
+        self.subContainerRead = gui.Widget(style={'width': '220px', 'display': 'block', \
+                                                  'overflow': 'auto', 'text-align': 'center'})
+        self.container.append(self.subContainerRead)
         # Select one or more files to be imported
 ##        file_path_names = filedialog.askopenfilenames(
 ##            filetypes=[("CSV files","*.csv"),("JSON files","*.json"), ("All files","*.*")], \
@@ -352,8 +355,11 @@ class Communicator(App):
 
         self.dialog.show(self)
 
+    def read_files(self):
+        ''' Read the file(s) that are selected in the file selection dialog
+        '''
         #self.file_path_names = ''
-        print('Selected file(s):',self.file_path_names)
+        #print('Selected file(s):',self.file_path_names)
         if self.file_path_names == []:
             self.Message_UI(
                 'The file name is blank or the inclusion is cancelled. There is no file read.',\
@@ -386,14 +392,16 @@ class Communicator(App):
 
     def on_fileselection_dialog_confirm(self, widget, filelist):
         # a list() of filenames and folders is returned
-        self.lbl.set_text('Selected files: %s' % ','.join(filelist))
-        print('File list:', filelist)
+        #self.lbl.set_text('Selected files: %s' % ','.join(filelist))
+        print('File list: {}'.format(filelist))
         self.file_path_names = filelist
         if len(filelist):
             f = filelist[0]
             # replace the last download link
             fdownloader = gui.FileDownloader("download selected", f, width=200, height=30)
-            self.subContainerRight.append(fdownloader, key='file_downloader')
+            self.subContainerRead.append(fdownloader, key='file_downloader')
+
+            self.read_files()
 
     def on_dialog_cancel(self, widget):
         self.set_root_widget(self.container)
