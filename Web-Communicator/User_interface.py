@@ -384,7 +384,7 @@ class Communicator(App):
                 file_path = ''
 
             # Create file object
-            self.current_file = Gellish_file(file_path_and_name, self)
+            self.current_file = Gellish_file(file_path_and_name, self.gel_net)
             self.gel_net.Gellish_files.append(self.current_file)
 
             # Import expressions from file
