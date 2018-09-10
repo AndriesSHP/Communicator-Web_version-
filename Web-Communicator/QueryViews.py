@@ -433,7 +433,7 @@ of the name of the selected object'
         nr_cols = 6
 ##        if self.user_interface.extended_query:
 ##            nr_cols = 8
-        ##self.lh_opt_frame = gui.VBox(height='100%', width='60%') #, borderwidth=3, relief='ridge')
+        ##self.lh_opt_frame = gui.VBox(height='300', width='60%') #, borderwidth=2, relief='ridge')
 ##        self.lh_opt_frame.grid(column=0, row=16, columnspan=nr_cols, rowspan=1, sticky=NSEW)
 ##        self.lh_opt_frame.columnconfigure(0, minsize=10, weight=1)
 ##        self.lh_opt_frame.rowconfigure(0, minsize=3, weight=1)
@@ -451,11 +451,11 @@ of the name of the selected object'
         relaCol = ['Relation UID', 'Relatie UID']
         righCol = ['Right UID', 'Rechter UID']
 
-        self.opt_table_height = 10
+        self.opt_table_rows = 10
         if self.user_interface.extended_query:
-            self.opt_table_height = 5
+            self.opt_table_rows = 5
             
-        self.options_table = gui.TableWidget(self.opt_table_height, 5, True, True, width='100%', height=200,\
+        self.options_table = gui.TableWidget(self.opt_table_rows, 5, True, True, width='100%', height=200,\
                                              style={"overflow":"auto","background-color":"#eeffaa",\
                                                     "border-width":"2px","border-style":"solid",\
                                                     "font-size":"12px"})
@@ -467,20 +467,20 @@ of the name of the selected object'
         self.sixth_line_left_box.append(self.options_table)
         self.options_table.on_table_row_click.connect(self.Set_selected_q_lh_term)
         
-        self.lh_options_tree = gui.TreeView(width='100%', height=300)
-        lh_option_heading = uid_text[self.GUI_lang_index] + ' '\
-                            + nameCol[self.GUI_lang_index] + ' '\
-                            + kindCol[self.GUI_lang_index] + ' '\
-                            + commCol[self.GUI_lang_index] + ' '\
-                            + langCol[self.GUI_lang_index]
-        self.tree_heading = gui.TreeItem(lh_option_heading)
-        self.sixth_line_left_box.append(self.tree_heading)
-        self.sixth_line_left_box.append(self.lh_options_tree)
-        
+##        self.lh_options_tree = gui.TreeView(width='100%', height=300)
+##        lh_option_heading = uid_text[self.GUI_lang_index] + ' '\
+##                            + nameCol[self.GUI_lang_index] + ' '\
+##                            + kindCol[self.GUI_lang_index] + ' '\
+##                            + commCol[self.GUI_lang_index] + ' '\
+##                            + langCol[self.GUI_lang_index]
+##        self.tree_heading = gui.TreeItem(lh_option_heading)
+##        self.sixth_line_left_box.append(self.tree_heading)
+##        self.sixth_line_left_box.append(self.lh_options_tree)
+##
         ##self.sixth_line_left_box.append(self.lh_opt_frame)
 ##                                            columns=('UID', 'Name','Kind','Comm','Lang'),\
 ##                                            displaycolumns=('Name','Kind','Comm','Lang'),\
-##                                            selectmode='browse', height=self.opt_table_height)
+##                                            selectmode='browse', height=self.opt_table_rows)
 ##        self.lh_options_tree.heading('#0', text=uid_col[self.GUI_lang_index], anchor=W)
 ##        self.lh_options_tree.heading('Name', text=nameCol[self.GUI_lang_index], anchor=W)
 ##        self.lh_options_tree.heading('Kind', text=kindCol[self.GUI_lang_index], anchor=W)
@@ -521,7 +521,7 @@ of the name of the selected object'
 ##            self.rel_options_tree = ttk.Treeview(rel_opt_frame,\
 ##                                                 columns=('UID','Name','Kind','Comm','Lang'),\
 ##                                                 displaycolumns='#all', selectmode='browse', \
-##                                                 height=self.opt_table_height)
+##                                                 height=self.opt_table_rows)
 ##            self.rel_options_tree.heading('#0', anchor=W)
 ##            self.rel_options_tree.heading('UID',  text=relaCol[self.GUI_lang_index], anchor=W)
 ##            self.rel_options_tree.heading('Name', text=nameCol[self.GUI_lang_index], anchor=W)
@@ -566,7 +566,7 @@ of the name of the selected object'
 ##            self.rh_options_tree = ttk.Treeview(rh_opt_frame,\
 ##                                                columns=('UID','Name','Kind','Comm','Lang'),\
 ##                                                displaycolumns='#all', selectmode='browse', \
-##                                                height=self.opt_table_height)
+##                                                height=self.opt_table_rows)
 ##            self.rh_options_tree.heading('#0', anchor=W)
 ##            self.rh_options_tree.heading('UID',  text=righCol[self.GUI_lang_index], anchor=W)
 ##            self.rh_options_tree.heading('Name', text=nameCol[self.GUI_lang_index], anchor=W)
@@ -602,7 +602,7 @@ of the name of the selected object'
         # Aspect frame widget
         self.aspect_frame = gui.VBox(height='99%', width='39%',\
                                      style={'background-color':'#eeffdd',\
-                                            "border-width":"3px","border-style":"solid"}) #relief='ridge')
+                                            "border-width":"2px","border-style":"solid"}) #relief='ridge')
         self.aspect_frame.style['justify-content'] = 'flex-start'
         self.aspect_frame.style['align-items'] = 'flex-start'
         # Aspects label widget
@@ -765,12 +765,11 @@ of the name of the selected object'
 
         self.query.q_lh_uid = 0
         self.lh_options[:] = []
-        # Make the options_table empty
-        for r in range(1, self.opt_table_height):
+        # Remove possible earlier options by make the options_table empty
+        for r in range(1, self.opt_table_rows):
             for c in range(0, 5):
                 self.options_table.item_at(r, c).set_text('')
         
-        # Remove possible earlier options
 ##        x = self.lh_options_tree.get_children()
 ##        for item in x: self.lh_options_tree.delete(item)
         
@@ -803,7 +802,7 @@ of the name of the selected object'
                 else:
                     comm_name = self.gel_net.community_dict[option[3]]
 
-                # Display option in lh_options_tree
+                # Display option in lh_options table
                 uid = option[5]
                 name = option[4]
                 kind_name = option[8]
@@ -815,9 +814,9 @@ of the name of the selected object'
                 self.options_table.item_at(opt_table_row, 3).set_text(comm_name)
                 self.options_table.item_at(opt_table_row, 4).set_text(lang_name)
                 
-                opt_text = uid + name + kind_name + comm_name + lang_name
-                option = gui.TreeItem(opt_text)
-                self.lh_options_tree.append(option)
+##                opt_text = uid + name + kind_name + comm_name + lang_name
+##                option = gui.TreeItem(opt_text)
+##                self.lh_options_tree.append(option)
 ##                self.lh_options_tree.insert('',index='end',values=opt, text=opt[0])
 
             # Display lh_object uid
