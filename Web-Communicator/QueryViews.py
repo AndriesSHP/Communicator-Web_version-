@@ -285,7 +285,10 @@ class Query_view():
         self.q_lh_name_widget = gui.TextInput(height=20, width='100%',\
                                               style={'background-color':'#ffffb0'}) #self.lh_terms
         #self.q_lh_name_widget.set_value('')
-        self.q_lh_name_widget.attributes['title'] = 'A text string that is (part of) a name of the searched object'
+        self.q_lh_name_widget.attributes['title'] = 'Enter a text string that is (part of) a name of the searched object'
+        # Bindings for search uid and search string fields
+        self.q_lh_uid_widget.onkeyup.connect(self.Lh_uid_command)
+        self.q_lh_name_widget.onkeyup.connect(self.Lh_search_cmd)
         self.fourth_line_widget.append(self.q_lh_name_widget)
 ##        if self.user_interface.extended_query:
 ##            self.q_rel_name_widget = gui.DropDown(self.rel_terms, width=40)
@@ -295,9 +298,6 @@ class Query_view():
 ##            self.q_uom_name_widget = gui.DropDown(self.uoms, width=10)
 ##            self.query_frame.append(self.q_uom_name_widget)
 
-        # Bindings for search uid and search string fields and for extended query fields
-        self.q_lh_uid_widget.onkeyup.connect(self.Lh_uid_command)
-        self.q_lh_name_widget.onkeyup.connect(self.Lh_search_cmd)
 ##        if self.user_interface.extended_query:
 ##            self.q_rel_name_widget.onkeyup.connect(self.Rel_search_cmd)
 ##            self.q_rh_name_widget.onkeyup.connect(self.Rh_search_cmd)
@@ -327,7 +327,7 @@ class Query_view():
         
         # Aliases and options in sixth_line_left_box
         self.sixth_line_left_box = gui.VBox(height='99%', width='60%',
-                                            style={'background-color':'#eeffaa', \
+                                            style={'background-color':'#eeffdd', \
                                                    "border-width":"3px","border-style":"solid"})
         self.sixth_line_left_box.style['justify-content'] = 'flex-start'
         self.sixth_line_left_box.style['align-items'] = 'flex-start'
@@ -451,20 +451,21 @@ of the name of the selected object'
         relaCol = ['Relation UID', 'Relatie UID']
         righCol = ['Right UID', 'Rechter UID']
 
-        tree_height = 10
+        self.opt_table_height = 10
         if self.user_interface.extended_query:
-            tree_height = 5
+            self.opt_table_height = 5
             
-        self.options_table = gui.TableWidget(tree_height, 5, True, True, width='100%', height=300,\
-                                             style={"overflow":"auto","background-color":"#d6ffb0",\
-                                                    "border-width":"3px","border-style":"solid",\
-                                                    "font-size":"8px"})
+        self.options_table = gui.TableWidget(self.opt_table_height, 5, True, True, width='100%', height=200,\
+                                             style={"overflow":"auto","background-color":"#eeffaa",\
+                                                    "border-width":"2px","border-style":"solid",\
+                                                    "font-size":"12px"})
         self.options_table.item_at(0, 0).set_text(uid_text[self.GUI_lang_index])
         self.options_table.item_at(0, 1).set_text(nameCol[self.GUI_lang_index])
         self.options_table.item_at(0, 2).set_text(kindCol[self.GUI_lang_index])
         self.options_table.item_at(0, 3).set_text(commCol[self.GUI_lang_index])
         self.options_table.item_at(0, 4).set_text(langCol[self.GUI_lang_index])
         self.sixth_line_left_box.append(self.options_table)
+        self.options_table.on_table_row_click.connect(self.Set_selected_q_lh_term)
         
         self.lh_options_tree = gui.TreeView(width='100%', height=300)
         lh_option_heading = uid_text[self.GUI_lang_index] + ' '\
@@ -479,7 +480,7 @@ of the name of the selected object'
         ##self.sixth_line_left_box.append(self.lh_opt_frame)
 ##                                            columns=('UID', 'Name','Kind','Comm','Lang'),\
 ##                                            displaycolumns=('Name','Kind','Comm','Lang'),\
-##                                            selectmode='browse', height=tree_height)
+##                                            selectmode='browse', height=self.opt_table_height)
 ##        self.lh_options_tree.heading('#0', text=uid_col[self.GUI_lang_index], anchor=W)
 ##        self.lh_options_tree.heading('Name', text=nameCol[self.GUI_lang_index], anchor=W)
 ##        self.lh_options_tree.heading('Kind', text=kindCol[self.GUI_lang_index], anchor=W)
@@ -520,7 +521,7 @@ of the name of the selected object'
 ##            self.rel_options_tree = ttk.Treeview(rel_opt_frame,\
 ##                                                 columns=('UID','Name','Kind','Comm','Lang'),\
 ##                                                 displaycolumns='#all', selectmode='browse', \
-##                                                 height=tree_height)
+##                                                 height=self.opt_table_height)
 ##            self.rel_options_tree.heading('#0', anchor=W)
 ##            self.rel_options_tree.heading('UID',  text=relaCol[self.GUI_lang_index], anchor=W)
 ##            self.rel_options_tree.heading('Name', text=nameCol[self.GUI_lang_index], anchor=W)
@@ -565,7 +566,7 @@ of the name of the selected object'
 ##            self.rh_options_tree = ttk.Treeview(rh_opt_frame,\
 ##                                                columns=('UID','Name','Kind','Comm','Lang'),\
 ##                                                displaycolumns='#all', selectmode='browse', \
-##                                                height=tree_height)
+##                                                height=self.opt_table_height)
 ##            self.rh_options_tree.heading('#0', anchor=W)
 ##            self.rh_options_tree.heading('UID',  text=righCol[self.GUI_lang_index], anchor=W)
 ##            self.rh_options_tree.heading('Name', text=nameCol[self.GUI_lang_index], anchor=W)
@@ -600,7 +601,7 @@ of the name of the selected object'
 ##                                      func=self.Set_selected_q_rh_term)
         # Aspect frame widget
         self.aspect_frame = gui.VBox(height='99%', width='39%',\
-                                     style={'background-color':'#eeffee',\
+                                     style={'background-color':'#eeffdd',\
                                             "border-width":"3px","border-style":"solid"}) #relief='ridge')
         self.aspect_frame.style['justify-content'] = 'flex-start'
         self.aspect_frame.style['align-items'] = 'flex-start'
@@ -710,7 +711,9 @@ of the name of the selected object'
                 #print('Lh_option', option)
                 self.lh_options.append(option)
                 opt = [option[5], option[4], option[8], comm_name, lang_name]
-                self.lh_options_tree.insert('', index='end', values=opt, text=opt[0])
+                option = gui.TreeItem(opt[0])
+                self.lh_options_tree.append(option)
+##                self.lh_options_tree.insert('', index='end', values=opt, text=opt[0])
 
                 # Display lh_object uid
                 self.query.q_lh_uid = lh_uid
@@ -742,7 +745,7 @@ of the name of the selected object'
             An entry in QueryWindow can be just a name (lhString)
             (for search on UID see Lh_uid_command)
             or a full question with possible condition expressions:
-            (lhString,relString,rhString optionally followed by one or more conditions):
+            (lhString, relString, rhString optionally followed by one or more conditions):
        
             lhCommonality = case sensitivity: 'cs/ci';
                                   (partially/front end) identical 'i/pi/fi'
@@ -757,21 +760,25 @@ of the name of the selected object'
 
         #print('Lh name entry:',event.char)
         #if event.keysym not in ['Shift_L', 'Shift_R']:
-
+        opt_table_row = 0
         self.string_commonality = self.cs + self.fe
 
         self.query.q_lh_uid = 0
         self.lh_options[:] = []
+        # Make the options_table empty
+        for r in range(1, self.opt_table_height):
+            for c in range(0, 5):
+                self.options_table.item_at(r, c).set_text('')
         
         # Remove possible earlier options
 ##        x = self.lh_options_tree.get_children()
 ##        for item in x: self.lh_options_tree.delete(item)
         
         # Determine lh_options for lh term in query
-        lhString = new_value #self.q_lh_name_widget.get()
+        self.lhString = new_value #self.q_lh_name_widget.get()
         self.found_lh_uid, self.lh_options = \
-                           self.Solve_unknown(lhString)
-        #print("  Found lh: ", lhString, self.unknown_quid, \
+                           self.Solve_unknown(self.lhString)
+        #print("  Found lh: ", self.lhString, self.unknown_quid, \
         #      self.lh_options[0:3])
 
         # => lh_options: optionNr, whetherKnown, langUIDres, commUIDres, result_string,\
@@ -799,9 +806,18 @@ of the name of the selected object'
                 # Display option in lh_options_tree
                 uid = option[5]
                 name = option[4]
-                kind = option[8]
-                opt = [option[5], option[4], option[8], comm_name, lang_name]
-                option = gui.TreeItem(opt[0])
+                kind_name = option[8]
+                opt = [uid, name, kind_name, comm_name, lang_name]
+                opt_table_row += +1
+                self.options_table.item_at(opt_table_row, 0).set_text(uid)
+                self.options_table.item_at(opt_table_row, 1).set_text(name)
+                self.options_table.item_at(opt_table_row, 2).set_text(kind_name)
+                self.options_table.item_at(opt_table_row, 3).set_text(comm_name)
+                self.options_table.item_at(opt_table_row, 4).set_text(lang_name)
+                
+                opt_text = uid + name + kind_name + comm_name + lang_name
+                option = gui.TreeItem(opt_text)
+                self.lh_options_tree.append(option)
 ##                self.lh_options_tree.insert('',index='end',values=opt, text=opt[0])
 
             # Display lh_object uid
@@ -826,7 +842,7 @@ of the name of the selected object'
     def Rel_search_cmd(self, widget):
         """ Search or Query in Ontology and Model
             Entry in QueryWindow is a question with possible condition expressions
-            (lhString,relString,rhString):
+            (lhString, relString, rhString):
        
             lhCommonality = 'csfi'
             lhCommonality = input('Lh-commonality
@@ -892,7 +908,7 @@ of the name of the selected object'
 #------------------------------------------------------------------
     def Rh_search_cmd(self, widget):
         """ Search or Query in Ontology and Model
-            An entry in QueryWindow (lhString,relString,rhString)
+            An entry in QueryWindow (lhString, relString, rhString)
             is a question with possible condition expressions:
        
             rhCommonality = input('Rh-commonality
@@ -1139,7 +1155,7 @@ of the name of the selected object'
                 options.append(option)
                     
                 self.user_interface.Message_UI(
-                    'String <{}> not found in the dictionary. UID = {}. '.\
+                    'String <{}> is not found in the dictionary. UID = {}. '.\
                     format(search_string, self.unknown_quid),\
                     'Term <{}> is niet gevonden in het woordenboek. UID = {}. '.\
                     format(search_string, self.unknown_quid))
@@ -1157,7 +1173,7 @@ of the name of the selected object'
                  
         return found_uid, options
 
-    def Set_selected_q_lh_term(self, ind):
+    def Set_selected_q_lh_term(self, table, row, item):
         """ Put the lh_object that is selected from lh_options
             in the query (q_lh_name_str and q_lh_uid_str)
             and display its textual definition.
@@ -1166,19 +1182,21 @@ of the name of the selected object'
             for display their phrases in dropdown listbox and selection.
             And determine the synonyms and translations of lh_object name.
         """
-        item = self.lh_options_tree.selection()
-        ind = self.lh_options_tree.index(item) 
-        if len(self.lh_options) == 0:
-            self.user_interface.Message_UI(
-                'Warning: No option is selected yet. Please try again.',
-                'Waarschuwing: Er is nog geen optie geselecteerd. Probeer nogmaals.')
-            return
-        self.query.lhSel = self.lh_options[ind]
+##        item = self.lh_options_tree.selection()
+##        ind = self.lh_options_tree.index(item)
+##        if len(self.lh_options) == 0:
+##            self.user_interface.Message_UI(
+##                'Warning: No option is selected yet. Please try again.',
+##                'Waarschuwing: Er is nog geen optie geselecteerd. Probeer nogmaals.')
+##            return
+##        self.query.lhSel = self.lh_options[ind]
         # Determine UID and Name of selected option
-        self.query.q_lh_uid = self.query.lhSel[5]
-        self.query.q_lh_name = self.query.lhSel[4]
-        self.q_lh_uid_str.set(str(self.query.q_lh_uid))
-        self.q_lh_name_str.set(self.query.q_lh_name)
+        print('Clicked option uid:', item.get_text())
+        self.query.q_lh_uid = item.get_text()
+##        self.query.q_lh_uid = self.query.lhSel[5]
+##        self.query.q_lh_name = self.query.lhSel[4]
+##        self.q_lh_uid_str.set(str(self.query.q_lh_uid))
+##        self.q_lh_name_str.set(self.query.q_lh_name)
         self.full_def_widget.set_text('')
         
         full_def = ''
@@ -1186,7 +1204,7 @@ of the name of the selected object'
         int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
         # If not unknown
         if integer is False or int_q_lh_uid >= 100:
-            self.query.q_lh_category = self.query.lhSel[8]
+##            self.query.q_lh_category = self.query.lhSel[8]
             obj = self.gel_net.uid_dict[self.query.q_lh_uid]
             
             # Determine the full definition of the selected object in the preferred language
@@ -1235,8 +1253,8 @@ of the name of the selected object'
                 self.Determine_aspect_and_value_options(lh_obj_sub)
 
             # Delete previous characteristics
-            x = self.aspects_tree.get_children()
-            for item in x: self.aspects_tree.delete(item)
+##            x = self.aspects_tree.get_children()
+##            for item in x: self.aspects_tree.delete(item)
             # Insert new list of characteristics in aspects_tree
             if len(self.q_aspects) > 0:
                 # Sort aspect values by kind of aspect name and by value
@@ -1489,7 +1507,7 @@ of the name of the selected object'
             # Determine the full definition of the selected object in the preferred language
             lang_name, comm_name, preferred_name, full_def = \
                        self.user_interface.Determine_name_in_context(self.query.q_lh_obj)
-            #print('Full def:', self.query.q_lh_uid, lhString, self.query.q_lh_category, full_def)
+            #print('Full def:', self.query.q_lh_uid, self.lhString, self.query.q_lh_category, full_def)
             # Display full definition
             self.full_def_widget.set_text(full_def)
             
