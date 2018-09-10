@@ -351,7 +351,7 @@ of the name of the selected object'
 ##        self.alias_tree.config(yscrollcommand=alias_scroll.set)
         head_text = str(term_text[self.GUI_lang_index] + alias_text[self.GUI_lang_index])
         self.alias_head = gui.Label(head_text, height=20, width='100%')
-        self.alias_tree = gui.TreeView(height=120, width='100%')
+        self.alias_tree = gui.TreeView(height=120, width='100%', treeopen=True)
 ##                                       columns=('Term', 'Alias_type'),\
 ##                                       displaycolumns=('Alias_type'),\
 ##                                       selectmode='none', height=4)
@@ -757,7 +757,6 @@ of the name of the selected object'
             == OptionsTable: optionNr,whetherKnown,langUIDres,commUIDres,
                              result_string,resultUID,is_called_uid,kindKnown,kind
         """
-
         #print('Lh name entry:',event.char)
         #if event.keysym not in ['Shift_L', 'Shift_R']:
         opt_table_row = 0
@@ -866,14 +865,14 @@ of the name of the selected object'
             for item in x: self.rel_options_tree.delete(item)
             
             # Get relation type name (relString) from user interface
-            relString = self.q_rel_name_widget.get()
+##            relString = self.q_rel_name_widget.get()
             #if event != '': relString = relString # + event.char
             if relString == 'any':
                 if self.GUI_lang_index == 1:
                     relString = 'binaire relatie'
                 else:
                     relString = 'binary relation'
-                self.q_rel_name_widget.set(relString)
+##                self.q_rel_name_widget.set(relString)
             if relString == '':
                 relString = 'binary relation'
             self.string_commonality = 'csfi'
@@ -1190,7 +1189,7 @@ of the name of the selected object'
 ##            return
 ##        self.query.lhSel = self.lh_options[ind]
         # Determine UID and Name of selected option
-        print('Clicked option uid:', item.get_text())
+        #print('Clicked option uid:', item.get_text())
         self.query.q_lh_uid = item.get_text()
 ##        self.query.q_lh_uid = self.query.lhSel[5]
 ##        self.query.q_lh_name = self.query.lhSel[4]
@@ -1261,35 +1260,46 @@ of the name of the selected object'
                 for asp in self.q_aspects:
                     #print('Asp:', asp)
                     if asp[1] == '':
-                        self.aspects_tree.insert(asp[4], index='end',
-                                                 values=asp,
-                                                 text=asp[1], open=False)
+##                        self.aspects_tree.insert(asp[4], index='end',
+##                                                 values=asp,
+##                                                 text=asp[1], open=False)
+                        asp_row = gui.TreeItem(asp[1])
+                        self.aspects_tree.append(asp_row)
                     else:
-                        self.aspects_tree.insert(asp[4], index='end',
-                                                 iid=asp[1],
-                                                 values=asp,
-                                                 text=asp[1], open=False)
+##                        self.aspects_tree.insert(asp[4], index='end',
+##                                                 iid=asp[1],
+##                                                 values=asp,
+##                                                 text=asp[1], open=False)
+                        asp_row = gui.TreeItem(asp[1])
+                        self.aspects_tree.append(asp_row)
                         
             rel_options.sort()
             self.gel_net.rel_terms = rel_options
-            self.q_rel_name_widget.config(values=self.gel_net.rel_terms)
+##            self.q_rel_name_widget.config(values=self.gel_net.rel_terms)
 
             # Delete previous aliases
-            x = self.alias_tree.get_children()
-            for item in x: self.alias_tree.delete(item)
+##            x = self.alias_tree.get_children()
+##            for item in x: self.alias_tree.delete(item)
             
             # Determine synonyms and translations of lh_object name in various languages        
             languages, alias_table = self.Determine_aliases(lh_object)
             for language in languages:
-                self.alias_tree.insert('', index='end',
-                                       values=language,
-                                       iid=language,
-                                       text=language, open=True)
-            for alias_row in alias_table:
-                self.alias_tree.insert(alias_row[0], index='end',
-                                       values=alias_row[1:],
-                                       #iid=alias_row[1],
-                                       text=alias_row[1], open=True)
+##                self.alias_tree.insert('', index='end',
+##                                       values=language,
+##                                       iid=language,
+##                                       text=language, open=True)
+                self.language_row = gui.TreeItem(language)
+                self.alias_tree.append(self.language_row)
+                self.language_row.attributes['treeopen'] = 'true'
+                for alias_row in alias_table:
+##                self.alias_tree.insert(alias_row[0], index='end',
+##                                       values=alias_row[1:],
+##                                       #iid=alias_row[1],
+##                                       text=alias_row[1], open=True)
+                    if alias_row[0] == language:
+                        self.row = gui.TreeItem(alias_row[1])
+                        self.row.attributes['treeopen'] = 'true'
+                        self.language_row.append(self.row)
                 
     def Determine_aspect_and_value_options(self, lh_obj_sub):
         ''' Determine in a search the characteristics of lh_object and its subtypes
