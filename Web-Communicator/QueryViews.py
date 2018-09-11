@@ -1253,6 +1253,7 @@ of the name of the selected object'
             # Delete previous characteristics
 ##            x = self.aspects_tree.get_children()
 ##            for item in x: self.aspects_tree.delete(item)
+            self.aspects_tree.empty()
             # Insert new list of characteristics in aspects_tree
             if len(self.q_aspects) > 0:
                 # Sort aspect values by kind of aspect name and by value
@@ -1277,9 +1278,10 @@ of the name of the selected object'
             self.gel_net.rel_terms = rel_options
 ##            self.q_rel_name_widget.config(values=self.gel_net.rel_terms)
 
-            # Delete previous aliases
+            # Delete previous aliases in alias_tree
 ##            x = self.alias_tree.get_children()
 ##            for item in x: self.alias_tree.delete(item)
+            self.alias_tree.empty()
             
             # Determine synonyms and translations of lh_object name in various languages        
             languages, alias_table = self.Determine_aliases(lh_object)
