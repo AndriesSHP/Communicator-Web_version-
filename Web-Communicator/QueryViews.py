@@ -334,8 +334,9 @@ class Query_view():
         self.sixth_line_box.append(self.sixth_line_left_box)
 
         # Aliases display label
-        aliasText = ['Aliases:','Aliases:']
-        self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width=100)
+        aliasText = ['Aliases for the name of the selected object:',\
+                     'Aliases voor de naam van het geselecteerde object:']
+        self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width='100%')
         self.alias_label.attributes['title'] = 'Synonyms, abbreviations and translations \
 of the name of the selected object'
         self.sixth_line_left_box.append(self.alias_label)
@@ -617,7 +618,7 @@ of the name of the selected object'
         self.aspect_frame.style['align-items'] = 'flex-start'
         # Aspects label widget
         aspect_text = ['Aspects and known possible values:', 'Aspecten en bekende mogelijke waarden:']
-        self.aspect_label = gui.Label(aspect_text[self.GUI_lang_index], height=20, width=100)
+        self.aspect_label = gui.Label(aspect_text[self.GUI_lang_index], height=20, width='100%')
         self.aspect_label.attributes['title'] = 'Aspects of the selected object and their possible values'
         self.aspect_frame.append(self.aspect_label)
         
