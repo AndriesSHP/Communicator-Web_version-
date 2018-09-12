@@ -97,8 +97,8 @@ class Query_view():
 
         # Define reply language with language selector
         lang_text = ['Reply language:', 'Antwoordtaal:']
-        reply_text = ['The language used for display of search results',
-                      'De taal waarin zoekresultaten weergegeven worden']
+        reply_text = ['Select the language used for display of search results',
+                      'Kies de taal waarin zoekresultaten weergegeven worden']
         self.reply_lang_label = gui.Label(lang_text[self.GUI_lang_index], width=100, height=20)
         self.reply_lang_label.attributes['title'] = reply_text[self.GUI_lang_index]
 
@@ -248,10 +248,10 @@ class Query_view():
         # Query variables widgets definition
         self.third_line_widget = gui.HBox(height=20, width=300)
         
-        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width=100,
+        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width=110,
                               style='background-color:#eeffdd')
         lhNameLbl.attributes['title'] = 'Specify a text string as part of the name of an object to be searched'
-        lhUIDLbl = gui.Label('UID:', height=20, width=50,
+        lhUIDLbl = gui.Label('UID:', height=20, width=40,
                              style='background-color:#eeffdd')
         lhUIDLbl.attributes['title'] = 'A unique identifier of the searched object (specified or found)'
         
@@ -278,12 +278,12 @@ class Query_view():
 ##            self.query_frame.append(relNameLbl)
 ##            self.query_frame.append(rhNameLbl)
 ##            self.query_frame.append(uomNameLbl)
-        self.fourth_line_widget = gui.HBox(height=20, width=300,\
-                                           style={"border-width":"1px","border-style":"solid"})
+        self.fourth_line_widget = gui.HBox(height=20, width=300)
         self.query_widget.append(self.fourth_line_widget)
         
         self.q_lh_name_widget = gui.TextInput(height=20, width='100%',\
-                                              style={'background-color':'#ffffb0'}) #self.lh_terms
+                                              style={'background-color':'#ffffb0',\
+                                                     'border-width':'1px', 'border-style':'solid'})
         #self.q_lh_name_widget.set_value('')
         self.q_lh_name_widget.attributes['title'] = 'Enter a text string that is (part of) a name of the searched object'
         # Bindings for search uid and search string fields
@@ -340,23 +340,32 @@ class Query_view():
 of the name of the selected object'
         self.sixth_line_left_box.append(self.alias_label)
         
-        term_text = ('     Term', '     Term')
+        term_text = ('Term', 'Term')
         alias_text = ('Alias type', 'Aliastype')
-        #lang_text = ('Language', 'Taal')
+        lang_text = ('Language', 'Taal')
 ##        self.alias_tree.heading('#0', text=term_text[self.GUI_lang_index], anchor=W)
 ##        self.alias_tree.heading('Alias_type', text=alias_text[self.GUI_lang_index], anchor=W)
 ##        #self.alias_tree.heading('Language', text=lang_text[self.GUI_lang_index], anchor=W)
 ##        alias_scroll = ttk.Scrollbar(self.query_frame, orient=VERTICAL, \
 ##                                     command=self.alias_tree.yview)
 ##        self.alias_tree.config(yscrollcommand=alias_scroll.set)
-        head_text = str(term_text[self.GUI_lang_index] + alias_text[self.GUI_lang_index])
-        self.alias_head = gui.Label(head_text, height=20, width='100%')
-        self.alias_tree = gui.TreeView(height=120, width='100%', treeopen=True)
+##        head_text = str(term_text[self.GUI_lang_index] + alias_text[self.GUI_lang_index])
+##        self.alias_head = gui.Label(head_text, height=20, width='100%')
+##        self.alias_tree = gui.TreeView(height=120, width='100%', treeopen=True)
 ##                                       columns=('Term', 'Alias_type'),\
 ##                                       displaycolumns=('Alias_type'),\
 ##                                       selectmode='none', height=4)
-        self.sixth_line_left_box.append(self.alias_head)
-        self.sixth_line_left_box.append(self.alias_tree)
+        self.alias_table_rows = 5
+        self.aliases_table_widget = gui.TableWidget(self.alias_table_rows, 3, True, True,\
+                                                    width='100%', height=200,\
+                                                    style={"overflow":"auto", "background-color":"#eeffaa",\
+                                                           "border-width":"2px", "border-style":"solid",\
+                                                           "font-size":"12px", 'table-layout':'auto'})
+        self.aliases_table_widget.style['background-color'] = '#eeffaa'
+        self.aliases_table_widget.item_at(0, 0).set_text(lang_text[self.GUI_lang_index])
+        self.aliases_table_widget.item_at(0, 1).set_text(term_text[self.GUI_lang_index])
+        self.aliases_table_widget.item_at(0, 2).set_text(alias_text[self.GUI_lang_index])
+        self.sixth_line_left_box.append(self.aliases_table_widget)
 
 ##        # Widgets locations in grid
 ##        lhNameLbl.grid(column=0, row=3, sticky=W)
@@ -422,8 +431,8 @@ of the name of the selected object'
 ##                                              columnspan=2, rowspan=1, sticky=EW)
         
         # Options for selection widgets definition
-        select_term = ["Select one of the following options:", \
-                       "Kies één van de volgende opties:"]
+        select_term = ["Select the UID of one of the following options:", \
+                       "Kies de UID van één van de volgende opties:"]
         options_heading = gui.Label(select_term[self.GUI_lang_index], height=20, width=300)
         self.sixth_line_left_box.append(options_heading)
         # Option label widget location
@@ -459,6 +468,7 @@ of the name of the selected object'
                                              style={"overflow":"auto","background-color":"#eeffaa",\
                                                     "border-width":"2px","border-style":"solid",\
                                                     "font-size":"12px"})
+        self.options_table.style['background-color'] = '#eeffaa'
         self.options_table.item_at(0, 0).set_text(uid_text[self.GUI_lang_index])
         self.options_table.item_at(0, 1).set_text(nameCol[self.GUI_lang_index])
         self.options_table.item_at(0, 2).set_text(kindCol[self.GUI_lang_index])
@@ -606,7 +616,7 @@ of the name of the selected object'
         self.aspect_frame.style['justify-content'] = 'flex-start'
         self.aspect_frame.style['align-items'] = 'flex-start'
         # Aspects label widget
-        aspect_text = ['Aspects:', 'Aspecten:']
+        aspect_text = ['Aspects and known possible values:', 'Aspecten en bekende mogelijke waarden:']
         self.aspect_label = gui.Label(aspect_text[self.GUI_lang_index], height=20, width=100)
         self.aspect_label.attributes['title'] = 'Aspects of the selected object and their possible values'
         self.aspect_frame.append(self.aspect_label)
@@ -628,13 +638,25 @@ of the name of the selected object'
         eq_col = ['>=<', '>=<']
         value_col = ['Value', 'Waarde']
         uom_col = ['UoM', 'Eenheid']
-        self.aspect_heading = gui.TreeItem(aspect_col[self.GUI_lang_index] + ' ' +
-                                       eq_col[self.GUI_lang_index] + ' ' +
-                                       value_col[self.GUI_lang_index] + ' ' +
-                                       uom_col[self.GUI_lang_index])
-        self.aspect_frame.append(self.aspect_heading)
-        self.aspects_tree = gui.TreeView(height='100%', width='100%')
-        self.aspect_frame.append(self.aspects_tree)
+        self.aspect_table_rows = 15
+        self.aspects_table = gui.TableWidget(self.aspect_table_rows, 4, True, True,\
+                                             width='100%', height=200,\
+                                             style={"overflow":"auto","background-color":"#eeffaa",\
+                                                    "border-width":"2px","border-style":"solid",\
+                                                    "font-size":"12px"})
+        self.aspects_table.style['table-layout'] = 'auto'
+        self.aspects_table.style['background-color'] = '#eeffaa'
+        self.aspects_table.item_at(0, 0).set_text(aspect_col[self.GUI_lang_index])
+        self.aspects_table.item_at(0, 1).set_text(eq_col[self.GUI_lang_index])
+        self.aspects_table.item_at(0, 2).set_text(value_col[self.GUI_lang_index])
+        self.aspects_table.item_at(0, 3).set_text(uom_col[self.GUI_lang_index])
+##        self.aspect_heading = gui.TreeItem(aspect_col[self.GUI_lang_index] + ' ' +
+##                                       eq_col[self.GUI_lang_index] + ' ' +
+##                                       value_col[self.GUI_lang_index] + ' ' +
+##                                       uom_col[self.GUI_lang_index])
+##        self.aspect_frame.append(self.aspect_heading)
+##        self.aspects_tree = gui.TreeView(height='100%', width='100%')
+        self.aspect_frame.append(self.aspects_table)
         self.sixth_line_box.append(self.aspect_frame)
 ##                                         columns=('UID','Name','Rel_uid','UID-2','Parent',\
 ##                                                  'Equality','Value','UoM'),\
@@ -681,10 +703,14 @@ of the name of the selected object'
         """
         #print('Lh uid entry:',event.char)
 
-        # Delete previous options
+        opt_table_row_nr = 0
         self.lh_options[:] = []
 ##        x = self.lh_options_tree.get_children()
 ##        for item in x: self.lh_options_tree.delete(item)
+        # Remove possible earlier options by making the options_table empty
+        for r in range(1, self.opt_table_rows):
+            for c in range(0, 5):
+                self.options_table.item_at(r, c).set_text('')
         
         # Determine lh_options for lh uid in query
         lh_uid = new_value #self.q_lh_uid_widget.get()
@@ -710,16 +736,27 @@ of the name of the selected object'
                          + [lh.uid, '5117', 'known', lh.kind.name]
                 #print('Lh_option', option)
                 self.lh_options.append(option)
-                opt = [option[5], option[4], option[8], comm_name, lang_name]
-                option = gui.TreeItem(opt[0])
-                self.lh_options_tree.append(option)
+##                opt = [option[5], option[4], option[8], comm_name, lang_name]
+##                option = gui.TreeItem(opt[0])
+##                self.lh_options_tree.append(option)
 ##                self.lh_options_tree.insert('', index='end', values=opt, text=opt[0])
+                # Display option in options table
+                uid = option[5]
+                name = option[4]
+                kind_name = option[8]
+                opt = [uid, name, kind_name, comm_name, lang_name]
+                opt_table_row_nr += +1
+                self.options_table.item_at(opt_table_row_nr, 0).set_text(uid)
+                self.options_table.item_at(opt_table_row_nr, 1).set_text(name)
+                self.options_table.item_at(opt_table_row_nr, 2).set_text(kind_name)
+                self.options_table.item_at(opt_table_row_nr, 3).set_text(comm_name)
+                self.options_table.item_at(opt_table_row_nr, 4).set_text(lang_name)
 
                 # Display lh_object uid
                 self.query.q_lh_uid = lh_uid
 ##                self.q_lh_uid_str.set(str(lh_uid))
                 
-            # delete earlier definition text. Then replace by new definition text
+            # Delete earlier definition text and replace by new definition text
 ##            self.full_def_widget.delete('1.0', END)
             # Display full definition
             self.full_def_widget.set_text(full_def)
@@ -759,7 +796,7 @@ of the name of the selected object'
         """
         #print('Lh name entry:',event.char)
         #if event.keysym not in ['Shift_L', 'Shift_R']:
-        opt_table_row = 0
+        opt_table_row_nr = 0
         self.string_commonality = self.cs + self.fe
 
         self.query.q_lh_uid = 0
@@ -806,12 +843,12 @@ of the name of the selected object'
                 name = option[4]
                 kind_name = option[8]
                 opt = [uid, name, kind_name, comm_name, lang_name]
-                opt_table_row += +1
-                self.options_table.item_at(opt_table_row, 0).set_text(uid)
-                self.options_table.item_at(opt_table_row, 1).set_text(name)
-                self.options_table.item_at(opt_table_row, 2).set_text(kind_name)
-                self.options_table.item_at(opt_table_row, 3).set_text(comm_name)
-                self.options_table.item_at(opt_table_row, 4).set_text(lang_name)
+                opt_table_row_nr += +1
+                self.options_table.item_at(opt_table_row_nr, 0).set_text(uid)
+                self.options_table.item_at(opt_table_row_nr, 1).set_text(name)
+                self.options_table.item_at(opt_table_row_nr, 2).set_text(kind_name)
+                self.options_table.item_at(opt_table_row_nr, 3).set_text(comm_name)
+                self.options_table.item_at(opt_table_row_nr, 4).set_text(lang_name)
                 
 ##                opt_text = uid + name + kind_name + comm_name + lang_name
 ##                option = gui.TreeItem(opt_text)
@@ -1174,7 +1211,7 @@ of the name of the selected object'
     def Set_selected_q_lh_term(self, table, row, item):
         """ Put the lh_object that is selected from lh_options
             in the query (q_lh_name_str and q_lh_uid_str)
-            and display its textual definition.
+            and display its textual definition, name and uid.
             Then determine the kinds of relations
             that relate to that lh_object or its subtypes
             for display their phrases in dropdown listbox and selection.
@@ -1205,13 +1242,19 @@ of the name of the selected object'
 ##            self.query.q_lh_category = self.query.lhSel[8]
             obj = self.gel_net.uid_dict[self.query.q_lh_uid]
             
-            # Determine the full definition of the selected object in the preferred language
+            # Determine the full definition and preferred_name
+            # of the selected object in the preferred language
             lang_name, comm_name, preferred_name, full_def = \
                        self.user_interface.Determine_name_in_context(obj)
             #print('FullDef:',self.query.q_lh_uid, self.query.q_lh_name,\
             #      self.query.q_lh_category,full_def)
         # Display full definition
         self.full_def_widget.set_text(full_def)
+
+        # Display selected UID and Name in selection fields
+        self.q_lh_uid_widget.set_text(self.query.q_lh_uid)
+        selected_name = preferred_name # row[1]
+        self.q_lh_name_widget.set_text(selected_name)
 
         self.q_aspects[:] = []
         # If the lh_object is known,
@@ -1253,26 +1296,42 @@ of the name of the selected object'
             # Delete previous characteristics
 ##            x = self.aspects_tree.get_children()
 ##            for item in x: self.aspects_tree.delete(item)
-            self.aspects_tree.empty()
+            for r in range(1, self.aspect_table_rows):
+                for c in range(0, 4):
+                    self.aspects_table.item_at(r, c).set_text('')
+            aspect_row_nr = 0
             # Insert new list of characteristics in aspects_tree
             if len(self.q_aspects) > 0:
                 # Sort aspect values by kind of aspect name and by value
                 self.q_aspects.sort(key=itemgetter(4,6))
                 for asp in self.q_aspects:
                     #print('Asp:', asp)
-                    if asp[1] == '':
-##                        self.aspects_tree.insert(asp[4], index='end',
-##                                                 values=asp,
-##                                                 text=asp[1], open=False)
-                        asp_row = gui.TreeItem(asp[1])
-                        self.aspects_tree.append(asp_row)
-                    else:
+                    aspect_name = asp[1]
+                    if aspect_name != '':
 ##                        self.aspects_tree.insert(asp[4], index='end',
 ##                                                 iid=asp[1],
 ##                                                 values=asp,
 ##                                                 text=asp[1], open=False)
-                        asp_row = gui.TreeItem(asp[1])
-                        self.aspects_tree.append(asp_row)
+##                        asp_row = gui.TreeItem(asp[1])
+##                        self.aspects_tree.append(asp_row)
+                        aspect_row_nr += +1
+                        self.aspects_table.item_at(aspect_row_nr, 0).set_text(aspect_name)
+##                    else:
+##                        self.aspects_tree.insert(asp[4], index='end',
+##                                                 values=asp,
+##                                                 text=asp[1], open=False)
+##                        asp_row = gui.TreeItem(asp[1])
+##                        self.aspects_tree.append(asp_row)
+                        for asp_val in self.q_aspects:
+                            name_value = asp_val[4]
+                            if name_value == aspect_name and aspect_row_nr < self.aspect_table_rows-1:
+                                equality = asp_val[5]
+                                value = asp_val[6]
+                                uom = asp_val[7]
+                                aspect_row_nr += +1
+                                self.aspects_table.item_at(aspect_row_nr, 1).set_text(equality)
+                                self.aspects_table.item_at(aspect_row_nr, 2).set_text(value)
+                                self.aspects_table.item_at(aspect_row_nr, 3).set_text(uom)
                         
             rel_options.sort()
             self.gel_net.rel_terms = rel_options
@@ -1281,27 +1340,34 @@ of the name of the selected object'
             # Delete previous aliases in alias_tree
 ##            x = self.alias_tree.get_children()
 ##            for item in x: self.alias_tree.delete(item)
-            self.alias_tree.empty()
+            for r in range(1, self.alias_table_rows):
+                for c in range(0, 3):
+                    self.aliases_table_widget.item_at(r, c).set_text('')
             
             # Determine synonyms and translations of lh_object name in various languages        
             languages, alias_table = self.Determine_aliases(lh_object)
+            alias_row_nr = 0
             for language in languages:
 ##                self.alias_tree.insert('', index='end',
 ##                                       values=language,
 ##                                       iid=language,
 ##                                       text=language, open=True)
-                self.language_row = gui.TreeItem(language)
-                self.alias_tree.append(self.language_row)
-                self.language_row.attributes['treeopen'] = 'true'
+##                self.language_row = gui.TableRow(language)
+                alias_row_nr += +1
+                self.aliases_table_widget.item_at(alias_row_nr, 0).set_text(language)
+##                self.language_row.attributes['treeopen'] = 'true'
                 for alias_row in alias_table:
 ##                self.alias_tree.insert(alias_row[0], index='end',
 ##                                       values=alias_row[1:],
 ##                                       #iid=alias_row[1],
 ##                                       text=alias_row[1], open=True)
                     if alias_row[0] == language:
-                        self.row = gui.TreeItem(alias_row[1])
-                        self.row.attributes['treeopen'] = 'true'
-                        self.language_row.append(self.row)
+##                        self.row = gui.TreeItem(alias_row[1])
+##                        self.row.attributes['treeopen'] = 'true'
+##                        self.language_row.append(self.row)
+                        alias_row_nr += +1
+                        self.aliases_table_widget.item_at(alias_row_nr, 1).set_text(alias_row[1])
+                        self.aliases_table_widget.item_at(alias_row_nr, 2).set_text(alias_row[2])
                 
     def Determine_aspect_and_value_options(self, lh_obj_sub):
         ''' Determine in a search the characteristics of lh_object and its subtypes
@@ -1314,7 +1380,7 @@ of the name of the selected object'
             if expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs \
                and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids:
                 # An aspect is found
-                asp_opt = [expr[rh_uid_col], expr[rh_name_col], '', '', '', '', '']
+                asp_opt = [expr[rh_uid_col], expr[rh_name_col], '', '', '', '', '', '']
                 role_uid = expr[rh_role_uid_col]
                 if asp_opt not in self.q_aspects:
                     self.q_aspects.append(asp_opt)
