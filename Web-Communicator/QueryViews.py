@@ -246,22 +246,26 @@ class Query_view():
         uom_term = ["Unit of measure", "Meeteenheid"]
 
         # Query variables widgets definition
-        self.third_line_widget = gui.HBox(height=20, width=300)
-        
-        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width=110,
+        self.third_line_widget = gui.HBox(height=20, width='100%',\
+                                          style='background-color:#eeffdd')
+        self.label_frame = gui.HBox(height=20, width=300,
+                                    style='background-color:#eeffdd')
+        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width=160,
                               style='background-color:#eeffdd')
         lhNameLbl.attributes['title'] = 'Specify a text string as part of the name of an object to be searched'
         lhUIDLbl = gui.Label('UID:', height=20, width=40,
                              style='background-color:#eeffdd')
         lhUIDLbl.attributes['title'] = 'A unique identifier of the searched object (specified or found)'
         
-        self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width=150,\
+        self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width=100,\
                                              style={'background-color':'#ffffc0',
                                                     "border-width":"1px","border-style":"solid"})
         self.q_lh_uid_widget.attributes['title'] = 'A unique identifier of the searched object (specified or found'
-        self.third_line_widget.append(lhNameLbl)
-        self.third_line_widget.append(lhUIDLbl)
-        self.third_line_widget.append(self.q_lh_uid_widget)
+        self.q_lh_uid_widget.onkeyup.connect(self.Lh_uid_command)
+        self.label_frame.append(lhNameLbl)
+        self.label_frame.append(lhUIDLbl)
+        self.label_frame.append(self.q_lh_uid_widget)
+        self.third_line_widget.append(self.label_frame)
         self.query_widget.append(self.third_line_widget)
 ##        if self.user_interface.extended_query:
 ##            self.q_rel_uid_widget = gui.TextInput(self.q_rel_uid_str, width=10)
@@ -278,18 +282,28 @@ class Query_view():
 ##            self.query_frame.append(relNameLbl)
 ##            self.query_frame.append(rhNameLbl)
 ##            self.query_frame.append(uomNameLbl)
-        self.fourth_line_widget = gui.HBox(height=20, width=300)
+        self.fourth_line_widget = gui.HBox(height=60, width='100%',\
+                                           style={'background-color':'#eeffdd',\
+                                                  'justify-content':'flex-start',\
+                                                  'align-items':'flex-start'})
         self.query_widget.append(self.fourth_line_widget)
-        
-        self.q_lh_name_widget = gui.TextInput(height=20, width='100%',\
+        self.name_frame = gui.VBox(height=60, width=300,\
+                                   style={'background-color':'#eeffdd',\
+                                          'justify-content':'flex-start',\
+                                          'align-items':'flex-start'})
+        self.q_lh_name_widget = gui.TextInput(height=20, width=300,\
                                               style={'background-color':'#ffffb0',\
-                                                     'border-width':'1px', 'border-style':'solid'})
+                                                     'border-width':'2px', 'border-style':'solid',\
+                                                     'justify-content':'flex-start',\
+                                                     'align-items':'flex-start'})
+        self.dummy_widget = gui.TextInput(height=40, width=300,
+                                          style={'background-color':'#eeffdd'})
         #self.q_lh_name_widget.set_value('')
         self.q_lh_name_widget.attributes['title'] = 'Enter a text string that is (part of) a name of the searched object'
-        # Bindings for search uid and search string fields
-        self.q_lh_uid_widget.onkeyup.connect(self.Lh_uid_command)
         self.q_lh_name_widget.onkeyup.connect(self.Lh_search_cmd)
-        self.fourth_line_widget.append(self.q_lh_name_widget)
+        self.name_frame.append(self.q_lh_name_widget)
+        self.name_frame.append(self.dummy_widget)
+        self.fourth_line_widget.append(self.name_frame)
 ##        if self.user_interface.extended_query:
 ##            self.q_rel_name_widget = gui.DropDown(self.rel_terms, width=40)
 ##            self.query_frame.append(self.q_rel_name_widget)
@@ -303,16 +317,19 @@ class Query_view():
 ##            self.q_rh_name_widget.onkeyup.connect(self.Rh_search_cmd)
 
         # Definition display widget
-        self.fifth_line_widget = gui.HBox(height=60, width='100%')
+        #self.fifth_line_widget = gui.HBox(height=60, width='100%')
         def_text = ['Definition of the selected object:', 'Definitie van het geselecteerde object:']
-        def_label = gui.Label(def_text[self.GUI_lang_index], height=60, width=300,
-                              style='background-color:#eeffdd')
+        def_label = gui.Label(def_text[self.GUI_lang_index], height=20, width='100%',\
+                              style={'background-color':'#eeffdd', 'margin-left':'5px'})
         def_label.attributes['title'] = 'First select an object below, then its definition will appear'
         fullDefQStr = ''
-        self.full_def_widget = gui.TextInput(single_line=False, width='98%', height=60)
-        self.fifth_line_widget.append(def_label)
-        self.fifth_line_widget.append(self.full_def_widget)
-        self.query_widget.append(self.fifth_line_widget)
+        self.full_def_widget = gui.TextInput(single_line=False, width='100%', height=60,\
+                                             style={'justify-content':'flex-start',\
+                                                    'align-items':'flex-start', 'margin-left':'5px',\
+                                                    'border-width':'1px', 'border-style':'solid'})
+        self.third_line_widget.append(def_label)
+        self.fourth_line_widget.append(self.full_def_widget)
+        #self.query_widget.append(self.fifth_line_widget)
         
 ##        defQScroll = ttk.Scrollbar(self.query_frame, orient=VERTICAL, \
 ##                                   command=self.full_def_widget.yview)
