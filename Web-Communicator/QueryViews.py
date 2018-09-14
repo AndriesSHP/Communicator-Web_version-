@@ -95,14 +95,15 @@ class Query_view():
 ##                                           'background-color':'#eeffdd'})
 ##        self.query_widget.append(self.query_frame)
         
-        self.first_line_widget = gui.HBox(height=20, width=650, margin='5px',
+        self.first_line_widget = gui.HBox(height=20, width=730, margin='5px',
                                           style='position:relative; background-color:#eeffdd')
 
         # Define reply language with language selector
         lang_text = ['Reply language:', 'Antwoordtaal:']
         reply_text = ['Select the language used for display of search results',
                       'Kies de taal waarin zoekresultaten weergegeven worden']
-        self.reply_lang_label = gui.Label(lang_text[self.GUI_lang_index], width=100, height=20)
+        self.reply_lang_label = gui.Label(lang_text[self.GUI_lang_index], width=100, height=20,
+                                          style={'margin-left':'110px'})
         self.reply_lang_label.attributes['title'] = reply_text[self.GUI_lang_index]
 
         # Set default language: reply_lang_names[0] = English, [1] = Nederlands
@@ -138,8 +139,7 @@ class Query_view():
         case_sensitive_box = gui.CheckBox(checked=True, width=10, height=20)
         case_sensitive_box.attributes['title'] = 'Tick when search string is case sensitive'
         case_sensitive_box.onchange.connect(self.set_case)
-        case_sensitive_text = gui.Label(case_text[self.GUI_lang_index], width=150, height=20,
-                                        style={'margin-right':'20px'})
+        case_sensitive_text = gui.Label(case_text[self.GUI_lang_index], width=150, height=20)
         case_sensitive_text.attributes['title'] = 'Tick when search string is case sensitive'
 ##        FirstCharMatch = ttk.Checkbutton(self.query_frame, text=front_end[self.GUI_lang_index], \
 ##                                         variable = self.front_end_match_var, onvalue = True)
@@ -361,9 +361,9 @@ class Query_view():
 of the name of the selected object'
         self.sixth_line_left_box.append(self.alias_label)
         
+        lang_text = ('Language', 'Taal')
         term_text = ('Term', 'Term')
         alias_text = ('Alias type', 'Aliastype')
-        lang_text = ('Language', 'Taal')
 ##        self.alias_tree.heading('#0', text=term_text[self.GUI_lang_index], anchor=W)
 ##        self.alias_tree.heading('Alias_type', text=alias_text[self.GUI_lang_index], anchor=W)
 ##        #self.alias_tree.heading('Language', text=lang_text[self.GUI_lang_index], anchor=W)
@@ -376,16 +376,20 @@ of the name of the selected object'
 ##                                       columns=('Term', 'Alias_type'),\
 ##                                       displaycolumns=('Alias_type'),\
 ##                                       selectmode='none', height=4)
-        self.alias_table_rows = 5
-        self.aliases_table_widget = gui.TableWidget(self.alias_table_rows, 3, True, True,\
-                                                    width='100%', height=200,\
-                                                    style={"overflow":"auto", "background-color":"#eeffaa",\
-                                                           "border-width":"2px", "border-style":"solid",\
-                                                           "font-size":"12px", 'table-layout':'auto'})
-        self.aliases_table_widget.style['background-color'] = '#eeffaa'
-        self.aliases_table_widget.item_at(0, 0).set_text(lang_text[self.GUI_lang_index])
-        self.aliases_table_widget.item_at(0, 1).set_text(term_text[self.GUI_lang_index])
-        self.aliases_table_widget.item_at(0, 2).set_text(alias_text[self.GUI_lang_index])
+##        self.alias_table_rows = 5
+##        self.aliases_table_widget = gui.TableWidget(self.alias_table_rows, 3, True, True,\
+        self.aliases_table_widget = gui.Table(width='100%',
+                                              style={"overflow":"auto", "background-color":"#eeffaa",\
+                                                     "border-width":"2px", "border-style":"solid",\
+                                                     "font-size":"12px", 'table-layout':'auto'})
+##        self.aliases_table_widget.style['background-color'] = '#eeffaa'
+##        self.aliases_table_widget.item_at(0, 0).set_text(lang_text[self.GUI_lang_index])
+##        self.aliases_table_widget.item_at(0, 1).set_text(term_text[self.GUI_lang_index])
+##        self.aliases_table_widget.item_at(0, 2).set_text(alias_text[self.GUI_lang_index])
+        content = [(lang_text[self.GUI_lang_index],
+                    term_text[self.GUI_lang_index],
+                    alias_text[self.GUI_lang_index])]
+        self.aliases_table_widget.append_from_list(content, fill_title=True)
         self.sixth_line_left_box.append(self.aliases_table_widget)
 
 ##        # Widgets locations in grid
@@ -1361,9 +1365,10 @@ of the name of the selected object'
             # Delete previous aliases in alias_tree
 ##            x = self.alias_tree.get_children()
 ##            for item in x: self.alias_tree.delete(item)
-            for r in range(1, self.alias_table_rows):
-                for c in range(0, 3):
-                    self.aliases_table_widget.item_at(r, c).set_text('')
+##            for r in range(1, self.alias_table_rows):
+##                for c in range(0, 3):
+##                    self.aliases_table_widget.item_at(r, c).set_text('')
+            #self.aliases_table_widget.empty()
             
             # Determine synonyms and translations of lh_object name in various languages        
             languages, alias_table = self.Determine_aliases(lh_object)
@@ -1375,8 +1380,15 @@ of the name of the selected object'
 ##                                       text=language, open=True)
 ##                self.language_row = gui.TableRow(language)
                 alias_row_nr += +1
-                self.aliases_table_widget.item_at(alias_row_nr, 0).set_text(language)
+                # Add language_row to table
+                language_row = gui.TableRow()
+                language_item = gui.TableItem(text=language)
+                language_row.add_child(language_item, language_item)
+                self.aliases_table_widget.add_child(language, language_row)
+##                self.aliases_table_widget.item_at(alias_row_nr, 0).set_text(language)
 ##                self.language_row.attributes['treeopen'] = 'true'
+                
+                # Add aliases rowa per language to the table 
                 for alias_row in alias_table:
 ##                self.alias_tree.insert(alias_row[0], index='end',
 ##                                       values=alias_row[1:],
@@ -1387,8 +1399,15 @@ of the name of the selected object'
 ##                        self.row.attributes['treeopen'] = 'true'
 ##                        self.language_row.append(self.row)
                         alias_row_nr += +1
-                        self.aliases_table_widget.item_at(alias_row_nr, 1).set_text(alias_row[1])
-                        self.aliases_table_widget.item_at(alias_row_nr, 2).set_text(alias_row[2])
+                        row_widget = gui.TableRow()
+                        row_item = gui.TableItem(text='')
+                        row_widget.add_child(row_item, row_item)
+                        for field in alias_row[1:]:
+                            row_item = gui.TableItem(text=field)
+                            row_widget.add_child(row_item, row_item)
+                        self.aliases_table_widget.add_child(alias_row[1], row_widget)
+##                        self.aliases_table_widget.item_at(alias_row_nr, 1).set_text(alias_row[1])
+##                        self.aliases_table_widget.item_at(alias_row_nr, 2).set_text(alias_row[2])
                 
     def Determine_aspect_and_value_options(self, lh_obj_sub):
         ''' Determine in a search the characteristics of lh_object and its subtypes
