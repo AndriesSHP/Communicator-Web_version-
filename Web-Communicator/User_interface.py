@@ -398,10 +398,10 @@ class Communicator(App):
         print('File list: {}'.format(filelist))
         self.file_path_names = filelist
         if len(filelist):
-            f = filelist[0]
+            #f = filelist[0]
             # replace the last download link
-            fdownloader = gui.FileDownloader("download selected", f, width=200, height=30)
-            self.subContainerRead.append(fdownloader, key='file_downloader')
+            #fdownloader = gui.FileDownloader("download selected", f, width=200, height=30)
+            #self.subContainerRead.append(fdownloader, key='file_downloader')
 
             self.read_files()
 
