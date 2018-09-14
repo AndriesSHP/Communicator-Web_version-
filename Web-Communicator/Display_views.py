@@ -2278,7 +2278,8 @@ class Display_views():
     def Define_and_display_network(self):
         # Destroy earlier network_frame
         try:
-            self.network_frame.destroy()
+##            self.network_frame.destroy()
+            self.user_interface.views_noteb.remove_child(self.network_tree)
         except AttributeError:
             pass
 
@@ -2290,19 +2291,23 @@ class Display_views():
         ''' Define a network sheet for display of network_model (a list of network rows)
             for display in a tab of Notebook
         '''
-        self.network_frame = Frame(self.views_noteb)
-        self.network_frame.grid (column=0, row=0, sticky=NSEW, rowspan=2, columnspan=4)
-        self.network_frame.columnconfigure(0, weight=1)
-        self.network_frame.columnconfigure(1, weight=1)
-        self.network_frame.columnconfigure(2, weight=1)
-        self.network_frame.columnconfigure(3, weight=1)
-        self.network_frame.rowconfigure(0,weight=0)
-        self.network_frame.rowconfigure(1,weight=1)
-
+##        self.network_frame = Frame(self.views_noteb)
+##        self.network_frame.grid (column=0, row=0, sticky=NSEW, rowspan=2, columnspan=4)
+##        self.network_frame.columnconfigure(0, weight=1)
+##        self.network_frame.columnconfigure(1, weight=1)
+##        self.network_frame.columnconfigure(2, weight=1)
+##        self.network_frame.columnconfigure(3, weight=1)
+##        self.network_frame.rowconfigure(0,weight=0)
+##        self.network_frame.rowconfigure(1,weight=1)
         network_text = ['Network','Netwerk']
-        self.views_noteb.add(self.network_frame, text=network_text[self.GUI_lang_index], \
-                             sticky=NSEW)
-        #self.views_noteb.insert("end", self.network_frame, sticky=NSEW)
+        self.network_frame = gui.VBox(width='100%', height='100%',
+                                      style='background-color:#eeffdd')
+        self.user_interface.views_noteb.add_tab(self.network_frame,
+                                 network_text[self.GUI_lang_index], self.tab_cb)
+
+##        self.views_noteb.add(self.network_frame, text=network_text[self.GUI_lang_index], \
+##                             sticky=NSEW)
+##        #self.views_noteb.insert("end", self.network_frame, sticky=NSEW)
 
 ##        network_head = ['Network of objects and aspects',\
 ##                        'Netwerk van objecten en aspecten']
@@ -2313,62 +2318,111 @@ class Display_views():
         classif_button_text = ['Classify left individual object', \
                                'Classificeer linker individueel object']
 
-        self.net_button = Button(self.network_frame, text=net_button_text[self.GUI_lang_index], \
-                                command=self.Prepare_lh_object_network_view)
-        self.lh_button = Button(self.network_frame, text=lh_button_text[self.GUI_lang_index], \
-                                command=lambda:self.Prepare_network_object_detail_view('lh_obj'))
-        self.rh_button = Button(self.network_frame, text=rh_button_text[self.GUI_lang_index], \
-                                command=lambda:self.Prepare_network_object_detail_view('rh_obj'))
-        self.classif_button = Button(self.network_frame, \
-                                     text=classif_button_text[self.GUI_lang_index], \
-                                     command=self.Prepare_for_classification)
+##        self.net_button = Button(self.network_frame, text=net_button_text[self.GUI_lang_index], \
+##                                command=self.Prepare_lh_object_network_view)
+##        self.lh_button = Button(self.network_frame, text=lh_button_text[self.GUI_lang_index], \
+##                                command=lambda:self.Prepare_network_object_detail_view('lh_obj'))
+##        self.rh_button = Button(self.network_frame, text=rh_button_text[self.GUI_lang_index], \
+##                                command=lambda:self.Prepare_network_object_detail_view('rh_obj'))
+##        self.classif_button = Button(self.network_frame, \
+##                                     text=classif_button_text[self.GUI_lang_index], \
+##                                     command=self.Prepare_for_classification)
+        self.button_row = gui.HBox(height=20, width='100%')
+        self.net_button = gui.Button(net_button_text[self.GUI_lang_index], width=200, height=20)
+        self.net_button.attributes['title'] = 'Press button after selection of left hand object'
+        self.net_button.onclick.connect(self.Prepare_lh_object_network_view)
 
-        headings = ['UID', 'Name', 'Parent', 'Kind', \
-                    'Equal','Value','Unit']
+        self.lh_button = gui.Button(lh_button_text[self.GUI_lang_index], width=200, height=20)
+        self.lh_button.attributes['title'] = 'Press button after selection of left hand object'
+        self.lh_button.onclick.connect(self.Prepare_lh_network_object_detail_view)
+
+        self.rh_button = gui.Button(rh_button_text[self.GUI_lang_index], width=200, height=20)
+        self.rh_button.attributes['title'] = 'Press button after selection of right hand object'
+        self.rh_button.onclick.connect(self.Prepare_rh_network_object_detail_view)
+
+        self.classif_button = gui.Button(classif_button_text[self.GUI_lang_index], width=200, height=20)
+        self.classif_button.attributes['title'] = 'Press button after selection of left hand individual object'
+        self.classif_button.onclick.connect(self.Prepare_for_classification)
+
+        self.button_row.append(self.net_button)
+        self.button_row.append(self.lh_button)
+        self.button_row.append(self.rh_button)
+        self.button_row.append(self.classif_button)
+        self.network_frame.append(self.button_row)
+
+##        headings = ['UID', 'Name', 'Parent', 'Kind', \
+##                    'Equal','Value','Unit']
         nr_of_cols = 7 # len(self.taxon_column_names)
-        display_cols = headings[3:nr_of_cols]
+##        display_cols = headings[3:nr_of_cols]
 
-        self.network_tree = Treeview(self.network_frame, columns=(headings[0:nr_of_cols]),\
-                                     displaycolumns=display_cols, selectmode='browse', height=30)
+##        self.network_tree = Treeview(self.network_frame, columns=(headings[0:nr_of_cols]),\
+##                                     displaycolumns=display_cols, selectmode='browse', height=30)
+        self.network_tree = gui.Table(width='100%',
+                                      style={"overflow":"auto", "background-color":"#eeffaa",\
+                                             "border-width":"2px", "border-style":"solid",\
+                                             "font-size":"12px", 'table-layout':'auto',\
+                                             'text-align':'left'})
         eqal_head = ['>=<', '>=<']
         valu_head = ['Value', 'Waarde']
         unit_head = ['Unit', 'Eenheid']
-        self.network_tree.heading('#0'   , text='Object', anchor=W)
-        self.network_tree.heading('UID'  , text='UID'   , anchor=W)
-        self.network_tree.heading('Name' , text=self.name_head[self.GUI_lang_index], anchor=W)
-        self.network_tree.heading('Parent', text=self.parent_head[self.GUI_lang_index], anchor=W)
-        self.network_tree.heading('Kind' , text=self.kind_head[self.GUI_lang_index], anchor=W)
-        self.network_tree.heading('Equal', text=eqal_head[self.GUI_lang_index], anchor=W)
-        self.network_tree.heading('Value', text=valu_head[self.GUI_lang_index], anchor=W)
-        self.network_tree.heading('Unit' , text=unit_head[self.GUI_lang_index], anchor=W)
+        #self.network_tree.item_at(0, 0).set_text('Object')
+##        self.network_tree.item_at(0, 0).set_text('UID')
+##        self.network_tree.item_at(0, 1).set_text(self.name_head[self.GUI_lang_index])
+##        self.network_tree.item_at(0, 2).set_text(self.parent_head[self.GUI_lang_index])
+##        self.network_tree.item_at(0, 3).set_text(self.kind_head[self.GUI_lang_index])
+##        self.network_tree.item_at(0, 4).set_text(eqal_head[self.GUI_lang_index])
+##        self.network_tree.item_at(0, 5).set_text(valu_head[self.GUI_lang_index])
+##        self.network_tree.item_at(0, 6).set_text(unit_head[self.GUI_lang_index])
+        content = [('UID', self.name_head[self.GUI_lang_index],
+                    self.parent_head[self.GUI_lang_index],
+                    self.kind_head[self.GUI_lang_index],
+                    eqal_head[self.GUI_lang_index],
+                    valu_head[self.GUI_lang_index],
+                    unit_head[self.GUI_lang_index])]
+        self.network_tree.append_from_list(content, fill_title=True)
+        self.network_frame.append(self.network_tree)
+##        self.network_tree.heading('#0'   , text='Object', anchor=W)
+##        self.network_tree.heading('UID'  , text='UID'   , anchor=W)
+##        self.network_tree.heading('Name' , text=self.name_head[self.GUI_lang_index], anchor=W)
+##        self.network_tree.heading('Parent', text=self.parent_head[self.GUI_lang_index], anchor=W)
+##        self.network_tree.heading('Kind' , text=self.kind_head[self.GUI_lang_index], anchor=W)
+##        self.network_tree.heading('Equal', text=eqal_head[self.GUI_lang_index], anchor=W)
+##        self.network_tree.heading('Value', text=valu_head[self.GUI_lang_index], anchor=W)
+##        self.network_tree.heading('Unit' , text=unit_head[self.GUI_lang_index], anchor=W)
+##
+##        self.network_tree.column ('#0'   , minwidth=100, width=200)
+##        self.network_tree.column ('Parent', minwidth=20, width=50)
+##        self.network_tree.column ('Kind' , minwidth=20, width=50)
+##        self.network_tree.column ('Equal', minwidth=5, width=5)
+##        self.network_tree.column ('Value', minwidth=20, width=50)
+##        self.network_tree.column ('Unit' , minwidth=8, width=10)
+##
+##        self.network_tree.tag_configure('rel_tag', option=None, background='#afa')
+##        self.network_tree.tag_configure('uom_tag', option=None, background='#ccf')
+##        self.network_tree.tag_configure('sum_tag', option=None, background='#cfc')
+##
+##        # Locate buttons in grid
+####        network_lbl.grid(column=0, row=0, sticky=W)
+##        self.net_button.grid(column=0, row=0, sticky=W)
+##        self.lh_button.grid(column=1, row=0, sticky=W)
+##        self.rh_button.grid(column=2, row=0, sticky=W)
+##        self.classif_button.grid(column=3, row=0, sticky=W)
+##
+##        self.network_tree.grid(column=0, row=1, sticky=NSEW, columnspan=4)
+##        network_scroll = Scrollbar(self.network_frame, orient=VERTICAL, \
+##                                   command=self.network_tree.yview)
+##        network_scroll.grid(column=3, row=1, sticky=NS+E)
+##        self.network_tree.config(yscrollcommand=network_scroll.set)
 
-        self.network_tree.column ('#0'   , minwidth=100, width=200)
-        self.network_tree.column ('Parent', minwidth=20, width=50)
-        self.network_tree.column ('Kind' , minwidth=20, width=50)
-        self.network_tree.column ('Equal', minwidth=5, width=5)
-        self.network_tree.column ('Value', minwidth=20, width=50)
-        self.network_tree.column ('Unit' , minwidth=8, width=10)
+##        self.network_tree.bind(sequence='<Double-1>', func=self.Network_object_detail_view)
+##        self.network_tree.bind(sequence='i'         , func=self.Network_object_detail_view)
+##        self.network_tree.bind(sequence='<Double-3>', func=self.Network_object_detail_view)
+        self.network_tree.on_table_row_click.connect(self.Network_object_detail_view)
+        #self.network_tree.on_table_row_i_key_click.connect(self.Network_object_detail_view)
+        #self.network_tree.on_table_row_right_click.connect(self.Network_object_detail_view)
 
-        self.network_tree.tag_configure('rel_tag', option=None, background='#afa')
-        self.network_tree.tag_configure('uom_tag', option=None, background='#ccf')
-        self.network_tree.tag_configure('sum_tag', option=None, background='#cfc')
-
-        # Locate buttons in grid
-##        network_lbl.grid(column=0, row=0, sticky=W)
-        self.net_button.grid(column=0, row=0, sticky=W)
-        self.lh_button.grid(column=1, row=0, sticky=W)
-        self.rh_button.grid(column=2, row=0, sticky=W)
-        self.classif_button.grid(column=3, row=0, sticky=W)
-
-        self.network_tree.grid(column=0, row=1, sticky=NSEW, columnspan=4)
-        network_scroll = Scrollbar(self.network_frame, orient=VERTICAL, \
-                                   command=self.network_tree.yview)
-        network_scroll.grid(column=3, row=1, sticky=NS+E)
-        self.network_tree.config(yscrollcommand=network_scroll.set)
-
-        self.network_tree.bind(sequence='<Double-1>', func=self.Network_object_detail_view)
-        self.network_tree.bind(sequence='i'         , func=self.Network_object_detail_view)
-        self.network_tree.bind(sequence='<Double-3>', func=self.Network_object_detail_view)
+    def tab_cb(self):
+        return
 
     def Display_network_view(self):
         # Display header row with units of measure
@@ -2376,29 +2430,49 @@ class Display_views():
 
         # Display self.network_model rows in self.network_tree
         parents = []
+        network_row_nr = 0
+        included = []
         for network_line in self.network_model:
             # Verify whether network_line[7], being the parent (typically intermediate),
             # is blank or is in the list of parents
             openness = False
-            if network_line[7] == '' or network_line[7] in parents:
+            upper_concept = network_line[7]
+            if upper_concept == '' or upper_concept in parents:
                 # Skip duplicate line
-                if self.network_tree.exists(network_line[6]):
-                    continue
-                else:
-                    if network_line[7] == '':
+##                if self.network_tree.exists(network_line[6]):
+                row_duplicate = False
+                name = network_line[6]
+##                else:
+                # Excluded lines that are already included
+                if network_line not in included:
+                    included.append(network_line)
+                    if upper_concept == '':
                         openness = True
                     color_tag = 'sum_tag'
                     rel_tag = ''
-                    term = network_line[6].partition(' ')
+                    term = name.partition(' ')
                     if term[0] in ['has', 'heeft', 'classifies', 'classificeert', \
                                    'is', 'can', 'kan', 'shall', 'moet']:
-                        rel_tag = 'rel_tag'
-                    self.network_tree.insert(network_line[7], index='end', \
-                                             values=network_line[5:],\
-                                             tags=rel_tag,\
-                                             iid=network_line[6], \
-                                             text=network_line[6], open=openness)
-                    parents.append(network_line[6])
+                       rel_tag = 'rel_tag'
+##                    self.network_tree.insert(network_line[7], index='end', \
+##                                             values=network_line[5:],\
+##                                             tags=rel_tag,\
+##                                             iid=network_line[6], \
+##                                             text=network_line[6], open=openness)
+                    network_row_nr += +1
+                    #print('network_line:', network_line)
+##                    nr_of_cols = len(network_line)
+##                    for col in range(5, nr_of_cols):
+##                        if network_row_nr <= self.network_table_rows:
+##                            self.network_tree.item_at(network_row_nr, col-5).set_text(network_line[col])
+                    row_widget = gui.TableRow()
+                    for field in network_line[5:]:
+                        row_item = gui.TableItem(text=field)
+                        row_widget.add_child(row_item, row_item)
+                    self.network_tree.add_child(name, row_widget)
+                            # Set color of line in table (rel_tag) === to be done ===
+                    if name not in parents:
+                        parents.append(name)
 
     def Define_and_display_taxonomy_of_kinds(self):
         # Destroy earlier taxon_frame
@@ -3673,16 +3747,24 @@ class Display_views():
             # Display query results in notebook sheets
             self.Display_notebook_views()
 
-    def Prepare_network_object_detail_view(self, lh_or_rh):
-        ''' Set the uid of the left hand or right hand object
+    def Prepare_lh_network_object_detail_view(self, widget):
+        ''' Set the uid of the left hand object
             in a selected network treeview row
             as the chosen object for display of details
         '''
         tree_values = self.Determine_network_tree_values()
-        if len(tree_values) > 0 and lh_or_rh == 'lh_obj':
+        if len(tree_values) > 0:
             chosen_object_uid = tree_values[0]
             self.Determine_category_of_object_view(chosen_object_uid, tree_values)
-        elif len(tree_values) > 4 and lh_or_rh == 'rh_obj':
+            self.Determine_category_of_object_view(chosen_object_uid, tree_values)
+
+    def Prepare_rh_network_object_detail_view(self, widget):
+        ''' Set the uid of the right hand object
+            in a selected network treeview row
+            as the chosen object for display of details
+        '''
+        tree_values = self.Determine_network_tree_values()
+        if len(tree_values) > 4:
             chosen_object_uid = tree_values[4]
             self.Determine_category_of_object_view(chosen_object_uid, tree_values)
 
@@ -3746,7 +3828,7 @@ class Display_views():
         if len(self.info_model) > 0:
             self.Define_and_display_documents()
 
-    def Network_object_detail_view(self, sel):
+    def Network_object_detail_view(self, window, row, item):
         """ Find the selected left hand object from a user selection with left button
             in the network_model that is displayed in the network_tree view.
         """

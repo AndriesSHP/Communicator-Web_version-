@@ -27,6 +27,7 @@ class Communicator(App):
         self.gel_net = None
         self.user = None
         self.user_interface = None
+        #self.views_noteb = None
 
         self.GUI_lang_name_dict = {"English":'910036', \
                                    "Nederlands":'910037'}
@@ -349,7 +350,8 @@ class Communicator(App):
         #             allow_file_selection=True, allow_folder_selection=True
         self.dialog = gui.FileSelectionDialog('File selection dialog',
                                               'Select one or more files',
-                                              False, '.')
+                                              False, '.',
+                                              style='background-color:#eeffdd')
         self.dialog.confirm_value.connect(self.on_fileselection_dialog_confirm)
         self.dialog.cancel_dialog.connect(self.on_dialog_cancel)
 
@@ -408,10 +410,10 @@ class Communicator(App):
 
     def Message_UI(self, mess_text_EN, mess_text_NL):
         if self.GUI_lang_index == 1:
-            print(mess_text_NL)
+            #print(mess_text_NL)
             self.log_frame.append(mess_text_NL)
         else:
-            print(mess_text_EN)
+            #print(mess_text_EN)
             self.log_frame.append(mess_text_EN)
 
     def user_manual(self, widget):

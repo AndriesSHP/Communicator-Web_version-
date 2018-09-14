@@ -8,7 +8,7 @@ from operator import itemgetter
 from Bootstrapping import ini_out_path
 from Expr_Table_Def import *
 from Query import Query
-from Display_views import Display_views
+#from Display_views import Display_views
 from Anything import Anything
 from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer, \
      Open_output_file
@@ -1563,31 +1563,35 @@ of the name of the selected object'
         
         # LH: Get selected option (textString)
         # from the presented list of options (lh_options_tree) in QueryWindow
-        lh_uid_init = self.q_lh_uid_widget.get()
+##        lh_uid_init = self.q_lh_uid_widget.get()
+        lh_uid_init = self.q_lh_uid_widget.get_text()
+        print('lh_uid_init', lh_uid_init)
         if lh_uid_init == '':
             #print('Warning: Left hand option not yet selected. Please try again.')
             self.user_interface.Message_UI(
                 'Left hand option is not yet selected. Please try again.',
                 'Linker optie is nog niet geselecteerd. Probeer nogmaals.')
             return
-        item = self.lh_options_tree.selection()
-        ind = self.lh_options_tree.index(item)
-        # => lh_options: optionNr, whetherKnown, langUIDres, commUIDres, result_string,\
-        #                resultUID, is_called_uid, kindKnown, kind
-        if len(self.lh_options) == 0:
-            self.user_interface.Message_UI(
-                'No option is selected. Please try again.',
-                'Er is geen optie geselecteerd. Probeer nogmaals.')
-            return
-        self.query.lhSel = self.lh_options[ind]
-        #print('Selected option:',item, ind, self.query.lhSel)
+##        item = self.lh_options_tree.selection()
+##        ind = self.lh_options_tree.index(item)
+##        # => lh_options: optionNr, whetherKnown, langUIDres, commUIDres, result_string,\
+##        #                resultUID, is_called_uid, kindKnown, kind
+##        if len(self.lh_options) == 0:
+##            self.user_interface.Message_UI(
+##                'No option is selected. Please try again.',
+##                'Er is geen optie geselecteerd. Probeer nogmaals.')
+##            return
+##        self.query.lhSel = self.lh_options[ind]
+##        #print('Selected option:',item, ind, self.query.lhSel)
 
         # Determine UID and Name of selected lh option
         # and formulate query expression (query_expr)
-        self.query.q_lh_uid = self.query.lhSel[5]
-        self.query.q_lh_name = self.query.lhSel[4]
-        self.q_lh_uid_str.set(str(self.query.q_lh_uid))
-        self.q_lh_name_str.set(self.query.q_lh_name)
+##        self.query.q_lh_uid = self.query.lhSel[5]
+##        self.query.q_lh_name = self.query.lhSel[4]
+##        self.q_lh_uid_str.set(str(self.query.q_lh_uid))
+##        self.q_lh_name_str.set(self.query.q_lh_name)
+        self.query.q_lh_uid = lh_uid_init
+        self.query.q_lh_name = self.q_lh_name_widget.get_text()
         self.query.query_expr = [self.query.q_lh_uid, self.query.q_lh_name]
 
         # Delete earlier definition text in query_window.
@@ -1609,7 +1613,11 @@ of the name of the selected object'
         # Rel: Selected relation type option
         # Verify whether kind of relation is specified or only lh option is selected.
         #   If yes then formulate query, else determine rel and rh part of query expression 
-        rel_uid_init = self.q_rel_uid_widget.get()
+
+        # Initial rel_uid_init set to blank ('') to indicate the no query expression is specified
+        # (no extended search specification)
+        rel_uid_init = ''
+##        rel_uid_init = self.q_rel_uid_widget.get()
         if rel_uid_init != '':
             # There is a kind of relation specified. Identify its uid and name
             item = self.rel_options_tree.selection()
@@ -1722,8 +1730,9 @@ of the name of the selected object'
         # Display query results in notebook sheets
         self.views.Display_notebook_views()
 
-    def Close_query(self):
-        self.query_widget.destroy()
+    def Close_query(self, widget):
+##        self.query_widget.destroy()
+        self.user_interface.views_noteb.remove_child(self.query_widget)
         
 #------------------------------------------------------
 class User_interface():
