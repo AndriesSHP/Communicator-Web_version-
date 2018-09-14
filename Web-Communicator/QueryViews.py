@@ -80,6 +80,9 @@ class Query_view():
             query_text = ["Search","Zoek"]
         self.query_widget = gui.Widget(height='100%', width='100%',
                                        style={'display': 'block', 'background-color':'#eeffdd'})
+        search_title = ['A window for searching and selecting objects from the semantic network (dictionary)',\
+                        'Een scherm voor het zoeken en selecteren van objecten uit het semantische netwerk (woordenboek)']
+        self.query_widget.attributes['title'] = search_title[self.GUI_lang_index]
         self.user_interface.views_noteb.add_tab(self.query_widget, query_text[self.GUI_lang_index],
                                                 self.user_interface.tab_cb)
 ##        self.query_frame.title(query_text[self.GUI_lang_index])

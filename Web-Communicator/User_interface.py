@@ -146,13 +146,14 @@ class Communicator(App):
         self.admin_tag.append(self.new_net_tag)
 
         # Define language selector 
-        self.lang_container = gui.HBox(width=180, height=20)
-        self.container.append(self.lang_container)
+        self.lang_container = gui.HBox(width=180, height=20, style='margin-left:200px')
+        #self.container.append(self.lang_container)
         
         lang_text = ['Language:', 'Taal:']
         self.lang_label = gui.Label(lang_text[self.GUI_lang_index], width=80, height=20,
                                     style='background-color:#eeffdd')
         self.lang_label.attributes['title'] = 'Select a language for specification of a search'
+        
         self.lang_container.append(self.lang_label) #self.main_frame, width=10)
         # Set default language: GUI_lang_names[0] = English, [1] = Nederlands
         self.lang_default = self.GUI_lang_names[0]
@@ -160,6 +161,7 @@ class Communicator(App):
                                         style='background-color:#ffffc0') #margin='10px'
         self.lang_select.attributes['title'] = 'The language used for specification of a search'
         self.lang_container.append(self.lang_select)
+        self.menubar.append(self.lang_container)
 ##        self.lang_label.grid(column=0, row=0, sticky=NW)
 ##        self.lang_box.grid(column=1, row=0, sticky=NW)
         # Binding GUI language choice
