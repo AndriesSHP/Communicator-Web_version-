@@ -379,17 +379,17 @@ of the name of the selected object'
 ##        self.alias_table_rows = 5
 ##        self.aliases_table_widget = gui.TableWidget(self.alias_table_rows, 3, True, True,\
         self.aliases_table_widget = gui.Table(width='100%',
-                                              style={"overflow":"auto", "background-color":"#eeffaa",\
+                                              style={"overflow":"auto", "background-color":"#eeffdd",\
                                                      "border-width":"2px", "border-style":"solid",\
                                                      "font-size":"12px", 'table-layout':'auto'})
 ##        self.aliases_table_widget.style['background-color'] = '#eeffaa'
 ##        self.aliases_table_widget.item_at(0, 0).set_text(lang_text[self.GUI_lang_index])
 ##        self.aliases_table_widget.item_at(0, 1).set_text(term_text[self.GUI_lang_index])
 ##        self.aliases_table_widget.item_at(0, 2).set_text(alias_text[self.GUI_lang_index])
-        content = [(lang_text[self.GUI_lang_index],
-                    term_text[self.GUI_lang_index],
-                    alias_text[self.GUI_lang_index])]
-        self.aliases_table_widget.append_from_list(content, fill_title=True)
+        self.aliases_table_head = [(lang_text[self.GUI_lang_index],
+                                    term_text[self.GUI_lang_index],
+                                    alias_text[self.GUI_lang_index])]
+        self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
         self.sixth_line_left_box.append(self.aliases_table_widget)
 
 ##        # Widgets locations in grid
@@ -410,12 +410,12 @@ of the name of the selected object'
 ##            self.q_rh_name_widget.grid(column=4, row=4, columnspan=2, rowspan=1, sticky=EW)
 ##            self.q_uom_name_widget.grid(column=6, row=4, columnspan=2, rowspan=1, sticky=EW)
 
-          # Definition location in grid
+##        # Definition location in grid
 ##        def_label.grid(column=0, row=5, rowspan=1, sticky=EW)
 ##        self.full_def_widget.grid(column=1, row=5, columnspan=7, rowspan=1, sticky=EW)
 ##        defQScroll.grid(column=7, row=5, rowspan=1, sticky=NS+E)
 
-          # Alias location in grid
+##        # Alias location in grid
 ##        #alias_label.grid(column=0, row=6, rowspan=1, sticky=EW)
 ##        self.alias_tree.grid(column=0, row=6, columnspan=5, rowspan=1, sticky=EW)
 ##        alias_scroll.grid(column=4, row=6, rowspan=1, sticky=NS+E)
@@ -1368,7 +1368,8 @@ of the name of the selected object'
 ##            for r in range(1, self.alias_table_rows):
 ##                for c in range(0, 3):
 ##                    self.aliases_table_widget.item_at(r, c).set_text('')
-            #self.aliases_table_widget.empty()
+            self.aliases_table_widget.empty()
+            self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
             
             # Determine synonyms and translations of lh_object name in various languages        
             languages, alias_table = self.Determine_aliases(lh_object)
@@ -1382,7 +1383,8 @@ of the name of the selected object'
                 alias_row_nr += +1
                 # Add language_row to table
                 language_row = gui.TableRow()
-                language_item = gui.TableItem(text=language)
+                language_item = gui.TableItem(text=language,
+                                              style={'text-align':'left'})
                 language_row.add_child(language_item, language_item)
                 self.aliases_table_widget.add_child(language, language_row)
 ##                self.aliases_table_widget.item_at(alias_row_nr, 0).set_text(language)
@@ -1403,7 +1405,8 @@ of the name of the selected object'
                         row_item = gui.TableItem(text='')
                         row_widget.add_child(row_item, row_item)
                         for field in alias_row[1:]:
-                            row_item = gui.TableItem(text=field)
+                            row_item = gui.TableItem(text=field,
+                                                     style={'text-align':'left'})
                             row_widget.add_child(row_item, row_item)
                         self.aliases_table_widget.add_child(alias_row[1], row_widget)
 ##                        self.aliases_table_widget.item_at(alias_row_nr, 1).set_text(alias_row[1])
