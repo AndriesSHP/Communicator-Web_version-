@@ -13,6 +13,18 @@ from QueryViews import Query_view
 from Display_views import Display_views
 from Create_output_file import Convert_numeric_to_integer
 
+
+class MyTabBox(gui.TabBox):
+    def remove_tab_by_name(self, name):
+        """ Removes a tab identified by its name """
+        for a, li, holder in self._tabs.values():
+            if a.children['text'] == name:
+                a.get_parent().remove_child(a)
+                li.get_parent().remove_child(li)
+                holder.get_parent().remove_child(holder)
+                self._tab_cbs.pop(holder.identifier)
+                self._tabs.pop(holder.identifier)
+
 class Communicator(App):
     ''' The opening window of the Communicator program
         that presents options for execution.
@@ -199,7 +211,7 @@ class Communicator(App):
             Starting in grid on row 1.
         """
         # Define the overall views_notebook
-        self.views_noteb = gui.TabBox(height='100%', width='100%', style='background-color:#eeffdd')
+        self.views_noteb = MyTabBox(height='100%', width='100%', style='background-color:#eeffdd')
         self.main_frame.append(self.views_noteb)
 ##        self.views_noteb.grid(column=0, row=1,sticky=NSEW, columnspan=2)
 ##        self.views_noteb.columnconfigure(0,weight=1)
