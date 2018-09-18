@@ -80,8 +80,8 @@ class Query_view():
             query_text = ["Search","Zoek"]
         self.query_widget = gui.Widget(height='100%', width='100%',
                                        style={'display': 'block', 'background-color':'#eeffdd'})
-        search_title = ['A window for searching and selecting objects from the semantic network (dictionary)',\
-                        'Een scherm voor het zoeken en selecteren van objecten uit het semantische netwerk (woordenboek)']
+        search_title = ['A table for searching and selecting objects from the semantic network (dictionary)',\
+                        'Een tabel voor het zoeken en selecteren van objecten uit het semantische netwerk (woordenboek)']
         self.query_widget.attributes['title'] = search_title[self.GUI_lang_index]
         self.user_interface.views_noteb.add_tab(self.query_widget, query_text[self.GUI_lang_index],
                                                 self.user_interface.tab_cb)
@@ -166,7 +166,7 @@ class Query_view():
 
         close_button = gui.Button(close[self.GUI_lang_index], width=100, height=20)
         close_button.attributes['title'] = 'Close the search window'
-        close_button.onclick.connect(self.Close_query)
+        close_button.onclick.connect(self.Close_query, self.user_interface.views_noteb, self.query_widget)
 
         #verifyBut = gui.Button(verify[self.GUI_lang_index])
         #verifyBut.onclick.connect(self.query.Verify_model)
@@ -357,7 +357,7 @@ class Query_view():
         aliasText = ['Aliases for the name of the selected object:',\
                      'Aliases voor de naam van het geselecteerde object:']
         self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width='100%')
-        self.alias_label.attributes['title'] = 'Synonyms, abbreviations and translations \
+        self.alias_label.attributes['title'] = 'A table with synonyms, abbreviations and translations \
 of the name of the selected object'
         self.sixth_line_left_box.append(self.alias_label)
         
@@ -463,8 +463,8 @@ of the name of the selected object'
         # Option label widget location
 ##        options_heading.grid(column=0, row=15, columnspan=3, rowspan=1, sticky=EW)
 
-        # lh Options frame in query_frame for lh options Treeview
-        nr_cols = 6
+        # lh Options frame in query_frame for lh options table
+##        nr_cols = 6
 ##        if self.user_interface.extended_query:
 ##            nr_cols = 8
         ##self.lh_opt_frame = gui.VBox(height='300', width='60%') #, borderwidth=2, relief='ridge')
@@ -478,36 +478,48 @@ of the name of the selected object'
             uid_col = left_uid_text
         else:
             uid_col = uid_text
-        nameCol = ['Name', 'Naam']
-        kindCol = ['Kind', 'Soort']
-        commCol = ['Community', 'Taalgemeenschap']
-        langCol = ['Language', 'Taal']
-        relaCol = ['Relation UID', 'Relatie UID']
-        righCol = ['Right UID', 'Rechter UID']
+        name_col = ['Name', 'Naam']
+        kind_col = ['Kind', 'Soort']
+        comm_col = ['Community', 'Taalgemeenschap']
+        lang_col = ['Language', 'Taal']
+        rela_col = ['Relation UID', 'Relatie UID']
+        right_col = ['Right UID', 'Rechter UID']
 
-        self.opt_table_rows = 10
-        if self.user_interface.extended_query:
-            self.opt_table_rows = 5
+##        self.opt_table_rows = 10
+##        if self.user_interface.extended_query:
+##            self.opt_table_rows = 5
             
-        self.options_table = gui.TableWidget(self.opt_table_rows, 5, True, True, width='100%', height=200,\
-                                             style={"overflow":"auto","background-color":"#eeffaa",\
-                                                    "border-width":"2px","border-style":"solid",\
-                                                    "font-size":"12px"})
-        self.options_table.style['background-color'] = '#eeffaa'
-        self.options_table.item_at(0, 0).set_text(uid_text[self.GUI_lang_index])
-        self.options_table.item_at(0, 1).set_text(nameCol[self.GUI_lang_index])
-        self.options_table.item_at(0, 2).set_text(kindCol[self.GUI_lang_index])
-        self.options_table.item_at(0, 3).set_text(commCol[self.GUI_lang_index])
-        self.options_table.item_at(0, 4).set_text(langCol[self.GUI_lang_index])
-        self.sixth_line_left_box.append(self.options_table)
+##        self.options_table = gui.TableWidget(self.opt_table_rows, 5, True, True, width='100%', height=200,\
+##                                             style={"overflow":"auto","background-color":"#eeffaa",\
+##                                                    "border-width":"2px","border-style":"solid",\
+##                                                    "font-size":"12px"})
+##        self.options_table.style['background-color'] = '#eeffaa'
+##        self.options_table.item_at(0, 0).set_text(uid_text[self.GUI_lang_index])
+##        self.options_table.item_at(0, 1).set_text(name_col[self.GUI_lang_index])
+##        self.options_table.item_at(0, 2).set_text(kind_col[self.GUI_lang_index])
+##        self.options_table.item_at(0, 3).set_text(comm_col[self.GUI_lang_index])
+##        self.options_table.item_at(0, 4).set_text(lang_col[self.GUI_lang_index])
+
+        self.options_table = gui.Table(width='100%',
+                                       style={"overflow":"auto", "background-color":"#eeffdd",\
+                                              "border-width":"2px", "border-style":"solid",\
+                                              "font-size":"12px", 'table-layout':'auto'})
+        self.options_table_head = [(uid_text[self.GUI_lang_index],
+                                    name_col[self.GUI_lang_index],
+                                    kind_col[self.GUI_lang_index],
+                                    comm_col[self.GUI_lang_index],
+                                    lang_col[self.GUI_lang_index])]
+        self.options_table.append_from_list(self.options_table_head, fill_title=True)
+
         self.options_table.on_table_row_click.connect(self.Set_selected_q_lh_term)
+        self.sixth_line_left_box.append(self.options_table)
         
 ##        self.lh_options_tree = gui.TreeView(width='100%', height=300)
 ##        lh_option_heading = uid_text[self.GUI_lang_index] + ' '\
-##                            + nameCol[self.GUI_lang_index] + ' '\
-##                            + kindCol[self.GUI_lang_index] + ' '\
-##                            + commCol[self.GUI_lang_index] + ' '\
-##                            + langCol[self.GUI_lang_index]
+##                            + name_col[self.GUI_lang_index] + ' '\
+##                            + kind_col[self.GUI_lang_index] + ' '\
+##                            + comm_col[self.GUI_lang_index] + ' '\
+##                            + lang_col[self.GUI_lang_index]
 ##        self.tree_heading = gui.TreeItem(lh_option_heading)
 ##        self.sixth_line_left_box.append(self.tree_heading)
 ##        self.sixth_line_left_box.append(self.lh_options_tree)
@@ -517,10 +529,10 @@ of the name of the selected object'
 ##                                            displaycolumns=('Name','Kind','Comm','Lang'),\
 ##                                            selectmode='browse', height=self.opt_table_rows)
 ##        self.lh_options_tree.heading('#0', text=uid_col[self.GUI_lang_index], anchor=W)
-##        self.lh_options_tree.heading('Name', text=nameCol[self.GUI_lang_index], anchor=W)
-##        self.lh_options_tree.heading('Kind', text=kindCol[self.GUI_lang_index], anchor=W)
-##        self.lh_options_tree.heading('Comm', text=commCol[self.GUI_lang_index], anchor=W)
-##        self.lh_options_tree.heading('Lang', text=langCol[self.GUI_lang_index], anchor=W)
+##        self.lh_options_tree.heading('Name', text=name_col[self.GUI_lang_index], anchor=W)
+##        self.lh_options_tree.heading('Kind', text=kind_col[self.GUI_lang_index], anchor=W)
+##        self.lh_options_tree.heading('Comm', text=comm_col[self.GUI_lang_index], anchor=W)
+##        self.lh_options_tree.heading('Lang', text=lang_col[self.GUI_lang_index], anchor=W)
 ##
 ##        self.lh_options_tree.column ('#0', width=80)
 ##        #self.lh_options_tree.column ('UID', minwidth=40, width=80)
@@ -558,11 +570,11 @@ of the name of the selected object'
 ##                                                 displaycolumns='#all', selectmode='browse', \
 ##                                                 height=self.opt_table_rows)
 ##            self.rel_options_tree.heading('#0', anchor=W)
-##            self.rel_options_tree.heading('UID',  text=relaCol[self.GUI_lang_index], anchor=W)
-##            self.rel_options_tree.heading('Name', text=nameCol[self.GUI_lang_index], anchor=W)
-##            self.rel_options_tree.heading('Kind', text=kindCol[self.GUI_lang_index], anchor=W)
-##            self.rel_options_tree.heading('Comm', text=commCol[self.GUI_lang_index], anchor=W)
-##            self.rel_options_tree.heading('Lang', text=langCol[self.GUI_lang_index], anchor=W)
+##            self.rel_options_tree.heading('UID',  text=rela_col[self.GUI_lang_index], anchor=W)
+##            self.rel_options_tree.heading('Name', text=name_col[self.GUI_lang_index], anchor=W)
+##            self.rel_options_tree.heading('Kind', text=kind_col[self.GUI_lang_index], anchor=W)
+##            self.rel_options_tree.heading('Comm', text=comm_col[self.GUI_lang_index], anchor=W)
+##            self.rel_options_tree.heading('Lang', text=lang_col[self.GUI_lang_index], anchor=W)
 ##
 ##            self.rel_options_tree.column ('#0', width=10)
 ##            self.rel_options_tree.column ('UID',  minwidth=40 , width=80)
@@ -603,11 +615,11 @@ of the name of the selected object'
 ##                                                displaycolumns='#all', selectmode='browse', \
 ##                                                height=self.opt_table_rows)
 ##            self.rh_options_tree.heading('#0', anchor=W)
-##            self.rh_options_tree.heading('UID',  text=righCol[self.GUI_lang_index], anchor=W)
-##            self.rh_options_tree.heading('Name', text=nameCol[self.GUI_lang_index], anchor=W)
-##            self.rh_options_tree.heading('Kind', text=kindCol[self.GUI_lang_index], anchor=W)
-##            self.rh_options_tree.heading('Comm', text=commCol[self.GUI_lang_index], anchor=W)
-##            self.rh_options_tree.heading('Lang', text=langCol[self.GUI_lang_index], anchor=W)
+##            self.rh_options_tree.heading('UID',  text=right_col[self.GUI_lang_index], anchor=W)
+##            self.rh_options_tree.heading('Name', text=name_col[self.GUI_lang_index], anchor=W)
+##            self.rh_options_tree.heading('Kind', text=kind_col[self.GUI_lang_index], anchor=W)
+##            self.rh_options_tree.heading('Comm', text=comm_col[self.GUI_lang_index], anchor=W)
+##            self.rh_options_tree.heading('Lang', text=lang_col[self.GUI_lang_index], anchor=W)
 ##
 ##            self.rh_options_tree.column ('#0'     ,width=10)
 ##            self.rh_options_tree.column ('UID'    ,minwidth=40 , width=80)
@@ -663,24 +675,35 @@ of the name of the selected object'
         eq_col = ['>=<', '>=<']
         value_col = ['Value', 'Waarde']
         uom_col = ['UoM', 'Eenheid']
-        self.aspect_table_rows = 15
-        self.aspects_table = gui.TableWidget(self.aspect_table_rows, 4, True, True,\
-                                             width='100%', height=200,\
-                                             style={"overflow":"auto","background-color":"#eeffaa",\
-                                                    "border-width":"2px","border-style":"solid",\
-                                                    "font-size":"12px"})
-        self.aspects_table.style['table-layout'] = 'auto'
-        self.aspects_table.style['background-color'] = '#eeffaa'
-        self.aspects_table.item_at(0, 0).set_text(aspect_col[self.GUI_lang_index])
-        self.aspects_table.item_at(0, 1).set_text(eq_col[self.GUI_lang_index])
-        self.aspects_table.item_at(0, 2).set_text(value_col[self.GUI_lang_index])
-        self.aspects_table.item_at(0, 3).set_text(uom_col[self.GUI_lang_index])
+##        self.aspect_table_rows = 15
+##        self.aspects_table = gui.TableWidget(self.aspect_table_rows, 4, True, True,\
+##                                             width='100%', height=200,\
+##                                             style={"overflow":"auto","background-color":"#eeffaa",\
+##                                                    "border-width":"2px","border-style":"solid",\
+##                                                    "font-size":"12px"})
+##        self.aspects_table.style['table-layout'] = 'auto'
+##        self.aspects_table.style['background-color'] = '#eeffaa'
+##        self.aspects_table.item_at(0, 0).set_text(aspect_col[self.GUI_lang_index])
+##        self.aspects_table.item_at(0, 1).set_text(eq_col[self.GUI_lang_index])
+##        self.aspects_table.item_at(0, 2).set_text(value_col[self.GUI_lang_index])
+##        self.aspects_table.item_at(0, 3).set_text(uom_col[self.GUI_lang_index])
 ##        self.aspect_heading = gui.TreeItem(aspect_col[self.GUI_lang_index] + ' ' +
 ##                                       eq_col[self.GUI_lang_index] + ' ' +
 ##                                       value_col[self.GUI_lang_index] + ' ' +
 ##                                       uom_col[self.GUI_lang_index])
 ##        self.aspect_frame.append(self.aspect_heading)
 ##        self.aspects_tree = gui.TreeView(height='100%', width='100%')
+        self.aspects_table = gui.Table(width='100%',
+                                       style={"overflow":"auto", "background-color":"#eeffdd",\
+                                              "border-width":"2px", "border-style":"solid",\
+                                              "font-size":"12px", 'table-layout':'auto'})
+        self.aspects_table_head = [(aspect_col[self.GUI_lang_index],
+                                    eq_col[self.GUI_lang_index],
+                                    value_col[self.GUI_lang_index],
+                                    uom_col[self.GUI_lang_index])]
+        self.aspects_table.append_from_list(self.aspects_table_head, fill_title=True)
+
+        self.aspects_table.on_table_row_click.connect(self.Determine_selected_aspects)
         self.aspect_frame.append(self.aspects_table)
         self.sixth_line_box.append(self.aspect_frame)
 ##                                         columns=('UID','Name','Rel_uid','UID-2','Parent',\
@@ -728,14 +751,16 @@ of the name of the selected object'
         """
         #print('Lh uid entry:',event.char)
 
-        opt_table_row_nr = 0
+##        opt_table_row_nr = 0
         self.lh_options[:] = []
 ##        x = self.lh_options_tree.get_children()
 ##        for item in x: self.lh_options_tree.delete(item)
         # Remove possible earlier options by making the options_table empty
-        for r in range(1, self.opt_table_rows):
-            for c in range(0, 5):
-                self.options_table.item_at(r, c).set_text('')
+##        for r in range(1, self.opt_table_rows):
+##            for c in range(0, 5):
+##                self.options_table.item_at(r, c).set_text('')
+        self.options_table.empty()
+        self.options_table.append_from_list(self.options_table_head, fill_title=True)
         
         # Determine lh_options for lh uid in query
         lh_uid = new_value #self.q_lh_uid_widget.get()
@@ -770,12 +795,18 @@ of the name of the selected object'
                 name = option[4]
                 kind_name = option[8]
                 opt = [uid, name, kind_name, comm_name, lang_name]
-                opt_table_row_nr += +1
-                self.options_table.item_at(opt_table_row_nr, 0).set_text(uid)
-                self.options_table.item_at(opt_table_row_nr, 1).set_text(name)
-                self.options_table.item_at(opt_table_row_nr, 2).set_text(kind_name)
-                self.options_table.item_at(opt_table_row_nr, 3).set_text(comm_name)
-                self.options_table.item_at(opt_table_row_nr, 4).set_text(lang_name)
+##                opt_table_row_nr += +1
+##                self.options_table.item_at(opt_table_row_nr, 0).set_text(uid)
+##                self.options_table.item_at(opt_table_row_nr, 1).set_text(name)
+##                self.options_table.item_at(opt_table_row_nr, 2).set_text(kind_name)
+##                self.options_table.item_at(opt_table_row_nr, 3).set_text(comm_name)
+##                self.options_table.item_at(opt_table_row_nr, 4).set_text(lang_name)
+                row_widget = gui.TableRow()
+                for field in opt:
+                    row_item = gui.TableItem(text=field,
+                                             style={'text-align':'left'})
+                    row_widget.append(row_item, field)
+                    self.options_table.append(row_widget, opt[1])
 
                 # Display lh_object uid
                 self.query.q_lh_uid = lh_uid
@@ -821,15 +852,17 @@ of the name of the selected object'
         """
         #print('Lh name entry:',event.char)
         #if event.keysym not in ['Shift_L', 'Shift_R']:
-        opt_table_row_nr = 0
+##        opt_table_row_nr = 0
         self.string_commonality = self.cs + self.fe
 
         self.query.q_lh_uid = 0
         self.lh_options[:] = []
         # Remove possible earlier options by make the options_table empty
-        for r in range(1, self.opt_table_rows):
-            for c in range(0, 5):
-                self.options_table.item_at(r, c).set_text('')
+##        for r in range(1, self.opt_table_rows):
+##            for c in range(0, 5):
+##                self.options_table.item_at(r, c).set_text('')
+        self.options_table.empty()
+        self.options_table.append_from_list(self.options_table_head, fill_title=True)
         
 ##        x = self.lh_options_tree.get_children()
 ##        for item in x: self.lh_options_tree.delete(item)
@@ -868,12 +901,18 @@ of the name of the selected object'
                 name = option[4]
                 kind_name = option[8]
                 opt = [uid, name, kind_name, comm_name, lang_name]
-                opt_table_row_nr += +1
-                self.options_table.item_at(opt_table_row_nr, 0).set_text(uid)
-                self.options_table.item_at(opt_table_row_nr, 1).set_text(name)
-                self.options_table.item_at(opt_table_row_nr, 2).set_text(kind_name)
-                self.options_table.item_at(opt_table_row_nr, 3).set_text(comm_name)
-                self.options_table.item_at(opt_table_row_nr, 4).set_text(lang_name)
+##                opt_table_row_nr += +1
+##                self.options_table.item_at(opt_table_row_nr, 0).set_text(uid)
+##                self.options_table.item_at(opt_table_row_nr, 1).set_text(name)
+##                self.options_table.item_at(opt_table_row_nr, 2).set_text(kind_name)
+##                self.options_table.item_at(opt_table_row_nr, 3).set_text(comm_name)
+##                self.options_table.item_at(opt_table_row_nr, 4).set_text(lang_name)
+                row_widget = gui.TableRow()
+                for field in opt:
+                    row_item = gui.TableItem(text=field,
+                                             style={'text-align':'left'})
+                    row_widget.add_child(field, row_item)
+                    self.options_table.add_child(opt[1], row_widget)
                 
 ##                opt_text = uid + name + kind_name + comm_name + lang_name
 ##                option = gui.TreeItem(opt_text)
@@ -1233,7 +1272,7 @@ of the name of the selected object'
                  
         return found_uid, options
 
-    def Set_selected_q_lh_term(self, table, row, item):
+    def Set_selected_q_lh_term(self, window, row, item):
         """ Put the lh_object that is selected from lh_options
             in the query (q_lh_name_str and q_lh_uid_str)
             and display its textual definition, name and uid.
@@ -1251,7 +1290,7 @@ of the name of the selected object'
 ##            return
 ##        self.query.lhSel = self.lh_options[ind]
         # Determine UID and Name of selected option
-        #print('Clicked option uid:', item.get_text())
+        print('Clicked option uid:', item.get_text())
         self.query.q_lh_uid = item.get_text()
 ##        self.query.q_lh_uid = self.query.lhSel[5]
 ##        self.query.q_lh_name = self.query.lhSel[4]
@@ -1321,10 +1360,13 @@ of the name of the selected object'
             # Delete previous characteristics
 ##            x = self.aspects_tree.get_children()
 ##            for item in x: self.aspects_tree.delete(item)
-            for r in range(1, self.aspect_table_rows):
-                for c in range(0, 4):
-                    self.aspects_table.item_at(r, c).set_text('')
-            aspect_row_nr = 0
+##            for r in range(1, self.aspect_table_rows):
+##                for c in range(0, 4):
+##                    self.aspects_table.item_at(r, c).set_text('')
+            self.aspects_table.empty()
+            self.aspects_table.append_from_list(self.aspects_table_head, fill_title=True)
+            
+##            aspect_row_nr = 0
             # Insert new list of characteristics in aspects_tree
             if len(self.q_aspects) > 0:
                 # Sort aspect values by kind of aspect name and by value
@@ -1339,8 +1381,13 @@ of the name of the selected object'
 ##                                                 text=asp[1], open=False)
 ##                        asp_row = gui.TreeItem(asp[1])
 ##                        self.aspects_tree.append(asp_row)
-                        aspect_row_nr += +1
-                        self.aspects_table.item_at(aspect_row_nr, 0).set_text(aspect_name)
+                        # Display kind of aspect name
+##                        aspect_row_nr += +1
+##                        self.aspects_table.item_at(aspect_row_nr, 0).set_text(aspect_name)
+                        aspect_row = gui.TableRow()
+                        aspect_row_item = gui.TableItem(text=aspect_name)
+                        aspect_row.append(aspect_row_item)
+                        self.aspects_table.append(aspect_row)
 ##                    else:
 ##                        self.aspects_tree.insert(asp[4], index='end',
 ##                                                 values=asp,
@@ -1349,14 +1396,35 @@ of the name of the selected object'
 ##                        self.aspects_tree.append(asp_row)
                         for asp_val in self.q_aspects:
                             name_value = asp_val[4]
-                            if name_value == aspect_name and aspect_row_nr < self.aspect_table_rows-1:
+                            if name_value == aspect_name:
                                 equality = asp_val[5]
                                 value = asp_val[6]
                                 uom = asp_val[7]
                                 aspect_row_nr += +1
-                                self.aspects_table.item_at(aspect_row_nr, 1).set_text(equality)
-                                self.aspects_table.item_at(aspect_row_nr, 2).set_text(value)
-                                self.aspects_table.item_at(aspect_row_nr, 3).set_text(uom)
+                                aspect_row = gui.TableRow()
+                                aspect_row_item = gui.TableItem(text='')
+                                aspect_row.append(aspect_row_item)
+                                aspect_row_item = gui.TableItem(text=equality)
+                                aspect_row.append(aspect_row_item)
+                                aspect_row_item = gui.TableItem(text=value)
+                                aspect_row.append(aspect_row_item)
+                                aspect_row_item = gui.TableItem(text=uom)
+                                aspect_row.append(aspect_row_item)
+
+##                    if alias_row[0] == language:
+####                        self.row = gui.TreeItem(alias_row[1])
+####                        self.row.attributes['treeopen'] = 'true'
+####                        self.language_row.append(self.row)
+####                        alias_row_nr += +1
+##                        row_widget = gui.TableRow()
+##                        row_item = gui.TableItem(text='')
+##                        row_widget.add_child(row_item, row_item)
+##                        for field in alias_row[1:]:
+##                            row_item = gui.TableItem(text=field,
+##                                                     style={'text-align':'left'})
+##                            row_widget.add_child(field, row_item)
+##                        self.aliases_table_widget.add_child(alias_row[1], row_widget)
+
                         
             rel_options.sort()
             self.gel_net.rel_terms = rel_options
@@ -1373,14 +1441,14 @@ of the name of the selected object'
             
             # Determine synonyms and translations of lh_object name in various languages        
             languages, alias_table = self.Determine_aliases(lh_object)
-            alias_row_nr = 0
+##            alias_row_nr = 0
             for language in languages:
 ##                self.alias_tree.insert('', index='end',
 ##                                       values=language,
 ##                                       iid=language,
 ##                                       text=language, open=True)
 ##                self.language_row = gui.TableRow(language)
-                alias_row_nr += +1
+##                alias_row_nr += +1
                 # Add language_row to table
                 language_row = gui.TableRow()
                 language_item = gui.TableItem(text=language,
@@ -1400,14 +1468,14 @@ of the name of the selected object'
 ##                        self.row = gui.TreeItem(alias_row[1])
 ##                        self.row.attributes['treeopen'] = 'true'
 ##                        self.language_row.append(self.row)
-                        alias_row_nr += +1
+##                        alias_row_nr += +1
                         row_widget = gui.TableRow()
                         row_item = gui.TableItem(text='')
-                        row_widget.add_child(row_item, row_item)
+                        row_widget.add_child(language, row_item)
                         for field in alias_row[1:]:
                             row_item = gui.TableItem(text=field,
                                                      style={'text-align':'left'})
-                            row_widget.add_child(row_item, row_item)
+                            row_widget.add_child(field, row_item)
                         self.aliases_table_widget.add_child(alias_row[1], row_widget)
 ##                        self.aliases_table_widget.item_at(alias_row_nr, 1).set_text(alias_row[1])
 ##                        self.aliases_table_widget.item_at(alias_row_nr, 2).set_text(alias_row[2])
@@ -1755,9 +1823,12 @@ of the name of the selected object'
         # Display query results in notebook sheets
         self.views.Display_notebook_views()
 
-    def Close_query(self, widget):
+    def Close_query(self, widget, tabbox, refWidgetTab):
 ##        self.query_widget.destroy()
-        self.user_interface.views_noteb.remove_child(self.query_widget)
+        query_text = ["Search","Zoek"]
+        tabbox.select_by_widget(refWidgetTab)
+        tabbox.remove_tab_by_name(query_text[self.GUI_lang_index])
+##        self.user_interface.views_noteb.remove_child(self.query_widget)
         
 #------------------------------------------------------
 class User_interface():
