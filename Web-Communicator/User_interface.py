@@ -17,12 +17,15 @@ from Create_output_file import Convert_numeric_to_integer
 class MyTabBox(gui.TabBox):
     def remove_tab_by_name(self, name):
         """ Removes a tab identified by its name """
+        identifier = None
         for a, li, holder in self._tabs.values():
             if a.children['text'] == name:
                 a.get_parent().remove_child(a)
                 li.get_parent().remove_child(li)
                 holder.get_parent().remove_child(holder)
                 self._tab_cbs.pop(holder.identifier)
+                identifier = holder.identifier
+            if identifier != None:
                 self._tabs.pop(holder.identifier)
 
 class Communicator(App):
