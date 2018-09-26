@@ -1076,11 +1076,11 @@ of the name of the selected object'
                   values for different aspects are additional requirements (and)
         '''
         self.query.aspect_values = []
-        selected_aspects = self.aspects_tree.selection()
-        #print('Selected aspects:', selected_aspects)
+        selected_aspects = item.get_text()
+        print('Selected aspects:', selected_aspects)
         if len(selected_aspects) > 0:
             for aspect in selected_aspects:
-                aspect_dict = self.aspects_tree.item(aspect)
+                aspect_dict = self.aspects_table.item(aspect)
                 aspect_values = list(aspect_dict['values'])
                 print('Query aspects:', aspect_values)
                 self.query.aspect_values.append(aspect_values)
@@ -1281,6 +1281,7 @@ of the name of the selected object'
             for display their phrases in dropdown listbox and selection.
             And determine the synonyms and translations of lh_object name.
         """
+        blank = ''
 ##        item = self.lh_options_tree.selection()
 ##        ind = self.lh_options_tree.index(item)
 ##        if len(self.lh_options) == 0:
@@ -1290,7 +1291,7 @@ of the name of the selected object'
 ##            return
 ##        self.query.lhSel = self.lh_options[ind]
         # Determine UID and Name of selected option
-        print('Clicked option uid:', item.get_text())
+        print('Clicked option uid:', item.get_text(), row)
         self.query.q_lh_uid = item.get_text()
 ##        self.query.q_lh_uid = self.query.lhSel[5]
 ##        self.query.q_lh_name = self.query.lhSel[4]
@@ -1385,7 +1386,8 @@ of the name of the selected object'
 ##                        aspect_row_nr += +1
 ##                        self.aspects_table.item_at(aspect_row_nr, 0).set_text(aspect_name)
                         aspect_row = gui.TableRow()
-                        aspect_row_item = gui.TableItem(text=aspect_name)
+                        aspect_row_item = gui.TableItem(text=aspect_name,\
+                                                        style={'text-align':'left'})
                         aspect_row.append(aspect_row_item)
                         self.aspects_table.append(aspect_row)
 ##                    else:
@@ -1402,14 +1404,19 @@ of the name of the selected object'
                                 uom = asp_val[7]
 ##                                aspect_row_nr += +1
                                 aspect_row = gui.TableRow()
-                                aspect_row_item = gui.TableItem(text='')
-                                aspect_row.append(aspect_row_item)
-                                aspect_row_item = gui.TableItem(text=equality)
-                                aspect_row.append(aspect_row_item)
-                                aspect_row_item = gui.TableItem(text=value)
-                                aspect_row.append(aspect_row_item)
-                                aspect_row_item = gui.TableItem(text=uom)
-                                aspect_row.append(aspect_row_item)
+                                aspect_row_item = gui.TableItem(text=blank,\
+                                                                style={'text-align':'left'})
+                                aspect_row.append(aspect_row_item, blank)
+                                aspect_row_item = gui.TableItem(text=equality,\
+                                                                style={'text-align':'left'})
+                                aspect_row.append(aspect_row_item, equality)
+                                aspect_row_item = gui.TableItem(text=value,\
+                                                                style={'text-align':'left'})
+                                aspect_row.append(aspect_row_item, value)
+                                aspect_row_item = gui.TableItem(text=uom,\
+                                                                style={'text-align':'left'})
+                                aspect_row.append(aspect_row_item, uom)
+                                self.aspects_table.append(aspect_row)
 
 ##                    if alias_row[0] == language:
 ####                        self.row = gui.TreeItem(alias_row[1])
