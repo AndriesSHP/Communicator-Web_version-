@@ -86,51 +86,25 @@ class Communicator(App):
         self.Set_GUI_language(self.GUI_lang_names[0])
 
         # Define main GUI window
-        #self.root = Tk()
         self.container = gui.Widget(margin='2px', style='background-color:#eeffdd')
         self.container.set_size('100%', '100%')
         self.container.attributes['title'] = 'Communicator'
-##        self.container.title("Gellish Communicator")
-##        max_width, max_height = self.container.winfo_screenwidth(), \
-##                                self.container.winfo_screenheight()
-##        self.container.geometry('1000x600')
-##        self.container.minsize(width=600, height=300)
-##        self.container.maxsize(width=1000,height=600) #max_width, height=max_height)
-##        self.container.myStyle = Style()
-##        self.container.myStyle.configure("TFrame", background="#dfd")
-##        self.container.configure(background="#ddf")
-##        self.container.columnconfigure(0, weight=1)
-##        self.container.rowconfigure(0, weight=1)
-##        self.container.option_add('*tearOff', False)
 
         # Menu bar
         self.menubar = gui.MenuBar(height=20, width='100%')
         self.container.append(self.menubar)
 
-##        self.menubar.add_cascade(menu=self.main_menu,
-##                                 label=main_menu[self.GUI_lang_index])
-##        self.main_menu.add_command(label=login[self.GUI_lang_index],
-##                                   command=self.login_reg)
-        #login_tag = gui.MenuItem(login[self.GUI_lang_index], width=100, height=20)
-        #self.menubar.append(login_tag)
-##        self.main_menu.add_command(label=read_file[self.GUI_lang_index],
-##                                   command=self.read_file)
         import_text = ['Import one or more Gellish files', 'Lees een of meer Gellish files']
         self.read_file_tag = gui.MenuItem(read_file[self.GUI_lang_index], width=100, height=20)
         self.read_file_tag.attributes['title'] = import_text[self.GUI_lang_index]
         self.read_file_tag.onclick.connect(self.read_verify_and_merge_files)
         self.menubar.append(self.read_file_tag)
         
-##        self.main_menu.add_command(label=search[self.GUI_lang_index],
-##                                   command=self.search_net)
         self.search_tag = gui.MenuItem(search[self.GUI_lang_index], width=100, height=20)
         self.search_tag.attributes['title'] = 'Open a search window'
         self.search_tag.onclick.connect(self.search_net)
         self.menubar.append(self.search_tag)
-##        self.main_menu.add_command(label=query[self.GUI_lang_index],
-##                                   command=self.query_net)
-##        self.main_menu.add_command(label=manual[self.GUI_lang_index],
-##                                   command=self.user_manual)
+
         self.manual_tag = gui.MenuItem(manual[self.GUI_lang_index], width=100, height=20)
         self.manual_tag.attributes['title'] = 'Open the Communicator user manual'
         self.manual_tag.onclick.connect(self.user_manual)
@@ -138,23 +112,18 @@ class Communicator(App):
 
         self.wiki_tag = gui.MenuItem(wiki[self.GUI_lang_index], width=100, height=20)
         self.wiki_tag.attributes['title'] = 'Open the Gellish languages wiki'
-        self.wiki_tag.onclick.connect(self.user_manual)
+        self.wiki_tag.onclick.connect(self.open_wiki)
         self.menubar.append(self.wiki_tag)
 
         self.admin_tag = gui.MenuItem(admin[self.GUI_lang_index], width=100, height=20)
         self.admin_tag.attributes['title'] = 'Save network on file or delete old and create new network'
         self.menubar.append(self.admin_tag)
-##        self.menubar.add_cascade(menu=self.db_menu,
-##                                 label=admin[self.GUI_lang_index])
-##        self.db_menu.add_command(label=save_as[self.GUI_lang_index],
-##                                 command=self.gel_net.save_pickle_db)
+
         self.save_as_tag = gui.MenuItem(save_as[self.GUI_lang_index], width=100, height=20)
         self.save_as_tag.attributes['title'] = 'Save semantic network on binary file'
         self.save_as_tag.onclick.connect(self.gel_net.save_pickle_db)
         self.admin_tag.append(self.save_as_tag)
 
-##        self.db_menu.add_command(label=new_net[self.GUI_lang_index],
-##                                 command=self.gel_net.reset_and_build_network)
         self.new_net_tag = gui.MenuItem(new_net[self.GUI_lang_index], width=100, height=20)
         self.new_net_tag.attributes['title'] = 'Delete old and create new semantic network'
         self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network)
@@ -162,7 +131,6 @@ class Communicator(App):
 
         # Define language selector 
         self.lang_container = gui.HBox(width=180, height=20, style='margin-left:200px')
-        #self.container.append(self.lang_container)
         
         lang_text = ['Language:', 'Taal:']
         self.lang_label = gui.Label(lang_text[self.GUI_lang_index], width=80, height=20,
@@ -177,10 +145,8 @@ class Communicator(App):
         self.lang_select.attributes['title'] = 'The language used for specification of a search'
         self.lang_container.append(self.lang_select)
         self.menubar.append(self.lang_container)
-##        self.lang_label.grid(column=0, row=0, sticky=NW)
-##        self.lang_box.grid(column=1, row=0, sticky=NW)
+
         # Binding GUI language choice
-##        self.lang_box.bind("<<ComboboxSelected>>", self.Determine_GUI_language)
         self.lang_select.onchange.connect(self.Determine_GUI_language)
 
         # Main Frame
@@ -188,15 +154,6 @@ class Communicator(App):
         self.container.append(self.main_frame)
         self.main_frame.attributes['color'] = 'green'
         
-##        self.main_frame.grid(column=0, row=0, sticky=NSEW)
-##        self.main_frame.columnconfigure(0, weight=0)
-##        self.main_frame.columnconfigure(1, weight=1)
-##        self.main_frame.rowconfigure(0, weight=0)
-##        self.main_frame.rowconfigure(1, weight=1)
-
-##        event = 'Button-1'
-##        self.Determine_GUI_language(event)
-##
         self.query = None
         self.unknown = ['unknown', 'onbekend']
         self.unknown_quid = 0   # start UID for unknowns in queries
@@ -216,9 +173,6 @@ class Communicator(App):
         # Define the overall views_notebook
         self.views_noteb = MyTabBox(height='100%', width='100%', style='background-color:#eeffdd')
         self.main_frame.append(self.views_noteb)
-##        self.views_noteb.grid(column=0, row=1,sticky=NSEW, columnspan=2)
-##        self.views_noteb.columnconfigure(0,weight=1)
-##        self.views_noteb.rowconfigure(0,weight=1)
 
         self.Define_log_sheet()
     
@@ -228,21 +182,6 @@ class Communicator(App):
         self.log_frame = gui.ListView(width='100%', height='100%', style='background-color:#eeffdd')
         self.log_frame.attributes['title'] = 'Display messages and warnings'
         self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], self.tab_cb)
-##        self.log_frame.grid (column=0, row=0,sticky=NSEW)
-##        self.log_frame.columnconfigure(0, weight=1)
-##        self.log_frame.rowconfigure(0, weight=1)
-        
-##        self.views_noteb.add(self.log_frame, text=log_head[self.GUI_lang_index], sticky=NSEW)
-##        self.views_noteb.insert("end", self.log_frame, sticky=NSEW)
-
-        # Messages area - text widget definition
-##        self.log_message = Text(self.log_frame, width = 40, background='#efc') # height = 10,
-##        log_mess_scroll  = ttk.Scrollbar(self.log_frame,orient=VERTICAL,\
-##                                         command=self.log_message.yview)
-##        self.log_message.config(yscrollcommand=log_mess_scroll.set)
-##
-##        self.log_message.grid(column=0, row=0, columnspan=1, rowspan=1, sticky=NSEW)
-##        log_mess_scroll.grid(column=0, row=0, sticky=NS+E)
     
     def tab_cb(self):
         return
@@ -268,8 +207,6 @@ class Communicator(App):
             self.gel_net = Semantic_Network(self.net_name)
             # Build the semantic network
             self.gel_net.build_network()
-        # Create and open a user interface
-##        self.user_interface = User_interface(self.gel_net)
 
     def load_net(self):
         # Load semantic network from pickle binary file.
@@ -360,13 +297,8 @@ class Communicator(App):
                                                   'overflow': 'auto', 'text-align': 'center'})
         self.container.append(self.subContainerRead)
         # Select one or more files to be imported
-##        file_path_names = filedialog.askopenfilenames(
-##            filetypes=[("CSV files","*.csv"),("JSON files","*.json"), ("All files","*.*")], \
-##            title="Select file")
-        # Attributes: title=, message=, multiple_selection=, selection_folder=,
-        #             allow_file_selection=True, allow_folder_selection=True
         self.dialog = gui.FileSelectionDialog('File selection dialog',
-                                              'Select one or more files',
+                                              'Select one or more CSV or JSON files',
                                               False, '.',
                                               style='background-color:#eeffdd')
         self.dialog.confirm_value.connect(self.on_fileselection_dialog_confirm)
@@ -415,11 +347,6 @@ class Communicator(App):
         print('File list: {}'.format(filelist))
         self.file_path_names = filelist
         if len(filelist):
-            #f = filelist[0]
-            # replace the last download link
-            #fdownloader = gui.FileDownloader("download selected", f, width=200, height=30)
-            #self.subContainerRead.append(fdownloader, key='file_downloader')
-
             self.read_files()
 
     def on_dialog_cancel(self, widget):
@@ -440,7 +367,7 @@ class Communicator(App):
         # Open URL in a new tab, if a browser window is already open.
         webbrowser.open_new_tab(url)
 
-    def wiki(self, widget):
+    def open_wiki(self, widget):
         ''' Open the Gellish wiki. '''
 
         url = 'http://wiki.gellish.net/'
@@ -530,14 +457,7 @@ class Communicator(App):
                             obj_name = name_in_context[2]
                             lang_name = self.gel_net.lang_uid_dict[name_in_context[0]]
                             comm_name = self.gel_net.community_dict[name_in_context[1]] # community uid
-##                            # base and inverse phrases have no description (name_in_context[4])
-##                            if len(name_in_context) < 5:
-##                                part_def = ''
-##                            else:
-##                                part_def = name_in_context[4]
-##                            name_known = True
                             break
-                            #return lang_name, comm_name, obj_name, part_def
                     if obj_name:
                         break
                 if obj_name:
