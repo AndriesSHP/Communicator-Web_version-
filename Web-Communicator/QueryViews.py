@@ -911,8 +911,8 @@ of the name of the selected object'
                 for field in opt:
                     row_item = gui.TableItem(text=field,
                                              style={'text-align':'left'})
-                    row_widget.add_child(field, row_item)
-                    self.options_table.add_child(opt[1], row_widget)
+                    row_widget.append(row_item, field)
+                    self.options_table.append(row_widget, opt[1])
                 
 ##                opt_text = uid + name + kind_name + comm_name + lang_name
 ##                option = gui.TreeItem(opt_text)
@@ -1069,7 +1069,7 @@ of the name of the selected object'
                     opt = [option[5],option[4],option[8],comm_name,lang_name]
                     self.rh_options_tree.insert('', index='end', values=opt)
 
-    def Determine_selected_aspects(self, widget):
+    def Determine_selected_aspects(self, widget, row, item):
         ''' Determine one or more selected aspects and their values
             and add them to the query.
             Note: values for the same aspects are alternative options (or)
@@ -1400,7 +1400,7 @@ of the name of the selected object'
                                 equality = asp_val[5]
                                 value = asp_val[6]
                                 uom = asp_val[7]
-                                aspect_row_nr += +1
+##                                aspect_row_nr += +1
                                 aspect_row = gui.TableRow()
                                 aspect_row_item = gui.TableItem(text='')
                                 aspect_row.append(aspect_row_item)
@@ -1453,8 +1453,8 @@ of the name of the selected object'
                 language_row = gui.TableRow()
                 language_item = gui.TableItem(text=language,
                                               style={'text-align':'left'})
-                language_row.add_child(language_item, language_item)
-                self.aliases_table_widget.add_child(language, language_row)
+                language_row.append(language_item, language_item)
+                self.aliases_table_widget.append(language_row, language)
 ##                self.aliases_table_widget.item_at(alias_row_nr, 0).set_text(language)
 ##                self.language_row.attributes['treeopen'] = 'true'
                 
@@ -1471,12 +1471,12 @@ of the name of the selected object'
 ##                        alias_row_nr += +1
                         row_widget = gui.TableRow()
                         row_item = gui.TableItem(text='')
-                        row_widget.add_child(language, row_item)
+                        row_widget.append(row_item, language)
                         for field in alias_row[1:]:
                             row_item = gui.TableItem(text=field,
                                                      style={'text-align':'left'})
-                            row_widget.add_child(field, row_item)
-                        self.aliases_table_widget.add_child(alias_row[1], row_widget)
+                            row_widget.append(row_item, field)
+                        self.aliases_table_widget.append(row_widget, alias_row[1])
 ##                        self.aliases_table_widget.item_at(alias_row_nr, 1).set_text(alias_row[1])
 ##                        self.aliases_table_widget.item_at(alias_row_nr, 2).set_text(alias_row[2])
                 
