@@ -1,14 +1,10 @@
 import os
-##from tkinter import *
-##from tkinter.ttk import *
-##from tkinter import messagebox, filedialog
 import remi.gui as gui
 from operator import itemgetter
 
 from Bootstrapping import ini_out_path
 from Expr_Table_Def import *
 from Query import Query
-#from Display_views import Display_views
 from Anything import Anything
 from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer, \
      Open_output_file
@@ -73,11 +69,7 @@ class Query_view():
             Initiate seach for information about selected option
             by selecting confirmation button.
         """
-
-        if self.user_interface.extended_query:
-            query_text = ["Query","Vraag"]
-        else:
-            query_text = ["Search","Zoek"]
+        query_text = ["Search","Zoek"]
         self.query_widget = gui.Widget(height='100%', width='100%',
                                        style={'display': 'block', 'background-color':'#eeffdd'})
         search_title = ['A table for searching and selecting objects from the semantic network (dictionary)',\
@@ -85,16 +77,7 @@ class Query_view():
         self.query_widget.attributes['title'] = search_title[self.GUI_lang_index]
         self.user_interface.views_noteb.add_tab(self.query_widget, query_text[self.GUI_lang_index],
                                                 self.user_interface.tab_cb)
-##        self.query_frame.title(query_text[self.GUI_lang_index])
-##        self.query_frame.columnconfigure(0, weight=1)
-##        self.query_frame.rowconfigure(0, weight=1)
 
-        # Specify query_frame
-##        self.query_frame = gui.VBox(height='100%', width='100%',
-##                                    style={'display': 'block', 'text-align':'left',
-##                                           'background-color':'#eeffdd'})
-##        self.query_widget.append(self.query_frame)
-        
         self.first_line_widget = gui.HBox(height=20, width=730, margin='5px',
                                           style='position:relative; background-color:#eeffdd')
 
@@ -116,50 +99,27 @@ class Query_view():
         self.reply_lang_box.onchange.connect(self.Determine_reply_language)
 
         # String commonality buttons
-##        #ImmediateSearchVar = BooleanVar()
-##        self.case_sensitive_var = BooleanVar()
-##        self.front_end_match_var = BooleanVar()
-##        #ExactMatchVar = BooleanVar()
-##        #IncludeDescrVar = BooleanVar()
-
-        #ImmediateSearchVar.set(True)
         self.case_sensitive = True
         self.front_end_match = True
-        #ExactMatchVar.set(False)
-        #IncludeDescrVar.set(False)
 
-        #immText = ["Immediate Search", "Direct zoeken"]
         case_text = ["Case sensitive", "Hoofdletter gevoelig"]
         front_end = ["Front end match", "Beginletter(s) kloppen"]
-        #exactText = ["Exact Match", "Preciese overeenstemming"]
-        #ImmediateSearch = ttk.Checkbutton(self.query_frame, text=immText[self.GUI_lang_index], \
-        #                                  variable = ImmediateSearchVar, onvalue = True)
-##        CaseSensitive = ttk.Checkbutton(self.query_frame, text=case_text[self.GUI_lang_index], \
-##                                        variable = self.case_sensitive_var, onvalue = True)
+
         case_sensitive_box = gui.CheckBox(checked=True, width=10, height=20)
         case_sensitive_box.attributes['title'] = 'Tick when search string is case sensitive'
         case_sensitive_box.onchange.connect(self.set_case)
         case_sensitive_text = gui.Label(case_text[self.GUI_lang_index], width=150, height=20)
         case_sensitive_text.attributes['title'] = 'Tick when search string is case sensitive'
-##        FirstCharMatch = ttk.Checkbutton(self.query_frame, text=front_end[self.GUI_lang_index], \
-##                                         variable = self.front_end_match_var, onvalue = True)
+
         front_end_box = gui.CheckBox(checked=True, width=10, height=20)
         front_end_box.attributes['title'] = 'Tick when search string shall match with first character(s) of found string'
         front_end_box.onchange.connect(self.set_front_end)
         front_end_text = gui.Label(front_end[self.GUI_lang_index], width=150, height=20)
         front_end_text.attributes['title'] = 'Tick when search string shall match with first character(s) of found string'
-        #ExactMatch = ttk.Checkbutton(self.query_frame, text=exactText[self.GUI_lang_index], \
-        #                             variable = ExactMatchVar, onvalue = True)
-        #exact_match_box = gui.CheckBox(checked = True)
-        #exact_match_text = gui.Label(case_text[self.GUI_lang_index])
-        # Include searching in descriptions
-        #IncludeDescr = ttk.Checkbutton(self.query_frame, text="Include Description", \
-        #                               variable = IncludeDescrVar, onvalue = True)
 
         # Buttons definition
         confirm = ['Confirm','Bevestig']
         close = ['Close'  ,'Sluit']
-        #verify = ['Verify model' ,'Verifieer model']
         confirm_button = gui.Button(confirm[self.GUI_lang_index], width=100, height=20)
         confirm_button.attributes['title'] = 'Confirm that selected option is searched for'
         confirm_button.onclick.connect(self.Formulate_query_spec)
@@ -167,10 +127,6 @@ class Query_view():
         close_button = gui.Button(close[self.GUI_lang_index], width=100, height=20)
         close_button.attributes['title'] = 'Close the search window'
         close_button.onclick.connect(self.Close_query, self.user_interface.views_noteb, self.query_widget)
-
-        #verifyBut = gui.Button(verify[self.GUI_lang_index])
-        #verifyBut.onclick.connect(self.query.Verify_model)
-        #self.query_frame.append(verifyBut)
 
         # Widget locations in grid
         self.first_line_widget.append(case_sensitive_box)
@@ -186,16 +142,6 @@ class Query_view():
         self.second_line_widget.append(front_end_box)
         self.second_line_widget.append(front_end_text)
         self.query_widget.append(self.second_line_widget)
-##        #ImmediateSearch.grid(column=0, columnspan=2, row=1, sticky=W)
-##        CaseSensitive.grid(column=0, columnspan=2, row=1, sticky=W)
-##        FirstCharMatch.grid(column=0, columnspan=2, row=2, sticky=W)
-##        #ExactMatch.grid(column=0, columnspan=2, row=3, sticky=W)
-##        #IncludeDescr.grid(column=0, row=4, sticky=W)
-##
-##        #searchBut.grid(column=6, row=2 ,sticky=EW)
-##        confirm_button.grid(column=6, row=1, sticky=N+EW)
-##        close_button.grid(column=7, row=1 ,sticky=EW)
-##        #verifyBut.grid(column=7, row=2 ,sticky=N+EW)
 
         # Define English and Dutch example values (initial options) for query
         lhTermListEN = ['?','Paris', 'Eiffel tower', 'France']
@@ -241,9 +187,7 @@ class Query_view():
             rhCondQStr.append ('')
             uomCondQStr.append('')
 
-        if self.user_interface.extended_query:
-            lh_term = ["Left hand term", "Linker term"]
-        else: lh_term = ["Search term", "Zoekterm"]
+        lh_term = ["Search term", "Zoekterm"]
         rel_term = ["Relation type phrase", "Relatietype frase"]
         rh_term = ["Right hand term", "Rechter term"]
         uom_term = ["Unit of measure", "Meeteenheid"]
@@ -270,21 +214,7 @@ class Query_view():
         self.label_frame.append(self.q_lh_uid_widget)
         self.third_line_widget.append(self.label_frame)
         self.query_widget.append(self.third_line_widget)
-##        if self.user_interface.extended_query:
-##            self.q_rel_uid_widget = gui.TextInput(self.q_rel_uid_str, width=10)
-##            self.query_frame.append(self.q_rel_uid_widget)
-##            self.q_rh_uid_widget = gui.TextInput(self.q_rh_uid_str, width=10)
-##            self.query_frame.append(self.q_rh_uid_widget)
-##            self.q_uom_uid_widget = gui.TextInput(self.q_uom_uid_str, width=10)
-##            self.query_frame.append(self.q_uom_uid_widget)
 
-##        if self.user_interface.extended_query:
-##            relNameLbl = gui.Label(rel_term[self.GUI_lang_index])
-##            rhNameLbl = gui.Label(self.query_frame, text=rh_term[self.GUI_lang_index])
-##            uomNameLbl = gui.Label(self.query_frame, text=uom_term[self.GUI_lang_index])
-##            self.query_frame.append(relNameLbl)
-##            self.query_frame.append(rhNameLbl)
-##            self.query_frame.append(uomNameLbl)
         self.fourth_line_widget = gui.HBox(height=60, width='100%',\
                                            style={'background-color':'#eeffdd',\
                                                   'justify-content':'flex-start',\
@@ -301,23 +231,12 @@ class Query_view():
                                                      'align-items':'flex-start'})
         self.dummy_widget = gui.TextInput(height=40, width=300,
                                           style={'background-color':'#eeffdd'})
-        #self.q_lh_name_widget.set_value('')
+
         self.q_lh_name_widget.attributes['title'] = 'Enter a text string that is (part of) a name of the searched object'
         self.q_lh_name_widget.onkeyup.connect(self.Lh_search_cmd)
         self.name_frame.append(self.q_lh_name_widget)
         self.name_frame.append(self.dummy_widget)
         self.fourth_line_widget.append(self.name_frame)
-##        if self.user_interface.extended_query:
-##            self.q_rel_name_widget = gui.DropDown(self.rel_terms, width=40)
-##            self.query_frame.append(self.q_rel_name_widget)
-##            self.q_rh_name_widget = gui.DropDown(self.rh_terms, width=30)
-##            self.query_frame.append(self.q_rh_name_widget)
-##            self.q_uom_name_widget = gui.DropDown(self.uoms, width=10)
-##            self.query_frame.append(self.q_uom_name_widget)
-
-##        if self.user_interface.extended_query:
-##            self.q_rel_name_widget.onkeyup.connect(self.Rel_search_cmd)
-##            self.q_rh_name_widget.onkeyup.connect(self.Rh_search_cmd)
 
         # Definition display widget
         #self.fifth_line_widget = gui.HBox(height=60, width='100%')
@@ -332,11 +251,6 @@ class Query_view():
                                                     'border-width':'1px', 'border-style':'solid'})
         self.third_line_widget.append(def_label)
         self.fourth_line_widget.append(self.full_def_widget)
-        #self.query_widget.append(self.fifth_line_widget)
-        
-##        defQScroll = ttk.Scrollbar(self.query_frame, orient=VERTICAL, \
-##                                   command=self.full_def_widget.yview)
-##        self.full_def_widget.config(yscrollcommand=defQScroll.set)
 
         # Aliases, options and aspects boxes on sixth line
         self.sixth_line_box = gui.HBox(height=600, width='100%',
@@ -364,120 +278,24 @@ of the name of the selected object'
         lang_text = ('Language', 'Taal')
         term_text = ('Term', 'Term')
         alias_text = ('Alias type', 'Aliastype')
-##        self.alias_tree.heading('#0', text=term_text[self.GUI_lang_index], anchor=W)
-##        self.alias_tree.heading('Alias_type', text=alias_text[self.GUI_lang_index], anchor=W)
-##        #self.alias_tree.heading('Language', text=lang_text[self.GUI_lang_index], anchor=W)
-##        alias_scroll = ttk.Scrollbar(self.query_frame, orient=VERTICAL, \
-##                                     command=self.alias_tree.yview)
-##        self.alias_tree.config(yscrollcommand=alias_scroll.set)
-##        head_text = str(term_text[self.GUI_lang_index] + alias_text[self.GUI_lang_index])
-##        self.alias_head = gui.Label(head_text, height=20, width='100%')
-##        self.alias_tree = gui.TreeView(height=120, width='100%', treeopen=True)
-##                                       columns=('Term', 'Alias_type'),\
-##                                       displaycolumns=('Alias_type'),\
-##                                       selectmode='none', height=4)
-##        self.alias_table_rows = 5
-##        self.aliases_table_widget = gui.TableWidget(self.alias_table_rows, 3, True, True,\
+
         self.aliases_table_widget = gui.Table(width='100%',
                                               style={"overflow":"auto", "background-color":"#eeffdd",\
                                                      "border-width":"2px", "border-style":"solid",\
                                                      "font-size":"12px", 'table-layout':'auto'})
-##        self.aliases_table_widget.style['background-color'] = '#eeffaa'
-##        self.aliases_table_widget.item_at(0, 0).set_text(lang_text[self.GUI_lang_index])
-##        self.aliases_table_widget.item_at(0, 1).set_text(term_text[self.GUI_lang_index])
-##        self.aliases_table_widget.item_at(0, 2).set_text(alias_text[self.GUI_lang_index])
         self.aliases_table_head = [(lang_text[self.GUI_lang_index],
                                     term_text[self.GUI_lang_index],
                                     alias_text[self.GUI_lang_index])]
         self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
         self.sixth_line_left_box.append(self.aliases_table_widget)
-
-##        # Widgets locations in grid
-##        lhNameLbl.grid(column=0, row=3, sticky=W)
-##        lhUIDLbl.grid(column=0, row=3, sticky=E)
-##        if self.user_interface.extended_query:
-##            relNameLbl.grid(column=2, row=3, sticky=EW)
-##            rhNameLbl.grid(column=4, row=3, sticky=EW)
-##            uomNameLbl.grid(column=6, row=3, sticky=EW)
-##        self.q_lh_uid_widget.grid(column=1, row=3, columnspan=1, rowspan=1, sticky=EW)
-##        if self.user_interface.extended_query:
-##            self.q_rel_uid_widget.grid(column=3, row=3, columnspan=1, rowspan=1, sticky=EW)
-##            self.q_rh_uid_widget.grid(column=5, row=3, columnspan=1, rowspan=1, sticky=EW)
-##            self.q_uom_uid_widget.grid(column=7, row=3, columnspan=1, rowspan=1, sticky=EW)
-##        self.q_lh_name_widget.grid (column=0, row=4, columnspan=2, rowspan=1, sticky=EW)
-##        if self.user_interface.extended_query:
-##            self.q_rel_name_widget.grid(column=2, row=4, columnspan=2, rowspan=1, sticky=EW)
-##            self.q_rh_name_widget.grid(column=4, row=4, columnspan=2, rowspan=1, sticky=EW)
-##            self.q_uom_name_widget.grid(column=6, row=4, columnspan=2, rowspan=1, sticky=EW)
-
-##        # Definition location in grid
-##        def_label.grid(column=0, row=5, rowspan=1, sticky=EW)
-##        self.full_def_widget.grid(column=1, row=5, columnspan=7, rowspan=1, sticky=EW)
-##        defQScroll.grid(column=7, row=5, rowspan=1, sticky=NS+E)
-
-##        # Alias location in grid
-##        #alias_label.grid(column=0, row=6, rowspan=1, sticky=EW)
-##        self.alias_tree.grid(column=0, row=6, columnspan=5, rowspan=1, sticky=EW)
-##        alias_scroll.grid(column=4, row=6, rowspan=1, sticky=NS+E)
-        
-##        # Conditions widgets definition
-##        if self.user_interface.extended_query:
-##            condit = ["Conditions:", "Voorwaarden:"]
-##            condLbl = ttk.Label(self.query_frame, text=condit[self.GUI_lang_index])
-##            for i in range(0,3):
-##                self.query.lhCondVal.append(ttk.Combobox(self.query_frame,\
-##                                                         textvariable=lhCondQStr[i], \
-##                                                         values=self.lh_terms,\
-##                                                         width=30))
-##                self.query.relCondVal.append(ttk.Combobox(self.query_frame,\
-##                                                          textvariable=relCondQStr[i],\
-##                                                          values=self.rel_terms, \
-##                                                          width=40))
-##                self.query.rhCondVal.append(ttk.Combobox(self.query_frame,\
-##                                                         textvariable=rhCondQStr[i], \
-##                                                         values=self.rh_terms,\
-##                                                         width=30))
-##                self.query.uomCondVal.append(ttk.Combobox(self.query_frame,\
-##                                                          textvariable=uomCondQStr[i],\
-##                                                          values=self.uoms, \
-##                                                          width=10))
-##        # Conditions widgets location
-##        if self.user_interface.extended_query:
-##            condLbl.grid  (column=0, row=8, columnspan=1, sticky=W)
-##            for i in range(0,3):
-##                rowNr = 12 + i
-##                self.query.lhCondVal[i].grid(column=0, row=rowNr, \
-##                                             columnspan=2, rowspan=1, sticky=EW)
-##                self.query.relCondVal[i].grid(column=2, row=rowNr, \
-##                                              columnspan=2, rowspan=1, sticky=EW)
-##                self.query.rhCondVal[i].grid(column=4, row=rowNr, \
-##                                             columnspan=2, rowspan=1, sticky=EW)
-##                self.query.uomCondVal[i].grid(column=6, row=rowNr, \
-##                                              columnspan=2, rowspan=1, sticky=EW)
         
         # Options for selection widgets definition
         select_term = ["Select the UID of one of the following options:", \
                        "Kies de UID van één van de volgende opties:"]
         options_heading = gui.Label(select_term[self.GUI_lang_index], height=20, width=300)
         self.sixth_line_left_box.append(options_heading)
-        # Option label widget location
-##        options_heading.grid(column=0, row=15, columnspan=3, rowspan=1, sticky=EW)
 
-        # lh Options frame in query_frame for lh options table
-##        nr_cols = 6
-##        if self.user_interface.extended_query:
-##            nr_cols = 8
-        ##self.lh_opt_frame = gui.VBox(height='300', width='60%') #, borderwidth=2, relief='ridge')
-##        self.lh_opt_frame.grid(column=0, row=16, columnspan=nr_cols, rowspan=1, sticky=NSEW)
-##        self.lh_opt_frame.columnconfigure(0, minsize=10, weight=1)
-##        self.lh_opt_frame.rowconfigure(0, minsize=3, weight=1)
-
-        uid_text = ('UID', 'UID')
-        left_uid_text = ['Left UID', 'Linker UID']
-        if self.user_interface.extended_query:
-            uid_col = left_uid_text
-        else:
-            uid_col = uid_text
+        uid_col = ['UID', 'UID']
         name_col = ['Name', 'Naam']
         kind_col = ['Kind', 'Soort']
         comm_col = ['Community', 'Taalgemeenschap']
@@ -485,26 +303,11 @@ of the name of the selected object'
         rela_col = ['Relation UID', 'Relatie UID']
         right_col = ['Right UID', 'Rechter UID']
 
-##        self.opt_table_rows = 10
-##        if self.user_interface.extended_query:
-##            self.opt_table_rows = 5
-            
-##        self.options_table = gui.TableWidget(self.opt_table_rows, 5, True, True, width='100%', height=200,\
-##                                             style={"overflow":"auto","background-color":"#eeffaa",\
-##                                                    "border-width":"2px","border-style":"solid",\
-##                                                    "font-size":"12px"})
-##        self.options_table.style['background-color'] = '#eeffaa'
-##        self.options_table.item_at(0, 0).set_text(uid_text[self.GUI_lang_index])
-##        self.options_table.item_at(0, 1).set_text(name_col[self.GUI_lang_index])
-##        self.options_table.item_at(0, 2).set_text(kind_col[self.GUI_lang_index])
-##        self.options_table.item_at(0, 3).set_text(comm_col[self.GUI_lang_index])
-##        self.options_table.item_at(0, 4).set_text(lang_col[self.GUI_lang_index])
-
         self.options_table = gui.Table(width='100%',
                                        style={"overflow":"auto", "background-color":"#eeffdd",\
                                               "border-width":"2px", "border-style":"solid",\
                                               "font-size":"12px", 'table-layout':'auto'})
-        self.options_table_head = [(uid_text[self.GUI_lang_index],
+        self.options_table_head = [(uid_col[self.GUI_lang_index],
                                     name_col[self.GUI_lang_index],
                                     kind_col[self.GUI_lang_index],
                                     comm_col[self.GUI_lang_index],
@@ -514,138 +317,6 @@ of the name of the selected object'
         self.options_table.on_table_row_click.connect(self.Set_selected_q_lh_term)
         self.sixth_line_left_box.append(self.options_table)
         
-##        self.lh_options_tree = gui.TreeView(width='100%', height=300)
-##        lh_option_heading = uid_text[self.GUI_lang_index] + ' '\
-##                            + name_col[self.GUI_lang_index] + ' '\
-##                            + kind_col[self.GUI_lang_index] + ' '\
-##                            + comm_col[self.GUI_lang_index] + ' '\
-##                            + lang_col[self.GUI_lang_index]
-##        self.tree_heading = gui.TreeItem(lh_option_heading)
-##        self.sixth_line_left_box.append(self.tree_heading)
-##        self.sixth_line_left_box.append(self.lh_options_tree)
-##
-        ##self.sixth_line_left_box.append(self.lh_opt_frame)
-##                                            columns=('UID', 'Name','Kind','Comm','Lang'),\
-##                                            displaycolumns=('Name','Kind','Comm','Lang'),\
-##                                            selectmode='browse', height=self.opt_table_rows)
-##        self.lh_options_tree.heading('#0', text=uid_col[self.GUI_lang_index], anchor=W)
-##        self.lh_options_tree.heading('Name', text=name_col[self.GUI_lang_index], anchor=W)
-##        self.lh_options_tree.heading('Kind', text=kind_col[self.GUI_lang_index], anchor=W)
-##        self.lh_options_tree.heading('Comm', text=comm_col[self.GUI_lang_index], anchor=W)
-##        self.lh_options_tree.heading('Lang', text=lang_col[self.GUI_lang_index], anchor=W)
-##
-##        self.lh_options_tree.column ('#0', width=80)
-##        #self.lh_options_tree.column ('UID', minwidth=40, width=80)
-##        self.lh_options_tree.column ('Name', minwidth=100, width=200)
-##        self.lh_options_tree.column ('Kind', minwidth=100, width=200)
-##        self.lh_options_tree.column ('Comm', minwidth=80, width=160)
-##        self.lh_options_tree.column ('Lang', minwidth=50, width=100)
-##
-##        self.lh_options_tree.grid(column=0, row=0, columnspan=1, rowspan=1, sticky=NSEW)
-##
-##        self.lh_options_tree.columnconfigure(0, weight=1)
-##        self.lh_options_tree.columnconfigure(1, weight=1)
-##        self.lh_options_tree.columnconfigure(2, weight=1)
-##        self.lh_options_tree.columnconfigure(3, weight=1)
-##        self.lh_options_tree.columnconfigure(4, weight=1)
-##        self.lh_options_tree.rowconfigure(0, weight=1)
-
-##        lhOptScroll = ttk.Scrollbar(self.lh_opt_frame, orient=VERTICAL, \
-##                                    command=self.lh_options_tree.yview)
-##        lhOptScroll.grid (column=0, row=0, sticky=NS+E)
-##        self.lh_options_tree.config(yscrollcommand=lhOptScroll.set)
-##
-##        self.lh_options_tree.bind(sequence='<ButtonRelease-1>', \
-##                                  func=self.Set_selected_q_lh_term)
-
-##        if self.user_interface.extended_query:
-##        # rel Options frame in query_frame for rel options Treeview
-##            rel_opt_frame = ttk.Frame(self.query_frame, borderwidth=3, relief='ridge')
-##            rel_opt_frame.grid(column=0, row=21, columnspan=8, rowspan=1, sticky=NSEW)
-##            rel_opt_frame.columnconfigure(0, minsize=10, weight=1)
-##            rel_opt_frame.rowconfigure(0, minsize=10, weight=1)
-##
-##            self.rel_options_tree = ttk.Treeview(rel_opt_frame,\
-##                                                 columns=('UID','Name','Kind','Comm','Lang'),\
-##                                                 displaycolumns='#all', selectmode='browse', \
-##                                                 height=self.opt_table_rows)
-##            self.rel_options_tree.heading('#0', anchor=W)
-##            self.rel_options_tree.heading('UID',  text=rela_col[self.GUI_lang_index], anchor=W)
-##            self.rel_options_tree.heading('Name', text=name_col[self.GUI_lang_index], anchor=W)
-##            self.rel_options_tree.heading('Kind', text=kind_col[self.GUI_lang_index], anchor=W)
-##            self.rel_options_tree.heading('Comm', text=comm_col[self.GUI_lang_index], anchor=W)
-##            self.rel_options_tree.heading('Lang', text=lang_col[self.GUI_lang_index], anchor=W)
-##
-##            self.rel_options_tree.column ('#0', width=10)
-##            self.rel_options_tree.column ('UID',  minwidth=40 , width=80)
-##            self.rel_options_tree.column ('Name', minwidth=100, width=200)
-##            self.rel_options_tree.column ('Kind', minwidth=100, width=200)
-##            self.rel_options_tree.column ('Comm', minwidth=80 , width=160)
-##            self.rel_options_tree.column ('Lang', minwidth=50 , width=100)
-##
-##            #relOptLbl.grid (column=0, row=0,sticky=EW)
-##            self.rel_options_tree.grid(column=0, row=0, columnspan=1, rowspan=1, sticky=NSEW)
-##
-##            self.rel_options_tree.columnconfigure(0, weight=0)
-##            self.rel_options_tree.columnconfigure(1, weight=1)
-##            self.rel_options_tree.columnconfigure(2, weight=1)
-##            self.rel_options_tree.columnconfigure(3, weight=1)
-##            self.rel_options_tree.columnconfigure(4, weight=1)
-##            #self.rel_options_tree.columnconfigure(5, weight=1)
-##            self.rel_options_tree.rowconfigure(0, weight=1)
-##
-##            relOptScroll = ttk.Scrollbar(rel_opt_frame,orient=VERTICAL,\
-##                                         command=self.rel_options_tree.yview)
-##            relOptScroll.grid (column=0, row=0, sticky=NS+E)
-##            self.rel_options_tree.config(yscrollcommand=relOptScroll.set)
-##
-##            self.rel_options_tree.bind(sequence='<ButtonRelease-1>', \
-##                                       func=self.Set_selected_q_rel_term)
-##
-##        # rh Options frame in query_frame for rh options Treeview
-##            rh_opt_frame = ttk.Frame(self.query_frame, borderwidth=3, relief='ridge')
-##            rh_opt_frame.grid (column=0, row=26, columnspan=8, rowspan=1, sticky=NSEW)
-##            rh_opt_frame.columnconfigure(0, minsize=10, weight=1)
-##            rh_opt_frame.rowconfigure(0, minsize=10, weight=1)
-##            
-##            #rhOptVal = ttk.Combobox(self.query_frame,textvariable=rhSelect,\
-##            #                        values=rhOptionList, width=40, postcommand=UpdateRhNames)
-##            self.rh_options_tree = ttk.Treeview(rh_opt_frame,\
-##                                                columns=('UID','Name','Kind','Comm','Lang'),\
-##                                                displaycolumns='#all', selectmode='browse', \
-##                                                height=self.opt_table_rows)
-##            self.rh_options_tree.heading('#0', anchor=W)
-##            self.rh_options_tree.heading('UID',  text=right_col[self.GUI_lang_index], anchor=W)
-##            self.rh_options_tree.heading('Name', text=name_col[self.GUI_lang_index], anchor=W)
-##            self.rh_options_tree.heading('Kind', text=kind_col[self.GUI_lang_index], anchor=W)
-##            self.rh_options_tree.heading('Comm', text=comm_col[self.GUI_lang_index], anchor=W)
-##            self.rh_options_tree.heading('Lang', text=lang_col[self.GUI_lang_index], anchor=W)
-##
-##            self.rh_options_tree.column ('#0'     ,width=10)
-##            self.rh_options_tree.column ('UID'    ,minwidth=40 , width=80)
-##            self.rh_options_tree.column ('Name'   ,minwidth=100, width=200)
-##            self.rh_options_tree.column ('Kind'   ,minwidth=100, width=200)
-##            self.rh_options_tree.column ('Comm'   ,minwidth=80 , width=160)
-##            self.rh_options_tree.column ('Lang'   ,minwidth=50 , width=100)
-##
-##            #rhOptLbl.grid (column=0, row=0,sticky=EW)
-##            self.rh_options_tree.grid(column=0, row=0, columnspan=1, rowspan=1, sticky=NSEW)
-##
-##            self.rh_options_tree.columnconfigure(0, weight=0)
-##            self.rh_options_tree.columnconfigure(1, weight=1)
-##            self.rh_options_tree.columnconfigure(2, weight=1)
-##            self.rh_options_tree.columnconfigure(3, weight=1)
-##            self.rh_options_tree.columnconfigure(4, weight=1)
-##            #self.rh_options_tree.columnconfigure(5, weight=1)
-##            self.rh_options_tree.rowconfigure(0, weight=1)
-##
-##            rhOptScroll = ttk.Scrollbar(rh_opt_frame,orient=VERTICAL,\
-##                                        command=self.rh_options_tree.yview)
-##            rhOptScroll.grid (column=0, row=0, sticky=NS+E)
-##            self.rh_options_tree.config(yscrollcommand=rhOptScroll.set)
-##
-##            self.rh_options_tree.bind(sequence='<ButtonRelease-1>', \
-##                                      func=self.Set_selected_q_rh_term)
         # Aspect frame widget
         self.aspect_frame = gui.VBox(height='99%', width='39%',\
                                      style={'background-color':'#eeffdd',\
@@ -657,42 +328,13 @@ of the name of the selected object'
         self.aspect_label = gui.Label(aspect_text[self.GUI_lang_index], height=20, width='100%')
         self.aspect_label.attributes['title'] = 'Aspects of the selected object and their possible values'
         self.aspect_frame.append(self.aspect_label)
-        
-##        nr_of_rows = 24
-##        if self.user_interface.extended_query:
-##            nr_of_rows = 4
 
-##        self.aspect_frame.grid(column=6, row=6, columnspan=2, rowspan=nr_of_rows, sticky=NSEW)
-##        self.aspect_frame.columnconfigure(0, minsize=10, weight=1)
-##        self.aspect_frame.rowconfigure(0, minsize=10, weight=1)
-##        tree_style = ttk.Style()
-##        #tree_style.configure(".", font=('Helvetica', 8), foreground="white")
-##        #tree_style.configure("Treeview", foreground='red')
-##        tree_style.configure("Treeview.Heading", foreground='blue', background='#cfc')
-
-        # Aspects treeview for selection on aspect value(s)
+        # Aspects table view for selection on aspect value(s)
         aspect_col = ['Aspect', 'Aspect']
         eq_col = ['>=<', '>=<']
         value_col = ['Value', 'Waarde']
         uom_col = ['UoM', 'Eenheid']
-##        self.aspect_table_rows = 15
-##        self.aspects_table = gui.TableWidget(self.aspect_table_rows, 4, True, True,\
-##                                             width='100%', height=200,\
-##                                             style={"overflow":"auto","background-color":"#eeffaa",\
-##                                                    "border-width":"2px","border-style":"solid",\
-##                                                    "font-size":"12px"})
-##        self.aspects_table.style['table-layout'] = 'auto'
-##        self.aspects_table.style['background-color'] = '#eeffaa'
-##        self.aspects_table.item_at(0, 0).set_text(aspect_col[self.GUI_lang_index])
-##        self.aspects_table.item_at(0, 1).set_text(eq_col[self.GUI_lang_index])
-##        self.aspects_table.item_at(0, 2).set_text(value_col[self.GUI_lang_index])
-##        self.aspects_table.item_at(0, 3).set_text(uom_col[self.GUI_lang_index])
-##        self.aspect_heading = gui.TreeItem(aspect_col[self.GUI_lang_index] + ' ' +
-##                                       eq_col[self.GUI_lang_index] + ' ' +
-##                                       value_col[self.GUI_lang_index] + ' ' +
-##                                       uom_col[self.GUI_lang_index])
-##        self.aspect_frame.append(self.aspect_heading)
-##        self.aspects_tree = gui.TreeView(height='100%', width='100%')
+
         self.aspects_table = gui.Table(width='100%',
                                        style={"overflow":"auto", "background-color":"#eeffdd",\
                                               "border-width":"2px", "border-style":"solid",\
@@ -706,27 +348,6 @@ of the name of the selected object'
         self.aspects_table.on_table_row_click.connect(self.Determine_selected_aspects)
         self.aspect_frame.append(self.aspects_table)
         self.sixth_line_box.append(self.aspect_frame)
-##                                         columns=('UID','Name','Rel_uid','UID-2','Parent',\
-##                                                  'Equality','Value','UoM'),\
-##                                         displaycolumns=('Equality','Value','UoM'),\
-##                                         selectmode='extended', height=3)
-##        self.aspects_tree.heading('#0', text=aspect_col[self.GUI_lang_index], anchor=W)
-##        self.aspects_tree.heading('Equality', text=eq_col[self.GUI_lang_index], anchor=W)
-##        self.aspects_tree.heading('Value', text=value_col[self.GUI_lang_index], anchor=W)
-##        self.aspects_tree.heading('UoM', text=uom_col[self.GUI_lang_index], anchor=W)
-##
-##        self.aspects_tree.column ('#0', width=200)
-##        self.aspects_tree.column ('Equality', width=30)
-##        self.aspects_tree.column ('Value', width=80)
-##        self.aspects_tree.column ('UoM', width=60)
-##        self.aspects_tree.grid(column=0, row=0, sticky=NSEW)
-##
-##        aspect_scroll = ttk.Scrollbar(self.aspect_frame, orient=VERTICAL, \
-##                                      command=self.aspects_tree.yview)
-##        aspect_scroll.grid(column=0, row=0, sticky=NS+E)
-##        self.aspects_tree.config(yscrollcommand=aspect_scroll.set)
-##        self.aspects_tree.bind(sequence='<ButtonRelease-1>', \
-##                               func=self.Determine_selected_aspects)
 
         # Set the reply language initially identical to the GUI language
         self.user_interface.Set_reply_language(self.GUI_lang_name)
@@ -751,24 +372,13 @@ of the name of the selected object'
         """
         #print('Lh uid entry:',event.char)
 
-##        opt_table_row_nr = 0
         self.lh_options[:] = []
-##        x = self.lh_options_tree.get_children()
-##        for item in x: self.lh_options_tree.delete(item)
         # Remove possible earlier options by making the options_table empty
-##        for r in range(1, self.opt_table_rows):
-##            for c in range(0, 5):
-##                self.options_table.item_at(r, c).set_text('')
         self.options_table.empty()
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
         
         # Determine lh_options for lh uid in query
         lh_uid = new_value #self.q_lh_uid_widget.get()
-##        if lh_uid_string.isdecimal():
-##            lh_uid = lh_uid_string
-##        else:
-##            print('UID {} should be a whole number'.format(lh_uid_string))
-##            return
         try:
             lh = self.gel_net.uid_dict[lh_uid]
             
@@ -786,21 +396,13 @@ of the name of the selected object'
                          + [lh.uid, '5117', 'known', lh.kind.name]
                 #print('Lh_option', option)
                 self.lh_options.append(option)
-##                opt = [option[5], option[4], option[8], comm_name, lang_name]
-##                option = gui.TreeItem(opt[0])
-##                self.lh_options_tree.append(option)
-##                self.lh_options_tree.insert('', index='end', values=opt, text=opt[0])
+
                 # Display option in options table
                 uid = option[5]
                 name = option[4]
                 kind_name = option[8]
                 opt = [uid, name, kind_name, comm_name, lang_name]
-##                opt_table_row_nr += +1
-##                self.options_table.item_at(opt_table_row_nr, 0).set_text(uid)
-##                self.options_table.item_at(opt_table_row_nr, 1).set_text(name)
-##                self.options_table.item_at(opt_table_row_nr, 2).set_text(kind_name)
-##                self.options_table.item_at(opt_table_row_nr, 3).set_text(comm_name)
-##                self.options_table.item_at(opt_table_row_nr, 4).set_text(lang_name)
+
                 row_widget = gui.TableRow()
                 for field in opt:
                     row_item = gui.TableItem(text=field,
@@ -810,11 +412,8 @@ of the name of the selected object'
 
                 # Display lh_object uid
                 self.query.q_lh_uid = lh_uid
-##                self.q_lh_uid_str.set(str(lh_uid))
                 
-            # Delete earlier definition text and replace by new definition text
-##            self.full_def_widget.delete('1.0', END)
-            # Display full definition
+            # Delete earlier definition text and replace by new full definition text
             self.full_def_widget.set_text(full_def)
         except KeyError:
             pass
@@ -852,20 +451,13 @@ of the name of the selected object'
         """
         #print('Lh name entry:',event.char)
         #if event.keysym not in ['Shift_L', 'Shift_R']:
-##        opt_table_row_nr = 0
         self.string_commonality = self.cs + self.fe
 
         self.query.q_lh_uid = 0
         self.lh_options[:] = []
         # Remove possible earlier options by make the options_table empty
-##        for r in range(1, self.opt_table_rows):
-##            for c in range(0, 5):
-##                self.options_table.item_at(r, c).set_text('')
         self.options_table.empty()
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
-        
-##        x = self.lh_options_tree.get_children()
-##        for item in x: self.lh_options_tree.delete(item)
         
         # Determine lh_options for lh term in query
         self.lhString = new_value #self.q_lh_name_widget.get()
@@ -901,30 +493,18 @@ of the name of the selected object'
                 name = option[4]
                 kind_name = option[8]
                 opt = [uid, name, kind_name, comm_name, lang_name]
-##                opt_table_row_nr += +1
-##                self.options_table.item_at(opt_table_row_nr, 0).set_text(uid)
-##                self.options_table.item_at(opt_table_row_nr, 1).set_text(name)
-##                self.options_table.item_at(opt_table_row_nr, 2).set_text(kind_name)
-##                self.options_table.item_at(opt_table_row_nr, 3).set_text(comm_name)
-##                self.options_table.item_at(opt_table_row_nr, 4).set_text(lang_name)
+
                 row_widget = gui.TableRow()
                 for field in opt:
                     row_item = gui.TableItem(text=field,
                                              style={'text-align':'left'})
                     row_widget.append(row_item, field)
                     self.options_table.append(row_widget, opt[1])
-                
-##                opt_text = uid + name + kind_name + comm_name + lang_name
-##                option = gui.TreeItem(opt_text)
-##                self.lh_options_tree.append(option)
-##                self.lh_options_tree.insert('',index='end',values=opt, text=opt[0])
 
             # Display lh_object uid
             self.query.q_lh_uid = self.lh_options[0][5]
-##            self.q_lh_uid_str.set(str(self.query.q_lh_uid))
             
         # Delete earlier definition text. Then replace by new definition text
-##        self.full_def_widget.delete('1.0', END)
         full_def = ''
         int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
         if integer is False or int_q_lh_uid >= 100:
@@ -966,14 +546,12 @@ of the name of the selected object'
             for item in x: self.rel_options_tree.delete(item)
             
             # Get relation type name (relString) from user interface
-##            relString = self.q_rel_name_widget.get()
             #if event != '': relString = relString # + event.char
             if relString == 'any':
                 if self.GUI_lang_index == 1:
                     relString = 'binaire relatie'
                 else:
                     relString = 'binary relation'
-##                self.q_rel_name_widget.set(relString)
             if relString == '':
                 relString = 'binary relation'
             self.string_commonality = 'csfi'
@@ -1021,18 +599,6 @@ of the name of the selected object'
         """
         #print('Rh Entry:',event.char)
         if event.keysym not in ['Shift_L', 'Shift_R']:
-
-##            case_sens = self.case_sensitive_var.get()
-##            front_end = self.front_end_match_var.get()
-##            if case_sens:
-##                self.cs = 'cs'   # case sensitive
-##            else:
-##                self.cs = 'ci'   # case insensitive
-##            if front_end:
-##                self.fe = 'fi'   # front end identical
-##            else:
-##                self.fe = 'pi'   # part identical
-##            self.string_commonality = self.cs + self.fe
 
             # Delete previous items in the rh_options in tree
             self.rh_options[:]  = []
@@ -1211,17 +777,9 @@ of the name of the selected object'
                         if len(obj.classifiers[0].names_in_contexts) > 0:
                             lang_name, comm_name_supertype, pref_kind_name, descr_of_super = \
                                 self.user_interface.Determine_name_in_context(obj.classifiers[0])
-##                        for name_in_context in obj.classifiers[0].names_in_contexts:
-##                            if name_in_context[0] == self.GUI_lang_uid:
-##                                pref_kind_name = name_in_context[2]
-##                                continue
                     else:
                         pref_kind_name = obj.category
                     option.append(pref_kind_name)
-                    
-##                    # Determine the direct supertype(s), if any    
-##                    supers = obj.supertypes
-##                    option.append(obj.name) #names_in_contexts[0][2])
                 else:
                     #option.append('unknown')       # objectType
                     option.append(self.unknown_kind[self.GUI_lang_index])
@@ -1282,29 +840,16 @@ of the name of the selected object'
             And determine the synonyms and translations of lh_object name.
         """
         blank = ''
-##        item = self.lh_options_tree.selection()
-##        ind = self.lh_options_tree.index(item)
-##        if len(self.lh_options) == 0:
-##            self.user_interface.Message_UI(
-##                'Warning: No option is selected yet. Please try again.',
-##                'Waarschuwing: Er is nog geen optie geselecteerd. Probeer nogmaals.')
-##            return
-##        self.query.lhSel = self.lh_options[ind]
         # Determine UID and Name of selected option
-        print('Clicked option uid:', item.get_text(), row)
+        #print('Clicked option uid:', item.get_text(), row)
         self.query.q_lh_uid = item.get_text()
-##        self.query.q_lh_uid = self.query.lhSel[5]
-##        self.query.q_lh_name = self.query.lhSel[4]
-##        self.q_lh_uid_str.set(str(self.query.q_lh_uid))
-##        self.q_lh_name_str.set(self.query.q_lh_name)
+
         self.full_def_widget.set_text('')
-        
         full_def = ''
         # Determine the selected object via its uid
         int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
         # If not unknown
         if integer is False or int_q_lh_uid >= 100:
-##            self.query.q_lh_category = self.query.lhSel[8]
             obj = self.gel_net.uid_dict[self.query.q_lh_uid]
             
             # Determine the full definition and preferred_name
@@ -1359,15 +904,9 @@ of the name of the selected object'
                 self.Determine_aspect_and_value_options(lh_obj_sub)
 
             # Delete previous characteristics
-##            x = self.aspects_tree.get_children()
-##            for item in x: self.aspects_tree.delete(item)
-##            for r in range(1, self.aspect_table_rows):
-##                for c in range(0, 4):
-##                    self.aspects_table.item_at(r, c).set_text('')
             self.aspects_table.empty()
             self.aspects_table.append_from_list(self.aspects_table_head, fill_title=True)
-            
-##            aspect_row_nr = 0
+
             # Insert new list of characteristics in aspects_tree
             if len(self.q_aspects) > 0:
                 # Sort aspect values by kind of aspect name and by value
@@ -1376,33 +915,20 @@ of the name of the selected object'
                     #print('Asp:', asp)
                     aspect_name = asp[1]
                     if aspect_name != '':
-##                        self.aspects_tree.insert(asp[4], index='end',
-##                                                 iid=asp[1],
-##                                                 values=asp,
-##                                                 text=asp[1], open=False)
-##                        asp_row = gui.TreeItem(asp[1])
-##                        self.aspects_tree.append(asp_row)
                         # Display kind of aspect name
-##                        aspect_row_nr += +1
-##                        self.aspects_table.item_at(aspect_row_nr, 0).set_text(aspect_name)
                         aspect_row = gui.TableRow()
                         aspect_row_item = gui.TableItem(text=aspect_name,\
                                                         style={'text-align':'left'})
                         aspect_row.append(aspect_row_item)
                         self.aspects_table.append(aspect_row)
-##                    else:
-##                        self.aspects_tree.insert(asp[4], index='end',
-##                                                 values=asp,
-##                                                 text=asp[1], open=False)
-##                        asp_row = gui.TreeItem(asp[1])
-##                        self.aspects_tree.append(asp_row)
+
+                        # Display aspect values
                         for asp_val in self.q_aspects:
                             name_value = asp_val[4]
                             if name_value == aspect_name:
                                 equality = asp_val[5]
                                 value = asp_val[6]
                                 uom = asp_val[7]
-##                                aspect_row_nr += +1
                                 aspect_row = gui.TableRow()
                                 aspect_row_item = gui.TableItem(text=blank,\
                                                                 style={'text-align':'left'})
@@ -1417,65 +943,27 @@ of the name of the selected object'
                                                                 style={'text-align':'left'})
                                 aspect_row.append(aspect_row_item, uom)
                                 self.aspects_table.append(aspect_row)
-
-##                    if alias_row[0] == language:
-####                        self.row = gui.TreeItem(alias_row[1])
-####                        self.row.attributes['treeopen'] = 'true'
-####                        self.language_row.append(self.row)
-####                        alias_row_nr += +1
-##                        row_widget = gui.TableRow()
-##                        row_item = gui.TableItem(text='')
-##                        row_widget.add_child(row_item, row_item)
-##                        for field in alias_row[1:]:
-##                            row_item = gui.TableItem(text=field,
-##                                                     style={'text-align':'left'})
-##                            row_widget.add_child(field, row_item)
-##                        self.aliases_table_widget.add_child(alias_row[1], row_widget)
-
                         
             rel_options.sort()
             self.gel_net.rel_terms = rel_options
-##            self.q_rel_name_widget.config(values=self.gel_net.rel_terms)
 
             # Delete previous aliases in alias_tree
-##            x = self.alias_tree.get_children()
-##            for item in x: self.alias_tree.delete(item)
-##            for r in range(1, self.alias_table_rows):
-##                for c in range(0, 3):
-##                    self.aliases_table_widget.item_at(r, c).set_text('')
             self.aliases_table_widget.empty()
             self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
             
             # Determine synonyms and translations of lh_object name in various languages        
             languages, alias_table = self.Determine_aliases(lh_object)
-##            alias_row_nr = 0
             for language in languages:
-##                self.alias_tree.insert('', index='end',
-##                                       values=language,
-##                                       iid=language,
-##                                       text=language, open=True)
-##                self.language_row = gui.TableRow(language)
-##                alias_row_nr += +1
                 # Add language_row to table
                 language_row = gui.TableRow()
                 language_item = gui.TableItem(text=language,
                                               style={'text-align':'left'})
                 language_row.append(language_item, language_item)
                 self.aliases_table_widget.append(language_row, language)
-##                self.aliases_table_widget.item_at(alias_row_nr, 0).set_text(language)
-##                self.language_row.attributes['treeopen'] = 'true'
                 
                 # Add aliases rowa per language to the table 
                 for alias_row in alias_table:
-##                self.alias_tree.insert(alias_row[0], index='end',
-##                                       values=alias_row[1:],
-##                                       #iid=alias_row[1],
-##                                       text=alias_row[1], open=True)
                     if alias_row[0] == language:
-##                        self.row = gui.TreeItem(alias_row[1])
-##                        self.row.attributes['treeopen'] = 'true'
-##                        self.language_row.append(self.row)
-##                        alias_row_nr += +1
                         row_widget = gui.TableRow()
                         row_item = gui.TableItem(text='')
                         row_widget.append(row_item, language)
@@ -1484,8 +972,6 @@ of the name of the selected object'
                                                      style={'text-align':'left'})
                             row_widget.append(row_item, field)
                         self.aliases_table_widget.append(row_widget, alias_row[1])
-##                        self.aliases_table_widget.item_at(alias_row_nr, 1).set_text(alias_row[1])
-##                        self.aliases_table_widget.item_at(alias_row_nr, 2).set_text(alias_row[2])
                 
     def Determine_aspect_and_value_options(self, lh_obj_sub):
         ''' Determine in a search the characteristics of lh_object and its subtypes
@@ -1663,7 +1149,6 @@ of the name of the selected object'
         
         # LH: Get selected option (textString)
         # from the presented list of options (lh_options_tree) in QueryWindow
-##        lh_uid_init = self.q_lh_uid_widget.get()
         lh_uid_init = self.q_lh_uid_widget.get_text()
         print('lh_uid_init', lh_uid_init)
         if lh_uid_init == '':
@@ -1672,24 +1157,9 @@ of the name of the selected object'
                 'Left hand option is not yet selected. Please try again.',
                 'Linker optie is nog niet geselecteerd. Probeer nogmaals.')
             return
-##        item = self.lh_options_tree.selection()
-##        ind = self.lh_options_tree.index(item)
-##        # => lh_options: optionNr, whetherKnown, langUIDres, commUIDres, result_string,\
-##        #                resultUID, is_called_uid, kindKnown, kind
-##        if len(self.lh_options) == 0:
-##            self.user_interface.Message_UI(
-##                'No option is selected. Please try again.',
-##                'Er is geen optie geselecteerd. Probeer nogmaals.')
-##            return
-##        self.query.lhSel = self.lh_options[ind]
-##        #print('Selected option:',item, ind, self.query.lhSel)
 
         # Determine UID and Name of selected lh option
         # and formulate query expression (query_expr)
-##        self.query.q_lh_uid = self.query.lhSel[5]
-##        self.query.q_lh_name = self.query.lhSel[4]
-##        self.q_lh_uid_str.set(str(self.query.q_lh_uid))
-##        self.q_lh_name_str.set(self.query.q_lh_name)
         self.query.q_lh_uid = lh_uid_init
         self.query.q_lh_name = self.q_lh_name_widget.get_text()
         self.query.query_expr = [self.query.q_lh_uid, self.query.q_lh_name]
@@ -1717,7 +1187,6 @@ of the name of the selected object'
         # Initial rel_uid_init set to blank ('') to indicate the no query expression is specified
         # (no extended search specification)
         rel_uid_init = ''
-##        rel_uid_init = self.q_rel_uid_widget.get()
         if rel_uid_init != '':
             # There is a kind of relation specified. Identify its uid and name
             item = self.rel_options_tree.selection()
@@ -1812,11 +1281,6 @@ of the name of the selected object'
                                          self.query.q_rel_uid, self.query.q_rel_name,\
                                          self.query.q_rh_uid, self.query.q_rh_name, \
                                          self.query.q_phrase_type_uid]
-##        else:
-##            # Option for relation type is blank
-##            self.user_interface.Message_UI(
-##              'Relation type option is not (yet) selected.',\
-##              'Optie voor soort relatie is (noch) niet geselecteerd.')
                 
         # Append query expression as first line in query_spec
         # query_expr = lh_uid, lh_name, rel_uid, rel_name, rh_uid_rh_name, phrase_type_uid
@@ -1831,11 +1295,9 @@ of the name of the selected object'
         self.views.Display_notebook_views()
 
     def Close_query(self, widget, tabbox, refWidgetTab):
-##        self.query_widget.destroy()
         query_text = ["Search","Zoek"]
         tabbox.select_by_widget(refWidgetTab)
         tabbox.remove_tab_by_name(query_text[self.GUI_lang_index])
-##        self.user_interface.views_noteb.remove_child(self.query_widget)
         
 #------------------------------------------------------
 class User_interface():
