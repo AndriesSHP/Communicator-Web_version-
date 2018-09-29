@@ -344,7 +344,7 @@ class Communicator(App):
     def on_fileselection_dialog_confirm(self, widget, filelist):
         # a list() of filenames and folders is returned
         #self.lbl.set_text('Selected files: %s' % ','.join(filelist))
-        print('File list: {}'.format(filelist))
+        #print('File list: {}'.format(filelist))
         self.file_path_names = filelist
         if len(filelist):
             self.read_files()

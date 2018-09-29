@@ -9,6 +9,15 @@ from Anything import Anything
 from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer, \
      Open_output_file
 
+class MyTable(gui.Table):
+    @gui.decorate_event
+    def on_table_row_click(self, row, item):
+        if hasattr(self, "last_clicked_row"):
+            del self.last_clicked_row.style['outline']
+        self.last_clicked_row = row
+        self.last_clicked_row.style['outline'] = "2px dotted blue"
+        return (row, item)
+
 class Query_view():
     ''' Defines a query window
         for specification of queries in dictionary and models.
@@ -290,8 +299,8 @@ of the name of the selected object'
         self.sixth_line_left_box.append(self.aliases_table_widget)
         
         # Options for selection widgets definition
-        select_term = ["Select the UID of one of the following options:", \
-                       "Kies de UID van één van de volgende opties:"]
+        select_term = ["Select one of the following options:", \
+                       "Kies één van de volgende opties:"]
         options_heading = gui.Label(select_term[self.GUI_lang_index], height=20, width=300)
         self.sixth_line_left_box.append(options_heading)
 
@@ -303,10 +312,10 @@ of the name of the selected object'
         rela_col = ['Relation UID', 'Relatie UID']
         right_col = ['Right UID', 'Rechter UID']
 
-        self.options_table = gui.Table(width='100%',
-                                       style={"overflow":"auto", "background-color":"#eeffdd",\
-                                              "border-width":"2px", "border-style":"solid",\
-                                              "font-size":"12px", 'table-layout':'auto'})
+        self.options_table = MyTable(width='100%',
+                                     style={"overflow":"auto", "background-color":"#eeffdd",\
+                                            "border-width":"2px", "border-style":"solid",\
+                                            "font-size":"12px", 'table-layout':'auto'})
         self.options_table_head = [(uid_col[self.GUI_lang_index],
                                     name_col[self.GUI_lang_index],
                                     kind_col[self.GUI_lang_index],
@@ -335,10 +344,10 @@ of the name of the selected object'
         value_col = ['Value', 'Waarde']
         uom_col = ['UoM', 'Eenheid']
 
-        self.aspects_table = gui.Table(width='100%',
-                                       style={"overflow":"auto", "background-color":"#eeffdd",\
-                                              "border-width":"2px", "border-style":"solid",\
-                                              "font-size":"12px", 'table-layout':'auto'})
+        self.aspects_table = MyTable(width='100%',
+                                     style={"overflow":"auto", "background-color":"#eeffdd",\
+                                            "border-width":"2px", "border-style":"solid",\
+                                            "font-size":"12px", 'table-layout':'auto'})
         self.aspects_table_head = [(aspect_col[self.GUI_lang_index],
                                     eq_col[self.GUI_lang_index],
                                     value_col[self.GUI_lang_index],
@@ -641,15 +650,13 @@ of the name of the selected object'
             Note: values for the same aspects are alternative options (or)
                   values for different aspects are additional requirements (and)
         '''
+        aspect_value = []
         self.query.aspect_values = []
-        selected_aspects = item.get_text()
-        print('Selected aspects:', selected_aspects)
-        if len(selected_aspects) > 0:
-            for aspect in selected_aspects:
-                aspect_dict = self.aspects_table.item(aspect)
-                aspect_values = list(aspect_dict['values'])
-                print('Query aspects:', aspect_values)
-                self.query.aspect_values.append(aspect_values)
+        for val in row.children.values():
+            print('Aspect value:', val.get_text())
+            aspect_value.append(val.get_text())
+        #print('Query aspects:', aspect_value)
+        self.query.aspect_values.append(aspect_value)
 
     def Solve_unknown(self, search_string):
         """ Determine the available options (UIDs and names) in the dictionary
@@ -841,8 +848,9 @@ of the name of the selected object'
         """
         blank = ''
         # Determine UID and Name of selected option
-        #print('Clicked option uid:', item.get_text(), row)
-        self.query.q_lh_uid = item.get_text()
+        values = list(row.children.values())
+        self.query.q_lh_uid = values[0].get_text()
+        #print('LH_uid', self.query.q_lh_uid)
 
         self.full_def_widget.set_text('')
         full_def = ''
