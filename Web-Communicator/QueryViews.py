@@ -69,6 +69,9 @@ class Query_view():
         self.reply_language = ['The reply language is', 'De antwoordtaal is']
 
         self.q_aspects = []
+        self.options_widget = False
+        self.aliases_widget = False
+        self.aspects_widget = False
         
     def Query_window(self):
         """ Specify a Search term or UID
@@ -282,7 +285,7 @@ class Query_view():
         self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width='100%')
         self.alias_label.attributes['title'] = 'A table with synonyms, abbreviations and translations \
 of the name of the selected object'
-        self.sixth_line_left_box.append(self.alias_label)
+        #self.sixth_line_left_box.append(self.alias_label)
         
         lang_text = ('Language', 'Taal')
         term_text = ('Term', 'Term')
@@ -296,13 +299,14 @@ of the name of the selected object'
                                     term_text[self.GUI_lang_index],
                                     alias_text[self.GUI_lang_index])]
         self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
-        self.sixth_line_left_box.append(self.aliases_table_widget)
+        #self.sixth_line_left_box.append(self.aliases_table_widget)
+        self.aliases_widget == False
         
         # Options for selection widgets definition
         select_term = ["Select one of the following options:", \
                        "Kies één van de volgende opties:"]
-        options_heading = gui.Label(select_term[self.GUI_lang_index], height=20, width=300)
-        self.sixth_line_left_box.append(options_heading)
+        self.options_heading = gui.Label(select_term[self.GUI_lang_index], height=20, width=300)
+        #self.sixth_line_left_box.append(self.options_heading)
 
         uid_col = ['UID', 'UID']
         name_col = ['Name', 'Naam']
@@ -324,19 +328,21 @@ of the name of the selected object'
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
 
         self.options_table.on_table_row_click.connect(self.Set_selected_q_lh_term)
-        self.sixth_line_left_box.append(self.options_table)
+        #self.sixth_line_left_box.append(self.options_table)
+        self.options_widget = False
         
         # Aspect frame widget
-        self.aspect_frame = gui.VBox(height='99%', width='39%',\
+        self.aspects_frame = gui.VBox(height='99%', width='39%',\
                                      style={'background-color':'#eeffdd',\
                                             "border-width":"2px","border-style":"solid"}) #relief='ridge')
-        self.aspect_frame.style['justify-content'] = 'flex-start'
-        self.aspect_frame.style['align-items'] = 'flex-start'
+        self.aspects_frame.style['justify-content'] = 'flex-start'
+        self.aspects_frame.style['align-items'] = 'flex-start'
         # Aspects label widget
         aspect_text = ['Aspects and known possible values:', 'Aspecten en bekende mogelijke waarden:']
-        self.aspect_label = gui.Label(aspect_text[self.GUI_lang_index], height=20, width='100%')
-        self.aspect_label.attributes['title'] = 'Aspects of the selected object and their possible values'
-        self.aspect_frame.append(self.aspect_label)
+        self.aspects_label = gui.Label(aspect_text[self.GUI_lang_index], height=20, width='100%')
+        self.aspects_label.attributes['title'] = 'Aspects of the selected object and their possible values'
+        self.aspects_widget = False
+        self.aspects_frame.append(self.aspects_label)
 
         # Aspects table view for selection on aspect value(s)
         aspect_col = ['Aspect', 'Aspect']
@@ -355,8 +361,8 @@ of the name of the selected object'
         self.aspects_table.append_from_list(self.aspects_table_head, fill_title=True)
 
         self.aspects_table.on_table_row_click.connect(self.Determine_selected_aspects)
-        self.aspect_frame.append(self.aspects_table)
-        self.sixth_line_box.append(self.aspect_frame)
+        self.aspects_frame.append(self.aspects_table)
+        #self.sixth_line_box.append(self.aspects_frame)
 
         # Set the reply language initially identical to the GUI language
         self.user_interface.Set_reply_language(self.GUI_lang_name)
@@ -383,6 +389,11 @@ of the name of the selected object'
 
         self.lh_options[:] = []
         # Remove possible earlier options by making the options_table empty
+        if self.options_widget == False:
+            self.sixth_line_left_box.append(self.options_heading)
+            self.sixth_line_left_box.append(self.options_table)
+            self.options_widget = True
+            
         self.options_table.empty()
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
         
@@ -464,7 +475,12 @@ of the name of the selected object'
 
         self.query.q_lh_uid = 0
         self.lh_options[:] = []
-        # Remove possible earlier options by make the options_table empty
+        # If no options_table yet, then add options_table to sixth_line_left_box
+        if self.options_widget == False:
+            self.sixth_line_left_box.append(self.options_heading)
+            self.sixth_line_left_box.append(self.options_table)
+            self.options_widget = True
+        # Remove possible earlier options by making the options_table empty
         self.options_table.empty()
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
         
@@ -911,7 +927,10 @@ of the name of the selected object'
 
                 self.Determine_aspect_and_value_options(lh_obj_sub)
 
-            # Delete previous characteristics
+            if self.aspects_widget == False:
+                self.sixth_line_box.append(self.aspects_frame)
+                self.aspects_widget = True
+            # Delete previous characteristics, if any
             self.aspects_table.empty()
             self.aspects_table.append_from_list(self.aspects_table_head, fill_title=True)
 
@@ -956,6 +975,10 @@ of the name of the selected object'
             self.gel_net.rel_terms = rel_options
 
             # Delete previous aliases in alias_tree
+            if self.aliases_widget == False:
+                self.sixth_line_left_box.append(self.alias_label)
+                self.sixth_line_left_box.append(self.aliases_table_widget)
+                self.aliases_widget == True
             self.aliases_table_widget.empty()
             self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
             
