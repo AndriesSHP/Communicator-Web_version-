@@ -2425,12 +2425,13 @@ class Display_views():
         return
 
     def Display_network_view(self):
-        # Display header row with units of measure
-        #self.network_tree.insert('', index='end', values=self.taxon_uom_names, tags='uom_tag')
-
+        ''' Display a network of all related things
+            that are directly related to the object in focus.
+        '''
         # Display self.network_model rows in self.network_tree
         parents = []
-        network_row_nr = 0
+##        network_row_nr = 0
+        # Initialize the list of included names of things
         included = []
         for network_line in self.network_model:
             # Verify whether network_line[7], being the parent (typically intermediate),
@@ -2439,37 +2440,42 @@ class Display_views():
             upper_concept = network_line[7]
             if upper_concept == '' or upper_concept in parents:
                 # Skip duplicate line
-##                if self.network_tree.exists(network_line[6]):
                 row_duplicate = False
                 name = network_line[6]
-##                else:
-                # Excluded lines that are already included
+                # Include omly lines that are not already included yet
                 if network_line not in included:
                     included.append(network_line)
                     if upper_concept == '':
                         openness = True
-                    color_tag = 'sum_tag'
-                    rel_tag = ''
+##                    color_tag = 'sum_tag'
+##                    rel_tag = ''
+                    relation = False
+                    color = '#ffff99'
                     term = name.partition(' ')
                     if term[0] in ['has', 'heeft', 'classifies', 'classificeert', \
                                    'is', 'can', 'kan', 'shall', 'moet']:
-                       rel_tag = 'rel_tag'
+##                       rel_tag = 'rel_tag'
+                        relation = True
+                        color = '#eeffdd'
 ##                    self.network_tree.insert(network_line[7], index='end', \
 ##                                             values=network_line[5:],\
 ##                                             tags=rel_tag,\
 ##                                             iid=network_line[6], \
 ##                                             text=network_line[6], open=openness)
-                    network_row_nr += +1
+##                    network_row_nr += +1
                     #print('network_line:', network_line)
 ##                    nr_of_cols = len(network_line)
 ##                    for col in range(5, nr_of_cols):
 ##                        if network_row_nr <= self.network_table_rows:
 ##                            self.network_tree.item_at(network_row_nr, col-5).set_text(network_line[col])
                     row_widget = gui.TableRow()
-                    for field in network_line[5:]:
-                        row_item = gui.TableItem(text=field)
-                        row_widget.add_child(row_item, row_item)
-                    self.network_tree.add_child(name, row_widget)
+                    for index, field in enumerate(network_line[5:]):
+                        row_item = gui.TableItem(text=field,
+                                                 style={'text-align':'left',\
+                                                        'background-color':color})
+                        if relation == False or index < 2:
+                            row_widget.append(row_item, field)
+                    self.network_tree.append(row_widget, name)
                             # Set color of line in table (rel_tag) === to be done ===
                     if name not in parents:
                         parents.append(name)
