@@ -63,7 +63,6 @@ class Communicator():
             return()
         try:
             self.gel_net = pickle.load(infile)
-            #self = pickle.load(f)
         except EOFError:
             print("Input pickle file could not be read: {}". \
                   format(fname))
