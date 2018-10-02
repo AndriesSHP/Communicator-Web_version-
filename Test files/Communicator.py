@@ -18,7 +18,7 @@ class Communicator():
         self.user_interface = None
 
     def start_up(self, user_db):
-        party = 'Andries'   #input("User name: ")
+        party = 'Andries'   # input("User name: ")
         self.user = SU.User(party)
         sesam = self.user.Providing_Access(party, user_db)
         if sesam is False:
