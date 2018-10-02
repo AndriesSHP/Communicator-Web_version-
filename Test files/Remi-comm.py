@@ -1,6 +1,7 @@
 import remi.gui as gui
 from remi import start, App
 
+
 class Communicator(App):
     def __init__(self, *args):
         super(Communicator, self).__init__(*args)

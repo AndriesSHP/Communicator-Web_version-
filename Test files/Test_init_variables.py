@@ -3,6 +3,7 @@ from remi import start, App
 
 import sys
 
+
 class Communicator(App):
 
     def __init__(self, *args):
@@ -15,6 +16,7 @@ class Communicator(App):
         self.container = gui.Widget(margin='0px auto')
         self.container.set_size(1020, 600)
         return self.container
+
 
 if __name__ == "__main__":
     sys.setrecursionlimit(100000)
