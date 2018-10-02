@@ -59,7 +59,7 @@ class Communicator(App):
                                      'Francais':'910039'}
         self.comm_pref_uids = ['492014', 'any'] # Default: 492014 = 'Gellish'
         self.file_path_names = []
-        
+
         super(Communicator, self).__init__(*args)
 
     # Define the main window
@@ -81,7 +81,7 @@ class Communicator(App):
         user_db = SU.UserDb()
         self.start_up(user_db)
         self.start_net()
-        
+
         # Set GUI language default = English: GUI_lang_names[0]
         self.Set_GUI_language(self.GUI_lang_names[0])
 
@@ -99,7 +99,7 @@ class Communicator(App):
         self.read_file_tag.attributes['title'] = import_text[self.GUI_lang_index]
         self.read_file_tag.onclick.connect(self.read_verify_and_merge_files)
         self.menubar.append(self.read_file_tag)
-        
+
         self.search_tag = gui.MenuItem(search[self.GUI_lang_index], width=100, height=20)
         self.search_tag.attributes['title'] = 'Open a search window'
         self.search_tag.onclick.connect(self.search_net)
@@ -129,14 +129,14 @@ class Communicator(App):
         self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network)
         self.admin_tag.append(self.new_net_tag)
 
-        # Define language selector 
+        # Define language selector
         self.lang_container = gui.HBox(width=180, height=20, style='margin-left:200px')
-        
+
         lang_text = ['Language:', 'Taal:']
         self.lang_label = gui.Label(lang_text[self.GUI_lang_index], width=80, height=20,
                                     style='background-color:#eeffdd')
         self.lang_label.attributes['title'] = 'Select a language for specification of a search'
-        
+
         self.lang_container.append(self.lang_label) #self.main_frame, width=10)
         # Set default language: GUI_lang_names[0] = English, [1] = Nederlands
         self.lang_default = self.GUI_lang_names[0]
@@ -153,19 +153,19 @@ class Communicator(App):
         self.main_frame = gui.VBox(width='100%', height='100%')
         self.container.append(self.main_frame)
         self.main_frame.attributes['color'] = 'green'
-        
+
         self.query = None
         self.unknown = ['unknown', 'onbekend']
         self.unknown_quid = 0   # start UID for unknowns in queries
 
         # Create display views object
         self.views = Display_views(self.gel_net, self)
-        
+
         # Define a notebook in window
         self.Define_notebook()
 
         return self.container
-    
+
     def Define_notebook(self):
         """ Defines a Notebook with various view layouts and displays view contents.
             Starting in grid on row 1.
@@ -175,14 +175,14 @@ class Communicator(App):
         self.main_frame.append(self.views_noteb)
 
         self.Define_log_sheet()
-    
+
     def Define_log_sheet(self):
         ''' Define a tab and frame for errors and warnings'''
         log_head = ['Messages and warnings','Berichten en foutmeldingen']
         self.log_frame = gui.ListView(width='100%', height='100%', style='background-color:#eeffdd')
         self.log_frame.attributes['title'] = 'Display messages and warnings'
         self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], self.tab_cb)
-    
+
     def tab_cb(self):
         return
 
@@ -552,6 +552,6 @@ class Network():
 
 if __name__ == "__main__":
     sys.setrecursionlimit(100000)
-    
+
     net = Network()
     start(Communicator, title="Gellish Communicator")

@@ -13,7 +13,7 @@ class Occurrences_diagram():
         self.involv_table = user_interface.views.involv_table
         #self.parts_of_occ_table = user_interface.views.parts_of_occ_table
         self.part_whole_occs = user_interface.views.part_whole_occs
-        
+
         self.drawings = []
         self.sheets = []
         self.leftStrFrame = []
@@ -27,7 +27,7 @@ class Occurrences_diagram():
         self.boxes = []
         self.lines = []
         self.part = []
-        
+
     def Define_Notebook_for_drawings(self):
         """ Define a Notebook for drawings and call partRelList function."""
 
@@ -52,7 +52,7 @@ class Occurrences_diagram():
         occFrame.rowconfigure(0, weight=1)
         #occFrame.rowconfigure(1, weight=1)
         occFrame.grid(column=0,row=0, sticky=NSEW) # columnspan=2,
-        
+
         self.occ_notebook = ttk.Notebook(occFrame) #, height=600, width=1200)
         self.occ_notebook.columnconfigure(0, weight=1)
         self.occ_notebook.rowconfigure(0, weight=1)
@@ -111,7 +111,7 @@ class Occurrences_diagram():
         totalNrOfBoxes = len(occs)
         maxBoxesPerSheet = 7
         firstBox = 0
-        
+
         nrOfSheets = (totalNrOfBoxes-1)/maxBoxesPerSheet + 1
         intSheet = int(nrOfSheets)
         rest = totalNrOfBoxes - (intSheet-1)*maxBoxesPerSheet
@@ -155,7 +155,7 @@ class Occurrences_diagram():
     # Draw part occurrences on sheet(s)
             if parts_present is True:
                 self.MultipleSheets(childID, parts)
-            
+
         if parts_present is True:
             self.DrawPartOccurrences(childID, parts)
         return
@@ -170,7 +170,7 @@ class Occurrences_diagram():
         print('Activity details: x = %d, y = %d' % (event.x, event.y))
         name = ''
         midPts = self.BoxType1(self.sheets[self.sheet_nr], event.x, event.y, name)
-        
+
         return midPts
     #-------------------------------------------------------------
     def Define_DrawingOfOneSheet(self, sheetName):
@@ -246,7 +246,7 @@ class Occurrences_diagram():
         self.rightStrTree[self.sheet_nr].heading('strName' ,text=strText[self.GUI_lang_index] ,anchor=W)
         self.rightStrTree[self.sheet_nr].heading('strUID'  ,text=uidText[self.GUI_lang_index] ,anchor=W)
         self.rightStrTree[self.sheet_nr].heading('strKind' ,text=kinText[self.GUI_lang_index] ,anchor=W)
-        
+
         self.leftStrTree[self.sheet_nr].column('#0'       ,minwidth=10,width=10)
         self.leftStrTree[self.sheet_nr].column('strNr'    ,minwidth=20,width=40)
         self.leftStrTree[self.sheet_nr].column('strName'  ,minwidth=20,width=120)
@@ -278,7 +278,7 @@ class Occurrences_diagram():
         self.leftStrScroll.append(ttk.Scrollbar(self.leftStrFrame[self.sheet_nr],orient=VERTICAL,command=self.leftStrTree[self.sheet_nr].yview))
         self.leftStrScroll[self.sheet_nr].grid (column=0,row=0,sticky=NS+E)
         self.leftStrTree  [self.sheet_nr].config(yscrollcommand=self.leftStrScroll[self.sheet_nr].set)
-        
+
         self.rightStrScroll.append(ttk.Scrollbar(self.drawings[self.sheet_nr],orient=VERTICAL,command=self.rightStrTree[self.sheet_nr].yview))
         self.rightStrScroll[self.sheet_nr].grid (column=2,row=2,sticky=NS+E)
         self.rightStrTree  [self.sheet_nr].config(yscrollcommand=self.rightStrScroll[self.sheet_nr].set)
@@ -287,7 +287,7 @@ class Occurrences_diagram():
         ''' - parentID: the ID of the whole occurrence (box) of which the occNames (occurrences) are parts.
         '''
         test = False
-        
+
         outputUID = '640019'      # output role
         inputUID  = '640016'      # input role
         actorUID  = '5036'        # actor role (supertype of mechanism)
@@ -334,7 +334,7 @@ class Occurrences_diagram():
 
             if test: print('NSEWPts:',boxNr,midPts[boxNr])
         self.boxes.append(boxesOnSheet)
-        
+
     # initialize number of I/O/C/M down and upwards for each occurrence on sheet
         occIn     = [0 for i in range(0,nrOfOccs)]  # input stream nr of deltas downward
         occOut    = [0 for i in range(0,nrOfOccs)]
@@ -344,14 +344,14 @@ class Occurrences_diagram():
         occOutUp  = [0 for i in range(0,nrOfOccs)]
         occConUp  = [0 for i in range(0,nrOfOccs)]  # control stream nr of deltas left
         occMechUp = [0 for i in range(0,nrOfOccs)]
-            
+
     # Draw lines (streams)
         strNr = 0
         rsize = 20          # size of the rhombus polygon
         left  = True        # indicator for left or right streamTree.
         border = 5
-        
-    # Search for lines that have no begin/source occurrence (box), but only a destination occurrence.      
+
+    # Search for lines that have no begin/source occurrence (box), but only a destination occurrence.
         for occur, involved, inv_role_kind, inv_kind_name in self.involv_table:
             #print('ioRow[0]:', occur.uid, occur.name, involved.name, inv_role_kind.name)
             occUIDFrom = '0'
@@ -366,7 +366,7 @@ class Occurrences_diagram():
                     if involved == involved_2 and occur_2 in occs and inv_role_kind_2.uid in subOutputUIDs:
                         out = True
                         break
-                    
+
                 if out is False:
                     # Input comes from outside the sheet
                     streamUID  = involved.uid
@@ -378,16 +378,16 @@ class Occurrences_diagram():
                     strID = str(strNr)
                     endPt = midPts[indexTo][3]
                     beginPt = [border,midPts[indexTo][3][1]]
-                    
+
                     x = (beginPt[0] + endPt[0])/2
                     y =  beginPt[1]
                     rhombus = self.RhombusPolygon(self.sheets[self.sheet_nr], x, y, strID, rsize)
-                    
+
                     lConnPt = rhombus[3]
                     rConnPt = rhombus[2]
                     line1Pts = [beginPt,lConnPt]
                     line2Pts = [rConnPt,endPt]
-                    
+
                     line1 = self.sheets[self.sheet_nr].create_line(line1Pts,fill='blue', width=thick, arrow=LAST)
                     line2 = self.sheets[self.sheet_nr].create_line(line2Pts,fill='blue', width=thick, arrow=LAST)
                     linesOnSheet.append(line1)
@@ -414,12 +414,12 @@ class Occurrences_diagram():
                 streamKind = inv_kind_name
                 # Verify if found streamUID is input in box on sheet. If yes, then occUIDTo is known
                 for occ_2, involved_2, inv_role_kind_2, inv_kind_name_2 in self.involv_table:
-                    if streamUID == involved_2.uid and occ_2 in occs and inv_role_kind_2.uid in subInputUIDs: 
+                    if streamUID == involved_2.uid and occ_2 in occs and inv_role_kind_2.uid in subInputUIDs:
                         if test: print('** inputStream:',occ_2.name, inv_role_kind_2.name, inv_role_kind_2.name)
                         occUIDTo = occ_2.uid
                         # else occUIDTo remains '0'
                         break
-                # Determine index (in list of occs) of boxFrom and boxTo 
+                # Determine index (in list of occs) of boxFrom and boxTo
                 indexFrom = -1
                 indexTo   = -1
                 for index in range(0,len(occs)):
@@ -429,7 +429,7 @@ class Occurrences_diagram():
                         indexTo = index
 
                 # Determine the sequenceNr of the input and output of the occurrence box
-                # and adjust Yin and Yout accordingly.            
+                # and adjust Yin and Yout accordingly.
                 # Draw the stream line from box occUIDFrom to occUIDTo or to edge of sheet.
                 if indexTo == -1:
                     # No destination box, thus endPt is on rh side of the sheet.
@@ -451,7 +451,7 @@ class Occurrences_diagram():
                     rConnPt = rhombus[2]
                     line1Pts = [beginPt,lConnPt]
                     line2Pts = [rConnPt,endPt]
-                    
+
                 elif indexFrom + 1 < indexTo:       # destination box is behind next box.
                     ddyFrom   = (occOut  [indexFrom])*dy
                     ddyTo     = (occIn   [indexTo])*dy
@@ -470,7 +470,7 @@ class Occurrences_diagram():
                     lConnPt = rhombus[1]
                     line1Pts = [beginPt, mid1Pt, mid2Pt, uConnPt]
                     line2Pts = [lConnPt, mid3Pt, mid4Pt, endPt]
-                    
+
                 elif indexFrom + 1 > indexTo:       # destination box id before source box (or the box itself).
                     ddyUpFrom = (occOutUp[indexFrom])*dy
                     ddyUpTo   = (occInUp [indexTo])*dy
@@ -494,7 +494,7 @@ class Occurrences_diagram():
                     line1Pts = [beginPt, mid1Pt, mid2Pt, lConnPt]
                     line2Pts = [uConnPt, mid3Pt, mid4Pt, mid5Pt,\
                                 mid6Pt,  mid7Pt, mid8Pt, endPt]
-                                
+
                     if mid5Pt[1] < 0:
                         self.sheets[self.sheet_nr].yview_scroll(int(-mid5Pt[1]) + 20, 'units')
                 else:                               # destination box is nex box
@@ -502,7 +502,7 @@ class Occurrences_diagram():
                     ddyUpTo   = (occIn   [indexTo])*dy
                     occOut[indexFrom] += 1
                     occOutUp[indexTo] += 1
-                    beginPt = [midPts[indexFrom][2][0],midPts[indexFrom][2][1] + ddyFrom]                  
+                    beginPt = [midPts[indexFrom][2][0],midPts[indexFrom][2][1] + ddyFrom]
                     endPt   = [midPts[indexTo][3][0],  midPts[indexTo][3][1]   - ddyUpTo]
                     mid1Pt  = [(beginPt[0] + endPt[0])/2 - dxC, beginPt[1]]
                     mid2Pt  = [(beginPt[0] + endPt[0])/2      , beginPt[1] + dyC]
@@ -526,7 +526,7 @@ class Occurrences_diagram():
                 else:
                     self.rightStrTree[self.sheet_nr].insert('',index='end',values=(strID,streamName,streamUID,streamKind),tags='occTag')
                     left = True
-                
+
         self.lines.append(linesOnSheet)
         return
     #-----------------------------------------------------------
@@ -565,9 +565,9 @@ class Occurrences_diagram():
         midSouth = [x3,y3]
         midEast  = [x2,y2]
         midWest  = [x0,y0]
-        
+
         return midNorth,midSouth,midEast,midWest
     #-----------------------------------------------------------
     def exit_python(self, event):
         '''Exit Python when the event 'event' occurs.'''
-        quit() # no arguments to quit 
+        quit() # no arguments to quit
