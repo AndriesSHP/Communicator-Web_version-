@@ -7,7 +7,7 @@ class Communicator(App):
         super(Communicator, self).__init__(*args)
 
     def main(self):
-        container = gui.VBox(width = 200, height = 100)
+        container = gui.VBox(width=200, height=100)
         self.lbl = gui.Label('Hello world!')
         self.bt = gui.Button('Press me!')
         self.bt2 = gui.Button('Hello name surname!')

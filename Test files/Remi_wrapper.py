@@ -7,7 +7,7 @@ class MyApp(App):
         super(MyApp, self).__init__(*args)
 
     def main(self):
-        container = gui.VBox(width = 120, height = 100)
+        container = gui.VBox(width=120, height=100)
         self.lbl = gui.Label('Hello world!')
         self.bt = gui.Button('Hello name!')
         self.bt2 = gui.Button('Hello name surname!')
