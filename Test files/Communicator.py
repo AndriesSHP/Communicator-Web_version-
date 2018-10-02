@@ -45,11 +45,11 @@ class Communicator():
         # Load semantic network from pickle binary file.
         self.load_pickle_db(self.pickle_file_name)
         if self.gel_net is None:
-            print("Network '{}' is not loaded. File is not found".\
+            print("Network '{}' is not loaded. File is not found".
                   format(self.pickle_file_name))
         else:
             print("Network '{}' is loaded "
-                  "and is composed of the following files:".\
+                  "and is composed of the following files:".
                   format(self.pickle_file_name))
             for file in self.gel_net.Gellish_files:
                 print('- {}'.format(file.path_and_name))
@@ -58,13 +58,13 @@ class Communicator():
         try:
             infile = open(fname, "br")
         except FileNotFoundError:
-            print("Input pickle file could not be found: {}". \
+            print("Input pickle file could not be found: {}".
                   format(fname))
             return()
         try:
             self.gel_net = pickle.load(infile)
         except EOFError:
-            print("Input pickle file could not be read: {}". \
+            print("Input pickle file could not be read: {}".
                   format(fname))
         else:
             infile.close()
