@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/khink/Communicator-Web_version-.svg?branch=master)](https://travis-ci.org/khink/Communicator-Web_version-)
+[![Build Status](https://travis-ci.org/AndriesSHP/Communicator-Web_version-.svg?branch=master)](https://travis-ci.org/AndriesSHP/Communicator-Web_version-)
 
 # Communicator-Web_version-
 A web version of the Gellish Communicator App using RemiGUI
