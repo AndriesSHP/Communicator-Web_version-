@@ -7,7 +7,7 @@ import SystemUsers as SU
 from User_interface import User_interface
 from SemanticNetwork import Semantic_Network
 
-#-------------------------------------------------
+
 class Communicator():
     def __init__(self):
         self.net_name = "Gellish semantic network"
@@ -17,7 +17,6 @@ class Communicator():
         self.user = None
         self.user_interface = None
 
-#-----------------------------------------------------
     def start_up(self, user_db):
         party = 'Andries'   #input("User name: ")
         self.user = SU.User(party)
@@ -71,7 +70,7 @@ class Communicator():
         else:
             infile.close()
 
-#-----------------------------------------------
+
 if __name__ == "__main__":
     sys.setrecursionlimit(100000)
 

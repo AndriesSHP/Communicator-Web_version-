@@ -29,7 +29,7 @@ class Communicator(App):
         self.lbl.set_text('Button pressed!')
         widget.set_text('Hello ' + name + ' ' + surname)
 
-#--------------------------------------------------------------
+
 # starts the webserver
 if __name__ == "__main__":
     start(Communicator)
