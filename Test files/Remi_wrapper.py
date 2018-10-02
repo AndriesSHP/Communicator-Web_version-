@@ -14,7 +14,11 @@ class MyApp(App):
 
         # setting the listener for the onclick event of the buttons
         self.bt.onclick.connect(self.on_button_pressed, "Andries")
-        self.bt2.onclick.connect(self.on_button_pressed, "Andries", "van Renssen")
+        self.bt2.onclick.connect(
+            self.on_button_pressed,
+            "Andries",
+            "van Renssen",
+        )
 
         # appending a widget to another
         container.append(self.lbl)
