@@ -2,8 +2,6 @@ import remi.gui as gui
 from remi import start, App
 
 import sys
-import pickle
-import webbrowser
 
 class Communicator(App):
 
