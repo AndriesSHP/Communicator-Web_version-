@@ -1,9 +1,13 @@
-from tkinter import *
-from tkinter.ttk import *
-''' Define and display IDEF0 diagrams of occurrences, being activities or processes.
+''' Define and display IDEF0 diagrams of occurrences, being activities or
+    processes.
     The diagrams have a hierarchy,
     whereby the parts of an occurrence are presented on a next page
 '''
+# TODO: import specific names
+from tkinter import *  # NOQA
+from tkinter.ttk import *  # NOQA
+
+
 class Occurrences_diagram():
     def __init__(self, user_interface, gel_net):
         self.root = user_interface.root
