@@ -1,8 +1,5 @@
 import os
 
-##from tkinter import *
-##from tkinter.ttk import *
-##from tkinter import messagebox, filedialog
 import remi.gui as gui
 from operator import itemgetter
 
@@ -138,7 +135,7 @@ class Display_views():
             # If object is excluded because it did not satisfy a condition then skip it
             if obj in self.user_interface.query.ex_candids:
                 self.Display_message(
-                    'Excluded candidate-1: {}'.format(obj.name),\
+                    'Excluded candidate-1: {}'.format(obj.name),
                     'Uitgesloten kandidaat-1: {}'.format(obj.name))
                 continue
             self.subtype_level = 0
@@ -156,7 +153,7 @@ class Display_views():
         # Verify whether object is excluded from list of candidates
         if obj in self.user_interface.query.ex_candids:
             self.Display_message(
-                'Excluded candidate: {}'.format(obj.name),\
+                'Excluded candidate: {}'.format(obj.name),
                 'Uitgesloten kandidaat: {}'.format(obj.name))
             return
 
@@ -170,7 +167,7 @@ class Display_views():
         self.Create_prod_model_view_header(obj)
 
         # If object_in_focus is a kind, then collect its supertypes
-        if obj.category in ['kind', 'kind of physical object', 'kind of occurrence', \
+        if obj.category in ['kind', 'kind of physical object', 'kind of occurrence',
                             'kind of aspect', 'kind of role', 'kind of relation', 'number']:
             # Search for the first supertype relation
             # that generalizes the obj (= self.object_in_focus)
@@ -197,9 +194,9 @@ class Display_views():
         # Verify whether the individual thing is classified (has one or more classifiers)
         elif len(obj.classifiers) == 0:
             self.Display_message(
-                'For object {} neither a supertype nor a classifier is found.'.\
-                format(obj.name),\
-                'Voor object {} is geen supertype noch een classificeerder gevonden.'.\
+                'For object {} neither a supertype nor a classifier is found.'.
+                format(obj.name),
+                'Voor object {} is geen supertype noch een classificeerder gevonden.'.
                 format(obj.name))
         else:
             # The object_in_focus is classified (once or more times)
@@ -221,16 +218,16 @@ class Display_views():
         if obj.category == 'occurrence' or obj.category == 'kind of occurrence':
             self.nr_of_occurrencies += + 1
 
-            #self.occ_model.append([occ.uid, occ.name, higher.name, involv.uid, kind_occ.uid,\
-            #                       occ.name, part_occ.name, \
+            #self.occ_model.append([occ.uid, occ.name, higher.name, involv.uid, kind_occ.uid,
+            #                       occ.name, part_occ.name,
             #                       involv.name, kind_part_occ.name, role_of_involved])
-            self.occ_model.append([obj.uid, '', '', '', '', \
+            self.occ_model.append([obj.uid, '', '', '', '',
                                    obj.name, '', '', kind_name, ''])
 
         # Search for aspects of the whole object_in_focus and their values and UoMs
 
         # Find kinds of aspects and their values of kind_in_focus (and implied parts)
-        if obj.category in ['kind', 'kind of physical object', 'kind of occurrence', \
+        if obj.category in ['kind', 'kind of physical object', 'kind of occurrence',
                             'kind of aspect', 'kind of role' , 'kind of relation', 'number']:
             # Find preferred name of object in required language and community
             lang_name, comm_name, obj_name, descr = \
@@ -238,7 +235,7 @@ class Display_views():
             obj.name = obj_name
 
             self.taxon_row[0] = obj.uid
-            self.taxon_row[1] = obj.name    # preferred name
+            self.taxon_row[1] = obj.name
             #self.taxon_row[2] = supertype_name   # name of the first supertype
             self.taxon_row[3] = comm_name
 
@@ -248,8 +245,6 @@ class Display_views():
             else:
                 supertype_name = self.unknown[self.GUI_lang_index]
 
-##            self.possibility_row[0:5] = obj.uid, obj_name, '', supertype_name, comm_name
-##                   # comm_name of obj name (not of supertype name)
             # Add object_in_focus to possibilities_model with comm_name of obj (not of supertype)
             # Second (extended) obj_name enables duplicate branches in display tree
             possib_row = [obj.uid, obj_name, obj_name, '', supertype_name, comm_name]
@@ -301,9 +296,9 @@ class Display_views():
 
         else:
             self.Display_message(
-                "Object category '{}' is not programmed for searching for aspects.".\
-                format(obj.category),\
-                "Object categorie '{}' is niet geprogrammeerd voor het zoeken naar aspecten.".\
+                "Object category '{}' is not programmed for searching for aspects.".
+                format(obj.category),
+                "Object categorie '{}' is niet geprogrammeerd voor het zoeken naar aspecten.".
                 format(obj.category))
 
         #self.parts_of_occ_table= []       # parts of occurrence in focus
@@ -323,6 +318,7 @@ class Display_views():
         # then find the base phrase or inverse phrase for the relation
         # in the preferred language and language community
         if rel_obj.lh_obj == self.object_in_focus:
+            # lh_obj is the object_in_focus
             # Determine the preferred name of the related object
             kind_name, kind_uid = self.Determine_preferred_kind_name(rel_obj.rh_obj)
             # Determine the preferred phrase for the kind of relation
@@ -334,8 +330,8 @@ class Display_views():
                 # Rel_type_name is an inverse phrase
                 lang_name, comm_name, rel_type_phrase, full_def = \
                        self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'inverse')
-            branch = [rel_obj.rh_obj.uid, rel_obj.lh_obj.uid, expr[lh_name_col], \
-                      rel_type_phrase, expr[rh_name_col], kind_uid, \
+            branch = [rel_obj.rh_obj.uid, rel_obj.lh_obj.uid, expr[lh_name_col],
+                      rel_type_phrase, expr[rh_name_col], kind_uid,
                       rel_obj.rh_obj.name, rel_obj.lh_obj.name, kind_name]
         else:
             # rh_obj is the object_in_focus
@@ -346,8 +342,8 @@ class Display_views():
             else:
                 lang_name, comm_name, rel_type_phrase, full_def = \
                        self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'base')
-            branch = [rel_obj.lh_obj.uid, rel_obj.rh_obj.uid, expr[rh_name_col], \
-                      rel_type_phrase, expr[lh_name_col], kind_uid, \
+            branch = [rel_obj.lh_obj.uid, rel_obj.rh_obj.uid, expr[rh_name_col],
+                      rel_type_phrase, expr[lh_name_col], kind_uid,
                       rel_obj.lh_obj.name, rel_obj.rh_obj.name, kind_name]
 
         #print('Branch-1:', rel_obj.phrase_type_uid, branch)
@@ -360,12 +356,12 @@ class Display_views():
                is_related_to not in self.rels_in_network_model:
                 if len(self.rels_in_network_model) == 0:
                     kind_name, kind_uid = self.Determine_preferred_kind_name(self.object_in_focus)
-                    root = [self.object_in_focus.uid, \
-                            '', '', '', '', kind_uid, \
+                    root = [self.object_in_focus.uid,
+                            '', '', '', '', kind_uid,
                             self.object_in_focus.name, '', kind_name]
                     self.network_model.append(root)
 
-                intermediate = [rel_obj.rel_type.uid, '', '', '', '', '', \
+                intermediate = [rel_obj.rel_type.uid, '', '', '', '', '',
                                 is_related_to, branch[7]]
                 self.network_model.append(intermediate)
                 self.rels_in_network_model.append(is_related_to)
@@ -389,8 +385,6 @@ class Display_views():
             else:
                 self.network_model.append(branch)
             #print('Branch-3:', rel_obj.phrase_type_uid, branch)
-##        else:
-##            print('Duplicate branch: {}, {}, {}'.format(branch[1], branch[5], branch[2]))
 
     def Create_prod_model_view_header(self, obj):
         ''' Create prod_model view header '''
@@ -417,20 +411,20 @@ class Display_views():
         else:
             description = is_a[self.GUI_lang_index] + obj_kind_name
 
-        prod_line_0 = [obj.uid  , obj_kind_uid , '', 1 , form_text[self.GUI_lang_index], \
-                       obj.name, '', '',\
+        prod_line_0 = [obj.uid  , obj_kind_uid , '', 1 , form_text[self.GUI_lang_index],
+                       obj.name, '', '',
                        kind_text[self.GUI_lang_index], obj_kind_name, '', '', '', status]
-        prod_line_1 = ['','','',2,'', descr_text[self.GUI_lang_index], description,\
+        prod_line_1 = ['','','',2,'', descr_text[self.GUI_lang_index], description,
                        '','','','','','','']
 
-        prod_head_NL2I= ['','','',3,'','','','','Aspect','Soort aspect',\
+        prod_head_NL2I= ['','','',3,'','','','','Aspect','Soort aspect',
                          '>=<','Waarde','Eenheid','Status']
-        prod_head_NL2K= ['','','',3,'','','','','Soort aspect',''      ,\
+        prod_head_NL2K= ['','','',3,'','','','','Soort aspect',''      ,
                          '>=<','Waarde','Eenheid','Status']
 
-        prod_head_EN2I= ['','','',3,'','','','','Aspect','Aspect type',\
+        prod_head_EN2I= ['','','',3,'','','','','Aspect','Aspect type',
                          '>=<','Value','UoM','Status']
-        prod_head_EN2K= ['','','',3,'','','','','Kind of aspect',''   ,\
+        prod_head_EN2K= ['','','',3,'','','','','Kind of aspect',''   ,
                          '>=<','Value','UoM','Status']
 
         self.line_nr = 3
@@ -454,7 +448,7 @@ class Display_views():
                 for super_type in obj.supertypes[1:]:
                     lang_name, comm_name, supert_type_name, descr = \
                                self.user_interface.Determine_name_in_context(super_type)
-                    self.kind_model.append([obj.uid,super_type.uid,'',1,\
+                    self.kind_model.append([obj.uid,super_type.uid,'',1,
                                             '','','','','',supert_type_name])
             self.kind_model.append(prod_line_1)
             if self.user_interface.GUI_lang_name == 'Nederlands':
@@ -469,7 +463,7 @@ class Display_views():
                 for classifier in obj.classifiers[1:]:
                     lang_name, comm_name, classifier_name, descr = \
                                self.user_interface.Determine_name_in_context(classifier)
-                    self.prod_model.append([obj.uid,classifier.uid,'',1,\
+                    self.prod_model.append([obj.uid,classifier.uid,'',1,
                                             '','','','','',classifier_name])
             self.prod_model.append(prod_line_1)
             if self.user_interface.GUI_lang_name == 'Nederlands':
@@ -544,7 +538,7 @@ class Display_views():
                 else:
                     self.Display_message(
                         'The phrase type uid of idea {} is incompatible '
-                        'with the expression.'.format(expr.uid),\
+                        'with the expression.'.format(expr.uid),
                         'De uid van de soort frase van idee {} is niet compatibel '
                         'met de uitdrukking.'.format(expr.uid))
             else:
@@ -563,16 +557,8 @@ class Display_views():
                         qualifier = 'qualitative'
                 else:
                     continue
-##                if expr[rel_type_uid_col] in self.gel_net.sub_classif_uids:
-##                    if len(self.expr_table) < self.max_nr_of_rows
-##                       and expr not in self.expr_table:
-##                        self.expr_table.append(expr)
-##                #print('classif:', expr[lh_name_col], expr[rel_type_name_col], expr[rh_name_col])
 
-        # Aspect is found or qualitative aspect is found
-##            # Add the found relation expression to the expr_table
-##            if len(self.expr_table) < self.max_nr_of_rows and expr not in self.expr_table:
-##                self.expr_table.append(expr)
+            # Aspect is found or qualitative aspect is found
             status = expr[status_col]
             nr_of_aspects += 1
 
@@ -593,9 +579,9 @@ class Display_views():
                 #warnText  = ['Aspect','Waarschuwing: Aspect']
                 #valueMess = ['has no value.','heeft geen waarde.']
                 self.Display_message(
-                    'Aspect {} ({}) has no value.'.\
+                    'Aspect {} ({}) has no value.'.
                     format(aspect_name, aspect_uid),
-                    'Aspect {} ({}) heeft geen waarde.'.\
+                    'Aspect {} ({}) heeft geen waarde.'.
                     format(aspect_name, aspect_uid))
             else:
                 # Determine (in)equality symbol
@@ -608,7 +594,7 @@ class Display_views():
                 elif expr[rel_type_uid_col] == '5490':
                     equality = '<='
 
-        # Store result in various models (display views)
+            # Store result in various models (display views)
             # Network_model and expr_table
             # If quantitative sspect value is found
             # then add expression to network_model and expr_table
@@ -635,18 +621,18 @@ class Display_views():
                     # Build list of values conform list of aspects.
                     # Note: sumRow[0] = component
                     if aspect.kind_uid == kind_uid:
-                        #print('Aspects of phys:', indiv.name, len(self.summ_aspect_uids), \
+                        #print('Aspects of phys:', indiv.name, len(self.summ_aspect_uids),
                         #      aspect_name, aspect.kind_name, self.summ_ind, value_name)
                         self.summary_row[self.summ_ind] = value_name
                         if uom_name != self.summ_uom_names[self.summ_ind]:
                             self.Display_message(
                                 'The unit of measure {} ({}) of the value of {} differs '
-                                'from summary table header UoM {}.'.\
-                                format(uom_name, uom_uid, aspect_name, \
-                                       self.summ_uom_names[self.summ_ind]),\
+                                'from summary table header UoM {}.'.
+                                format(uom_name, uom_uid, aspect_name,
+                                       self.summ_uom_names[self.summ_ind]),
                                 'De meeteenheid {} ({}) van de waarde van {} verschilt '
-                                'van de overzichtstabel kop_eenheid {}.'.\
-                                format(uom_name, uom_uid, aspect_name, \
+                                'van de overzichtstabel kop_eenheid {}.'.
+                                format(uom_name, uom_uid, aspect_name,
                                        self.summ_uom_names[self.summ_ind]))
 
             # Indiv_table
@@ -667,25 +653,25 @@ class Display_views():
                     # Build list of values conform list of aspects.
                     # Note: sumRow[0] = component
                     if aspect.kind_uid == kind_uid:
-                        #print('Aspects of phys:', indiv.name, len(self.indiv_aspect_uids), \
+                        #print('Aspects of phys:', indiv.name, len(self.indiv_aspect_uids),
                         #      aspect_name, aspect.kind_name, self.indiv_ind, value_name)
                         self.indiv_row[self.indiv_ind] = value_name
                         if uom_name != self.indiv_uom_names[self.indiv_ind]:
                             if uom_name == '':
                                 self.Display_message(
-                                    'The unit of measure of the value of {} is missing.'.\
-                                    format(aspect_name),\
-                                    'De meeteenheid van de waarde van {} ontbreekt.'.\
+                                    'The unit of measure of the value of {} is missing.'.
+                                    format(aspect_name),
+                                    'De meeteenheid van de waarde van {} ontbreekt.'.
                                     format(aspect_name))
                             else:
                                 self.Display_message(
                                     'The unit of measure {} ({}) of the value of {} differs '
-                                    'from the table header UoM {}.'.\
-                                    format(uom_name, uom_uid, aspect_name, \
-                                           self.indiv_uom_names[self.indiv_ind]),\
+                                    'from the table header UoM {}.'.
+                                    format(uom_name, uom_uid, aspect_name,
+                                           self.indiv_uom_names[self.indiv_ind]),
                                     'De meeteenheid {} ({}) van de waarde van {} verschilt '
-                                    'van de eenheid {} in de kop van de tabel.'.\
-                                    format(uom_name, uom_uid, aspect_name, \
+                                    'van de eenheid {} in de kop van de tabel.'.
+                                    format(uom_name, uom_uid, aspect_name,
                                            self.indiv_uom_names[self.indiv_ind]))
 
             # Prod_model
@@ -693,29 +679,29 @@ class Display_views():
             self.line_nr += 1
             #print('Aspect of obj.:', self.decomp_level, nr_of_aspects, indiv.name, aspect_name)
             if self.decomp_level == 0 and nr_of_aspects == 1:
-                prod_line_3 = [indiv.uid   , indiv.kind_uid, aspect_uid, \
-                               self.line_nr, indiv.name, role,''  ,indiv.kind_name,\
-                               aspect_name , aspect.kind_name, equality, \
+                prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
+                               self.line_nr, indiv.name, role, '', indiv.kind_name,
+                               aspect_name, aspect.kind_name, equality,
                                value_name, uom_name, status]
             elif self.decomp_level == 1 and nr_of_aspects == 1:
-                prod_line_3 = [indiv.uid   , indiv.kind_uid, aspect_uid, \
-                               self.line_nr, indiv.name, role,''  ,indiv.kind_name,\
-                               aspect_name , aspect.kind_name, equality, \
+                prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
+                               self.line_nr, indiv.name, role, '', indiv.kind_name,
+                               aspect_name, aspect.kind_name, equality,
                                value_name, uom_name, status]
             elif self.decomp_level == 2 and nr_of_aspects == 1:
-                prod_line_3 = [indiv.uid   , indiv.kind_uid, aspect_uid, \
-                               self.line_nr, role, indiv.name,''  ,indiv.kind_name,\
-                               aspect_name , aspect.kind_name, equality, \
+                prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
+                               self.line_nr, role, indiv.name, '',indiv.kind_name,
+                               aspect_name, aspect.kind_name, equality,
                                value_name, uom_name, status]
             elif self.decomp_level == 3 and nr_of_aspects == 1:
-                prod_line_3 = [indiv.uid   , indiv.kind_uid, aspect_uid, \
-                               self.line_nr,'' , role, indiv.name, indiv.kind_name,\
-                               aspect_name , aspect.kind_name, equality, \
+                prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
+                               self.line_nr, '', role, indiv.name, indiv.kind_name,
+                               aspect_name, aspect.kind_name, equality,
                                value_name, uom_name, status]
             else:
-                prod_line_3 = [indiv.uid   , indiv.kind_uid, aspect_uid, \
-                               self.line_nr,'','','','',\
-                               aspect_name , aspect.kind_name, equality, \
+                prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
+                               self.line_nr, '', '', '', '',
+                               aspect_name , aspect.kind_name, equality,
                                value_name, uom_name, status]
             if len(self.prod_model) < self.max_nr_of_rows:
                 self.prod_model.append(prod_line_3)
@@ -853,15 +839,15 @@ class Display_views():
             (kind or individual)
             (and its supertypes?) and build info_model
         '''
-        obj_head          = ['Object'      ,'Object']
-        info_head         = ['Document'    ,'Document']
-        dir_head          = ['Directory'   ,'Directory']
-        kind_of_doc_head  = ['Kind'        ,'Soort']
-        file_head         = ['File'        ,'File']
-        kind_of_file_head = ['Kinf of file','Soort file']
-        status_head       = ['Status'      ,'Status']
-        descr_avail_text  = ['Description available', \
-                             'Omschrijving beschikbaar']
+        obj_head = ['Object', 'Object']
+        info_head = ['Document', 'Document']
+        dir_head = ['Directory', 'Directory']
+        kind_of_doc_head = ['Kind', 'Soort']
+        file_head = ['File', 'File']
+        kind_of_file_head = ['Kinf of file', 'Soort file']
+        status_head = ['Status', 'Status']
+        descr_avail_text = ['Description available',
+                            'Omschrijving beschikbaar']
 
         info_header = True
 
@@ -883,15 +869,15 @@ class Display_views():
                 # Create header line_type 8 info, only the first time for prod_model or kind_model
                 if info_header:
                     self.line_nr += + 1
-                    prod_head_8 = ['','','',self.line_nr, info_head[self.GUI_lang_index], \
-                                   dir_head[self.GUI_lang_index],'',\
-                                   kind_of_doc_head[self.GUI_lang_index], \
-                                   file_head[self.GUI_lang_index],\
-                                   kind_of_file_head[self.GUI_lang_index],'','','',\
+                    prod_head_8 = ['','','',self.line_nr, info_head[self.GUI_lang_index],
+                                   dir_head[self.GUI_lang_index],'',
+                                   kind_of_doc_head[self.GUI_lang_index],
+                                   file_head[self.GUI_lang_index],
+                                   kind_of_file_head[self.GUI_lang_index],'','','',
                                    status_head[self.GUI_lang_index]]
                     #print('obj.cat',obj.category)
-                    if obj.category in ['kind', 'kind of physical object', \
-                                        'kind of occurrence', 'kind of aspect', \
+                    if obj.category in ['kind', 'kind of physical object',
+                                        'kind of occurrence', 'kind of aspect',
                                         'kind of role', 'kind of relation']:
                         self.kind_model.append(prod_head_8)
                     else:
@@ -961,27 +947,27 @@ class Display_views():
 
                         if directory_name == '':
                             self.Display_message(
-                                'The name of the directory for file {} is unknown.'.\
+                                'The name of the directory for file {} is unknown.'.
                                 format(carrier.name),\
-                                'De naam van de directory voor file {} is onbekend.'.\
+                                'De naam van de directory voor file {} is onbekend.'.
                                 format(carrier.name))
 
                         # Store info about object in info_model
-                        #print('Carrier {} is located on directory {}.'.\
+                        #print('Carrier {} is located on directory {}.'.
                         #      format(carrier.name, directory_name))
-                        info_row = [info.uid, obj.uid, carrier.uid, directory_name,\
-                                    info.name, super_info_name, directory_name, obj.name, \
+                        info_row = [info.uid, obj.uid, carrier.uid, directory_name,
+                                    info.name, super_info_name, directory_name, obj.name,
                                     carrier.name, carrier_kind_name]
                         self.info_model.append(info_row)
 
                         # Store info about object in prod_model or kind_model
                         self.line_nr += + 1
-                        prod_line_8 = [info.uid, super_info_uid, carrier.uid, self.line_nr, \
-                                       info.name, directory_name, '',\
-                                       super_info_name, carrier.name, carrier_kind_name,\
+                        prod_line_8 = [info.uid, super_info_uid, carrier.uid, self.line_nr,
+                                       info.name, directory_name, '',
+                                       super_info_name, carrier.name, carrier_kind_name,
                                        '','','',info_status]
-                        if obj.category in ['kind', 'kind of physical object', \
-                                            'kind of occurrence', 'kind of aspect', \
+                        if obj.category in ['kind', 'kind of physical object',
+                                            'kind of occurrence', 'kind of aspect',
                                             'kind of role', 'kind of relation']:
                             self.kind_model.append(prod_line_8)
                         else:
@@ -989,25 +975,25 @@ class Display_views():
 
                 if qualified is False:
                     self.Display_message(
-                        'A qualification relation for information {} is missing.'.\
-                        format(info.name),\
-                        'Een kwalificatierelatie voor informatie {} ontbreekt.'.\
+                        'A qualification relation for information {} is missing.'.
+                        format(info.name),
+                        'Een kwalificatierelatie voor informatie {} ontbreekt.'.
                         format(info.name))
 
                 if presented is False:
                     # Store info about object in info_model
-                    info_row = [info.uid, obj.uid, info.description, '', \
-                                info.name, super_info_name, '', obj.name, '',\
+                    info_row = [info.uid, obj.uid, info.description, '',
+                                info.name, super_info_name, '', obj.name, '',
                                 descr_avail_text[self.GUI_lang_index], '', '']
                     self.info_model.append(info_row)
 
                     # Store info about object in prod_model or kind_model
                     self.line_nr += + 1
-                    prod_line_8 = [info.uid, super_info_uid, obj.uid, self.line_nr, \
-                                   info.name, '', '', \
+                    prod_line_8 = [info.uid, super_info_uid, obj.uid, self.line_nr,
+                                   info.name, '', '',
                                    super_info_name, '', '','','','',info_status]
-                    if obj.category in ['kind', 'kind of physical object', \
-                                        'kind of occurrence', 'kind of aspect', \
+                    if obj.category in ['kind', 'kind of physical object',
+                                        'kind of occurrence', 'kind of aspect',
                                         'kind of role', 'kind of relation']:
                         self.kind_model.append(prod_line_8)
                     else:
@@ -1030,7 +1016,7 @@ class Display_views():
         if self.decomp_level > 3:
             self.decomp_level += - 1
             return
-        #print('Indentation_level of parts of:',self.decomp_level,name,obj.uid)
+        #print('Indentation_level of parts of:', self.decomp_level, name,obj.uid)
 
         # Search for <has as part> relation or any of its subtypes
         part_uid = ''
@@ -1039,7 +1025,7 @@ class Display_views():
             if expr[rel_type_uid_col] in self.gel_net.subComposUIDs:
                 if expr not in self.expr_table and expr not in self.expr_table:
                     self.expr_table.append(expr)
-                    #print('Rel_obj-parts', rel_obj.lh_obj.uid, rel_obj.lh_obj.name, \
+                    #print('Rel_obj-parts', rel_obj.lh_obj.uid, rel_obj.lh_obj.name,
                     #      rel_obj.rel_type.base_phrases[0], rel_obj.rh_obj.name)
                     self.Add_line_to_network_model(rel_obj, expr)
 
@@ -1056,9 +1042,9 @@ class Display_views():
                         part_uid = expr[rh_uid_col]
                 else:
                     self.Display_message(
-                        'The uid of the phrase type {} is incorrect'.\
-                        format(expr[phrase_type_uid_col]),\
-                        'De uid van de soort frase {} is niet correct'.\
+                        'The uid of the phrase type {} is incorrect'.
+                        format(expr[phrase_type_uid_col]),
+                        'De uid van de soort frase {} is niet correct'.
                         format(expr[phrase_type_uid_col]))
                     continue
 
@@ -1067,9 +1053,9 @@ class Display_views():
                     # the first time only
                     if self.part_head_req is True:
                         self.line_nr += 1
-                        prod_head_4 = ['','','',self.line_nr, compHead[self.GUI_lang_index], \
-                                       partHead[self.GUI_lang_index],\
-                                       par3Head[self.GUI_lang_index], \
+                        prod_head_4 = ['','','',self.line_nr, compHead[self.GUI_lang_index],
+                                       partHead[self.GUI_lang_index],
+                                       par3Head[self.GUI_lang_index],
                                        kindHead[self.GUI_lang_index],'','','','','']
                         if len(self.prod_model) < self.max_nr_of_rows:
                             # Header of part list
@@ -1081,13 +1067,13 @@ class Display_views():
 
                     # Verify if the classification of the part is known
                     if len(part.classifiers) == 0:
-                        part_kind_uid  = ''
+                        part_kind_uid = ''
                         part_kind_name = unknownClassifierText[self.GUI_lang_index]
                     else:
-                        part_kind_uid  = part.classifiers[0].uid
+                        part_kind_uid = part.classifiers[0].uid
                         # Determine name etc. of the kind that classifies the part
                         if len(part.classifiers[0].names_in_contexts) > 0:
-                            #print('Part classifier names', self.reply_lang_pref_uids, \
+                            #print('Part classifier names', self.reply_lang_pref_uids,
                             #      part.classifiers[0].names_in_contexts)
                             lang_name, comm_name, part_kind_name, descrOfKind = \
                                 self.user_interface.Determine_name_in_context(part.classifiers[0])
@@ -1104,13 +1090,13 @@ class Display_views():
                         part_name = part.name
                         community_name = self.unknown[self.GUI_lang_index]
                         self.Display_message(
-                            'Part {} has no defined name for its language community.'.\
-                            format(part.name),\
-                            'Deel {} heeft geen gedefinieerde naam van zijn taalgemeenschap.'.\
+                            'Part {} has no defined name for its language community.'.
+                            format(part.name),
+                            'Deel {} heeft geen gedefinieerde naam van zijn taalgemeenschap.'.
                             format(part.name))
 
                     self.indiv_row[0] = part.uid
-                    self.indiv_row[1] = part_name #part.names_in_contexts[0][2] # obj.name
+                    self.indiv_row[1] = part_name
                     self.indiv_row[2] = obj.name
                     self.indiv_row[3] = part_kind_name
                     self.indiv_row[4] = community_name
@@ -1124,14 +1110,17 @@ class Display_views():
                     if nr_of_aspects == 0:
                         self.line_nr += + 1
                         if self.decomp_level == 1:
-                            prod_line_4 = [part.uid,part_kind_uid,'',self.line_nr,part.name,'','',\
-                                           part_kind_name,'','','','','',status]
+                            prod_line_4 = [part.uid, part_kind_uid, '',
+                                           self.line_nr, part.name, '', '',
+                                           part_kind_name, '', '', '', '', '', status]
                         elif self.decomp_level == 2:
-                            prod_line_4 = [part.uid,part_kind_uid,'',self.line_nr,'',part.name,'',\
-                                           part_kind_name,'','','','','',status]
+                            prod_line_4 = [part.uid, part_kind_uid, '',
+                                           self.line_nr, '', part.name, '',
+                                           part_kind_name, '', '', '', '', '', status]
                         elif self.decomp_level == 3:
-                            prod_line_4 = [part.uid,part_kind_uid,'',self.line_nr,'','',part.name,\
-                                           part_kind_name,'','','','','',status]
+                            prod_line_4 = [part.uid, part_kind_uid, '',
+                                           self.line_nr, '', '', part.name,
+                                           part_kind_name, '', '', '', '', '', status]
                         if self.decomp_level < 4:
                             if len(self.prod_model) < self.max_nr_of_rows:
                                 self.prod_model.append(prod_line_4)
@@ -1140,9 +1129,6 @@ class Display_views():
                     self.Find_parts_and_their_aspects(part)
 
         self.decomp_level += - 1
-        #if nrOfParts == 0:              # Check whether nr of parts = 0
-        #    print('\nNo parts found in query results for {} ({})'.format(obj.name, obj.uid))
-
 
     def Find_kinds_of_aspects(self, obj, role):
         ''' Search for kinds of aspects that can/shall or are by definition possessed
@@ -1207,17 +1193,17 @@ class Display_views():
                 if expr[lh_uid_col] == obj_i.uid \
                    and (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs \
                         and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
-                    aspect_uid   = expr[rh_uid_col]
-                    aspect_name  = expr[rh_name_col]
-                    role_uid     = expr[rh_role_uid_col]
-                    role_name    = expr[rh_role_name_col]
+                    aspect_uid = expr[rh_uid_col]
+                    aspect_name = expr[rh_name_col]
+                    role_uid = expr[rh_role_uid_col]
+                    role_name = expr[rh_role_name_col]
                 elif expr[rh_uid_col] == obj_i.uid \
                      and (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs \
                           and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
-                    aspect_uid   = expr[lh_uid_col]
-                    aspect_name  = expr[lh_name_col]
-                    role_uid     = expr[lh_role_uid_col]
-                    role_name    = expr[lh_role_name_col]
+                    aspect_uid = expr[lh_uid_col]
+                    aspect_name = expr[lh_name_col]
+                    role_uid = expr[lh_role_uid_col]
+                    role_name = expr[lh_role_name_col]
                 else:
                     continue
 
@@ -1245,13 +1231,13 @@ class Display_views():
                         # if any.
                         if role_uid == expr2[lh_uid_col] \
                            and expr2[rel_type_uid_col] in self.gel_net.qualOptionsUIDs:
-                            value_uid  = expr2[rh_uid_col]   # collection of allowed values
+                            value_uid = expr2[rh_uid_col]   # collection of allowed values
                             value_name = expr2[rh_name_col]
                             value_presence = True
                             break
                         elif role_uid == expr2[rh_uid_col] \
                              and expr2[rel_type_uid_col] in self.gel_net.qualOptionsUIDs:
-                            value_uid  = expr2[lh_uid_col]   # collection of allowed values
+                            value_uid = expr2[lh_uid_col]   # collection of allowed values
                             value_name = expr2[lh_name_col]
                             value_presence = True
                             break
@@ -1260,13 +1246,13 @@ class Display_views():
                         # for intrinsic aspect (=role), if any.
                         elif role_uid == expr2[lh_uid_col] \
                              and expr2[lh_role_uid_col] in self.gel_net.concComplUIDs:
-                            value_uid  = expr2[rh_uid_col]   # compliancy criterion or constraint
+                            value_uid = expr2[rh_uid_col]   # compliancy criterion or constraint
                             value_name = expr2[rh_name_col]
                             value_presence = True
                             break
                         elif role_uid == expr2[rh_uid_col] \
                              and expr2[rh_role_uid_col] in self.gel_net.concComplUIDs:
-                            value_uid  = expr2[lh_uid_col]   # compliancy criterion or constraint
+                            value_uid = expr2[lh_uid_col]   # compliancy criterion or constraint
                             value_name = expr2[lh_name_col]
                             value_presence = True
                             break
@@ -1275,18 +1261,18 @@ class Display_views():
                         # if any.
                         elif role_uid == expr2[lh_uid_col] \
                              and expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs:
-                            value_uid  = expr2[rh_uid_col]   # value (on a scale)
+                            value_uid = expr2[rh_uid_col]   # value (on a scale)
                             value_name = expr2[rh_name_col]
-                            uom_uid        = expr2[uom_uid_col]
-                            uom_name       = expr2[uom_name_col]
+                            uom_uid = expr2[uom_uid_col]
+                            uom_name = expr2[uom_name_col]
                             value_presence = True
                             break
                         elif role_uid == expr2[rh_uid_col] \
                              and expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs:
-                            value_uid  = expr2[lh_uid_col]   # value (on a scale)
+                            value_uid = expr2[lh_uid_col]   # value (on a scale)
                             value_name = expr2[lh_name_col]
-                            uom_uid        = expr2[uom_uid_col]
-                            uom_name       = expr2[uom_name_col]
+                            uom_uid = expr2[uom_uid_col]
+                            uom_name = expr2[uom_name_col]
                             value_presence = True
                             break
 
@@ -1295,14 +1281,14 @@ class Display_views():
                         elif role_uid == expr2[lh_uid_col] \
                              and expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs:
                             # Compliance criterion or def qualification
-                            value_uid  = expr2[rh_uid_col]
+                            value_uid = expr2[rh_uid_col]
                             value_name = expr2[rh_name_col]
                             value_presence = True
                             break
                         elif role_uid == expr2[rh_uid_col] \
                              and expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs:
                             # Compliance criterion or def qualification
-                            value_uid  = expr2[lh_uid_col]
+                            value_uid = expr2[lh_uid_col]
                             value_name = expr2[lh_name_col]
                             value_presence = True
                             break
@@ -1367,19 +1353,11 @@ class Display_views():
                         if self.possibility_row not in self.possibilities_model:
                             self.possibilities_model.append(self.possibility_row[:])
                         else:
-                            print('Duplicate possibility row',len(self.possibilities_model), \
+                            print('Duplicate possibility row',len(self.possibilities_model),
                                   self.possibility_row)
-                        self.possibility_row  = ['','','','','','','','','','','','','','','']
+                        self.possibility_row = ['','','','','','','','','','','','','','','']
 
-##                if value_presence is False:
-##                    value_name = '' # noValuesText[self.GUI_lang_index]
-##                    warnText  = ['Kind of aspect','Soort aspect']
-##                    valueMess = ['has no specification of (allowed) values.',\
-##                                 'heeft geen specificatie van (toegelaten) waarden.']
-##                    print('%s %s (%i) %s' % \
-##                          (warnText[self.GUI_lang_index],aspect_name,aspect_uid,\
-##                                    valueMess[self.GUI_lang_index]))
-                #print('obj_i', value_presence, obj_i.name, nr_of_aspects, aspect_name, \
+                #print('obj_i', value_presence, obj_i.name, nr_of_aspects, aspect_name,
                 #      value_name, len(self.taxon_aspect_uids))
 
                 if value_presence is True:
@@ -1390,21 +1368,22 @@ class Display_views():
 
                     if self.decomp_level == 0:
                         # Build summary_view header add a column for aspects if not yet included
-                        if value_presence is True and aspect_name not in self.taxon_column_names \
+                        if value_presence is True \
+                           and aspect_name not in self.taxon_column_names \
                            and len(self.taxon_column_names) <= 14:
                             #print('Summm_header', aspect_name, len(self.taxon_aspect_uids))
                             self.taxon_aspect_uids.append(aspect_uid)
                             self.taxon_column_names.append(aspect_name)
                             self.taxon_uom_names.append(uom_name)
                         self.taxon_ind = 3
-                        #print('Sums:',len(self.taxon_aspect_uids), self.taxon_aspect_uids, \
+                        #print('Sums:',len(self.taxon_aspect_uids), self.taxon_aspect_uids,
                         #      self.taxon_column_names, value_name)
                         # Find column in taxon_row where value should be stored
                         for kind_uid in self.taxon_aspect_uids[4:]:
                             self.taxon_ind += + 1
                             # Build list of values conform list of aspects.
                             if kind_uid == aspect_uid:
-                                #print('Aspects of phys:',len(self.taxon_aspect_uids), \
+                                #print('Aspects of phys:',len(self.taxon_aspect_uids),
                                 #      aspect_name, self.taxon_ind, value_name)
                                 self.taxon_row[self.taxon_ind] = value_name
                                 # Check whether there the uom corresponds with the table uom
@@ -1413,53 +1392,27 @@ class Display_views():
                                    and uom_name != self.taxon_uom_names[self.taxon_ind]:
                                     self.Display_message(
                                         'Unit of measure {} ({}) of the value of {} differs'
-                                        'from summary table header UoM {}'.\
-                                        format(uom_name, uom_uid, aspect_name, \
-                                               self.taxon_uom_names[self.taxon_ind]),\
+                                        'from summary table header UoM {}'.
+                                        format(uom_name, uom_uid, aspect_name,
+                                               self.taxon_uom_names[self.taxon_ind]),
                                         'Meeteenheid {} ({}) van de waarde van {} verschilt'
-                                        'van de overzichtstabel kop_eenheid {}'.\
-                                        format(uom_name, uom_uid, aspect_name, \
+                                        'van de overzichtstabel kop_eenheid {}'.
+                                        format(uom_name, uom_uid, aspect_name,
                                                self.taxon_uom_names[self.taxon_ind]))
-
-##                    if self.subtype_level == 0:
-##                        # Build composition_view header add a column for aspects,
-##                        # if not yet included
-##                        if value_presence is True and aspect_name not in self.possib_column_names\
-##                                  and len(self.possib_column_names) <= 15:
-##                            #print('Compon_header', aspect_name, len(self.possib_aspect_uids))
-##                            self.possib_aspect_uids.append(aspect_uid)
-##                            self.possib_column_names.append(aspect_name)
-##                            self.possib_uom_names.append(uom_name)
-##                        self.possib_ind = 4
-##                        #print('Sums:',len(self.possib_aspect_uids), self.possib_aspect_uids, \
-##                               self.possib_column_names, value_name)
-##                        # Find column in possibility_row where value should be stored
-##                        for kind_uid in self.possib_aspect_uids[5:]:
-##                            self.possib_ind += + 1
-##                            # Build list of values conform list of aspects.
-##                            if aspect_uid == kind_uid:
-##                                #print('Aspects of phys:',len(self.possib_aspect_uids), \
-##                                       aspect_name, self.possib_ind, value_name)
-##                                self.possibility_row[self.possib_ind] = value_name
-##                                if uom_name != self.possib_uom_names[self.possib_ind]:
-##                                    print('Unit of measure {} ({}) of the value of {} differs '
-##                                          'from composition table header UoM {}'\
-##                                          .format(uom_name, uom_uid, aspect_name, \
-##                                                  self.possib_uom_names[self.possib_ind]))
 
                     # Add a line of Line_type 3 to prod_model
                     self.subtype_level = 0 # not a subtype of object in focus
                     #self.line_nr += 1
                     if len(obj.supertypes) > 0:
-                        supertype_uid  = obj.supertypes[0].uid
+                        supertype_uid = obj.supertypes[0].uid
                         supertype_name = obj.supertypes[0].name
                     else:
-                        supertype_uid  = ''
+                        supertype_uid = ''
                         supertype_name = self.unknown[self.GUI_lang_index]
-                    self.Add_prod_model_line_type3(self.subtype_level, \
-                                                   obj_i.uid, supertype_uid, aspect_uid, \
-                                                   nr_of_aspects, obj.name, role, \
-                                                   supertype_name, aspect_name, equality, \
+                    self.Add_prod_model_line_type3(self.subtype_level,
+                                                   obj_i.uid, supertype_uid, aspect_uid,
+                                                   nr_of_aspects, obj.name, role,
+                                                   supertype_name, aspect_name, equality,
                                                    value_name, uom_name, status)
 
                     # Determine implied part if any
@@ -1503,12 +1456,12 @@ class Display_views():
                                 asp_of_part_uid = expr_asp[lh_uid_col]
                                 asp_of_part_name = expr_asp[lh_name_col]
 
-                        #print('Whole {} has implied part ({}) {} identified with aspect ({}) {}.'\
-                        #      .format(obj.name, part_uid, part_name, \
-                        #              asp_of_part_uid, asp_of_part_name))
+                        #print('Whole {} has implied part ({}) {} identified with aspect ({}) {}.'.
+                        #      format(obj.name, part_uid, part_name,
+                        #             asp_of_part_uid, asp_of_part_name))
                         key = (part_uid, asp_of_part_uid)
-                        self.implied_parts_dict[key] = (part_name, asp_of_part_uid, \
-                                                        asp_of_part_name, \
+                        self.implied_parts_dict[key] = (part_name, asp_of_part_uid,
+                                                        asp_of_part_name,
                                                         equality, value_name, uom_name, status)
 
         #        if obj.category == 'kind of occurrence':
@@ -1524,15 +1477,10 @@ class Display_views():
         #                    # Build list of values conform list of aspects.
         #                    # Note: sumRow[0] = component
         #                    if aspect.kind == kind_name:
-        #                        #print('Aspects of occ :',nrOfAspOccKinds,aspect_name,\
+        #                        #print('Aspects of occ :',nrOfAspOccKinds,aspect_name,
         #                               aspect.kind,self.taxon_ind,value_name)
         #                        occRow[self.taxon_ind] = value_name
         #                        if uom_name != self.occ_uoms[self.taxon_ind]:
-##                                    print('Unit of measure {} ({}) '
-##                                          'of the value of {} of kind {} '
-##                                          'differs from activity table header UoM {}'.\
-##                                          format(uom_name,uom_uid,aspect_name,\
-##                                                 aspect.kind, self.occ_uoms[self.taxon_ind]))
         #        # If not a kind of occurrence, then build header for summaryTable
         #        elif self.decomp_level == 0:
 
@@ -1549,7 +1497,7 @@ class Display_views():
                         # If summary row is about object in focus,
                         # then make supertype of object in focus empty
                         # Because treeview parent (taxon_row[2] should be supertype or blank.
-                        #print('Subtype_level-1:', self.subtype_level, self.object_in_focus.uid, \
+                        #print('Subtype_level-1:', self.subtype_level, self.object_in_focus.uid,
                         #      self.object_in_focus.name, obj.uid, obj.name, self.taxon_row[0:4])
                         if self.taxon_row[0] == self.object_in_focus.uid:
                             self.taxon_row[2] = ''
@@ -1558,7 +1506,8 @@ class Display_views():
                         # If the object not a subtype of the object_in_focus,
                         # then insert an inter_row header line for the subtypes
                         if self.subtype_level == 0:
-                            inter_row = [obj.uid, self.has_as_subtypes[self.GUI_lang_index], \
+                            inter_row = [obj.uid,
+                                         self.has_as_subtypes[self.GUI_lang_index],
                                          obj.name, '']
                             self.taxon_model.append(inter_row)
 
@@ -1574,25 +1523,6 @@ class Display_views():
                         #      self.taxon_row[0:4])
 
             self.taxon_row = ['','','','','','','','','','','','','','']
-
-##        # If not a subtype (subtype_level == 0) and for any decomp_level
-##        #    create a row in possibilities_model
-##        if self.subtype_level == 0:
-##            if len(self.possibilities_model) < self.max_nr_of_rows:
-####                if obj not in self.possib_objects:
-####                    self.possib_objects.append(obj)
-##                # If possibilities row is about object in focus,
-##                # then make whole of object in focus empty
-##                # Because treeview parent should be whole or blank.
-##                if self.possibility_row[0] == obj.uid:
-##                    self.possibility_row[2] = ''
-##                if self.possibility_row not in self.possibilities_model:
-##                    self.possibilities_model.append(self.possibility_row[:])
-##                else:
-##                    print('Duplicate composition row',len(self.possibilities_model), \
-##                          self.possibility_row)
-##            self.possibility_row  = ['','','','','','','','','','','','','','','']
-
         return nr_of_aspects
 
     def Determine_preferred_kind_name(self, obj):
@@ -1633,10 +1563,10 @@ class Display_views():
     def Find_kinds_of_parts_and_their_aspects(self, obj):
         """ Search for explicit kinds of parts and combine them with implied kinds of parts"""
 
-        compHead = ['Part hierarchy','Compositie']
-        partHead = ['Part of part','Deel van deel']
-        par3Head = ['Further part','Verder deel']
-        kindHead = ['Kind','Soort']
+        compHead = ['Part hierarchy', 'Compositie']
+        partHead = ['Part of part', 'Deel van deel']
+        par3Head = ['Further part', 'Verder deel']
+        kindHead = ['Kind', 'Soort']
         of_text = [' (of ', ' (van ']
 
         role = ''
@@ -1645,14 +1575,14 @@ class Display_views():
         for rel_obj in obj.relations:
                 expr = rel_obj.expression
                 if expr[lh_uid_col] == obj.uid \
-                   and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs\
+                   and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs \
                    and expr[phrase_type_uid_col] == '1986':
                     part_uid   = expr[rh_uid_col]
                     part_name  = expr[rh_name_col]
                     #role_uid     = expr[rh_role_uid_col]
                     #role_name    = expr[rh_role_name_col]
                 elif expr[rh_uid_col] == obj.uid \
-                     and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs\
+                     and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs \
                      and expr[phrase_type_uid_col] == '6066'  :
                     part_uid   = expr[lh_uid_col]
                     part_name  = expr[lh_name_col]
@@ -1666,9 +1596,10 @@ class Display_views():
                 #print('Kind of part', part_name)
                 if self.part_head_req is True:
                     self.line_nr += 1
-                    prod_head_4 = ['','','',self.line_nr, compHead[self.GUI_lang_index], \
-                                   partHead[self.GUI_lang_index],\
-                                   par3Head[self.GUI_lang_index], \
+                    prod_head_4 = ['', '', '',
+                                   self.line_nr, compHead[self.GUI_lang_index],
+                                   partHead[self.GUI_lang_index],
+                                   par3Head[self.GUI_lang_index],
                                    kindHead[self.GUI_lang_index],'','','','','']
                     if len(self.kind_model) < self.max_nr_of_rows:
                         # Add header of part to kind_model
@@ -1715,8 +1646,6 @@ class Display_views():
                 self.possibility_row[4] = part_kind_name
                 self.possibility_row[5] = community_name # of part
                 # Add possibility for part to possibilities_model
-##                if part not in self.possib_objects:
-##                    self.possib_objects.append(part)
                 if self.possibility_row not in self.possibilities_model:
                     self.possibilities_model.append(self.possibility_row[:])
 
@@ -1733,14 +1662,14 @@ class Display_views():
                             if part.uid == key[0]:
                                 self.Display_message(
                                     'Object ({}) {} has part ({}) {}'
-                                    'with implied aspect ({}) {}.'.\
-                                    format(obj.uid, obj.names_in_contexts[0][2], key[0], \
-                                           implied_tuple(0), implied_tuple(1), \
-                                           implied_tuple(2)),\
+                                    'with implied aspect ({}) {}.'.
+                                    format(obj.uid, obj.names_in_contexts[0][2], key[0],
+                                           implied_tuple(0), implied_tuple(1),
+                                           implied_tuple(2)),
                                     'Object ({}) {} heeft als deel ({}) {}'
-                                    'met als geïmpliceerd aspect ({}) {}.'.\
-                                    format(obj.uid, obj.names_in_contexts[0][2], key[0], \
-                                           implied_tuple(0), implied_tuple(1), \
+                                    'met als geïmpliceerd aspect ({}) {}.'.
+                                    format(obj.uid, obj.names_in_contexts[0][2], key[0],
+                                           implied_tuple(0), implied_tuple(1),
                                            implied_tuple(2)))
                                 del self.implied_parts_dict[key]
 
@@ -1752,9 +1681,10 @@ class Display_views():
             # the first time only
             if self.part_head_req is True:
                 self.line_nr += 1
-                prod_head_4 = ['','','',self.line_nr, compHead[self.GUI_lang_index], \
-                               partHead[self.GUI_lang_index],\
-                               par3Head[self.GUI_lang_index], \
+                prod_head_4 = ['', '', '',
+                               self.line_nr, compHead[self.GUI_lang_index],
+                               partHead[self.GUI_lang_index],
+                               par3Head[self.GUI_lang_index],
                                kindHead[self.GUI_lang_index],'','','','','']
                 if len(self.kind_model) < self.max_nr_of_rows:
                     self.kind_model.append(prod_head_4) # Header of part list
@@ -1766,10 +1696,10 @@ class Display_views():
                 nr_of_aspects = 1
                 part_name = implied_tuple[0]
                 if len(self.uid_dict[key[0]].supertypes) > 0:
-                    part_kind_uid  = self.uid_dict[key[0]].supertypes[0].uid
+                    part_kind_uid = self.uid_dict[key[0]].supertypes[0].uid
                     part_kind_name = self.uid_dict[key[0]].supertypes[0].name
                 else:
-                    part_kind_uid  = ''
+                    part_kind_uid = ''
                     part_kind_name = 'kind'
                 aspect_name = implied_tuple[2]
                 equality = implied_tuple[3]
@@ -1778,41 +1708,41 @@ class Display_views():
                 status = 'implied'
                 subtype_of_part_level = 0
 
-                self.Add_prod_model_line_type3(subtype_of_part_level, \
-                                               key[0], part_kind_uid, implied_tuple[1], \
-                                               nr_of_aspects, part_name, role, \
-                                               part_kind_name, aspect_name, equality, \
+                self.Add_prod_model_line_type3(subtype_of_part_level,
+                                               key[0], part_kind_uid, implied_tuple[1],
+                                               nr_of_aspects, part_name, role,
+                                               part_kind_name, aspect_name, equality,
                                                value_name, uom_name, status)
 
-    def Add_prod_model_line_type3(self, subtype_level, \
-                                  part_uid, part_kind_uid, aspect_uid, nr_of_aspects, \
-                                  part_name, role, part_kind_name, \
+    def Add_prod_model_line_type3(self, subtype_level,
+                                  part_uid, part_kind_uid, aspect_uid, nr_of_aspects,
+                                  part_name, role, part_kind_name,
                                   aspect_name, equality, value_name, uom_name, status):
         ''' Create a line_type 3 for product model view '''
         self.line_nr += 1
         # Decomp_level = 0 means object in focus, 1 means: part (2 = part of part, etc.)
         if self.decomp_level == 1 and nr_of_aspects <= 1:
-            prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr, \
-                           part_name, role, '', part_kind_name, aspect_name, '', equality, \
+            prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr,
+                           part_name, role, '', part_kind_name, aspect_name, '', equality,
                            value_name, uom_name, status]
         # Decomp_level = 2 means: part of part
         elif self.decomp_level == 2 and nr_of_aspects == 1:
-            prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr, \
-                           role, part_name, '', part_kind_name, aspect_name, '', equality,\
+            prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr,
+                           role, part_name, '', part_kind_name, aspect_name, '', equality,
                            value_name, uom_name, status]
         elif self.decomp_level == 3 and nr_of_aspects == 1:
-            prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr, \
-                           '', role, part_name, part_kind_name, aspect_name, '', equality,\
+            prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr,
+                           '', role, part_name, part_kind_name, aspect_name, '', equality,
                            value_name, uom_name, status]
 
         # Subtype_level = 1 means: first decomp_level subtype
         elif subtype_level > 0 and nr_of_aspects == 1:
-            prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr, \
-                           part_name, role, '', part_kind_name, aspect_name, '', equality,\
+            prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr,
+                           part_name, role, '', part_kind_name, aspect_name, '', equality,
                            value_name, uom_name, status]
         else:
-            prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr, \
-                           '', '', '', '', aspect_name, '', equality, \
+            prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr,
+                           '', '', '', '', aspect_name, '', equality,
                            value_name, uom_name, status]
 
         if len(self.kind_model) < self.max_nr_of_rows:
@@ -1822,9 +1752,6 @@ class Display_views():
         ''' Determine whether a kind_in_focus (obj) is a classifier for individual things
             if so, then add individual things to taxonomy (taxon_model) of kinds
         '''
-##        if self.individuals > 0:
-##            for individual in self.individuals:
-##                indiv_uid = individual.uid
         has_as_individuals = ['classifies as individual ', \
                               'classificeert als individuele ']
         first_time = True
@@ -1861,8 +1788,6 @@ class Display_views():
                 # under the header for individual things
                 lang_name, community_name, preferred_name, descr = \
                            self.user_interface.Determine_name_in_context(indiv)
-##                # Indiv.names_in_contexts[0][1] == community uid
-##                community_name = self.gel_net.community_dict[indiv.names_in_contexts[0][1]]
                 self.taxon_row[0] = indiv.uid
                 self.taxon_row[1] = preferred_name
                 self.taxon_row[2] = header_text
@@ -1870,13 +1795,6 @@ class Display_views():
 
                 self.taxon_model.append(self.taxon_row[:])
                 self.taxon_row = ['','','','','','','','','','','','','','']
-##                # Find aspects of individual object_in_focus
-##                role = ''
-##                nr_of_aspects = self.Find_aspects(indiv, role)
-##
-##                # Find parts and their aspects
-##                self.part_head_req = True
-##                self.Find_parts_and_their_aspects(indiv)
 
     def Occurs_and_involvs(self, obj):
         """ Search for occurrences in which the obj (in focus) is involved.
@@ -1887,10 +1805,10 @@ class Display_views():
             Search for aspects of the occurrences (such as duration).
             Store results in prod_model and the composition in partWholeOcc.
         """
-        occur_head   = ['Occurrences' ,'Gebeurtenissen']
-        role_head    = ['Role'        ,'Rol']
-        involv_head  = ['Involved object','Betrokken object']
-        kind_head    = ['Kind'        ,'Soort']
+        occur_head = ['Occurrences', 'Gebeurtenissen']
+        role_head = ['Role', 'Rol']
+        involv_head = ['Involved object', 'Betrokken object']
+        kind_head = ['Kind', 'Soort']
         #print('**** Occurs_and_involvs:',obj.uid, obj.name, obj.category)
 
         nr_of_occur = 0
@@ -1915,15 +1833,15 @@ class Display_views():
             occ = self.uid_dict[occ_uid]
             occ_name = occ.name
             self.decomp_level = 1
-            #print('Occ     :',obj.name, occ_uid, occ_name,'roles:', expr[rel_type_name_col],\
+            #print('Occ     :',obj.name, occ_uid, occ_name,'roles:', expr[rel_type_name_col],
             #      expr[lh_role_name_col], expr[rh_role_name_col])
 
             # Display occurrences header, only the first time
             if nr_of_occur == 1:
-                prod_head_5 = ['', '', '', self.line_nr, \
-                               occur_head[self.GUI_lang_index] , role_head[self.GUI_lang_index], \
-                               involv_head[self.GUI_lang_index], kind_head[self.GUI_lang_index], \
-                               '','','','','']
+                prod_head_5 = ['', '', '', self.line_nr,
+                               occur_head[self.GUI_lang_index], role_head[self.GUI_lang_index],
+                               involv_head[self.GUI_lang_index], kind_head[self.GUI_lang_index],
+                               '', '', '', '', '']
                 self.prod_model.append(prod_head_5)
 
             if len(self.expr_table) < self.max_nr_of_rows:
@@ -1938,14 +1856,11 @@ class Display_views():
                 occ_kind_uid = occ_kind.uid
             else:
                 self.Display_message(
-                    'Occurrence {} classifier is unknown.'.format(occ.name),\
+                    'Occurrence {} classifier is unknown.'.format(occ.name),
                     'Gebeurtenis {} classificeerder is onbekend.'.format(occ.name))
                 occ_kind_name = self.unknown[self.GUI_lang_index]
                 occ_kind_uid = ''
 
-            #self.occ_model.append([occ.uid, occ.name, higher.name, involv.uid, occ_kind.uid,\
-            #                       occ.name, part_occ.name, \
-            #                       involv.name, kind_part_occ.name, role_of_involved])
             self.occ_model.append([occ.uid, occ.name, '', '', occ_kind_uid, \
                                    occ.name, '', '', occ_kind_name, ''])
             #print('Occ-3:',[nr_of_occur, occ.name, occ_uid, occ_kind_name])
@@ -1960,8 +1875,9 @@ class Display_views():
             # (otherwise line is included in Find_aspects
             if nr_of_aspects == 0:
                 self.line_nr += + 1
-                prod_line_5 = [occ.uid, occ_kind.uid, '', self.line_nr, occ_name,'','',\
-                               occ_kind_name,'','','','','',status]
+                prod_line_5 = [occ.uid, occ_kind.uid, '',
+                               self.line_nr, occ_name, '', '',
+                               occ_kind_name, '', '', '', '', '', status]
                 self.prod_model.append(prod_line_5)
 
             # Search for objects that are involved in the found occurrence
@@ -1989,7 +1905,7 @@ class Display_views():
 
                 # An object is found that is involved in the occurrence
                 involved = self.uid_dict[involved_uid]
-                #print('Involved:',obj.uid, involved.uid, involved.name,\
+                #print('Involved:',obj.uid, involved.uid, involved.name,
                 #      'roles:',expr_occ[lh_role_uid_col],expr_occ[rh_role_uid_col])
 
                 self.expr_table.append(expr_occ)
@@ -2002,9 +1918,9 @@ class Display_views():
                     involved_kind_name = involved_kind.name
                 else:
                     self.Display_message(
-                        'The involved object {} has no classifier.'.\
-                        format(involved.name),\
-                        'Het betrokken object {} heeft geen classificeerder.'.\
+                        'The involved object {} has no classifier.'.
+                        format(involved.name),
+                        'Het betrokken object {} heeft geen classificeerder.'.
                         format(involved.name))
                     involved_kind_name = self.unknown[self.GUI_lang_index]
 
@@ -2015,9 +1931,9 @@ class Display_views():
                 # if no aspects of part found, then record part only
                 if nr_of_aspects == 0:
                     self.line_nr += + 1
-                    prod_line_6 = [involved.uid, involved_kind.uid, '', \
-                                   self.line_nr, '', inv_role_name, involved.name, \
-                                   involved_kind_name, '','','','','', status]
+                    prod_line_6 = [involved.uid, involved_kind.uid, '',
+                                   self.line_nr, '', inv_role_name, involved.name,
+                                   involved_kind_name, '', '', '', '', '', status]
                     self.prod_model.append(prod_line_6)
 
             # Search for successors or predecessors of found occurrence
@@ -2027,20 +1943,6 @@ class Display_views():
             # Search for parts of found occurrence and parts of parts, etc.
             occ_level = 1
             self.PartOfOccur(occ, occ_level)
-
-##        # Check whether nr of occurrences = 0
-##        if nr_of_occur == 0:
-##            #if self.GUI_lang_index == 1:
-##            #    print('Geen gebeurtenissen gevonden '
-##                       'in antwoord op vraag over {} ({})'.format(name,UID))
-##            #else:
-##            #    print('No involving occurrences found '
-##                       'in query results for {} ({})'.format(name,UID))
-##            self.line_nr += + 1
-##            none = ['None','Geen']
-##            prod_head_5A = ['','','',self.line_nr, none[self.GUI_lang_index],\
-##                            '','','','','','','','']
-##            self.prod_model.append(prod_head_5A)
 
     def Determine_sequences_of_occurrences(self, occ):
         """ Build occurrences (activities or processes or events)
@@ -2096,21 +1998,6 @@ class Display_views():
                 self.involv_table.append([occ, involved, inv_role_kind, inv_kind_name])
                 nr_of_ins_and_outs += 1
 
-##            # Search for parts of occurrence, being part - whole relations
-##            elif expr[lh_uid_col] == occ.uid \
-##                 and expr[rh_role_uid_col] in self.gel_net.subComponUIDs:
-##                part = self.uid_dict[expr[rh_uid_col]
-##                part_uids.append(part.uid)
-##                self.parts_of_occ_table.append([occ, part])
-##                nr_of_parts += 1
-##            # And for the inverse expressions
-##            elif expr[rh_uid_col] == occ.uid \
-##                 and expr[lh_role_uid_col] in self.gel_net.subComponUIDs:
-##                part = self.uid_dict[expr[lh_uid_col]]
-##                part_uids.append(part.uid)
-##                self.parts_of_occ_table.append([occ, part])
-##                nr_of_parts += 1
-
         if len(occ.parts) > 0:
             # Determine sequences, IOs and parts of parts
             for part_occ in occ.parts:
@@ -2120,9 +2007,8 @@ class Display_views():
         """ Determine whole-parts hierarchy for occurrences
             Store results in prod_model
         """
-
         parts = False
-        part_head   = ['Part occurrence', 'Deelgebeurtenis']
+        part_head = ['Part occurrence', 'Deelgebeurtenis']
         kind_part_head = ['Kind of part', 'Soort deel']
         for rel_occ in occ.relations:
             expr = rel_occ.expression
@@ -2131,8 +2017,10 @@ class Display_views():
                 # Create header line, only after finding a part the first time
                 if parts is False:
                     self.line_nr += + 1
-                    prod_line_7 = ['', '', '', self.line_nr, '', part_head[self.GUI_lang_index],\
-                                   '', kind_part_head[self.GUI_lang_index], '','','','','','']
+                    prod_line_7 = ['', '', '', self.line_nr, '',
+                                   part_head[self.GUI_lang_index],
+                                   '', kind_part_head[self.GUI_lang_index],
+                                   '', '', '', '', '', '']
                     self.prod_model.append(prod_line_7)
                     parts = True
                 part_occ = self.uid_dict[expr[rh_uid_col]]
@@ -2147,9 +2035,9 @@ class Display_views():
                     kind_part_occ_name = kind_part_occ.name
                 else:
                     self.Display_message(
-                        'The part of occurrnce {} has no classifier'.\
-                        format(part_occ.name),\
-                        'De deelgebeurtenis {} heeft geen classificeerder'.\
+                        'The part of occurrnce {} has no classifier'.
+                        format(part_occ.name),
+                        'De deelgebeurtenis {} heeft geen classificeerder'.
                         format(part_occ.name))
                     kind_part_occ = self.unknown[self.GUI_lang_index]
                     kind_part_occ_uid = '0'
@@ -2157,14 +2045,15 @@ class Display_views():
 
                 if occ_level < 2:
                     self.line_nr += + 1
-                    prod_line_8 = [part_occ.uid, kind_part_occ_uid, '', self.line_nr, '',\
-                                   part_occ.name, '', kind_part_occ_name, '','','','','', status]
+                    prod_line_8 = [part_occ.uid, kind_part_occ_uid, '', self.line_nr, '',
+                                   part_occ.name, '',
+                                   kind_part_occ_name, '', '', '', '', '', status]
                     self.prod_model.append(prod_line_8)
                     self.nr_of_occurrencies += + 1
                     involv_uid = ''
                     role_of_involved = ''
-                    self.occ_model.append([part_occ.uid, part_occ.name, occ.name, involv_uid, \
-                                           kind_part_occ_uid, '', part_occ.name,  '', \
+                    self.occ_model.append([part_occ.uid, part_occ.name, occ.name, involv_uid,
+                                           kind_part_occ_uid, '', part_occ.name, '',
                                            kind_part_occ_name, role_of_involved])
 
                 # Add whole, part and kind of part occurrence to part_whole_occs hierarchy
@@ -2177,23 +2066,23 @@ class Display_views():
     def Display_notebook_views(self):
         ''' For non-empty models define and display a treeview in a notebook tab.'''
 
-    # Define and display Network view sheet = = = = = = = = = = = = =
+        # Define and display Network view sheet
         if len(self.network_model) > 0:
             self.Define_and_display_network()
 
-    # Define and display Taxonomic view sheet for kinds of products = = = =
+        # Define and display Taxonomic view sheet for kinds of products
         if len(self.taxon_model) > 0:
             self.Define_and_display_taxonomy_of_kinds()
 
-    # Define and display Possibilities_view sheet of kind = = = = = = = = = =
+        # Define and display Possibilities_view sheet of kind
         if len(self.possibilities_model) > 0:
             self.Define_and_display_possibilities_of_kind()
 
-    # Define and display model of a Kind = = = = = = = = = = = = = =
+        # Define and display model of a Kind
         if len(self.kind_model) > 0:
             self.Define_and_display_kind_view()
 
-    # Define Summary_view sheet for individual products = = = = = = = = = = =
+        # Define Summary_view sheet for individual products
         if len(self.summ_model) > 0:
             # Destroy earlier summary_frame
             try:
@@ -2205,11 +2094,11 @@ class Display_views():
 
             self.Display_summary_view()
 
-    # Define Individual_view sheet = = = = = = = = = = = = = = = = = = = = =
+        # Define Individual_view sheet
         if len(self.indiv_model) > 0:
             self.Define_and_display_individual_model()
 
-    # Define Product_model_sheet view = = = = = = = = = = = = = = = =
+        # Define Product_model_sheet view
         if len(self.prod_model) > 0:
             #print('prod_model',self.prod_model)
             # Destroy earlier product_frame
@@ -2224,7 +2113,7 @@ class Display_views():
             # Display prod_model in Composition_sheet view
             self.Display_product_model_view()
 
-    # Define Data_sheet view = = = = = = = = = = = = = = = =
+        # Define Data_sheet view
         if len(self.prod_model) > 0:
             # Destroy earlier data sheet
             try:
@@ -2237,7 +2126,7 @@ class Display_views():
             # Display prod_model in Data_sheet view
             self.Display_data_sheet_view()
 
-    # Activities view = = = = = = = = = = = = = = = = = = = = =
+        # Activities view
         if len(self.occ_model) > 0:
             # Destroy earlier activity sheet
             try:
@@ -2250,11 +2139,11 @@ class Display_views():
             # Display occ_model in Activity sheet view
             self.Display_occ_model_view()
 
-     # Define and display Documents_view sheet = = = = = = = = = =
+        # Define and display Documents_view sheet
         if len(self.info_model) > 0:
             self.Define_and_display_documents()
 
-     # Define Expressions_view sheet = = = = = = = = = = = = = = = = = = =
+        # Define Expressions_view sheet
         # Destroy earlier expression_frame
         try:
             self.expr_frame.destroy()
@@ -2270,15 +2159,12 @@ class Display_views():
     def Display_message(self, text_en, text_nl):
         if self.GUI_lang_index == 1:
             self.user_interface.log_frame.append(text_nl)
-##            self.log_message.insert(END, '\n' + text_nl)
         else:
             self.user_interface.log_frame.append(text_en)
-##            self.log_message.insert(END, '\n' + text_en)
 
     def Define_and_display_network(self):
         # Destroy earlier network_frame
         try:
-##            self.network_frame.destroy()
             self.user_interface.views_noteb.remove_child(self.network_tree)
         except AttributeError:
             pass
@@ -2291,42 +2177,18 @@ class Display_views():
         ''' Define a network sheet for display of network_model (a list of network rows)
             for display in a tab of Notebook
         '''
-##        self.network_frame = Frame(self.views_noteb)
-##        self.network_frame.grid (column=0, row=0, sticky=NSEW, rowspan=2, columnspan=4)
-##        self.network_frame.columnconfigure(0, weight=1)
-##        self.network_frame.columnconfigure(1, weight=1)
-##        self.network_frame.columnconfigure(2, weight=1)
-##        self.network_frame.columnconfigure(3, weight=1)
-##        self.network_frame.rowconfigure(0,weight=0)
-##        self.network_frame.rowconfigure(1,weight=1)
         network_text = ['Network','Netwerk']
         self.network_frame = gui.VBox(width='100%', height='100%',
                                       style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.network_frame,
                                  network_text[self.GUI_lang_index], self.tab_cb)
 
-##        self.views_noteb.add(self.network_frame, text=network_text[self.GUI_lang_index], \
-##                             sticky=NSEW)
-##        #self.views_noteb.insert("end", self.network_frame, sticky=NSEW)
-
-##        network_head = ['Network of objects and aspects',\
-##                        'Netwerk van objecten en aspecten']
-##        network_lbl  = Label(self.network_frame,text=network_head[self.GUI_lang_index])
         net_button_text = ['Display network of left-object', 'Toon netwerk van linker object']
         lh_button_text = ['Display details of left object', 'Toon details van linker object']
         rh_button_text = ['Display details of kind', 'Toon details van soort']
         classif_button_text = ['Classify left individual object', \
                                'Classificeer linker individueel object']
 
-##        self.net_button = Button(self.network_frame, text=net_button_text[self.GUI_lang_index], \
-##                                command=self.Prepare_lh_object_network_view)
-##        self.lh_button = Button(self.network_frame, text=lh_button_text[self.GUI_lang_index], \
-##                                command=lambda:self.Prepare_network_object_detail_view('lh_obj'))
-##        self.rh_button = Button(self.network_frame, text=rh_button_text[self.GUI_lang_index], \
-##                                command=lambda:self.Prepare_network_object_detail_view('rh_obj'))
-##        self.classif_button = Button(self.network_frame, \
-##                                     text=classif_button_text[self.GUI_lang_index], \
-##                                     command=self.Prepare_for_classification)
         self.button_row = gui.HBox(height=20, width='100%')
         self.net_button = gui.Button(net_button_text[self.GUI_lang_index], width=200, height=20)
         self.net_button.attributes['title'] = 'Press button after selection of left hand object'
@@ -2350,13 +2212,7 @@ class Display_views():
         self.button_row.append(self.classif_button)
         self.network_frame.append(self.button_row)
 
-##        headings = ['UID', 'Name', 'Parent', 'Kind', \
-##                    'Equal','Value','Unit']
         nr_of_cols = 7 # len(self.taxon_column_names)
-##        display_cols = headings[3:nr_of_cols]
-
-##        self.network_tree = Treeview(self.network_frame, columns=(headings[0:nr_of_cols]),\
-##                                     displaycolumns=display_cols, selectmode='browse', height=30)
         self.network_tree = gui.Table(width='100%',
                                       style={"overflow":"auto", "background-color":"#eeffaa",\
                                              "border-width":"2px", "border-style":"solid",\
@@ -2365,14 +2221,6 @@ class Display_views():
         eqal_head = ['>=<', '>=<']
         valu_head = ['Value', 'Waarde']
         unit_head = ['Unit', 'Eenheid']
-        #self.network_tree.item_at(0, 0).set_text('Object')
-##        self.network_tree.item_at(0, 0).set_text('UID')
-##        self.network_tree.item_at(0, 1).set_text(self.name_head[self.GUI_lang_index])
-##        self.network_tree.item_at(0, 2).set_text(self.parent_head[self.GUI_lang_index])
-##        self.network_tree.item_at(0, 3).set_text(self.kind_head[self.GUI_lang_index])
-##        self.network_tree.item_at(0, 4).set_text(eqal_head[self.GUI_lang_index])
-##        self.network_tree.item_at(0, 5).set_text(valu_head[self.GUI_lang_index])
-##        self.network_tree.item_at(0, 6).set_text(unit_head[self.GUI_lang_index])
         content = [('UID', self.name_head[self.GUI_lang_index],
                     self.parent_head[self.GUI_lang_index],
                     self.kind_head[self.GUI_lang_index],
@@ -2381,42 +2229,7 @@ class Display_views():
                     unit_head[self.GUI_lang_index])]
         self.network_tree.append_from_list(content, fill_title=True)
         self.network_frame.append(self.network_tree)
-##        self.network_tree.heading('#0'   , text='Object', anchor=W)
-##        self.network_tree.heading('UID'  , text='UID'   , anchor=W)
-##        self.network_tree.heading('Name' , text=self.name_head[self.GUI_lang_index], anchor=W)
-##        self.network_tree.heading('Parent', text=self.parent_head[self.GUI_lang_index], anchor=W)
-##        self.network_tree.heading('Kind' , text=self.kind_head[self.GUI_lang_index], anchor=W)
-##        self.network_tree.heading('Equal', text=eqal_head[self.GUI_lang_index], anchor=W)
-##        self.network_tree.heading('Value', text=valu_head[self.GUI_lang_index], anchor=W)
-##        self.network_tree.heading('Unit' , text=unit_head[self.GUI_lang_index], anchor=W)
-##
-##        self.network_tree.column ('#0'   , minwidth=100, width=200)
-##        self.network_tree.column ('Parent', minwidth=20, width=50)
-##        self.network_tree.column ('Kind' , minwidth=20, width=50)
-##        self.network_tree.column ('Equal', minwidth=5, width=5)
-##        self.network_tree.column ('Value', minwidth=20, width=50)
-##        self.network_tree.column ('Unit' , minwidth=8, width=10)
-##
-##        self.network_tree.tag_configure('rel_tag', option=None, background='#afa')
-##        self.network_tree.tag_configure('uom_tag', option=None, background='#ccf')
-##        self.network_tree.tag_configure('sum_tag', option=None, background='#cfc')
-##
-##        # Locate buttons in grid
-####        network_lbl.grid(column=0, row=0, sticky=W)
-##        self.net_button.grid(column=0, row=0, sticky=W)
-##        self.lh_button.grid(column=1, row=0, sticky=W)
-##        self.rh_button.grid(column=2, row=0, sticky=W)
-##        self.classif_button.grid(column=3, row=0, sticky=W)
-##
-##        self.network_tree.grid(column=0, row=1, sticky=NSEW, columnspan=4)
-##        network_scroll = Scrollbar(self.network_frame, orient=VERTICAL, \
-##                                   command=self.network_tree.yview)
-##        network_scroll.grid(column=3, row=1, sticky=NS+E)
-##        self.network_tree.config(yscrollcommand=network_scroll.set)
 
-##        self.network_tree.bind(sequence='<Double-1>', func=self.Network_object_detail_view)
-##        self.network_tree.bind(sequence='i'         , func=self.Network_object_detail_view)
-##        self.network_tree.bind(sequence='<Double-3>', func=self.Network_object_detail_view)
         self.network_tree.on_table_row_click.connect(self.Network_object_detail_view)
         #self.network_tree.on_table_row_i_key_click.connect(self.Network_object_detail_view)
         #self.network_tree.on_table_row_right_click.connect(self.Network_object_detail_view)
@@ -2430,7 +2243,6 @@ class Display_views():
         '''
         # Display self.network_model rows in self.network_tree
         parents = []
-##        network_row_nr = 0
         # Initialize the list of included names of things
         included = []
         for network_line in self.network_model:
@@ -2447,27 +2259,13 @@ class Display_views():
                     included.append(network_line)
                     if upper_concept == '':
                         openness = True
-##                    color_tag = 'sum_tag'
-##                    rel_tag = ''
                     relation = False
                     color = '#ffff99'
                     term = name.partition(' ')
-                    if term[0] in ['has', 'heeft', 'classifies', 'classificeert', \
+                    if term[0] in ['has', 'heeft', 'classifies', 'classificeert',
                                    'is', 'can', 'kan', 'shall', 'moet']:
-##                       rel_tag = 'rel_tag'
                         relation = True
                         color = '#eeffdd'
-##                    self.network_tree.insert(network_line[7], index='end', \
-##                                             values=network_line[5:],\
-##                                             tags=rel_tag,\
-##                                             iid=network_line[6], \
-##                                             text=network_line[6], open=openness)
-##                    network_row_nr += +1
-                    #print('network_line:', network_line)
-##                    nr_of_cols = len(network_line)
-##                    for col in range(5, nr_of_cols):
-##                        if network_row_nr <= self.network_table_rows:
-##                            self.network_tree.item_at(network_row_nr, col-5).set_text(network_line[col])
                     row_widget = gui.TableRow()
                     for index, field in enumerate(network_line[5:]):
                         row_item = gui.TableItem(text=field,
@@ -2505,35 +2303,33 @@ class Display_views():
         self.views_noteb.add(self.taxon_frame, text=taxon_text[self.GUI_lang_index], sticky=NSEW)
         #self.views_noteb.insert("end", self.taxon_frame, sticky=NSEW)
 
-        taxon_head = ['Hierarchy of kinds and aspects per object of a particular kind',\
+        taxon_head = ['Hierarchy of kinds and aspects per object of a particular kind',
                       'Hiërarchie van soorten en aspecten per object van een bepaalde soort']
         taxon_lbl  = Label(self.taxon_frame,text=taxon_head[self.GUI_lang_index])
 
-        headings = ['UID','Name', 'Kind','Community','Aspect1','Aspect2','Aspect3','Aspect4',\
+        headings = ['UID','Name', 'Kind', 'Community',
+                    'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4',
                     'Aspect5','Aspect6','Aspect7','Aspect8','Aspect9','Aspect10']
         nr_of_cols = len(self.taxon_column_names)
         display_cols = headings[3:nr_of_cols]
 
-        self.taxon_tree = Treeview(self.taxon_frame,columns=(headings[0:nr_of_cols]),\
+        self.taxon_tree = Treeview(self.taxon_frame,columns=(headings[0:nr_of_cols]),
                                   displaycolumns=display_cols, selectmode='browse', height=30)
 
-        self.taxon_tree.heading('#0'    , text='Object', anchor=W)
-        self.taxon_tree.heading('UID'   , text='UID', anchor=W)
-        self.taxon_tree.heading('Name'  , text='Name', anchor=W)
-        self.taxon_tree.heading('Kind'  , text='Kind', anchor=W)
+        self.taxon_tree.heading('#0', text='Object', anchor=W)
+        self.taxon_tree.heading('UID', text='UID', anchor=W)
+        self.taxon_tree.heading('Name', text='Name', anchor=W)
+        self.taxon_tree.heading('Kind', text='Kind', anchor=W)
         self.taxon_tree.heading('Community', text='Community', anchor=W)
 
-        self.taxon_tree.column ('#0'    , minwidth=100, width=200)
-        self.taxon_tree.column ('Community' , minwidth=20, width=50)
+        self.taxon_tree.column ('#0', minwidth=100, width=200)
+        self.taxon_tree.column ('Community', minwidth=20, width=50)
         asp = 0
         for column in self.taxon_column_names[4:]:
             asp += 1
             Asp_name = 'Aspect' + str(asp)
             self.taxon_tree.heading(Asp_name, text=self.taxon_column_names[asp +3] ,anchor=W)
             self.taxon_tree.column (Asp_name, minwidth=20 ,width=50)
-
-##        self.taxon_tree.columnconfigure(0,weight=1)
-##        self.taxon_tree.rowconfigure   (0,weight=1)
 
         self.taxon_tree.tag_configure('rel_tag', option=None, background='#afa')
         self.taxon_tree.tag_configure('uom_tag', option=None, background='#ccf')
@@ -2645,15 +2441,6 @@ class Display_views():
                                           tags='sum_tag',iid=summ_line[1],\
                                           text=summ_line[1], open=True)
                     parents.append(summ_line[1])
-
-        # Sorting example
-##        # Add command to heading as follows:
-##        tree.heading(column1, text = 'some text', command = foo)
-
-##        l = [['a',2], ['a',1], ['b', 2], ['a',3], ['b',1], ['b',3]]
-##        l.sort(key=itemgetter(1))
-##        l.sort(key=itemgetter(0), reverse=True)
-##        # [['b', 1], ['b', 2], ['b', 3], ['a', 1], ['a', 2], ['a', 3]]
 
     def Define_and_display_possibilities_of_kind(self):
         # Destroy earlier possib_frame
@@ -3360,8 +3147,6 @@ class Display_views():
 
                 if possible_roles == True and prod_line[4] == '':
                     prod_name = ''
-##                elif possible_roles == False and prod_line[5] != '':
-##                    prod_line[5] = ''
 
                 # Insert line
                 #print('Values:', prod_line[1], type(prod_line[1]))
@@ -3545,8 +3330,7 @@ class Display_views():
         self.act_frame.rowconfigure(1,weight=0)
         self.views_noteb.add(self.act_frame, text=activity[self.GUI_lang_index], sticky=NSEW)
         self.views_noteb.insert("end",self.act_frame,sticky=NSEW)
-##        acts = ['Activity tree', 'Activiteitenboom']
-##        actLbl = Label(self.act_frame,text=acts[self.GUI_lang_index])
+
         headings = ['OccUID', 'OccName' , 'WholeOccName', 'InvolvUID', 'KindOccUID',
                     'OccName','PartName', 'Involved'    , 'Kind'     , 'Role']
         display_cols = headings[7:]
@@ -3582,9 +3366,6 @@ class Display_views():
         self.act_tree.columnconfigure(3,weight=1)
         self.act_tree.columnconfigure(4,weight=1)
         self.act_tree.columnconfigure(5,weight=1)
-##        self.act_tree.columnconfigure(6,weight=1)
-##        self.act_tree.columnconfigure(7,weight=1)
-##        self.act_tree.columnconfigure(8,weight=1)
         self.act_tree.rowconfigure(0,weight=0)
         self.act_tree.rowconfigure(1,weight=1)
 
@@ -3648,13 +3429,6 @@ class Display_views():
             if occ_line[0] == io_objects[0].uid:
                 self.act_tree.insert(id, index='end', values=(io_line), tags='ioTag' , open=True)
         level = 1
-##        for whole_occ, part_occ, part_kind_occ in self.part_whole_occs:
-##            # For each part of occurrence call Display_occurrence_tree recursively
-##            # If uid of occurrence == uid whole then there is a part
-##            if occ_line[0] == whole_part[0].uid:
-##                print('part in part_whole_occs:', whole_occ.name, part_occ.name,
-##                      part_kind_occ.name)
-##                self.Display_occurrence_tree(whole_part, level)
 
     def Define_and_display_documents(self):
         # Destroy earlier documents sheet
@@ -3872,13 +3646,6 @@ class Display_views():
 
             # If info_kind is a description then display the destription in messagebox
             if len(tree_values) > 8 and tree_values[8] in description_text:
-##                self.Display_message(
-##                    'The information {} is not presented on an information carrier '
-##                    'but reads as follows:\n   {}'.\
-##                    format(tree_values[5], selected_obj.description),\
-##                    'De informatie {} is niet aanwezig op een informatiedrager '
-##                    'maar luidt als volgt:\n   {}'.\
-##                    format(tree_values[5], selected_obj.description))
                 messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name,\
                                     selected_obj.description)
             else:
@@ -3907,14 +3674,7 @@ class Display_views():
 
         # If info_kind is a description then display the destription in messagebox
         if tree_values[7] in description_text:
-##            self.Display_message(
-##                'The information {} is not presented on a carrier '
-##                'but is as follows:\n   {}'.\
-##                format(tree_values[4], selected_obj.description),\
-##                'De informatie {} is niet aanwezig op een informatiedrager '
-##                'maar luidt als volgt:\n   {}'.\
-##                format(tree_values[4], selected_obj.description))
-            messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name, \
+            messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name,
                                 selected_obj.description)
         else:
             print('Display kind details of: {}'.format(selected_obj.name))
@@ -4008,7 +3768,7 @@ class Display_views():
             self.Display_message(
                 'There is no right hand object found to be displayed.',\
                 'Er is geen rechter object gevonden om weergegeven te worden.')
-#------------------------------------------------------------------------
+
     def Prod_detail_view_left(self, sel):
         self.Prod_detail_view_left_button()
 
@@ -4030,13 +3790,6 @@ class Display_views():
                 # If info_kind is a description
                 # then display the destription in messagebox
                 if tree_values[7] in description_text:
-##                    self.Display_message(
-##                        'The information {} is not presented on an information carrier '
-##                        'but reads as follows:\n {}'.\
-##                        format(tree_values[4], selected_obj.description),\
-##                        'De informatie {} is niet aanwezig op een informatiedrager '
-##                        'maar luidt als volgt:\n {}'.\
-##                        format(tree_values[4], selected_obj.description))
                     messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name,\
                                         selected_obj.description)
                 else:
@@ -4048,7 +3801,6 @@ class Display_views():
                 if len(self.info_model) > 0:
                     self.Define_and_display_documents()
 
-#------------------------------------------------------------------------
     def Prod_detail_view_middle(self, sel):
         """ Find the selected left classifier object from a user selection
             in the prod_table that is displayed in the prod_tree view.
@@ -4415,65 +4167,6 @@ class Display_views():
     def Contextual_facts(self):
         print('Contextual_facts')
 
-##    def Determine_prod_model_subtypes(self, obj):
-##        ''' Create header in prod_model for subtypes of obj
-##            and determine subtypes of obj in hierarchy of kinds
-##        '''
-##
-##        subsHead = ['Subtypes','Subtypen']
-##        sub2Head = ['Sub-subs','Sub-subs']
-##        sub3Head = ['Further subs','Verdere subs']
-##        collOfSubtypes = []
-##        #self.subtype_level = 0
-##        # Create header line for subtypes in prod_model
-##        self.line_nr  += 1
-##        prod_head_5 = ['','',self.line_nr, subsHead[self.GUI_lang_index], \
-##                       sub2Head[self.GUI_lang_index],\
-##                       sub3Head[self.GUI_lang_index],'','','','','','']
-##        if len(self.prod_model) < self.max_nr_of_rows:
-##            self.prod_model.append(prod_head_5)
-##
-##        if obj.category in ['kind', 'kind of occurrence']:
-##            self.Determine_display_hierarchy(obj)
-
-##    def Determine_display_hierarchy(self, obj):
-##        """Determine subtype hierarchy"""
-##        self.coll_of_subtype_uids = []
-##
-##        # Start with direct subtype, except when they should be excluded
-##        subs = []
-##        if len (obj.subtypes) > 0:
-##            for subtype in obj.subtypes:
-##                if subtype in self.user_interface.query.ex_candids:
-##                    continue
-##                subs.append(subtype)
-##        self.subtype_level = 0
-##        role = ''
-##        subsLocal = subs
-##        if len(subsLocal) > 0:
-##            self.subtype_level += + 1
-##            for s in subsLocal:
-##                for rel in s.relations:
-##                    if len(self.expr_table) < self.max_nr_of_rows:
-##                        self.expr_table.append(rel.expression)
-##                        self.Add_line_to_network_model(rel_obj, expr)
-##            # Determine subtypes of subtypes recursively
-##            for sub in subs:
-##                if sub in self.user_interface.query.ex_candids or sub.uid in self.coll_of_subtype_uids:
-##                    continue
-##                # Summary_row = [uid, community_name, obj.name, supertype name]
-##                community_name = self.community_dict[obj.names_in_contexts[0][1]] # community uid
-##                self.summary_row[0] = obj.uid
-##                self.summary_row[1] = obj.names_in_contexts[0][2] # obj.name
-##                self.summary_row[2] = sub.names_in_contexts[0][2] # why not supertype?
-##                self.summary_row[3] = community_name
-##                self.coll_of_subtype_uids.append(sub.uid)
-##                #print('self.summary_row',self.summary_row)
-##                nr_of_aspects = self.Find_kinds_of_aspects(sub, role)
-##                # Determine sub-subtypes
-##                Determine_display_hierarchy(sub)
-
-#------------------------------------------------
 class User_interface():
     def __init__(self):
         pass
