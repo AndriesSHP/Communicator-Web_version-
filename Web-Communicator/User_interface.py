@@ -44,22 +44,22 @@ class Communicator(App):
         self.user_interface = None
         #self.views_noteb = None
 
-        self.GUI_lang_name_dict = {"English":'910036', \
+        self.GUI_lang_name_dict = {"English":'910036',
                                    "Nederlands":'910037'}
         self.GUI_lang_names = ['English', 'Nederlands']
 
         self.extended_query = False
         self.obj_without_name_in_context = []
 
-        self.reply_lang_name_dict = {'English':'910036', \
-                                     'Nederlands':'910037', \
-                                     'American':'911689', \
-                                     'Chinese':'911876', \
-                                     'Deutsch':'910038', \
+        self.reply_lang_name_dict = {'English':'910036',
+                                     'Nederlands':'910037',
+                                     'American':'911689',
+                                     'Chinese':'911876',
+                                     'Deutsch':'910038',
                                      'Francais':'910039'}
         self.comm_pref_uids = ['492014', 'any'] # Default: 492014 = 'Gellish'
         self.file_path_names = []
-        
+
         super(Communicator, self).__init__(*args)
 
     # Define the main window
@@ -129,19 +129,19 @@ class Communicator(App):
         self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network)
         self.admin_tag.append(self.new_net_tag)
 
-        # Define language selector 
+        # Define language selector
         self.lang_container = gui.HBox(width=180, height=20, style='margin-left:200px')
-        
+
         lang_text = ['Language:', 'Taal:']
         self.lang_label = gui.Label(lang_text[self.GUI_lang_index], width=80, height=20,
                                     style='background-color:#eeffdd')
         self.lang_label.attributes['title'] = 'Select a language for specification of a search'
-        
-        self.lang_container.append(self.lang_label) #self.main_frame, width=10)
+
+        self.lang_container.append(self.lang_label)
         # Set default language: GUI_lang_names[0] = English, [1] = Nederlands
         self.lang_default = self.GUI_lang_names[0]
         self.lang_select = gui.DropDown(self.GUI_lang_names, width=100, height=20,
-                                        style='background-color:#ffffc0') #margin='10px'
+                                        style='background-color:#ffffc0')
         self.lang_select.attributes['title'] = 'The language used for specification of a search'
         self.lang_container.append(self.lang_select)
         self.menubar.append(self.lang_container)
@@ -153,14 +153,14 @@ class Communicator(App):
         self.main_frame = gui.VBox(width='100%', height='100%')
         self.container.append(self.main_frame)
         self.main_frame.attributes['color'] = 'green'
-        
+
         self.query = None
         self.unknown = ['unknown', 'onbekend']
         self.unknown_quid = 0   # start UID for unknowns in queries
 
         # Create display views object
         self.views = Display_views(self.gel_net, self)
-        
+
         # Define a notebook in window
         self.Define_notebook()
 
@@ -175,14 +175,14 @@ class Communicator(App):
         self.main_frame.append(self.views_noteb)
 
         self.Define_log_sheet()
-    
+
     def Define_log_sheet(self):
         ''' Define a tab and frame for errors and warnings'''
         log_head = ['Messages and warnings','Berichten en foutmeldingen']
         self.log_frame = gui.ListView(width='100%', height='100%', style='background-color:#eeffdd')
         self.log_frame.attributes['title'] = 'Display messages and warnings'
         self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], self.tab_cb)
-    
+
     def tab_cb(self):
         return
 
@@ -212,11 +212,11 @@ class Communicator(App):
         # Load semantic network from pickle binary file.
         self.load_pickle_db(self.pickle_file_name)
         if self.gel_net is None:
-            print("Network '{}' is not loaded. File is not found".\
+            print("Network '{}' is not loaded. File is not found".
                   format(self.pickle_file_name))
         else:
             print("Network '{}' is loaded "
-                  "and is composed of the following files:".\
+                  "and is composed of the following files:".
                   format(self.pickle_file_name))
             for file in self.gel_net.Gellish_files:
                 print('- {}'.format(file.path_and_name))
@@ -225,14 +225,14 @@ class Communicator(App):
         try:
             infile = open(fname, "br")
         except FileNotFoundError:
-            print("Input pickle file could not be found: {}". \
+            print("Input pickle file could not be found: {}".
                   format(fname))
             return()
         try:
             self.gel_net = pickle.load(infile)
             #self = pickle.load(f)
         except EOFError:
-            print("Input pickle file could not be read: {}". \
+            print("Input pickle file could not be read: {}".
                   format(fname))
         else:
             infile.close()
@@ -260,7 +260,7 @@ class Communicator(App):
                 self.GUI_lang_pref_uids = ['589211', self.GUI_lang_uid, '910036']
         else:
             self.Message_UI(
-                'The GUI language {} is unknown. Default = English.'.format(GUI_lang_name),\
+                'The GUI language {} is unknown. Default = English.'.format(GUI_lang_name),
                 'De GUI taal {} is onbekend. Default = English.'.format(GUI_lang_name))
             GUI_set = False
         return GUI_set
@@ -291,9 +291,9 @@ class Communicator(App):
         """ Select one or more Gellish files in a dialog
             and import the files,
             after syntactic verification.
-            The merge the file content in the semantic network
+            The merge the file content in the semantic network.
         """
-        self.subContainerRead = gui.Widget(style={'width': '220px', 'display': 'block', \
+        self.subContainerRead = gui.Widget(style={'width': '220px', 'display': 'block',
                                                   'overflow': 'auto', 'text-align': 'center'})
         self.container.append(self.subContainerRead)
         # Select one or more files to be imported
@@ -313,7 +313,7 @@ class Communicator(App):
         #print('Selected file(s):',self.file_path_names)
         if self.file_path_names == []:
             self.Message_UI(
-                'The file name is blank or the inclusion is cancelled. There is no file read.',\
+                'The file name is blank or the inclusion is cancelled. There is no file read.',
                 'De file naam is blanco of het inlezen is gecancelled. Er is geen file ingelezen.')
             return
 
@@ -323,13 +323,13 @@ class Communicator(App):
             path_name = file_path_and_name.rsplit('/', maxsplit=1)
             if len(path_name) == 2:
                 self.Message_UI(
-                    'Reading file <{}> from directory {}.'.format(path_name[1], path_name[0]),\
+                    'Reading file <{}> from directory {}.'.format(path_name[1], path_name[0]),
                     'Lees file <{}> van directory {}.'.format(path_name[1], path_name[0]))
                 file_name = path_name[1]
                 file_path = path_name[0]
             else:
                 self.Message_UI(
-                    'Reading file <{}> from current directory.'.format(file_path_and_name),\
+                    'Reading file <{}> from current directory.'.format(file_path_and_name),
                     'Lees file <{}> van actuele directory.'.format(file_path_and_name))
                 file_name = file_path_and_name
                 file_path = ''
@@ -423,9 +423,9 @@ class Communicator(App):
                 self.reply_lang_pref_uids = ['589211', self.reply_lang_uid, '910036']
         else:
             self.Message_UI(
-                'The reply language {} is unknown. Default = English is used.'.\
-                format(reply_lang_name),\
-                'De antwoordtaal {} is onbekend. Default = English wordt gebruikt.'.\
+                'The reply language {} is unknown. Default = English is used.'.
+                format(reply_lang_name),
+                'De antwoordtaal {} is onbekend. Default = English wordt gebruikt.'.
                 format(reply_lang_name))
             self.reply_lang_name = 'English'
             self.reply_lang_uid  = '910037'
@@ -456,7 +456,7 @@ class Communicator(App):
                            and (name_in_context[1] == comm_pref_uid or comm_pref_uid == 'any'):
                             obj_name = name_in_context[2]
                             lang_name = self.gel_net.lang_uid_dict[name_in_context[0]]
-                            comm_name = self.gel_net.community_dict[name_in_context[1]] # community uid
+                            comm_name = self.gel_net.community_dict[name_in_context[1]]
                             break
                     if obj_name:
                         break
@@ -503,7 +503,7 @@ class Communicator(App):
                 numeric_uid, integer = Convert_numeric_to_integer(obj.uid)
                 if integer is False or numeric_uid not in range(1000000000, 3000000000):
                     self.Message_UI(
-                        'There is no name in context known for {}'.format(obj.name),\
+                        'There is no name in context known for {}'.format(obj.name),
                         'Er is geen naam in context bekend voor {}'.format(obj.name))
             obj_name = obj.name
             lang_name = self.unknown[self.GUI_lang_index]
@@ -530,7 +530,7 @@ class Communicator(App):
 
         return lang_name, comm_name, obj_name, full_def
 
-#------------------------------------------------
+
 class Semantic_network():
     def __init__(self):
         self.GUI_lang_index = 0
@@ -552,6 +552,6 @@ class Network():
 
 if __name__ == "__main__":
     sys.setrecursionlimit(100000)
-    
+
     net = Network()
     start(Communicator, title="Gellish Communicator")
