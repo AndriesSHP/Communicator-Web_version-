@@ -1,12 +1,13 @@
 import remi.gui as gui
 from remi import start, App
 
+
 class Communicator(App):
     def __init__(self, *args):
         super(Communicator, self).__init__(*args)
 
     def main(self):
-        container = gui.VBox(width = 200, height = 100)
+        container = gui.VBox(width=200, height=100)
         self.lbl = gui.Label('Hello world!')
         self.bt = gui.Button('Press me!')
         self.bt2 = gui.Button('Hello name surname!')
@@ -28,7 +29,7 @@ class Communicator(App):
         self.lbl.set_text('Button pressed!')
         widget.set_text('Hello ' + name + ' ' + surname)
 
-#--------------------------------------------------------------
+
 # starts the webserver
 if __name__ == "__main__":
     start(Communicator)

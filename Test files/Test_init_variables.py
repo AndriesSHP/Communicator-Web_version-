@@ -2,8 +2,7 @@ import remi.gui as gui
 from remi import start, App
 
 import sys
-import pickle
-import webbrowser
+
 
 class Communicator(App):
 
@@ -17,6 +16,7 @@ class Communicator(App):
         self.container = gui.Widget(margin='0px auto')
         self.container.set_size(1020, 600)
         return self.container
+
 
 if __name__ == "__main__":
     sys.setrecursionlimit(100000)
