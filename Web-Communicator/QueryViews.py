@@ -277,7 +277,7 @@ class Query_view():
                                                    "border-width":"3px","border-style":"solid"})
         self.sixth_line_left_box.style['justify-content'] = 'flex-start'
         self.sixth_line_left_box.style['align-items'] = 'flex-start'
-        self.sixth_line_box.append(self.sixth_line_left_box)
+        #self.sixth_line_box.append(self.sixth_line_left_box)
 
         # Aliases display label
         aliasText = ['Aliases for the name of the selected object:',\
@@ -390,6 +390,7 @@ of the name of the selected object'
         self.lh_options[:] = []
         # Remove possible earlier options by making the options_table empty
         if self.options_widget == False:
+            self.sixth_line_box.append(self.sixth_line_left_box)
             self.sixth_line_left_box.append(self.options_heading)
             self.sixth_line_left_box.append(self.options_table)
             self.options_widget = True
@@ -477,6 +478,7 @@ of the name of the selected object'
         self.lh_options[:] = []
         # If no options_table yet, then add options_table to sixth_line_left_box
         if self.options_widget == False:
+            self.sixth_line_box.append(self.sixth_line_left_box)
             self.sixth_line_left_box.append(self.options_heading)
             self.sixth_line_left_box.append(self.options_table)
             self.options_widget = True
