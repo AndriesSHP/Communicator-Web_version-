@@ -42,23 +42,23 @@ class Display_views():
         self.seq_table = []
         self.part_whole_occs = []
 
-        self.taxon_row = ['','','','','','','','','','','','','','']
-        self.summary_row = ['','','','','','','','','','','','','','']
-        self.possibility_row = ['','','','','','','','','','','','','','','']
-        self.indiv_row = ['','','','','','','','','','','','','','','']
-        self.occ_row = ['','','','','','','','','','','','','','']
-        self.taxon_aspect_uids = ['','','','']
-        self.taxon_column_names = ['','','','']
-        self.taxon_uom_names = ['','','','']
-        self.summ_aspect_uids = ['','','','']
-        self.summ_column_names = ['','','','']
-        self.summ_uom_names = ['','','','']
-        self.possib_aspect_uids = ['','','','','']
-        self.possib_column_names = ['','','','','','']
-        self.possib_uom_names = ['','','','','']
-        self.indiv_aspect_uids = ['','','','','']
-        self.indiv_column_names = ['','','','','']
-        self.indiv_uom_names = ['','','','','']
+        self.taxon_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
+        self.summary_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
+        self.possibility_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+        self.indiv_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+        self.occ_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
+        self.taxon_aspect_uids = ['', '', '', '']
+        self.taxon_column_names = ['', '', '', '']
+        self.taxon_uom_names = ['', '', '', '']
+        self.summ_aspect_uids = ['', '', '', '']
+        self.summ_column_names = ['', '', '', '']
+        self.summ_uom_names = ['', '', '', '']
+        self.possib_aspect_uids = ['', '', '', '', '']
+        self.possib_column_names = ['', '', '', '', '', '']
+        self.possib_uom_names = ['', '', '', '', '']
+        self.indiv_aspect_uids = ['', '', '', '', '']
+        self.indiv_column_names = ['', '', '', '', '']
+        self.indiv_uom_names = ['', '', '', '', '']
 
         self.subs_head = ['Subtypes', 'Subtypen']
         self.comp_head = ['Part hierarchy', 'Compositie']
@@ -73,11 +73,11 @@ class Display_views():
         self.parent_head = ['Upper concept', 'Hoger concept']
         self.comm_head = ['Community', 'Taalgemeenschap']
         self.unknown = ['unknown', 'onbekend']
-        self.unknown_kind = ['unknown kind' ,'onbekende soort']
+        self.unknown_kind = ['unknown kind', 'onbekende soort']
 
-        self.occ_aspects = ['','','','','','','','','','','']
-        self.occ_kinds = ['','','','','','','','','','','']
-        self.occ_uoms = ['','','','','','','','','','','']
+        self.occ_aspects = ['', '', '', '', '', '', '', '', '', '', '']
+        self.occ_kinds = ['', '', '', '', '', '', '', '', '', '', '']
+        self.occ_uoms = ['', '', '', '', '', '', '', '', '', '', '']
 
         self.num_idea_uid = 211000000
         self.classification = ['is classified as a', 'is geclassificeerd als een']
@@ -108,15 +108,15 @@ class Display_views():
         self.seq_table[:] = []
         self.part_whole_occs[:] = []
 
-        self.summ_aspect_uids[:] = ['','','','']
-        self.summ_column_names[:] = ['','','','']
-        self.summ_uom_names[:] = ['','','','']
-        self.taxon_aspect_uids[:] = ['','','','']
-        self.taxon_column_names[:] = ['','','','']
-        self.taxon_uom_names[:] = ['','','','']
-        self.indiv_aspect_uids[:] = ['','','','','']
-        self.indiv_column_names[:] = ['','','','','']
-        self.indiv_uom_names[:] = ['','','','','']
+        self.summ_aspect_uids[:] = ['', '', '', '']
+        self.summ_column_names[:] = ['', '', '', '']
+        self.summ_uom_names[:] = ['', '', '', '']
+        self.taxon_aspect_uids[:] = ['', '', '', '']
+        self.taxon_column_names[:] = ['', '', '', '']
+        self.taxon_uom_names[:] = ['', '', '', '']
+        self.indiv_aspect_uids[:] = ['', '', '', '', '']
+        self.indiv_column_names[:] = ['', '', '', '', '']
+        self.indiv_uom_names[:] = ['', '', '', '', '']
 
     def Build_product_views(self, obj_list):
         ''' Create product model views for one or more objects in obj_list.'''
@@ -127,7 +127,7 @@ class Display_views():
             lang_name, comm_name, preferred_name, descr = \
                        self.user_interface.Determine_name_in_context(obj)
             obj.name = preferred_name
-            self.object_in_focus  = obj
+            self.object_in_focus = obj
 
             # Initialize subtype list of object in focus
             # Excluding duplicates due to multiple inheritance
@@ -160,7 +160,7 @@ class Display_views():
         self.implied_parts_dict = {}
         self.nr_of_occurrencies = 0
         self.occ_in_focus = 'no'
-        nr_of_occ_aspect_kinds  = 3
+        nr_of_occ_aspect_kinds = 3
         self.decomp_level = 0
         role = ''
 
@@ -228,7 +228,7 @@ class Display_views():
 
         # Find kinds of aspects and their values of kind_in_focus (and implied parts)
         if obj.category in ['kind', 'kind of physical object', 'kind of occurrence',
-                            'kind of aspect', 'kind of role' , 'kind of relation', 'number']:
+                            'kind of aspect', 'kind of role', 'kind of relation', 'number']:
             # Find preferred name of object in required language and community
             lang_name, comm_name, obj_name, descr = \
                        self.user_interface.Determine_name_in_context(obj)
@@ -322,7 +322,7 @@ class Display_views():
             # Determine the preferred name of the related object
             kind_name, kind_uid = self.Determine_preferred_kind_name(rel_obj.rh_obj)
             # Determine the preferred phrase for the kind of relation
-            #print('Base phrases:', expr[rel_type_name_col], rel_obj.rel_type.base_phrases)
+            # Debug print('Base phrases:', expr[rel_type_name_col], rel_obj.rel_type.base_phrases)
             if expr[rel_type_name_col] in rel_obj.rel_type.base_phrases:
                 lang_name, comm_name, rel_type_phrase, full_def = \
                        self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'base')
@@ -346,7 +346,7 @@ class Display_views():
                       rel_type_phrase, expr[lh_name_col], kind_uid,
                       rel_obj.lh_obj.name, rel_obj.rh_obj.name, kind_name]
 
-        #print('Branch-1:', rel_obj.phrase_type_uid, branch)
+        # Debug print('Branch-1:', rel_obj.phrase_type_uid, branch)
         # Add the branch to the network_model, if not yet present
         if branch not in self.network_model:
             is_related_to = branch[3] # rel_type_phrase
@@ -365,7 +365,7 @@ class Display_views():
                                 is_related_to, branch[7]]
                 self.network_model.append(intermediate)
                 self.rels_in_network_model.append(is_related_to)
-                #print('Branch-2:', rel_obj.phrase_type_uid, intermediate)
+                # Debug print('Branch-2:', rel_obj.phrase_type_uid, intermediate)
 
             # If the branch is a direct child of the object in focus,
             # then link the child to the intermediate instead of to its parent
@@ -384,7 +384,7 @@ class Display_views():
                 self.network_model.append(branch)
             else:
                 self.network_model.append(branch)
-            #print('Branch-3:', rel_obj.phrase_type_uid, branch)
+            # Debug print('Branch-3:', rel_obj.phrase_type_uid, branch)
 
     def Create_prod_model_view_header(self, obj):
         ''' Create prod_model view header '''
@@ -393,54 +393,54 @@ class Display_views():
         # === should become the status of the classification cr specialization relation ===
         status_text = ['accepted', 'geaccepteerd']
         if len(obj.classifiers) == 0 and len(obj.supertypes) == 0:
-            obj_kind_uid  = ''
+            obj_kind_uid = ''
             obj_kind_name = self.unknown[self.GUI_lang_index]
             status = status_text[self.GUI_lang_index]
         else:
-            obj_kind_uid  = obj.kind.uid
+            obj_kind_uid = obj.kind.uid
             lang_name, comm_name, obj_kind_name, descr = \
                                self.user_interface.Determine_name_in_context(obj.kind)
             status = 'unknown'
         is_a = ['is a ', 'is een ']
-        form_text  = ['Product form for:', 'Product formulier voor:']
-        kind_text  = ['Kind:'            , 'Soort:']
-        descr_text = ['Description:'     , 'Omschrijving:']
+        form_text = ['Product form for:', 'Product formulier voor:']
+        kind_text = ['Kind:', 'Soort:']
+        descr_text = ['Description:', 'Omschrijving:']
         if len(obj.names_in_contexts) > 0:
             description = is_a[self.GUI_lang_index] + obj_kind_name \
                           + '' + obj.names_in_contexts[0][4]
         else:
             description = is_a[self.GUI_lang_index] + obj_kind_name
 
-        prod_line_0 = [obj.uid  , obj_kind_uid , '', 1 , form_text[self.GUI_lang_index],
+        prod_line_0 = [obj.uid, obj_kind_uid, '', 1, form_text[self.GUI_lang_index],
                        obj.name, '', '',
                        kind_text[self.GUI_lang_index], obj_kind_name, '', '', '', status]
-        prod_line_1 = ['','','',2,'', descr_text[self.GUI_lang_index], description,
-                       '','','','','','','']
+        prod_line_1 = ['', '', '', 2, '', descr_text[self.GUI_lang_index], description,
+                       '', '', '', '', '', '', '']
 
-        prod_head_NL2I= ['','','',3,'','','','','Aspect','Soort aspect',
-                         '>=<','Waarde','Eenheid','Status']
-        prod_head_NL2K= ['','','',3,'','','','','Soort aspect',''      ,
-                         '>=<','Waarde','Eenheid','Status']
+        prod_head_NL2I= ['', '', '', 3, '', '', '', '', 'Aspect', 'Soort aspect',
+                         '>=<', 'Waarde', 'Eenheid', 'Status']
+        prod_head_NL2K= ['', '', '', 3, '', '', '', '', 'Soort aspect', '',
+                         '>=<', 'Waarde', 'Eenheid', 'Status']
 
-        prod_head_EN2I= ['','','',3,'','','','','Aspect','Aspect type',
-                         '>=<','Value','UoM','Status']
-        prod_head_EN2K= ['','','',3,'','','','','Kind of aspect',''   ,
-                         '>=<','Value','UoM','Status']
+        prod_head_EN2I= ['', '', '', 3, '', '', '', '', 'Aspect', 'Aspect type',
+                         '>=<', 'Value', 'UoM', 'Status']
+        prod_head_EN2K= ['', '', '', 3, '', '', '', '', 'Kind of aspect', '',
+                         '>=<', 'Value', 'UoM', 'Status']
 
         self.line_nr = 3
 
-        #prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr, part, \
-        #               '','', kindOfPart, aspect.name, kindOfAspect, value,UoM, status]
-        #prod_line_4 = [part_of_part.uid, part_kind_uid, aspect_uid, self.line_nr, '', \
-        #               partOfPart,'',kindOfPart, aspect.name, kindOfAspect, value,UoM, status]
-        #prod_line_5 = [occur_uid, occ_kind_uid, aspect_uid, self.line_nr, occur, \
-        #               '','',kindOfOcc, aspect.name, kindOfAspect, value,UoM, status]
-        #prod_line_6 = [inv_obj.uid, inv_kind_uid, aspect_uid, self.line_nr, '', \
+        #prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr, part,
+        #               '', '', kindOfPart, aspect.name, kindOfAspect, value,UoM, status]
+        #prod_line_4 = [part_of_part.uid, part_kind_uid, aspect_uid, self.line_nr, '',
+        #               partOfPart, '',kindOfPart, aspect.name, kindOfAspect, value,UoM, status]
+        #prod_line_5 = [occur_uid, occ_kind_uid, aspect_uid, self.line_nr, occur,
+        #               '', '',kindOfOcc, aspect.name, kindOfAspect, value,UoM, status]
+        #prod_line_6 = [inv_obj.uid, inv_kind_uid, aspect_uid, self.line_nr, '',
         #               invObject,role,kindOfInv, aspect.name, kindOfAspect, value,UoM, status]
-        #prod_line_7 = [part_uid, part_kind_uid,aspect_uid , self.line_nr, '', \
-        #               '','','', aspect.name, kindOfAspect, value,UoM, status]
-        #prod_line_8 = [obj.uid, obj_kind_uid, file_uid, self.line_nr, obj, \
-        #               document,'',kind_of_document, file, kind_of_file, '','', status]
+        #prod_line_7 = [part_uid, part_kind_uid,aspect_uid, self.line_nr, '',
+        #               '', '', '', aspect.name, kindOfAspect, value,UoM, status]
+        #prod_line_8 = [obj.uid, obj_kind_uid, file_uid, self.line_nr, obj,
+        #               document, '',kind_of_document, file, kind_of_file, '', '', status]
 
         if obj.category in ['kind', 'kind of physical object', 'kind of occurrence']:
             self.kind_model.append(prod_line_0)
@@ -448,8 +448,8 @@ class Display_views():
                 for super_type in obj.supertypes[1:]:
                     lang_name, comm_name, supert_type_name, descr = \
                                self.user_interface.Determine_name_in_context(super_type)
-                    self.kind_model.append([obj.uid,super_type.uid,'',1,
-                                            '','','','','',supert_type_name])
+                    self.kind_model.append([obj.uid,super_type.uid, '',1,
+                                            '', '', '', '', '',supert_type_name])
             self.kind_model.append(prod_line_1)
             if self.user_interface.GUI_lang_name == 'Nederlands':
                 self.kind_model.append(prod_head_NL2K)
@@ -463,8 +463,8 @@ class Display_views():
                 for classifier in obj.classifiers[1:]:
                     lang_name, comm_name, classifier_name, descr = \
                                self.user_interface.Determine_name_in_context(classifier)
-                    self.prod_model.append([obj.uid,classifier.uid,'',1,
-                                            '','','','','',classifier_name])
+                    self.prod_model.append([obj.uid,classifier.uid, '',1,
+                                            '', '', '', '', '',classifier_name])
             self.prod_model.append(prod_line_1)
             if self.user_interface.GUI_lang_name == 'Nederlands':
                 self.prod_model.append(prod_head_NL2I)
@@ -475,7 +475,7 @@ class Display_views():
         """ Search for aspects of an individual thing (indiv)
             and their qualifications or quantifications
             and store results in lines in prod_model
-            indiv     = the individual thing
+            indiv = the individual thing
             kind.name = the name of the kind of individual thing
             (for messages only)
             decomp_level = decomposition_level:
@@ -496,13 +496,13 @@ class Display_views():
         # If the individual object is not classified
         # then the classifying kind is called 'unknown'
         if len(indiv.classifiers) == 0:
-            indiv.kind_uid  = ''
+            indiv.kind_uid = ''
             indiv.kind_name = self.unknown_kind[self.GUI_lang_index]
         else:
             # Determine the preferred name of the first classifier of the individual object
             lang_name_cl, comm_name_cl, pref_cl_name, descr = \
                           self.user_interface.Determine_name_in_context(indiv.classifiers[0])
-            indiv.kind_uid  = indiv.classifiers[0].uid
+            indiv.kind_uid = indiv.classifiers[0].uid
             indiv.kind_name = pref_cl_name
 
         for rel_obj in indiv.relations:
@@ -513,7 +513,7 @@ class Display_views():
             if len(self.expr_table) < self.max_nr_of_rows \
                and expr not in self.expr_table:
                 self.expr_table.append(expr)
-                #print('Rel_obj', rel_obj.lh_obj.uid, rel_obj.lh_obj.name, \
+                # Debug print('Rel_obj', rel_obj.lh_obj.uid, rel_obj.lh_obj.name,
                 #      rel_obj.rel_type.base_phrases[0], rel_obj.rh_obj.name)
                 self.Add_line_to_network_model(rel_obj, expr)
 
@@ -526,14 +526,14 @@ class Display_views():
                 else:
                     self.Display_message(
                         'The phrase type uid of idea {} is incompatible '
-                        'with the expression.'.format(expr.uid),\
+                        'with the expression.'.format(expr.uid),
                         'De uid van de soort frase van idee {} is niet compatibel '
                         'met de uitdrukking.'.format(expr.uid))
             # And for the inverse
             elif indiv.uid == expr[rh_uid_col] \
                  and expr[rel_type_uid_col] in self.gel_net.subPossAspUIDs:
                 if expr[phrase_type_uid_col] == inversePhraseUID:
-                    aspect_uid   = expr[lh_uid_col]
+                    aspect_uid = expr[lh_uid_col]
                     qualifier = 'quantitative'
                 else:
                     self.Display_message(
@@ -574,10 +574,10 @@ class Display_views():
 
             # Verify if aspect has a known value
             if value_uid == '':
-                unknownVal = ['unknown value','onbekende waarde']
+                unknownVal = ['unknown value', 'onbekende waarde']
                 value_name = unknownVal[self.GUI_lang_index]
-                #warnText  = ['Aspect','Waarschuwing: Aspect']
-                #valueMess = ['has no value.','heeft geen waarde.']
+                #warnText = ['Aspect', 'Waarschuwing: Aspect']
+                #valueMess = ['has no value.', 'heeft geen waarde.']
                 self.Display_message(
                     'Aspect {} ({}) has no value.'.
                     format(aspect_name, aspect_uid),
@@ -621,7 +621,7 @@ class Display_views():
                     # Build list of values conform list of aspects.
                     # Note: sumRow[0] = component
                     if aspect.kind_uid == kind_uid:
-                        #print('Aspects of phys:', indiv.name, len(self.summ_aspect_uids),
+                        # Debug print('Aspects of phys:', indiv.name, len(self.summ_aspect_uids),
                         #      aspect_name, aspect.kind_name, self.summ_ind, value_name)
                         self.summary_row[self.summ_ind] = value_name
                         if uom_name != self.summ_uom_names[self.summ_ind]:
@@ -641,7 +641,7 @@ class Display_views():
             if self.subtype_level == 0:
                 # Build individual_view table header with list of aspects
                 # (indiv_column_names)
-                #print('Aspect kind', aspect.uid, aspect_name)
+                # Debug print('Aspect kind', aspect.uid, aspect_name)
                 if aspect.kind_name not in self.indiv_column_names \
                    and len(self.indiv_column_names) <= 15:
                     self.indiv_aspect_uids.append(aspect.kind_uid)
@@ -653,7 +653,7 @@ class Display_views():
                     # Build list of values conform list of aspects.
                     # Note: sumRow[0] = component
                     if aspect.kind_uid == kind_uid:
-                        #print('Aspects of phys:', indiv.name, len(self.indiv_aspect_uids),
+                        # Debug print('Aspects of phys:', indiv.name, len(self.indiv_aspect_uids),
                         #      aspect_name, aspect.kind_name, self.indiv_ind, value_name)
                         self.indiv_row[self.indiv_ind] = value_name
                         if uom_name != self.indiv_uom_names[self.indiv_ind]:
@@ -677,7 +677,7 @@ class Display_views():
             # Prod_model
             # Create prod_model text line for output view
             self.line_nr += 1
-            #print('Aspect of obj.:', self.decomp_level, nr_of_aspects, indiv.name, aspect_name)
+            # Debug print('Aspect of obj.:', self.decomp_level, nr_of_aspects, indiv.name, aspect_name)
             if self.decomp_level == 0 and nr_of_aspects == 1:
                 prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
                                self.line_nr, indiv.name, role, '', indiv.kind_name,
@@ -701,14 +701,14 @@ class Display_views():
             else:
                 prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
                                self.line_nr, '', '', '', '',
-                               aspect_name , aspect.kind_name, equality,
+                               aspect_name, aspect.kind_name, equality,
                                value_name, uom_name, status]
             if len(self.prod_model) < self.max_nr_of_rows:
                 self.prod_model.append(prod_line_3)
 
         # If aspect is possessed by object_in_focus (thus not possessed by a part)
         # then add row to summ_model
-        #print('Indiv', self.decomp_level, indiv.uid, self.summary_row)
+        # Debug print('Indiv', self.decomp_level, indiv.uid, self.summary_row)
         if self.decomp_level == 0:
             if len(self.summ_model) < self.max_nr_of_rows:
                 if indiv not in self.summ_objects:
@@ -720,7 +720,7 @@ class Display_views():
                         self.summary_row[2] = ''
                     self.summ_model.append(self.summary_row[:])
 
-            self.summary_row = ['','','','','','','','','','','','','','']
+            self.summary_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
 
         # For whole and for parts of whole create a row in indiv_model (not for occurences)
         if self.occ_in_focus != 'occurrence' \
@@ -734,7 +734,7 @@ class Display_views():
                     self.indiv_row[2] = ''
                 self.indiv_model.append(self.indiv_row[:])
 
-        self.indiv_row = ['','','','','','','','','','','','','','']
+        self.indiv_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
         return nr_of_aspects
 
     def Determine_aspect_value(self, aspect, qualifier):
@@ -754,7 +754,7 @@ class Display_views():
             else:
                 # Determine the preferred name of the first classifier
                 # of the individual aspect
-                #print('Lang_prefs for classifier of aspect', self.reply_lang_pref_uids, \
+                # Debug print('Lang_prefs for classifier of aspect', self.reply_lang_pref_uids,
                 #      aspect.classifiers[0].names_in_contexts)
                 lang_name_as, comm_name_as, pref_kind_name, descr = \
                     self.user_interface.Determine_name_in_context(aspect.classifiers[0])
@@ -807,7 +807,7 @@ class Display_views():
                 # or is outside the standard whole number range,
                 #    then determine the value name in the preferred language
                 #    (and in the preferred language community)
-                #print('Value', aspect_uid, value_uid, value_name, expr[0:25])
+                # Debug print('Value', aspect_uid, value_uid, value_name, expr[0:25])
                 numeric_uid, integer = Convert_numeric_to_integer(value_uid)
                 if integer is False or numeric_uid not in range(1000000000, 3000000000):
                     value = self.uid_dict[value_uid]
@@ -864,18 +864,17 @@ class Display_views():
                     continue
 
                 # Information is identified.
-##                self.expr_table.append(expr)
                 info = self.uid_dict[info_uid]
                 # Create header line_type 8 info, only the first time for prod_model or kind_model
                 if info_header:
                     self.line_nr += + 1
-                    prod_head_8 = ['','','',self.line_nr, info_head[self.GUI_lang_index],
-                                   dir_head[self.GUI_lang_index],'',
+                    prod_head_8 = ['', '', '',self.line_nr, info_head[self.GUI_lang_index],
+                                   dir_head[self.GUI_lang_index], '',
                                    kind_of_doc_head[self.GUI_lang_index],
                                    file_head[self.GUI_lang_index],
-                                   kind_of_file_head[self.GUI_lang_index],'','','',
+                                   kind_of_file_head[self.GUI_lang_index], '', '', '',
                                    status_head[self.GUI_lang_index]]
-                    #print('obj.cat',obj.category)
+                    # Debug print('obj.cat',obj.category)
                     if obj.category in ['kind', 'kind of physical object',
                                         'kind of occurrence', 'kind of aspect',
                                         'kind of role', 'kind of relation']:
@@ -889,7 +888,7 @@ class Display_views():
                 # And store full description
                 qualified = False
                 presented = False
-                super_info_uid  = ''
+                super_info_uid = ''
                 super_info_name = self.unknown[self.GUI_lang_index]
                 info.description = ''
                 for rel_info in info.relations:
@@ -897,8 +896,8 @@ class Display_views():
                     info_status = info_expr[status_col]
                     # Determine the qualifier of the info (its supertype)
                     if info_expr[rel_type_uid_col] in self.gel_net.specialRelUIDs:
-                        super_info_uid   = info_expr[rh_uid_col]
-                        super_info_name  = info_expr[rh_name_col]
+                        super_info_uid = info_expr[rh_uid_col]
+                        super_info_name = info_expr[rh_name_col]
                         info.description = info_expr[full_def_col]
                         qualified = True
                         self.expr_table.append(info_expr)
@@ -948,12 +947,12 @@ class Display_views():
                         if directory_name == '':
                             self.Display_message(
                                 'The name of the directory for file {} is unknown.'.
-                                format(carrier.name),\
+                                format(carrier.name),
                                 'De naam van de directory voor file {} is onbekend.'.
                                 format(carrier.name))
 
                         # Store info about object in info_model
-                        #print('Carrier {} is located on directory {}.'.
+                        # Debug print('Carrier {} is located on directory {}.'.
                         #      format(carrier.name, directory_name))
                         info_row = [info.uid, obj.uid, carrier.uid, directory_name,
                                     info.name, super_info_name, directory_name, obj.name,
@@ -965,7 +964,7 @@ class Display_views():
                         prod_line_8 = [info.uid, super_info_uid, carrier.uid, self.line_nr,
                                        info.name, directory_name, '',
                                        super_info_name, carrier.name, carrier_kind_name,
-                                       '','','',info_status]
+                                       '', '', '',info_status]
                         if obj.category in ['kind', 'kind of physical object',
                                             'kind of occurrence', 'kind of aspect',
                                             'kind of role', 'kind of relation']:
@@ -991,7 +990,7 @@ class Display_views():
                     self.line_nr += + 1
                     prod_line_8 = [info.uid, super_info_uid, obj.uid, self.line_nr,
                                    info.name, '', '',
-                                   super_info_name, '', '','','','',info_status]
+                                   super_info_name, '', '', '', '', '',info_status]
                     if obj.category in ['kind', 'kind of physical object',
                                         'kind of occurrence', 'kind of aspect',
                                         'kind of role', 'kind of relation']:
@@ -1004,11 +1003,11 @@ class Display_views():
             (and their aspects) in expr_table.
             Store results in prod_model or occ_model
         """
-        unknownClassifierText = ['unknown kind','onbekende soort']
-        compHead = ['Part hierarchy','Compositie']
-        partHead = ['Part of part','Deel van deel']
-        par3Head = ['Further part','Verder deel']
-        kindHead = ['Kind','Soort']
+        unknownClassifierText = ['unknown kind', 'onbekende soort']
+        compHead = ['Part hierarchy', 'Compositie']
+        partHead = ['Part of part', 'Deel van deel']
+        par3Head = ['Further part', 'Verder deel']
+        kindHead = ['Kind', 'Soort']
 
         #self.coll_of_subtype_uids = []
         self.nr_of_parts = 0
@@ -1016,7 +1015,7 @@ class Display_views():
         if self.decomp_level > 3:
             self.decomp_level += - 1
             return
-        #print('Indentation_level of parts of:', self.decomp_level, name,obj.uid)
+        # Debug print('Indentation_level of parts of:', self.decomp_level, name,obj.uid)
 
         # Search for <has as part> relation or any of its subtypes
         part_uid = ''
@@ -1025,7 +1024,7 @@ class Display_views():
             if expr[rel_type_uid_col] in self.gel_net.subComposUIDs:
                 if expr not in self.expr_table and expr not in self.expr_table:
                     self.expr_table.append(expr)
-                    #print('Rel_obj-parts', rel_obj.lh_obj.uid, rel_obj.lh_obj.name,
+                    # Debug print('Rel_obj-parts', rel_obj.lh_obj.uid, rel_obj.lh_obj.name,
                     #      rel_obj.rel_type.base_phrases[0], rel_obj.rh_obj.name)
                     self.Add_line_to_network_model(rel_obj, expr)
 
@@ -1053,10 +1052,10 @@ class Display_views():
                     # the first time only
                     if self.part_head_req is True:
                         self.line_nr += 1
-                        prod_head_4 = ['','','',self.line_nr, compHead[self.GUI_lang_index],
+                        prod_head_4 = ['', '', '',self.line_nr, compHead[self.GUI_lang_index],
                                        partHead[self.GUI_lang_index],
                                        par3Head[self.GUI_lang_index],
-                                       kindHead[self.GUI_lang_index],'','','','','']
+                                       kindHead[self.GUI_lang_index], '', '', '', '', '']
                         if len(self.prod_model) < self.max_nr_of_rows:
                             # Header of part list
                             self.prod_model.append(prod_head_4)
@@ -1073,13 +1072,13 @@ class Display_views():
                         part_kind_uid = part.classifiers[0].uid
                         # Determine name etc. of the kind that classifies the part
                         if len(part.classifiers[0].names_in_contexts) > 0:
-                            #print('Part classifier names', self.reply_lang_pref_uids,
+                            # Debug print('Part classifier names', self.reply_lang_pref_uids,
                             #      part.classifiers[0].names_in_contexts)
                             lang_name, comm_name, part_kind_name, descrOfKind = \
                                 self.user_interface.Determine_name_in_context(part.classifiers[0])
                         else:
                             part_kind_name = part.classifiers[0].name
-                            #print('Part_classifier_name', part_kind_name)
+                            # Debug print('Part_classifier_name', part_kind_name)
                             comm_name = self.unknown[self.GUI_lang_index]
 
                     # Determine the preferred name of the part
@@ -1143,8 +1142,8 @@ class Display_views():
                 being individual or kind or phys object or occurrence or kind of occurrence
         '''
 
-        unknownKind  = ['unknown supertype','onbekend supertype']
-        noValuesText = ['No specification','Geen specificatie']
+        unknownKind = ['unknown supertype', 'onbekend supertype']
+        noValuesText = ['No specification', 'Geen specificatie']
         self.has_as_subtypes = ['has as subtypes', 'heeft als subtypes']
         possible_aspect_text = ['possible characteristic of a ', 'mogelijk kenmerk van een ']
         of_text = [' (of ', ' (van ']
@@ -1345,7 +1344,7 @@ class Display_views():
                         self.possibility_row[2] = aspect_name + of_text[self.GUI_lang_index] \
                                                   + obj_name + ')'
                         self.possibility_row[3] = self.poss_asp_of_obj_text
-                        #print('Aspect:', obj_name, asp.uid, aspect_name, value_name)
+                        # Debug print('Aspect:', obj_name, asp.uid, aspect_name, value_name)
                         self.possibility_row[4] = asp_supertype_name
                         self.possibility_row[5] = community_name # of obj
                         self.possibility_row[6] = value_name
@@ -1355,13 +1354,13 @@ class Display_views():
                         else:
                             print('Duplicate possibility row',len(self.possibilities_model),
                                   self.possibility_row)
-                        self.possibility_row = ['','','','','','','','','','','','','','','']
+                        self.possibility_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
 
-                #print('obj_i', value_presence, obj_i.name, nr_of_aspects, aspect_name,
+                # Debug print('obj_i', value_presence, obj_i.name, nr_of_aspects, aspect_name,
                 #      value_name, len(self.taxon_aspect_uids))
 
                 if value_presence is True:
-                    #print('Value present:', obj_i.name, aspect_name, value_name)
+                    # Debug print('Value present:', obj_i.name, aspect_name, value_name)
                     if len(self.expr_table) < self.max_nr_of_rows:
                         self.expr_table.append(expr2)
                         self.Add_line_to_network_model(rel_obj2, expr2)
@@ -1371,19 +1370,19 @@ class Display_views():
                         if value_presence is True \
                            and aspect_name not in self.taxon_column_names \
                            and len(self.taxon_column_names) <= 14:
-                            #print('Summm_header', aspect_name, len(self.taxon_aspect_uids))
+                            # Debug print('Summm_header', aspect_name, len(self.taxon_aspect_uids))
                             self.taxon_aspect_uids.append(aspect_uid)
                             self.taxon_column_names.append(aspect_name)
                             self.taxon_uom_names.append(uom_name)
                         self.taxon_ind = 3
-                        #print('Sums:',len(self.taxon_aspect_uids), self.taxon_aspect_uids,
+                        # Debug print('Sums:',len(self.taxon_aspect_uids), self.taxon_aspect_uids,
                         #      self.taxon_column_names, value_name)
                         # Find column in taxon_row where value should be stored
                         for kind_uid in self.taxon_aspect_uids[4:]:
                             self.taxon_ind += + 1
                             # Build list of values conform list of aspects.
                             if kind_uid == aspect_uid:
-                                #print('Aspects of phys:',len(self.taxon_aspect_uids),
+                                # Debug print('Aspects of phys:',len(self.taxon_aspect_uids),
                                 #      aspect_name, self.taxon_ind, value_name)
                                 self.taxon_row[self.taxon_ind] = value_name
                                 # Check whether there the uom corresponds with the table uom
@@ -1456,7 +1455,7 @@ class Display_views():
                                 asp_of_part_uid = expr_asp[lh_uid_col]
                                 asp_of_part_name = expr_asp[lh_name_col]
 
-                        #print('Whole {} has implied part ({}) {} identified with aspect ({}) {}.'.
+                        # Debug print('Whole {} has implied part ({}) {} identified with aspect ({}) {}.'.
                         #      format(obj.name, part_uid, part_name,
                         #             asp_of_part_uid, asp_of_part_name))
                         key = (part_uid, asp_of_part_uid)
@@ -1477,7 +1476,7 @@ class Display_views():
         #                    # Build list of values conform list of aspects.
         #                    # Note: sumRow[0] = component
         #                    if aspect.kind == kind_name:
-        #                        #print('Aspects of occ :',nrOfAspOccKinds,aspect_name,
+        #                        # Debug print('Aspects of occ :',nrOfAspOccKinds,aspect_name,
         #                               aspect.kind,self.taxon_ind,value_name)
         #                        occRow[self.taxon_ind] = value_name
         #                        if uom_name != self.occ_uoms[self.taxon_ind]:
@@ -1497,7 +1496,7 @@ class Display_views():
                         # If summary row is about object in focus,
                         # then make supertype of object in focus empty
                         # Because treeview parent (taxon_row[2] should be supertype or blank.
-                        #print('Subtype_level-1:', self.subtype_level, self.object_in_focus.uid,
+                        # Debug print('Subtype_level-1:', self.subtype_level, self.object_in_focus.uid,
                         #      self.object_in_focus.name, obj.uid, obj.name, self.taxon_row[0:4])
                         if self.taxon_row[0] == self.object_in_focus.uid:
                             self.taxon_row[2] = ''
@@ -1519,10 +1518,10 @@ class Display_views():
                                 self.taxon_model.append(self.taxon_row[:])
                             else:
                                 self.taxon_model.append(self.taxon_row[:])
-                        #print('Subtype_level-2:', self.subtype_level, obj.name, \
+                        # Debug print('Subtype_level-2:', self.subtype_level, obj.name,
                         #      self.taxon_row[0:4])
 
-            self.taxon_row = ['','','','','','','','','','','','','','']
+            self.taxon_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
         return nr_of_aspects
 
     def Determine_preferred_kind_name(self, obj):
@@ -1577,30 +1576,30 @@ class Display_views():
                 if expr[lh_uid_col] == obj.uid \
                    and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs \
                    and expr[phrase_type_uid_col] == '1986':
-                    part_uid   = expr[rh_uid_col]
-                    part_name  = expr[rh_name_col]
-                    #role_uid     = expr[rh_role_uid_col]
-                    #role_name    = expr[rh_role_name_col]
+                    part_uid = expr[rh_uid_col]
+                    part_name = expr[rh_name_col]
+                    #role_uid = expr[rh_role_uid_col]
+                    #role_name = expr[rh_role_name_col]
                 elif expr[rh_uid_col] == obj.uid \
                      and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs \
                      and expr[phrase_type_uid_col] == '6066'  :
-                    part_uid   = expr[lh_uid_col]
-                    part_name  = expr[lh_name_col]
-                    #role_uid     = expr[lh_role_uid_col]
-                    #role_name    = expr[lh_role_name_col]
+                    part_uid = expr[lh_uid_col]
+                    part_name = expr[lh_name_col]
+                    #role_uid = expr[lh_role_uid_col]
+                    #role_name = expr[lh_role_name_col]
                 else:
                     continue
 
                 # There is an explicit kind of part found;
                 # create part_header in kind_model, the first time only
-                #print('Kind of part', part_name)
+                # Debug print('Kind of part', part_name)
                 if self.part_head_req is True:
                     self.line_nr += 1
                     prod_head_4 = ['', '', '',
                                    self.line_nr, compHead[self.GUI_lang_index],
                                    partHead[self.GUI_lang_index],
                                    par3Head[self.GUI_lang_index],
-                                   kindHead[self.GUI_lang_index],'','','','','']
+                                   kindHead[self.GUI_lang_index], '', '', '', '', '']
                     if len(self.kind_model) < self.max_nr_of_rows:
                         # Add header of part to kind_model
                         self.kind_model.append(prod_head_4)
@@ -1655,7 +1654,7 @@ class Display_views():
                     # Verify consistency between aspect values and implied aspect values.
                     # === to be completed ===
 
-                    #print('*** Nr of aspects to be verified', nr_of_aspects)
+                    # Debug print('*** Nr of aspects to be verified', nr_of_aspects)
                     # Verify whether there are implied parts with aspect values
                     if len(self.implied_parts_dict) > 0:
                         for key, implied_tuple in self.implied_parts_dict:
@@ -1675,7 +1674,7 @@ class Display_views():
 
         # If there are implied kinds of parts left, then create kind_model lines.
         if len(self.implied_parts_dict) > 0:
-            #print('Nr of implied parts', len(self.implied_parts_dict))
+            # Debug print('Nr of implied parts', len(self.implied_parts_dict))
 
             # There is an implied part left; thus create a part_header,
             # the first time only
@@ -1685,7 +1684,7 @@ class Display_views():
                                self.line_nr, compHead[self.GUI_lang_index],
                                partHead[self.GUI_lang_index],
                                par3Head[self.GUI_lang_index],
-                               kindHead[self.GUI_lang_index],'','','','','']
+                               kindHead[self.GUI_lang_index], '', '', '', '', '']
                 if len(self.kind_model) < self.max_nr_of_rows:
                     self.kind_model.append(prod_head_4) # Header of part list
                 self.part_head_req = False
@@ -1752,7 +1751,7 @@ class Display_views():
         ''' Determine whether a kind_in_focus (obj) is a classifier for individual things
             if so, then add individual things to taxonomy (taxon_model) of kinds
         '''
-        has_as_individuals = ['classifies as individual ', \
+        has_as_individuals = ['classifies as individual ',
                               'classificeert als individuele ']
         first_time = True
 
@@ -1794,7 +1793,7 @@ class Display_views():
                 self.taxon_row[3] = community_name
 
                 self.taxon_model.append(self.taxon_row[:])
-                self.taxon_row = ['','','','','','','','','','','','','','']
+                self.taxon_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
 
     def Occurs_and_involvs(self, obj):
         """ Search for occurrences in which the obj (in focus) is involved.
@@ -1809,7 +1808,7 @@ class Display_views():
         role_head = ['Role', 'Rol']
         involv_head = ['Involved object', 'Betrokken object']
         kind_head = ['Kind', 'Soort']
-        #print('**** Occurs_and_involvs:',obj.uid, obj.name, obj.category)
+        # Debug print('**** Occurs_and_involvs:',obj.uid, obj.name, obj.category)
 
         nr_of_occur = 0
         self.occ_in_focus = 'no'
@@ -1820,11 +1819,11 @@ class Display_views():
         for rel_obj in obj.relations:
             expr = rel_obj.expression
             if (expr[rh_uid_col] == obj.uid and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
-                occ_uid   = expr[lh_uid_col]
-                #occ_name  = expr[lh_name_col]
+                occ_uid = expr[lh_uid_col]
+                #occ_name = expr[lh_name_col]
             elif expr[lh_uid_col] == obj.uid and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
-                occ_uid   = expr[rh_uid_col]
-                #occ_name  = expr[rh_name_col]
+                occ_uid = expr[rh_uid_col]
+                #occ_name = expr[rh_name_col]
             else:
                 continue
 
@@ -1833,7 +1832,7 @@ class Display_views():
             occ = self.uid_dict[occ_uid]
             occ_name = occ.name
             self.decomp_level = 1
-            #print('Occ     :',obj.name, occ_uid, occ_name,'roles:', expr[rel_type_name_col],
+            # Debug print('Occ     :',obj.name, occ_uid, occ_name, 'roles:', expr[rel_type_name_col],
             #      expr[lh_role_name_col], expr[rh_role_name_col])
 
             # Display occurrences header, only the first time
@@ -1861,9 +1860,9 @@ class Display_views():
                 occ_kind_name = self.unknown[self.GUI_lang_index]
                 occ_kind_uid = ''
 
-            self.occ_model.append([occ.uid, occ.name, '', '', occ_kind_uid, \
+            self.occ_model.append([occ.uid, occ.name, '', '', occ_kind_uid,
                                    occ.name, '', '', occ_kind_name, ''])
-            #print('Occ-3:',[nr_of_occur, occ.name, occ_uid, occ_kind_name])
+            # Debug print('Occ-3:',[nr_of_occur, occ.name, occ_uid, occ_kind_name])
 
             status = expr[status_col]
             occ_role = ''
@@ -1905,7 +1904,7 @@ class Display_views():
 
                 # An object is found that is involved in the occurrence
                 involved = self.uid_dict[involved_uid]
-                #print('Involved:',obj.uid, involved.uid, involved.name,
+                # Debug print('Involved:',obj.uid, involved.uid, involved.name,
                 #      'roles:',expr_occ[lh_role_uid_col],expr_occ[rh_role_uid_col])
 
                 self.expr_table.append(expr_occ)
@@ -1953,7 +1952,7 @@ class Display_views():
             involv_table: occur_obj,   involved_obj, role_obj (of invObj), invKindName.
             p_occ_table:  whole_obj,   part_obj,     kindOfPartName
         """
-        #print('Determine_sequences_of_occurrences',occ.uid, occ.name)
+        # Debug print('Determine_sequences_of_occurrences',occ.uid, occ.name)
         part_uids = []
         nr_of_sequences = 0
         nr_of_ins_and_outs = 0
@@ -2100,7 +2099,7 @@ class Display_views():
 
         # Define Product_model_sheet view
         if len(self.prod_model) > 0:
-            #print('prod_model',self.prod_model)
+            # Debug print('prod_model',self.prod_model)
             # Destroy earlier product_frame
             try:
                 self.prod_frame.destroy()
@@ -2108,7 +2107,7 @@ class Display_views():
                 pass
 
             self.Define_product_model_sheet()
-            #print('len prod model', len(self.prod_model))
+            # Debug print('len prod model', len(self.prod_model))
 
             # Display prod_model in Composition_sheet view
             self.Display_product_model_view()
@@ -2177,7 +2176,7 @@ class Display_views():
         ''' Define a network sheet for display of network_model (a list of network rows)
             for display in a tab of Notebook
         '''
-        network_text = ['Network','Netwerk']
+        network_text = ['Network', 'Netwerk']
         self.network_frame = gui.VBox(width='100%', height='100%',
                                       style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.network_frame,
@@ -2186,7 +2185,7 @@ class Display_views():
         net_button_text = ['Display network of left-object', 'Toon netwerk van linker object']
         lh_button_text = ['Display details of left object', 'Toon details van linker object']
         rh_button_text = ['Display details of kind', 'Toon details van soort']
-        classif_button_text = ['Classify left individual object', \
+        classif_button_text = ['Classify left individual object',
                                'Classificeer linker individueel object']
 
         self.button_row = gui.HBox(height=20, width='100%')
@@ -2214,9 +2213,9 @@ class Display_views():
 
         nr_of_cols = 7 # len(self.taxon_column_names)
         self.network_tree = gui.Table(width='100%',
-                                      style={"overflow":"auto", "background-color":"#eeffaa",\
-                                             "border-width":"2px", "border-style":"solid",\
-                                             "font-size":"12px", 'table-layout':'auto',\
+                                      style={"overflow":"auto", "background-color":"#eeffaa",
+                                             "border-width":"2px", "border-style":"solid",
+                                             "font-size":"12px", 'table-layout':'auto',
                                              'text-align':'left'})
         eqal_head = ['>=<', '>=<']
         valu_head = ['Value', 'Waarde']
@@ -2269,7 +2268,7 @@ class Display_views():
                     row_widget = gui.TableRow()
                     for index, field in enumerate(network_line[5:]):
                         row_item = gui.TableItem(text=field,
-                                                 style={'text-align':'left',\
+                                                 style={'text-align':'left',
                                                         'background-color':color})
                         if relation == False or index < 2:
                             row_widget.append(row_item, field)
@@ -2296,20 +2295,20 @@ class Display_views():
         self.taxon_frame = Frame(self.views_noteb)
         self.taxon_frame.grid (column=0, row=0, sticky=NSEW, rowspan=2)
         self.taxon_frame.columnconfigure(0, weight=1)
-        self.taxon_frame.rowconfigure(0,weight=0)
-        self.taxon_frame.rowconfigure(1,weight=1)
+        self.taxon_frame.rowconfigure(0, weight=0)
+        self.taxon_frame.rowconfigure(1, weight=1)
 
-        taxon_text = ['Taxonomy','Taxonomie']
+        taxon_text = ['Taxonomy', 'Taxonomie']
         self.views_noteb.add(self.taxon_frame, text=taxon_text[self.GUI_lang_index], sticky=NSEW)
         #self.views_noteb.insert("end", self.taxon_frame, sticky=NSEW)
 
         taxon_head = ['Hierarchy of kinds and aspects per object of a particular kind',
                       'Hiërarchie van soorten en aspecten per object van een bepaalde soort']
-        taxon_lbl  = Label(self.taxon_frame,text=taxon_head[self.GUI_lang_index])
+        taxon_lbl = Label(self.taxon_frame, text=taxon_head[self.GUI_lang_index])
 
-        headings = ['UID','Name', 'Kind', 'Community',
+        headings = ['UID', 'Name', 'Kind', 'Community',
                     'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4',
-                    'Aspect5','Aspect6','Aspect7','Aspect8','Aspect9','Aspect10']
+                    'Aspect5', 'Aspect6', 'Aspect7', 'Aspect8', 'Aspect9', 'Aspect10']
         nr_of_cols = len(self.taxon_column_names)
         display_cols = headings[3:nr_of_cols]
 
@@ -2328,21 +2327,21 @@ class Display_views():
         for column in self.taxon_column_names[4:]:
             asp += 1
             Asp_name = 'Aspect' + str(asp)
-            self.taxon_tree.heading(Asp_name, text=self.taxon_column_names[asp +3] ,anchor=W)
-            self.taxon_tree.column (Asp_name, minwidth=20 ,width=50)
+            self.taxon_tree.heading(Asp_name, text=self.taxon_column_names[asp +3], anchor=W)
+            self.taxon_tree.column (Asp_name, minwidth=20, width=50)
 
         self.taxon_tree.tag_configure('rel_tag', option=None, background='#afa')
         self.taxon_tree.tag_configure('uom_tag', option=None, background='#ccf')
         self.taxon_tree.tag_configure('sum_tag', option=None, background='#cfc')
 
         taxon_scroll = Scrollbar(self.taxon_frame, orient=VERTICAL, command=self.taxon_tree.yview)
-        taxon_lbl.grid       (column=0, row=0,sticky=EW)
-        self.taxon_tree.grid (column=0, row=1,sticky=NSEW)
-        taxon_scroll.grid    (column=0, row=1,sticky=NS+E)
+        taxon_lbl.grid       (column=0, row=0, sticky=EW)
+        self.taxon_tree.grid (column=0, row=1, sticky=NSEW)
+        taxon_scroll.grid    (column=0, row=1, sticky=NS+E)
         self.taxon_tree.config(yscrollcommand=taxon_scroll.set)
 
         self.taxon_tree.bind(sequence='<Double-1>', func=self.Taxon_detail_view)
-        self.taxon_tree.bind(sequence='c'         , func=self.Taxon_detail_view)
+        self.taxon_tree.bind(sequence='c', func=self.Taxon_detail_view)
 
     def Display_taxonomy_view(self):
         # Display header row with units of measure
@@ -2350,7 +2349,7 @@ class Display_views():
         # Display self.taxon_model rows in self.taxon_tree
         parents = []
         for taxon_line in self.taxon_model:
-            #print('Taxon_line', taxon_line)
+            # Debug print('Taxon_line', taxon_line)
             # Verify whether taxon_line[2], being the supertype,
             # is blank or in the list of parents
             if taxon_line[2] == '' or taxon_line[2] in parents:
@@ -2363,9 +2362,9 @@ class Display_views():
                     term = taxon_line[1].partition(' ')
                     if term[0] in ['has', 'heeft', 'classifies', 'classificeert']:
                         rel_tag = 'rel_tag'
-                    self.taxon_tree.insert(taxon_line[2],index='end',values=taxon_line,\
-                                           tags=rel_tag,\
-                                           iid=taxon_line[1],text=taxon_line[1], open=True)
+                    self.taxon_tree.insert(taxon_line[2],index='end',values=taxon_line,
+                                           tags=rel_tag,
+                                           iid=taxon_line[1], text=taxon_line[1], open=True)
                     parents.append(taxon_line[1])
 
     def Define_summary_sheet(self):
@@ -2373,35 +2372,35 @@ class Display_views():
             for display in a tab of Notebook
         '''
         self.summ_frame = Frame(self.views_noteb)
-        self.summ_frame.grid (column=0, row=0,sticky=NSEW) #pack(fill=BOTH, expand=1)
+        self.summ_frame.grid (column=0, row=0, sticky=NSEW) #pack(fill=BOTH, expand=1)
         self.summ_frame.columnconfigure(0, weight=1)
-        self.summ_frame.rowconfigure(0,weight=1)
-        #self.summ_frame.rowconfigure(1,weight=1)
+        self.summ_frame.rowconfigure(0, weight=1)
+        #self.summ_frame.rowconfigure(1, weight=1)
 
-        summary = ['Summary','Overzicht']
+        summary = ['Summary', 'Overzicht']
         self.views_noteb.add(self.summ_frame, text=summary[self.GUI_lang_index], sticky=NSEW)
         self.views_noteb.insert("end", self.summ_frame, sticky=NSEW)
 
-        summHead = ['Aspects per object of a particular kind',\
+        summHead = ['Aspects per object of a particular kind',
                     'Aspecten per object van een bepaalde soort']
-        summ_lbl = Label(self.summ_frame,text=summHead[self.GUI_lang_index])
+        summ_lbl = Label(self.summ_frame, text=summHead[self.GUI_lang_index])
 
-        headings = ['UID','Name', 'Kind','Community','Aspect1','Aspect2','Aspect3','Aspect4',\
-                    'Aspect5','Aspect6','Aspect7','Aspect8','Aspect9','Aspect10']
+        headings = ['UID', 'Name', 'Kind', 'Community', 'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4',
+                    'Aspect5', 'Aspect6', 'Aspect7', 'Aspect8', 'Aspect9', 'Aspect10']
         nr_of_cols = len(self.summ_column_names)
         display_cols = headings[3:nr_of_cols]
 
-        self.summ_tree = Treeview(self.summ_frame,columns=(headings[0:nr_of_cols]),\
+        self.summ_tree = Treeview(self.summ_frame,columns=(headings[0:nr_of_cols]),
                                   displaycolumns=display_cols, selectmode='browse', height=30)
 
-        self.summ_tree.heading('#0'       , text='Object', anchor=W)
-        self.summ_tree.heading('UID'      , text='UID'   , anchor=W)
-        self.summ_tree.heading('Name'     , text=self.name_head[self.GUI_lang_index], anchor=W)
-        self.summ_tree.heading('Kind'     , text=self.kind_head[self.GUI_lang_index], anchor=W)
+        self.summ_tree.heading('#0', text='Object', anchor=W)
+        self.summ_tree.heading('UID', text='UID', anchor=W)
+        self.summ_tree.heading('Name', text=self.name_head[self.GUI_lang_index], anchor=W)
+        self.summ_tree.heading('Kind', text=self.kind_head[self.GUI_lang_index], anchor=W)
         self.summ_tree.heading('Community', text=self.comm_head[self.GUI_lang_index], anchor=W)
 
-        self.summ_tree.column ('#0'       , minwidth=100, width=200)
-        self.summ_tree.column ('Community', minwidth=20 , width=50)
+        self.summ_tree.column ('#0', minwidth=100, width=200)
+        self.summ_tree.column ('Community', minwidth=20, width=50)
         asp = 0
         for column in self.summ_column_names[4:]:
             asp += 1
@@ -2409,8 +2408,8 @@ class Display_views():
             self.summ_tree.heading(Asp_name, text=self.summ_column_names[asp +3], anchor=W)
             self.summ_tree.column (Asp_name, minwidth=20, width=50)
 
-        self.summ_tree.columnconfigure(0,weight=1)
-        self.summ_tree.rowconfigure   (0,weight=1)
+        self.summ_tree.columnconfigure(0, weight=1)
+        self.summ_tree.rowconfigure   (0, weight=1)
 
         #self.summ_tree.tag_configure('col_tag', option=None, background='#9f9')
         self.summ_tree.tag_configure('uom_tag', option=None, background='#ccf')
@@ -2437,8 +2436,8 @@ class Display_views():
                     continue
                 else:
                     # Summ_line[2] is the supertype
-                    self.summ_tree.insert(summ_line[2],index='end',values=summ_line,\
-                                          tags='sum_tag',iid=summ_line[1],\
+                    self.summ_tree.insert(summ_line[2],index='end',values=summ_line,
+                                          tags='sum_tag',iid=summ_line[1],
                                           text=summ_line[1], open=True)
                     parents.append(summ_line[1])
 
@@ -2461,10 +2460,10 @@ class Display_views():
             # or the parent appeared already,
             # then display the row in the tree
             if possib_line[3] == '' or possib_line[3] in parents:
-                #print('Possib_line', possib_line)
+                # Debug print('Possib_line', possib_line)
                 # Possib_line[3] is the whole
-                self.possib_tree.insert(possib_line[3], index='end', values=possib_line, \
-                                        tags='sum_tag', iid=possib_line[2], \
+                self.possib_tree.insert(possib_line[3], index='end', values=possib_line,
+                                        tags='sum_tag', iid=possib_line[2],
                                         text=possib_line[1], open=True)
                 parents.append(possib_line[2])
 
@@ -2479,53 +2478,53 @@ class Display_views():
         self.possib_frame.rowconfigure(0, weight=0)
         self.possib_frame.rowconfigure(1, weight=1)
 
-        possib_text = ['Possibilities','Mogelijkheden']
-        self.views_noteb.add(self.possib_frame, text=possib_text[self.GUI_lang_index],\
+        possib_text = ['Possibilities', 'Mogelijkheden']
+        self.views_noteb.add(self.possib_frame, text=possib_text[self.GUI_lang_index],
                              sticky=NSEW)
         self.views_noteb.insert("end", self.possib_frame, sticky=NSEW)
 
-        possib_head  = ['Possible aspects per object of a particular kind',\
+        possib_head = ['Possible aspects per object of a particular kind',
                         'Mogelijke aspecten per object van een bepaalde soort']
-        possib_label = Label(self.possib_frame,text=possib_head[self.GUI_lang_index])
-        headings = ['UID','Name','Ext_name','Parent','Kind','Community',\
-                    'Aspect1','Aspect2','Aspect3','Aspect4','Aspect5',\
-                    'Aspect6','Aspect7','Aspect8','Aspect9','Aspect10']
+        possib_label = Label(self.possib_frame, text=possib_head[self.GUI_lang_index])
+        headings = ['UID', 'Name', 'Ext_name', 'Parent', 'Kind', 'Community',
+                    'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4', 'Aspect5',
+                    'Aspect6', 'Aspect7', 'Aspect8', 'Aspect9', 'Aspect10']
         nr_of_cols = len(self.possib_column_names)
         display_cols = headings[4:nr_of_cols]
 
-        self.possib_tree = Treeview(self.possib_frame, columns=(headings[0:nr_of_cols]),\
+        self.possib_tree = Treeview(self.possib_frame, columns=(headings[0:nr_of_cols]),
                                     displaycolumns=display_cols, selectmode='browse', height=30)
 
-        self.possib_tree.heading('UID'      ,text='UID', anchor=W)
-        self.possib_tree.heading('Name'     ,text=self.name_head[self.GUI_lang_index], anchor=W)
-        self.possib_tree.heading('Ext_name' ,text=self.name_head[self.GUI_lang_index], anchor=W)
-        self.possib_tree.heading('Parent'   ,text=self.parent_head[self.GUI_lang_index], anchor=W)
-        self.possib_tree.heading('Kind'     ,text=self.kind_head[self.GUI_lang_index], anchor=W)
-        self.possib_tree.heading('Community',text=self.comm_head[self.GUI_lang_index], anchor=W)
+        self.possib_tree.heading('UID', text='UID', anchor=W)
+        self.possib_tree.heading('Name', text=self.name_head[self.GUI_lang_index], anchor=W)
+        self.possib_tree.heading('Ext_name', text=self.name_head[self.GUI_lang_index], anchor=W)
+        self.possib_tree.heading('Parent', text=self.parent_head[self.GUI_lang_index], anchor=W)
+        self.possib_tree.heading('Kind', text=self.kind_head[self.GUI_lang_index], anchor=W)
+        self.possib_tree.heading('Community', text=self.comm_head[self.GUI_lang_index], anchor=W)
 
-        self.possib_tree.column ('#0'       ,minwidth=100, width=200)
-        self.possib_tree.column ('Kind'     ,minwidth=20 , width=50)
-        self.possib_tree.column ('Community',minwidth=20 , width=50)
+        self.possib_tree.column ('#0', minwidth=100, width=200)
+        self.possib_tree.column ('Kind', minwidth=20, width=50)
+        self.possib_tree.column ('Community', minwidth=20, width=50)
         asp = 0
         for column in self.possib_column_names[6:]:
             asp += 1
             Asp_name = 'Aspect' + str(asp)
             self.possib_tree.heading(Asp_name, text=self.possib_column_names[asp +4], anchor=W)
-            self.possib_tree.column (Asp_name, minwidth=20 ,width=50)
+            self.possib_tree.column (Asp_name, minwidth=20, width=50)
 
-        self.possib_tree.columnconfigure(0,weight=1)
-        self.possib_tree.columnconfigure(1,weight=1)
-        self.possib_tree.rowconfigure   (0,weight=1)
-        self.possib_tree.rowconfigure   (1,weight=1)
+        self.possib_tree.columnconfigure(0, weight=1)
+        self.possib_tree.columnconfigure(1, weight=1)
+        self.possib_tree.rowconfigure   (0, weight=1)
+        self.possib_tree.rowconfigure   (1, weight=1)
 
         self.possib_tree.tag_configure('uom_tag', option=None, background='#ccf')
         self.possib_tree.tag_configure('sum_tag', option=None, background='#cfc')
 
-        possib_Scroll = Scrollbar(self.possib_frame, orient=VERTICAL, \
+        possib_Scroll = Scrollbar(self.possib_frame, orient=VERTICAL,
                                   command=self.possib_tree.yview)
-        possib_label.grid     (column=0, row=0,sticky=EW)
-        self.possib_tree.grid (column=0, row=1,sticky=NSEW)
-        possib_Scroll.grid    (column=0, row=1,sticky=NS+E)
+        possib_label.grid     (column=0, row=0, sticky=EW)
+        self.possib_tree.grid (column=0, row=1, sticky=NSEW)
+        possib_Scroll.grid    (column=0, row=1, sticky=NS+E)
         self.possib_tree.config(yscrollcommand=possib_Scroll.set)
 
         self.possib_tree.bind(sequence='<Double-1>', func=self.Possibilities_detail_view)
@@ -2548,54 +2547,54 @@ class Display_views():
             for display in a tab of Notebook
         '''
         self.indiv_frame = Frame(self.views_noteb)
-        self.indiv_frame.grid (column=0, row=0,sticky=NSEW) #pack(fill=BOTH, expand=1)
+        self.indiv_frame.grid (column=0, row=0, sticky=NSEW) #pack(fill=BOTH, expand=1)
         self.indiv_frame.columnconfigure(0, weight=1)
-        self.indiv_frame.rowconfigure(0,weight=1)
-        self.indiv_frame.rowconfigure(1,weight=1)
+        self.indiv_frame.rowconfigure(0, weight=1)
+        self.indiv_frame.rowconfigure(1, weight=1)
 
-        indiv_text = ['Composition','Samenstelling']
+        indiv_text = ['Composition', 'Samenstelling']
         self.views_noteb.add(self.indiv_frame, text=indiv_text[self.GUI_lang_index], sticky=NSEW)
         self.views_noteb.insert("end", self.indiv_frame, sticky=NSEW)
 
-        indiv_Head = ['Aspects per individual object','Aspecten per individueel object']
-        indiv_Lbl  = Label(self.indiv_frame,text=indiv_Head[self.GUI_lang_index])
-        headings = ['UID','Name','Parent','Kind','Community','Aspect1','Aspect2','Aspect3',\
-                    'Aspect4','Aspect5','Aspect6','Aspect7','Aspect8','Aspect9','Aspect10']
+        indiv_Head = ['Aspects per individual object', 'Aspecten per individueel object']
+        indiv_Lbl = Label(self.indiv_frame, text=indiv_Head[self.GUI_lang_index])
+        headings = ['UID', 'Name', 'Parent', 'Kind', 'Community', 'Aspect1', 'Aspect2', 'Aspect3',
+                    'Aspect4', 'Aspect5', 'Aspect6', 'Aspect7', 'Aspect8', 'Aspect9', 'Aspect10']
         nr_of_cols = len(self.indiv_column_names)
         display_cols = headings[3:nr_of_cols]
 
-        self.indiv_tree = Treeview(self.indiv_frame,columns=(headings[0:nr_of_cols]),\
-                                  displaycolumns=display_cols, selectmode='browse', height=30)
+        self.indiv_tree = Treeview(self.indiv_frame,columns=(headings[0:nr_of_cols]),
+                                   displaycolumns=display_cols, selectmode='browse', height=30)
 
-        self.indiv_tree.heading('#0'       ,text='Object', anchor=W)
-        self.indiv_tree.heading('UID'      ,text='UID'   , anchor=W)
-        self.indiv_tree.heading('Name'     ,text=self.name_head[self.GUI_lang_index], anchor=W)
-        self.indiv_tree.heading('Parent'   ,text=self.parent_head[self.GUI_lang_index], anchor=W)
-        self.indiv_tree.heading('Kind'     ,text=self.kind_head[self.GUI_lang_index], anchor=W)
-        self.indiv_tree.heading('Community',text=self.comm_head[self.GUI_lang_index], anchor=W)
+        self.indiv_tree.heading('#0', text='Object', anchor=W)
+        self.indiv_tree.heading('UID', text='UID', anchor=W)
+        self.indiv_tree.heading('Name', text=self.name_head[self.GUI_lang_index], anchor=W)
+        self.indiv_tree.heading('Parent', text=self.parent_head[self.GUI_lang_index], anchor=W)
+        self.indiv_tree.heading('Kind', text=self.kind_head[self.GUI_lang_index], anchor=W)
+        self.indiv_tree.heading('Community', text=self.comm_head[self.GUI_lang_index], anchor=W)
 
-        self.indiv_tree.column ('#0'       ,minwidth=100, width=200)
-        self.indiv_tree.column ('Kind'     ,minwidth=20 , width=50)
-        self.indiv_tree.column ('Community',minwidth=20 , width=50)
+        self.indiv_tree.column ('#0', minwidth=100, width=200)
+        self.indiv_tree.column ('Kind', minwidth=20, width=50)
+        self.indiv_tree.column ('Community', minwidth=20, width=50)
         asp = 0
         for column in self.indiv_column_names[5:]:
             asp += 1
             Asp_name = 'Aspect' + str(asp)
             self.indiv_tree.heading(Asp_name, text=self.indiv_column_names[asp +4], anchor=W)
-            self.indiv_tree.column (Asp_name, minwidth=20 ,width=50)
+            self.indiv_tree.column (Asp_name, minwidth=20, width=50)
 
-        self.indiv_tree.columnconfigure(0,weight=1)
-        self.indiv_tree.columnconfigure(1,weight=1)
-        self.indiv_tree.rowconfigure   (0,weight=1)
-        self.indiv_tree.rowconfigure   (1,weight=1)
+        self.indiv_tree.columnconfigure(0, weight=1)
+        self.indiv_tree.columnconfigure(1, weight=1)
+        self.indiv_tree.rowconfigure   (0, weight=1)
+        self.indiv_tree.rowconfigure   (1, weight=1)
 
         self.indiv_tree.tag_configure('uom_tag', option=None, background='#ccf')
         self.indiv_tree.tag_configure('sum_tag', option=None, background='#cfc')
 
         indiv_Scroll = Scrollbar(self.indiv_frame, orient=VERTICAL, command=self.indiv_tree.yview)
-        indiv_Lbl.grid      (column=0, row=0,sticky=EW)
-        self.indiv_tree.grid(column=0, row=1,sticky=NSEW)
-        indiv_Scroll.grid   (column=0, row=1,sticky=NS+E)
+        indiv_Lbl.grid      (column=0, row=0, sticky=EW)
+        self.indiv_tree.grid(column=0, row=1, sticky=NSEW)
+        indiv_Scroll.grid   (column=0, row=1, sticky=NS+E)
         self.indiv_tree.config(yscrollcommand=indiv_Scroll.set)
 
         self.indiv_tree.bind(sequence='<Double-1>', func=self.Indiv_detail_view)
@@ -2611,8 +2610,8 @@ class Display_views():
         for indiv_line in self.indiv_model:
             # Indiv_line[2] is the whole
             if indiv_line[2] == '' or indiv_line[2] in indiv_parents:
-                self.indiv_tree.insert(indiv_line[2], index='end', \
-                                       values=indiv_line,tags='sum_tag',iid=indiv_line[1],\
+                self.indiv_tree.insert(indiv_line[2], index='end',
+                                       values=indiv_line,tags='sum_tag',iid=indiv_line[1],
                                        text=indiv_line[1], open=True)
                 indiv_parents.append(indiv_line[1])
 
@@ -2620,121 +2619,121 @@ class Display_views():
         ''' Define expressions view sheet for display of expr_table in Notebook tab
         '''
         self.expr_frame = Frame(self.views_noteb)
-        self.expr_frame.grid (column=0, row=0,sticky=NSEW, rowspan=4)
-        self.expr_frame.columnconfigure(0,weight=1)
-        self.expr_frame.rowconfigure(0,weight=0)
-        self.expr_frame.rowconfigure(1,weight=0)
-        self.expr_frame.rowconfigure(2,weight=0)
-        self.expr_frame.rowconfigure(3,weight=1)
+        self.expr_frame.grid (column=0, row=0, sticky=NSEW, rowspan=4)
+        self.expr_frame.columnconfigure(0, weight=1)
+        self.expr_frame.rowconfigure(0, weight=0)
+        self.expr_frame.rowconfigure(1, weight=0)
+        self.expr_frame.rowconfigure(2, weight=0)
+        self.expr_frame.rowconfigure(3, weight=1)
 
-        expressions = ['Expressions' ,'Uitdrukkingen']
-        save_on_CSV_file  = ['Save on CSV file','Opslaan op CSV file']
-        save_on_JSON_file = ['Save on JSON file','Opslaan op JSON file']
+        expressions = ['Expressions', 'Uitdrukkingen']
+        save_on_CSV_file = ['Save on CSV file', 'Opslaan op CSV file']
+        save_on_JSON_file = ['Save on JSON file', 'Opslaan op JSON file']
 
-        self.views_noteb.add(self.expr_frame, text=expressions[self.GUI_lang_index],sticky=NSEW)
-        self.views_noteb.insert("end",self.expr_frame,sticky=NSEW)
+        self.views_noteb.add(self.expr_frame, text=expressions[self.GUI_lang_index], sticky=NSEW)
+        self.views_noteb.insert("end",self.expr_frame, sticky=NSEW)
         # Define button for display of contextual facts
-        details_button   = Button(self.expr_frame, text='Context', command=self.Contextual_facts)
-        save_CSV_button  = Button(self.expr_frame, text=save_on_CSV_file[self.GUI_lang_index], \
-                                  command=self.Save_on_CSV_file)
-        save_JSON_button = Button(self.expr_frame, text=save_on_JSON_file[self.GUI_lang_index], \
+        details_button = Button(self.expr_frame, text='Context', command=self.Contextual_facts)
+        save_CSV_button = Button(self.expr_frame, text=save_on_CSV_file[self.GUI_lang_index],
+                                 command=self.Save_on_CSV_file)
+        save_JSON_button = Button(self.expr_frame, text=save_on_JSON_file[self.GUI_lang_index],
                                   command=self.Save_on_JSON_file)
 
-        header = ['Model expressions in Gellish','Uitdrukkingen in Gellish']
+        header = ['Model expressions in Gellish', 'Uitdrukkingen in Gellish']
         expr_lbl = Label(self.expr_frame, text=header[self.GUI_lang_index],justify='left')
 
-        self.expr_tree = Treeview(self.expr_frame,\
-            columns=('seq'       ,'langUID'    ,'langName'  ,'commUID'    ,'commName' ,\
-                     'reality'   ,'intentUID'  ,'intentName','lhCard'     ,'lhUID'    ,\
-                     'lhName'    ,'lhRoleUID'  ,'lhRoleName','validUID'   ,'validName',\
-                     'ideaUID'   ,'ideaDescr'  ,'reltypeUID','reltypeName','phrasetypeUID',\
-                     'rhRoleUID' ,'rhRoleName' ,'rhCard'    ,'rhUID'      ,'rhName'   ,\
-                     'partDef'   ,'fullDef'    ,'uomUID'    ,'uomName'    ,'accUID'   ,\
-                     'accName'   ,'pickUID'    ,'pickName'  ,'remarks'    ,'status'   ,\
-                     'reason'    ,'succUID'    ,'dateStartVal','dateStartAv','dateCC' ,\
-                     'dateLatChE','orignatorUID','originatorName','authorUID','authorName',\
-                     'addrUID'   ,'addrName'   ,'refs'      ,'exprUID'    ,'collUID'  ,\
-                     'collName'  ,'fileName'   ,'lhComm'    ,'rhComm'     ,'relComm' ),\
-            displaycolumns=('langName','commName','ideaUID','lhUID'  ,'lhName','reltypeUID',\
-                            'reltypeName','rhUID','rhName' ,'fullDef','uomUID','uomName',\
-                            'remarks' ,'status') ,\
-            selectmode='browse', height=20\
+        self.expr_tree = Treeview(self.expr_frame,
+            columns=('seq', 'langUID', 'langName', 'commUID', 'commName',
+                     'reality', 'intentUID', 'intentName', 'lhCard', 'lhUID',
+                     'lhName', 'lhRoleUID', 'lhRoleName', 'validUID', 'validName',
+                     'ideaUID', 'ideaDescr', 'reltypeUID', 'reltypeName', 'phrasetypeUID',
+                     'rhRoleUID', 'rhRoleName', 'rhCard', 'rhUID', 'rhName',
+                     'partDef', 'fullDef', 'uomUID', 'uomName', 'accUID',
+                     'accName', 'pickUID', 'pickName', 'remarks', 'status',
+                     'reason', 'succUID', 'dateStartVal', 'dateStartAv', 'dateCC',
+                     'dateLatChE', 'orignatorUID', 'originatorName', 'authorUID', 'authorName',
+                     'addrUID', 'addrName', 'refs', 'exprUID', 'collUID',
+                     'collName', 'fileName', 'lhComm', 'rhComm', 'relComm' ),
+            displaycolumns=('langName', 'commName', 'ideaUID', 'lhUID', 'lhName', 'reltypeUID',
+                            'reltypeName', 'rhUID', 'rhName', 'fullDef', 'uomUID', 'uomName',
+                            'remarks', 'status'),
+            selectmode='browse', height=20
                                   )
 
-        self.expr_tree.heading('seq'       ,text='Seq'       ,anchor=W)
-        self.expr_tree.heading('langUID'   ,text='langUID'   ,anchor=W)
-        self.expr_tree.heading('langName'  ,text='Language'  ,anchor=W)
-        self.expr_tree.heading('commUID'   ,text='commUID'   ,anchor=W)
-        self.expr_tree.heading('commName'  ,text='Community' ,anchor=W)
-        self.expr_tree.heading('reality'   ,text='reality'   ,anchor=W)
-        self.expr_tree.heading('intentUID' ,text='intentUID' ,anchor=W)
-        self.expr_tree.heading('intentName',text='intentName',anchor=W)
-        self.expr_tree.heading('lhCard'    ,text='lhCard'    ,anchor=W)
-        self.expr_tree.heading('lhUID'     ,text='lhUID'     ,anchor=W)
-        self.expr_tree.heading('lhName'    ,text='lhName'    ,anchor=W)
-        self.expr_tree.heading('lhRoleUID' ,text='lhRoleUID' ,anchor=W)
-        self.expr_tree.heading('lhRoleName',text='lhRoleName',anchor=W)
-        self.expr_tree.heading('validUID'  ,text='validUID'  ,anchor=W)
-        self.expr_tree.heading('validName' ,text='validName' ,anchor=W)
-        self.expr_tree.heading('ideaUID'   ,text='ideaUID'   ,anchor=W)
-        self.expr_tree.heading('ideaDescr' ,text='ideaDescr' ,anchor=W)
-        self.expr_tree.heading('reltypeUID',text='reltypeUID',anchor=W)
-        self.expr_tree.heading('reltypeName',text='relation type',anchor=W)
-        self.expr_tree.heading('phrasetypeUID',text='phrase type',anchor=W)
-        self.expr_tree.heading('rhRoleUID' ,text='rhRoleUID' ,anchor=W)
-        self.expr_tree.heading('rhRoleName',text='rhRoleName',anchor=W)
-        self.expr_tree.heading('rhCard'    ,text='rhCard'    ,anchor=W)
-        self.expr_tree.heading('rhUID'     ,text='rhUID'     ,anchor=W)
-        self.expr_tree.heading('rhName'    ,text='rhName'    ,anchor=W)
-        self.expr_tree.heading('partDef'   ,text='partDef'   ,anchor=W)
-        self.expr_tree.heading('fullDef'   ,text='Description',anchor=W)
-        self.expr_tree.heading('uomUID'    ,text='uomUID'    ,anchor=W)
-        self.expr_tree.heading('uomName'   ,text='UoM'       ,anchor=W)
-        self.expr_tree.heading('accUID'    ,text='accUID'    ,anchor=W)
-        self.expr_tree.heading('accName'   ,text='accName'   ,anchor=W)
-        self.expr_tree.heading('pickUID'   ,text='pickUID'   ,anchor=W)
-        self.expr_tree.heading('pickName'  ,text='pickName'  ,anchor=W)
-        self.expr_tree.heading('remarks'   ,text='Remarks'   ,anchor=W)
-        self.expr_tree.heading('status'    ,text='Status'    ,anchor=W)
+        self.expr_tree.heading('seq', text='Seq', anchor=W)
+        self.expr_tree.heading('langUID', text='langUID', anchor=W)
+        self.expr_tree.heading('langName', text='Language', anchor=W)
+        self.expr_tree.heading('commUID', text='commUID', anchor=W)
+        self.expr_tree.heading('commName', text='Community', anchor=W)
+        self.expr_tree.heading('reality', text='reality', anchor=W)
+        self.expr_tree.heading('intentUID', text='intentUID', anchor=W)
+        self.expr_tree.heading('intentName', text='intentName', anchor=W)
+        self.expr_tree.heading('lhCard', text='lhCard', anchor=W)
+        self.expr_tree.heading('lhUID', text='lhUID', anchor=W)
+        self.expr_tree.heading('lhName', text='lhName', anchor=W)
+        self.expr_tree.heading('lhRoleUID', text='lhRoleUID', anchor=W)
+        self.expr_tree.heading('lhRoleName', text='lhRoleName', anchor=W)
+        self.expr_tree.heading('validUID', text='validUID', anchor=W)
+        self.expr_tree.heading('validName', text='validName', anchor=W)
+        self.expr_tree.heading('ideaUID', text='ideaUID', anchor=W)
+        self.expr_tree.heading('ideaDescr', text='ideaDescr', anchor=W)
+        self.expr_tree.heading('reltypeUID', text='reltypeUID', anchor=W)
+        self.expr_tree.heading('reltypeName', text='relation type', anchor=W)
+        self.expr_tree.heading('phrasetypeUID', text='phrase type', anchor=W)
+        self.expr_tree.heading('rhRoleUID', text='rhRoleUID', anchor=W)
+        self.expr_tree.heading('rhRoleName', text='rhRoleName', anchor=W)
+        self.expr_tree.heading('rhCard', text='rhCard', anchor=W)
+        self.expr_tree.heading('rhUID', text='rhUID', anchor=W)
+        self.expr_tree.heading('rhName', text='rhName', anchor=W)
+        self.expr_tree.heading('partDef', text='partDef', anchor=W)
+        self.expr_tree.heading('fullDef', text='Description', anchor=W)
+        self.expr_tree.heading('uomUID', text='uomUID', anchor=W)
+        self.expr_tree.heading('uomName', text='UoM', anchor=W)
+        self.expr_tree.heading('accUID', text='accUID', anchor=W)
+        self.expr_tree.heading('accName', text='accName', anchor=W)
+        self.expr_tree.heading('pickUID', text='pickUID', anchor=W)
+        self.expr_tree.heading('pickName', text='pickName', anchor=W)
+        self.expr_tree.heading('remarks', text='Remarks', anchor=W)
+        self.expr_tree.heading('status', text='Status', anchor=W)
 
-        self.expr_tree.column ('#0'        ,minwidth=10,width=20)
-        self.expr_tree.column ('seq'       ,minwidth=10,width=20)
-        self.expr_tree.column ('langUID'   ,minwidth=20,width=55)
-        self.expr_tree.column ('langName'  ,minwidth=15,width=80)
-        self.expr_tree.column ('commUID'   ,minwidth=15,width=55)
-        self.expr_tree.column ('commName'  ,minwidth=15,width=80)
-        self.expr_tree.column ('reality'   ,minwidth=15,width=40)
-        self.expr_tree.column ('intentUID' ,minwidth=15,width=55)
-        self.expr_tree.column ('intentName',minwidth=15,width=80)
-        self.expr_tree.column ('lhCard'    ,minwidth=15,width=40)
-        self.expr_tree.column ('lhUID'     ,minwidth=15,width=55)
-        self.expr_tree.column ('lhName'    ,minwidth=15,width=150)
-        self.expr_tree.column ('lhRoleUID' ,minwidth=15,width=55)
-        self.expr_tree.column ('lhRoleName',minwidth=15,width=80)
-        self.expr_tree.column ('validUID'  ,minwidth=15,width=55)
-        self.expr_tree.column ('validName' ,minwidth=15,width=80)
-        self.expr_tree.column ('ideaUID'   ,minwidth=15,width=55)
-        self.expr_tree.column ('ideaDescr' ,minwidth=15,width=80)
-        self.expr_tree.column ('reltypeUID',minwidth=15,width=55)
-        self.expr_tree.column ('reltypeName',minwidth=15,width=200)
-        self.expr_tree.column ('phrasetypeUID',minwidth=15,width=40)
-        self.expr_tree.column ('rhRoleUID' ,minwidth=15,width=55)
-        self.expr_tree.column ('rhRoleName',minwidth=15,width=80)
-        self.expr_tree.column ('rhCard'    ,minwidth=15,width=40)
-        self.expr_tree.column ('rhUID'     ,minwidth=15,width=55)
-        self.expr_tree.column ('rhName'    ,minwidth=15,width=150)
-        self.expr_tree.column ('partDef'   ,minwidth=15,width=5)
-        self.expr_tree.column ('fullDef'   ,minwidth=15,width=120)
-        self.expr_tree.column ('uomUID'    ,minwidth=15,width=55)
-        self.expr_tree.column ('uomName'   ,minwidth=15,width=60)
-        self.expr_tree.column ('accUID'    ,minwidth=15,width=55)
-        self.expr_tree.column ('accName'   ,minwidth=15,width=80)
-        self.expr_tree.column ('pickUID'   ,minwidth=15,width=55)
-        self.expr_tree.column ('pickName'  ,minwidth=15,width=80)
-        self.expr_tree.column ('remarks'   ,minwidth=15,width=100)
-        self.expr_tree.column ('status'    ,minwidth=15,width=120)
+        self.expr_tree.column ('#0', minwidth=10, width=20)
+        self.expr_tree.column ('seq', minwidth=10, width=20)
+        self.expr_tree.column ('langUID', minwidth=20, width=55)
+        self.expr_tree.column ('langName', minwidth=15, width=80)
+        self.expr_tree.column ('commUID', minwidth=15, width=55)
+        self.expr_tree.column ('commName', minwidth=15, width=80)
+        self.expr_tree.column ('reality', minwidth=15, width=40)
+        self.expr_tree.column ('intentUID', minwidth=15, width=55)
+        self.expr_tree.column ('intentName', minwidth=15, width=80)
+        self.expr_tree.column ('lhCard', minwidth=15, width=40)
+        self.expr_tree.column ('lhUID', minwidth=15, width=55)
+        self.expr_tree.column ('lhName', minwidth=15, width=150)
+        self.expr_tree.column ('lhRoleUID', minwidth=15, width=55)
+        self.expr_tree.column ('lhRoleName', minwidth=15, width=80)
+        self.expr_tree.column ('validUID', minwidth=15, width=55)
+        self.expr_tree.column ('validName', minwidth=15, width=80)
+        self.expr_tree.column ('ideaUID', minwidth=15, width=55)
+        self.expr_tree.column ('ideaDescr', minwidth=15, width=80)
+        self.expr_tree.column ('reltypeUID', minwidth=15, width=55)
+        self.expr_tree.column ('reltypeName', minwidth=15, width=200)
+        self.expr_tree.column ('phrasetypeUID', minwidth=15, width=40)
+        self.expr_tree.column ('rhRoleUID', minwidth=15, width=55)
+        self.expr_tree.column ('rhRoleName', minwidth=15, width=80)
+        self.expr_tree.column ('rhCard', minwidth=15, width=40)
+        self.expr_tree.column ('rhUID', minwidth=15, width=55)
+        self.expr_tree.column ('rhName', minwidth=15, width=150)
+        self.expr_tree.column ('partDef', minwidth=15, width=5)
+        self.expr_tree.column ('fullDef', minwidth=15, width=120)
+        self.expr_tree.column ('uomUID', minwidth=15, width=55)
+        self.expr_tree.column ('uomName', minwidth=15, width=60)
+        self.expr_tree.column ('accUID', minwidth=15, width=55)
+        self.expr_tree.column ('accName', minwidth=15, width=80)
+        self.expr_tree.column ('pickUID', minwidth=15, width=55)
+        self.expr_tree.column ('pickName', minwidth=15, width=80)
+        self.expr_tree.column ('remarks', minwidth=15, width=100)
+        self.expr_tree.column ('status', minwidth=15, width=120)
 
-        exprScrollV = Scrollbar(self.expr_frame, orient=VERTICAL  , command=self.expr_tree.yview)
+        exprScrollV = Scrollbar(self.expr_frame, orient=VERTICAL, command=self.expr_tree.yview)
         exprScrollV.grid      (column=0, row=1, sticky=NS+E, rowspan=3)
         exprScrollH = Scrollbar(self.expr_frame, orient=HORIZONTAL, command=self.expr_tree.xview)
         exprScrollH.grid      (column=0, row=3, sticky=S+EW)
@@ -2746,9 +2745,9 @@ class Display_views():
 
         self.expr_tree.config(yscrollcommand=exprScrollV.set)
         self.expr_tree.config(xscrollcommand=exprScrollH.set)
-        self.expr_tree.tag_configure('val_tag'  ,background='#cfc')
+        self.expr_tree.tag_configure('val_tag', background='#cfc')
 
-        self.expr_tree.columnconfigure(0,weight=1)
+        self.expr_tree.columnconfigure(0, weight=1)
 
         self.expr_tree.bind(sequence='<Double-1>', func=self.Expr_detail_view)
 
@@ -2759,8 +2758,8 @@ class Display_views():
 
         date = time.strftime("%x")
         # Create 3 header records of file
-        header1 = ['Gellish', 'Nederlands', 'Version', '9.0', date, 'Query results',\
-                   'Query results about '+self.object_in_focus.name,'','','','','']
+        header1 = ['Gellish', 'Nederlands', 'Version', '9.0', date, 'Query results',
+                   'Query results about '+self.object_in_focus.name, '', '', '', '', '']
         # header2 = expr_col_ids from initial settings
         # header3 is taken from Expr_Table_Def
 
@@ -2769,23 +2768,23 @@ class Display_views():
         #       to avoid interpretation as a Unicode string (and thus giving an error)
         # ini_out_path from bootstrapping
         ini_file_name = 'QueryResults.csv'
-        outputFile = filedialog.asksaveasfilename(filetypes  = (("CSV files","*.csv"),\
-                                                               ("All files","*.*")),\
-                                                  title      = "Enter a file name",\
-                                                  initialdir = ini_out_path,\
-                                                  initialfile= ini_file_name,\
-                                                  parent     = self.expr_frame)
+        outputFile = filedialog.asksaveasfilename(filetypes = (("CSV files","*.csv"),
+                                                               ("All files","*.*")),
+                                                  title = "Enter a file name",
+                                                  initialdir = ini_out_path,
+                                                  initialfile= ini_file_name,
+                                                  parent = self.expr_frame)
         if outputFile == '':
             outputFile = ini_file_name
             self.Display_message(
                 'File name for saving is blank or file selection is cancelled. '
-                'If generated, the file is saved under the name <{}>'.\
-                format(outputFile), \
+                'If generated, the file is saved under the name <{}>'.
+                format(outputFile),
                 'De filenaam voor opslaan is blanco of the file opslag is gecancelled. '
-                'Indien de file is gemaakt, dan is hij opgeslagen met de naam <{}>'.\
+                'Indien de file is gemaakt, dan is hij opgeslagen met de naam <{}>'.
                 format(outputFile))
 
-        queryFile  = open(outputFile,mode='w',newline='')
+        queryFile = open(outputFile,mode='w',newline='')
         fileWriter = csv.writer(queryFile,dialect='excel',delimiter=';')
 
         # Save the expr_table results in a CSV file, including three header lines
@@ -2825,70 +2824,70 @@ class Display_views():
     def Define_kind_model_sheet(self):
         ''' Kind_model View tab sheet for a kind in Notebook'''
         self.kind_frame = Frame(self.views_noteb)
-        self.kind_frame.grid (column=0, row=0,sticky=NSEW) #pack(fill=BOTH, expand=1)
-        self.kind_frame.columnconfigure(0,weight=1)
-        self.kind_frame.rowconfigure(0,weight=1)
-        self.kind_frame.rowconfigure(1,weight=1)
+        self.kind_frame.grid (column=0, row=0, sticky=NSEW) #pack(fill=BOTH, expand=1)
+        self.kind_frame.columnconfigure(0, weight=1)
+        self.kind_frame.rowconfigure(0, weight=1)
+        self.kind_frame.rowconfigure(1, weight=1)
 
-        comp = ['Model of a kind','Model van een soort']
-        self.views_noteb.add(self.kind_frame, text=comp[self.GUI_lang_index],sticky=NSEW)
-        self.views_noteb.insert("end",self.kind_frame,sticky=NSEW)
+        comp = ['Model of a kind', 'Model van een soort']
+        self.views_noteb.add(self.kind_frame, text=comp[self.GUI_lang_index], sticky=NSEW)
+        self.views_noteb.insert("end",self.kind_frame, sticky=NSEW)
 
-        structure = ['Tree structure','Boomstructuur']
+        structure = ['Tree structure', 'Boomstructuur']
 
         kind_label = Label(self.kind_frame, text=structure[self.GUI_lang_index],justify='left')
-        heads = ['uid_1','uid_2','uid-3','inFocus','Level1','Level2','Level3','kind',\
-                'aspect','kAspect','>=<','value', 'UoM','status']
+        heads = ['uid_1', 'uid_2', 'uid-3', 'inFocus', 'Level1', 'Level2', 'Level3', 'kind',
+                'aspect', 'kAspect', '>=<', 'value', 'UoM', 'status']
         display_heads = heads[3:]
-        self.kind_tree = Treeview(self.kind_frame,columns=(heads), displaycolumns=display_heads,\
+        self.kind_tree = Treeview(self.kind_frame,columns=(heads), displaycolumns=display_heads,
                                   selectmode='browse', height=30, padding=2)
-        self.kind_treeHead = [('LineNr' ,'Object','','' ,'Kind' ,'Aspect','Kind of aspect',\
-                               '>=<','Value' ,'UoM'    ,'Status'),\
-                              ('RegelNr','Object','','','Soort','Aspect','Soort aspect'  ,\
-                               '>=<','Waarde','Eenheid','Status')]
+        self.kind_treeHead = [('LineNr', 'Object', '', '', 'Kind', 'Aspect', 'Kind of aspect',
+                               '>=<', 'Value', 'UoM', 'Status'),
+                              ('RegelNr', 'Object', '', '', 'Soort', 'Aspect', 'Soort aspect',
+                               '>=<', 'Waarde', 'Eenheid', 'Status')]
         col = -1
         for head_field in display_heads:
             col += + 1
-            self.kind_tree.heading(head_field ,text=self.kind_treeHead[self.GUI_lang_index][col],\
+            self.kind_tree.heading(head_field, text=self.kind_treeHead[self.GUI_lang_index][col],
                                    anchor=W)
 
-        self.kind_tree.column ('#0'      ,minwidth=40,width=50)
-        self.kind_tree.column ('inFocus' ,minwidth=10,width=10)
-        self.kind_tree.column ('Level1'  ,minwidth=20,width=100)
-        self.kind_tree.column ('Level2'  ,minwidth=20,width=50)
-        self.kind_tree.column ('Level3'  ,minwidth=20,width=50)
-        self.kind_tree.column ('kind'    ,minwidth=20,width=100)
-        self.kind_tree.column ('aspect'  ,minwidth=20,width=100)
-        self.kind_tree.column ('kAspect' ,minwidth=20,width=100)
-        self.kind_tree.column ('>=<'     ,minwidth=20,width=20)
-        self.kind_tree.column ('value'   ,minwidth=20,width=100)
-        self.kind_tree.column ('UoM'     ,minwidth=20,width=50)
-        self.kind_tree.column ('status'  ,minwidth=20,width=80)
+        self.kind_tree.column ('#0', minwidth=40, width=50)
+        self.kind_tree.column ('inFocus', minwidth=10, width=10)
+        self.kind_tree.column ('Level1', minwidth=20, width=100)
+        self.kind_tree.column ('Level2', minwidth=20, width=50)
+        self.kind_tree.column ('Level3', minwidth=20, width=50)
+        self.kind_tree.column ('kind', minwidth=20, width=100)
+        self.kind_tree.column ('aspect', minwidth=20, width=100)
+        self.kind_tree.column ('kAspect', minwidth=20, width=100)
+        self.kind_tree.column ('>=<', minwidth=20, width=20)
+        self.kind_tree.column ('value', minwidth=20, width=100)
+        self.kind_tree.column ('UoM', minwidth=20, width=50)
+        self.kind_tree.column ('status', minwidth=20, width=80)
 
-        #self.kind_frame.grid  (column=0, row=3,sticky=EW)
-        kind_label.grid       (column=0, row=0,sticky=EW)
-        self.kind_tree.grid(column=0, row=1,sticky=NSEW)
-        #self.kind_tree.grid(column=0, row=2,sticky=NSEW)
+        #self.kind_frame.grid  (column=0, row=3, sticky=EW)
+        kind_label.grid       (column=0, row=0, sticky=EW)
+        self.kind_tree.grid(column=0, row=1, sticky=NSEW)
+        #self.kind_tree.grid(column=0, row=2, sticky=NSEW)
 
-        self.kind_tree.columnconfigure(0,weight=1)
-        self.kind_tree.columnconfigure(1,weight=1)
-        self.kind_tree.columnconfigure(2,weight=1)
-        self.kind_tree.columnconfigure(3,weight=1)
-        self.kind_tree.columnconfigure(4,weight=1)
-        self.kind_tree.columnconfigure(5,weight=1)
-        self.kind_tree.columnconfigure(6,weight=1)
-        self.kind_tree.columnconfigure(7,weight=1)
-        self.kind_tree.columnconfigure(8,weight=1)
-        self.kind_tree.columnconfigure(9,weight=1)
-        self.kind_tree.columnconfigure(10,weight=1)
-        self.kind_tree.columnconfigure(11,weight=1)
+        self.kind_tree.columnconfigure(0, weight=1)
+        self.kind_tree.columnconfigure(1, weight=1)
+        self.kind_tree.columnconfigure(2, weight=1)
+        self.kind_tree.columnconfigure(3, weight=1)
+        self.kind_tree.columnconfigure(4, weight=1)
+        self.kind_tree.columnconfigure(5, weight=1)
+        self.kind_tree.columnconfigure(6, weight=1)
+        self.kind_tree.columnconfigure(7, weight=1)
+        self.kind_tree.columnconfigure(8, weight=1)
+        self.kind_tree.columnconfigure(9, weight=1)
+        self.kind_tree.columnconfigure(10, weight=1)
+        self.kind_tree.columnconfigure(11, weight=1)
 
-        self.kind_tree.columnconfigure(0,weight=1)
-        self.kind_tree.rowconfigure(0,weight=1)
-        self.kind_tree.rowconfigure(1,weight=1)
+        self.kind_tree.columnconfigure(0, weight=1)
+        self.kind_tree.rowconfigure(0, weight=1)
+        self.kind_tree.rowconfigure(1, weight=1)
 
-        kind_scroll = Scrollbar(self.kind_frame,orient=VERTICAL,command=self.kind_tree.yview)
-        kind_scroll.grid (column=0,row=1,sticky=NS+E)
+        kind_scroll = Scrollbar(self.kind_frame, orient=VERTICAL, command=self.kind_tree.yview)
+        kind_scroll.grid (column=0, row=1, sticky=NS+E)
         self.kind_tree.config(yscrollcommand=kind_scroll.set)
 
         self.kind_tree.tag_configure('focus_tag', background='#9f9') # hell green
@@ -2906,8 +2905,8 @@ class Display_views():
             self.kind_tree.insert('',index=0,iid='UIDInFocus',values=[nameInFocus,kindDat],
             tags='focus_tag',open=True)
         '''
-        unknownVal   = ['unknown value','onbekende waarde']
-        unknownKind  = ['unknown kind' ,'onbekende soort']
+        unknownVal = ['unknown value', 'onbekende waarde']
+        unknownKind = ['unknown kind', 'onbekende soort']
         level0Part = ''
         level1Part = ''
         level2Part = ''
@@ -2915,7 +2914,7 @@ class Display_views():
         for kindLine in self.kind_model:
             head = False
             head_line = []
-            #print('kindLine:',kindLine)
+            # Debug print('kindLine:',kindLine)
             # If line_type == 1 then prepare header line for level 0 object
             # Note: line_type == 2 is skipped in this view
             if kindLine[3] == 1:
@@ -2925,7 +2924,7 @@ class Display_views():
                 head_line.append('')
                 head_line.append(kindLine[9])
                 nameInFocus = head_line[4]
-                level0Part = self.kind_tree.insert('', index='end', values=head_line,\
+                level0Part = self.kind_tree.insert('', index='end', values=head_line,
                                                    tags='focus_tag', open=True)
                 previusPart = level0Part
             # In kind_treeview line_type 2 to 3 (indicated in kindLine[3])
@@ -2959,8 +2958,8 @@ class Display_views():
                 if kindLine[7] in unknownVal:
                     value_tags[7] = 'missing'
                 # Insert line
-                #print('Value tags:', value_tags)
-                id = self.kind_tree.insert(level0Part, index='end', values=kindLine,\
+                # Debug print('Value tags:', value_tags)
+                id = self.kind_tree.insert(level0Part, index='end', values=kindLine,
                                            tags=value_tags, open=True)
 
                 # If the line is a header line, then continue to next line
@@ -2982,66 +2981,66 @@ class Display_views():
             Preceded by a frame with a number of buttons corresponding with binds
         '''
         self.prod_frame = Frame(self.views_noteb)
-        self.prod_frame.grid (column=0, row=0,sticky=NSEW, columnspan=6, rowspan=4)
-        self.prod_frame.columnconfigure(0,weight=1)
-        self.prod_frame.rowconfigure(0,weight=0)
-        self.prod_frame.rowconfigure(1,weight=0)
+        self.prod_frame.grid (column=0, row=0, sticky=NSEW, columnspan=6, rowspan=4)
+        self.prod_frame.columnconfigure(0, weight=1)
+        self.prod_frame.rowconfigure(0, weight=0)
+        self.prod_frame.rowconfigure(1, weight=0)
 
-        prod_text = ['Product model','Productmodel']
-        self.views_noteb.add(self.prod_frame, text=prod_text[self.GUI_lang_index],sticky=NSEW)
-        self.views_noteb.insert("end",self.prod_frame,sticky=NSEW)
+        prod_text = ['Product model', 'Productmodel']
+        self.views_noteb.add(self.prod_frame, text=prod_text[self.GUI_lang_index], sticky=NSEW)
+        self.views_noteb.insert("end",self.prod_frame, sticky=NSEW)
 
-        heads = ['uid_1','uid_2','uid-3','inFocus','Level1','Level2','Level3','kind',\
-                'aspect','kAspect','>=<','value', 'UoM','status']
+        heads = ['uid_1', 'uid_2', 'uid-3', 'inFocus', 'Level1', 'Level2', 'Level3', 'kind',
+                 'aspect', 'kAspect', '>=<', 'value', 'UoM', 'status']
         display_heads = heads[5:]
-        self.prod_tree = Treeview(self.prod_frame,columns=(heads), displaycolumns=display_heads, \
+        self.prod_tree = Treeview(self.prod_frame,columns=(heads), displaycolumns=display_heads,
                                   selectmode='browse', height=30, padding=2)
 
         self.prod_tree.grid(column=0, row=1, columnspan=6, sticky=NSEW)
 
-        self.prod_treeHead = [('','' ,'Kind' ,'Aspect','Kind of aspect',\
-                               '>=<','Value' ,'UoM'    ,'Status'),\
-                              ('','','Soort','Aspect','Soort aspect'  ,\
-                               '>=<','Waarde','Eenheid','Status')]
-        self.prod_tree.heading('#0' ,text='Object', anchor=W)
+        self.prod_treeHead = [('', '', 'Kind', 'Aspect', 'Kind of aspect',
+                               '>=<', 'Value', 'UoM', 'Status'),
+                              ('', '', 'Soort', 'Aspect', 'Soort aspect',
+                               '>=<', 'Waarde', 'Eenheid', 'Status')]
+        self.prod_tree.heading('#0', text='Object', anchor=W)
         col = -1
         for head_field in display_heads:
             col += + 1
-            self.prod_tree.heading(head_field ,text=self.prod_treeHead[self.GUI_lang_index][col],\
+            self.prod_tree.heading(head_field, text=self.prod_treeHead[self.GUI_lang_index][col],
                                    anchor=W)
 
-        self.prod_tree.column ('#0'      ,minwidth=40,width=100)
-        #self.prod_tree.column ('inFocus' ,minwidth=10,width=10)
-        self.prod_tree.column ('Level1'  ,minwidth=20,width=100)
-        self.prod_tree.column ('Level2'  ,minwidth=20,width=50)
-        self.prod_tree.column ('Level3'  ,minwidth=20,width=50)
-        self.prod_tree.column ('kind'    ,minwidth=20,width=100)
-        self.prod_tree.column ('aspect'  ,minwidth=20,width=100)
-        self.prod_tree.column ('kAspect' ,minwidth=20,width=100)
-        self.prod_tree.column ('>=<'     ,minwidth=20,width=20)
-        self.prod_tree.column ('value'   ,minwidth=20,width=100)
-        self.prod_tree.column ('UoM'     ,minwidth=20,width=50)
-        self.prod_tree.column ('status'  ,minwidth=20,width=80)
+        self.prod_tree.column ('#0', minwidth=40, width=100)
+        #self.prod_tree.column ('inFocus', minwidth=10, width=10)
+        self.prod_tree.column ('Level1', minwidth=20, width=100)
+        self.prod_tree.column ('Level2', minwidth=20, width=50)
+        self.prod_tree.column ('Level3', minwidth=20, width=50)
+        self.prod_tree.column ('kind', minwidth=20, width=100)
+        self.prod_tree.column ('aspect', minwidth=20, width=100)
+        self.prod_tree.column ('kAspect', minwidth=20, width=100)
+        self.prod_tree.column ('>=<', minwidth=20, width=20)
+        self.prod_tree.column ('value', minwidth=20, width=100)
+        self.prod_tree.column ('UoM', minwidth=20, width=50)
+        self.prod_tree.column ('status', minwidth=20, width=80)
 
-        self.prod_tree.columnconfigure(0,weight=1)
-        self.prod_tree.columnconfigure(1,weight=1)
-        self.prod_tree.columnconfigure(2,weight=1)
-        self.prod_tree.columnconfigure(3,weight=1)
-        self.prod_tree.columnconfigure(4,weight=1)
-        self.prod_tree.columnconfigure(5,weight=1)
-        self.prod_tree.columnconfigure(6,weight=1)
-        self.prod_tree.columnconfigure(7,weight=1)
-        self.prod_tree.columnconfigure(8,weight=1)
-        self.prod_tree.columnconfigure(9,weight=1)
-        self.prod_tree.columnconfigure(10,weight=1)
-        self.prod_tree.columnconfigure(11,weight=1)
+        self.prod_tree.columnconfigure(0, weight=1)
+        self.prod_tree.columnconfigure(1, weight=1)
+        self.prod_tree.columnconfigure(2, weight=1)
+        self.prod_tree.columnconfigure(3, weight=1)
+        self.prod_tree.columnconfigure(4, weight=1)
+        self.prod_tree.columnconfigure(5, weight=1)
+        self.prod_tree.columnconfigure(6, weight=1)
+        self.prod_tree.columnconfigure(7, weight=1)
+        self.prod_tree.columnconfigure(8, weight=1)
+        self.prod_tree.columnconfigure(9, weight=1)
+        self.prod_tree.columnconfigure(10, weight=1)
+        self.prod_tree.columnconfigure(11, weight=1)
 
-        self.prod_tree.columnconfigure(0,weight=1)
-        self.prod_tree.rowconfigure(0,weight=1)
-        self.prod_tree.rowconfigure(1,weight=1)
+        self.prod_tree.columnconfigure(0, weight=1)
+        self.prod_tree.rowconfigure(0, weight=1)
+        self.prod_tree.rowconfigure(1, weight=1)
 
-        prod_scroll = Scrollbar(self.prod_frame,orient=VERTICAL,command=self.prod_tree.yview)
-        prod_scroll.grid (column=5,row=1,sticky=NS+E)
+        prod_scroll = Scrollbar(self.prod_frame, orient=VERTICAL, command=self.prod_tree.yview)
+        prod_scroll.grid (column=5, row=1, sticky=NS+E)
         self.prod_tree.config(yscrollcommand=prod_scroll.set)
 
         self.prod_tree.tag_configure('focus_tag', background='#9f9') # hell green
@@ -3053,16 +3052,16 @@ class Display_views():
         self.prod_tree.bind(sequence='<Double-1>', func=self.Prod_detail_view_left)
         self.prod_tree.bind(sequence='<Button-2>', func=self.Prod_detail_view_middle)
         self.prod_tree.bind(sequence='<Button-3>', func=self.Prod_detail_view_right)
-        self.prod_tree.bind(sequence='c'         , func=self.Prod_detail_view_middle)
+        self.prod_tree.bind(sequence='c', func=self.Prod_detail_view_middle)
 
     def Display_product_model_view(self):
         ''' Product Model view: Display prod_model in self.prod_tree:
             self.prod_tree.insert('',index=0,iid='UIDInFocus',values=[nameInFocus,kindDat],
             tags='focus_tag',open=True)
         '''
-        unknownVal   = ['unknown value','onbekende waarde']
-        unknownKind  = ['unknown kind' ,'onbekende soort']
-        further_part = ['Further part' ,'Verder deel']
+        unknownVal = ['unknown value', 'onbekende waarde']
+        unknownKind = ['unknown kind', 'onbekende soort']
+        further_part = ['Further part', 'Verder deel']
         kind_of_part = ['Kind of part', 'Soort deel']
         possible_roles = False # No roles expected
         level0Part = ''
@@ -3073,7 +3072,7 @@ class Display_views():
             prod_line = prod_line_0[:]
             head = False
             head_line = []
-            #print('Prod_line:',prod_line)
+            # Debug print('Prod_line:',prod_line)
             # If line_type (prod_line[3]) == 1
             # then prepare header line from prod_line for level 0 object
             # Note: line_type == 2 and 3 are skipped in this view
@@ -3084,7 +3083,7 @@ class Display_views():
                 head_line.append('')
                 head_line.append(prod_line[9])
                 nameInFocus = head_line[4]
-                #print('Head_line:',head_line)
+                # Debug print('Head_line:',head_line)
                 level0Part = self.prod_tree.insert('', index='end', values=head_line,
                                                    text=nameInFocus, tags='focus_tag', open=True)
                 previusPart = level0Part
@@ -3094,7 +3093,7 @@ class Display_views():
             if prod_line[3] == 4:
                 #nameInFocus = prod_line[5]
                 prod_name = prod_line[4]
-                level0Part = self.prod_tree.insert('', index='end', values=prod_line,\
+                level0Part = self.prod_tree.insert('', index='end', values=prod_line,
                                                    text=prod_name, tags='focus_tag',open=True)
                 previusPart = level0Part
 
@@ -3149,8 +3148,8 @@ class Display_views():
                     prod_name = ''
 
                 # Insert line
-                #print('Values:', prod_line[1], type(prod_line[1]))
-                id = self.prod_tree.insert(previusPart, index='end', values=prod_line,\
+                # Debug print('Values:', prod_line[1], type(prod_line[1]))
+                id = self.prod_tree.insert(previusPart, index='end', values=prod_line,
                                            text=prod_name, tags=value_tags, open=True)
 
                 # If the line is a header line, then continue to next line
@@ -3171,46 +3170,46 @@ class Display_views():
         # Define ProductView tab in Notebook = = = = = = = = = = = = = = = = = = =
         # Product_sheet is canvas for scrollbar
         self.data_sheet = Frame(self.views_noteb)
-        self.data_sheet.grid (column=0, row=0,sticky=NSEW) #pack(fill=BOTH, expand=1)
-        self.data_sheet.columnconfigure(0,weight=1)
-        self.data_sheet.rowconfigure(0,weight=0)
-        #self.data_sheet.rowconfigure(1,weight=0)
+        self.data_sheet.grid (column=0, row=0, sticky=NSEW) #pack(fill=BOTH, expand=1)
+        self.data_sheet.columnconfigure(0, weight=1)
+        self.data_sheet.rowconfigure(0, weight=0)
+        #self.data_sheet.rowconfigure(1, weight=0)
         prodText = ['Data sheet', 'Data sheet']
         self.views_noteb.add(self.data_sheet, text=prodText[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end",self.data_sheet,sticky=NSEW)
+        self.views_noteb.insert("end",self.data_sheet, sticky=NSEW)
 
         data_canvas = Canvas(self.data_sheet, background='#ddf')
         #data_canvas.pack()
-        data_canvas.grid(column=0,row=0,sticky=NSEW)
+        data_canvas.grid(column=0, row=0, sticky=NSEW)
         #data_canvas.bind('<Button-2>', RightMouseButton)
-        data_canvas.columnconfigure(0,weight=1)
-        data_canvas.rowconfigure(0,weight=0)
+        data_canvas.columnconfigure(0, weight=1)
+        data_canvas.rowconfigure(0, weight=0)
 
         self.data_frame = Frame(data_canvas)
-        self.data_frame.grid(column=0,row=0,sticky=NSEW)
+        self.data_frame.grid(column=0, row=0, sticky=NSEW)
 
-        self.data_frame.columnconfigure(0,weight=1)
-        self.data_frame.columnconfigure(1,weight=1)
-        self.data_frame.columnconfigure(2,weight=1)
-        self.data_frame.columnconfigure(3,weight=1)
-        self.data_frame.columnconfigure(4,weight=1)
-        self.data_frame.columnconfigure(5,weight=1)
-        self.data_frame.columnconfigure(6,weight=1)
-        self.data_frame.columnconfigure(7,weight=1)
-        self.data_frame.columnconfigure(8,weight=1)
-        self.data_frame.columnconfigure(9,weight=1)
-        self.data_frame.columnconfigure(10,weight=1)
-        self.data_frame.rowconfigure(0,weight=0)
-        self.data_frame.rowconfigure(1,weight=0)
+        self.data_frame.columnconfigure(0, weight=1)
+        self.data_frame.columnconfigure(1, weight=1)
+        self.data_frame.columnconfigure(2, weight=1)
+        self.data_frame.columnconfigure(3, weight=1)
+        self.data_frame.columnconfigure(4, weight=1)
+        self.data_frame.columnconfigure(5, weight=1)
+        self.data_frame.columnconfigure(6, weight=1)
+        self.data_frame.columnconfigure(7, weight=1)
+        self.data_frame.columnconfigure(8, weight=1)
+        self.data_frame.columnconfigure(9, weight=1)
+        self.data_frame.columnconfigure(10, weight=1)
+        self.data_frame.rowconfigure(0, weight=0)
+        self.data_frame.rowconfigure(1, weight=0)
 
-        data_scroll = Scrollbar(self.data_sheet,orient=VERTICAL,command=data_canvas.yview)
+        data_scroll = Scrollbar(self.data_sheet, orient=VERTICAL, command=data_canvas.yview)
         data_scroll.grid(column=0, row=0, sticky=NS+E)
         data_canvas.config(yscrollcommand=data_scroll.set)
 
     def Display_data_sheet_view(self):
         ''' Produce a view of a product model in the form of a datasheet'''
-        unknownVal   = ['unknown value','onbekende waarde']
-        unknownKind  = ['unknown kind' ,'onbekende soort', 'anything', 'iets']
+        unknownVal = ['unknown value', 'onbekende waarde']
+        unknownKind = ['unknown kind', 'onbekende soort', 'anything', 'iets']
 
         # Set column widths in data sheet
         col_width = [4,20,10,10,20,15,20,4,10,5,10]
@@ -3218,12 +3217,12 @@ class Display_views():
         for prod_row in self.prod_model:
             line = prod_row[3:]
             line_nr += + 1
-            column_nr  = -1
+            column_nr = -1
             head = False
             header1 = False
             header2 = False
             header3 = False
-            body    = False
+            body = False
             back = 'white'
             fore = 'black'
             for field_value in line:
@@ -3243,7 +3242,7 @@ class Display_views():
                 # Display on line 1 the line nr, 'Product form' label and the 'kind' label
                 if header1 == True and column_nr in [0, 1, 5]:
                     back = '#dfb' # light green
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width, \
+                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
                                    justify='left', background=back, foreground=fore)\
                                    .grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
 
@@ -3251,7 +3250,7 @@ class Display_views():
                 if header1 == True and column_nr in [2, 6]:
                     back = 'white'
                     fore = 'black'
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width, \
+                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
                                    background=back, foreground=fore, borderwidth=0)\
                                    .grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
 
@@ -3264,16 +3263,16 @@ class Display_views():
                     span = 8
                     back = 'white'
                     fore = 'black'
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width, \
+                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
                                    justify='left', background=back, foreground=fore)\
-                                   .grid(row=line_nr, column=column_nr, columnspan=span, \
+                                   .grid(row=line_nr, column=column_nr, columnspan=span,
                                          rowspan=2, sticky=EW)
                 # Display on line 2 the description label
                 if header2 == True and column_nr in range(0,3):
                     back = '#dfb'
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width, \
+                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
                                    justify='left', background=back, foreground=fore)\
-                                   .grid(row=line_nr, column=column_nr, columnspan=span, \
+                                   .grid(row=line_nr, column=column_nr, columnspan=span,
                                          rowspan=2, sticky=EW)
 
                 # Detect start of header line 3:
@@ -3285,9 +3284,9 @@ class Display_views():
                 # Display the line 3 subsequent values
                 if header3 == True:
                     back = '#dfb'
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width, \
+                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
                                    justify="center", background=back, foreground=fore)\
-                                   .grid(row=line_nr, column=column_nr, columnspan=span, \
+                                   .grid(row=line_nr, column=column_nr, columnspan=span,
                                          sticky=EW)
 
                 # Detect start of body values: Value >3 in column 0 means body of values
@@ -3315,65 +3314,65 @@ class Display_views():
                         field_value = unknownKind[self.GUI_lang_index]
                         back = '#fcc'
                     # Display subsequent body values
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width, \
-                                   background=back, foreground=fore,\
+                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
+                                   background=back, foreground=fore,
                                    wraplength=200, borderwidth=0, relief='ridge')\
-                                   .grid(row=line_nr, column=column_nr, columnspan=span, \
+                                   .grid(row=line_nr, column=column_nr, columnspan=span,
                                          sticky=EW)
 
     def Define_activity_sheet(self):
-        activity = ['Activities','Activiteiten']
+        activity = ['Activities', 'Activiteiten']
         self.act_frame = Frame(self.views_noteb)
-        self.act_frame.grid (column=0, row=0,sticky=NSEW) #pack(fill=BOTH, expand=1)
-        self.act_frame.columnconfigure(0,weight=1)
-        self.act_frame.rowconfigure(0,weight=0)
-        self.act_frame.rowconfigure(1,weight=0)
+        self.act_frame.grid (column=0, row=0, sticky=NSEW) #pack(fill=BOTH, expand=1)
+        self.act_frame.columnconfigure(0, weight=1)
+        self.act_frame.rowconfigure(0, weight=0)
+        self.act_frame.rowconfigure(1, weight=0)
         self.views_noteb.add(self.act_frame, text=activity[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end",self.act_frame,sticky=NSEW)
+        self.views_noteb.insert("end",self.act_frame, sticky=NSEW)
 
-        headings = ['OccUID', 'OccName' , 'WholeOccName', 'InvolvUID', 'KindOccUID',
-                    'OccName','PartName', 'Involved'    , 'Kind'     , 'Role']
+        headings = ['OccUID', 'OccName', 'WholeOccName', 'InvolvUID', 'KindOccUID',
+                    'OccName', 'PartName', 'Involved', 'Kind', 'Role']
         display_cols = headings[7:]
-        self.act_tree = Treeview(self.act_frame, columns=(headings),\
-                               displaycolumns=display_cols,
-                               selectmode='browse',height=30)
+        self.act_tree = Treeview(self.act_frame, columns=(headings),
+                                 displaycolumns=display_cols,
+                                 selectmode='browse', height=30)
 
-        occText  = ['Occurrence'     ,'Gebeurtenis']
-        partText = ['Part occurrence','Deelgebeurtenis']
-        strText  = ['Involved object','Betrokken object']
-        kindText = ['Kind'           ,'Soort']
-        roleText = ['Role'           ,'Rol']
-        self.act_tree.heading('#0'      ,text=occText[self.GUI_lang_index] ,anchor=W)
-        self.act_tree.heading('OccName' ,text=occText[self.GUI_lang_index] ,anchor=W)
-        self.act_tree.heading('PartName',text=partText[self.GUI_lang_index],anchor=W)
-        self.act_tree.heading('Involved',text=strText[self.GUI_lang_index] ,anchor=W)
-        self.act_tree.heading('Kind'    ,text=kindText[self.GUI_lang_index],anchor=W)
-        self.act_tree.heading('Role'    ,text=roleText[self.GUI_lang_index],anchor=W)
+        occText = ['Occurrence', 'Gebeurtenis']
+        partText = ['Part occurrence', 'Deelgebeurtenis']
+        strText = ['Involved object', 'Betrokken object']
+        kindText = ['Kind', 'Soort']
+        roleText = ['Role', 'Rol']
+        self.act_tree.heading('#0', text=occText[self.GUI_lang_index], anchor=W)
+        self.act_tree.heading('OccName', text=occText[self.GUI_lang_index], anchor=W)
+        self.act_tree.heading('PartName', text=partText[self.GUI_lang_index], anchor=W)
+        self.act_tree.heading('Involved', text=strText[self.GUI_lang_index], anchor=W)
+        self.act_tree.heading('Kind', text=kindText[self.GUI_lang_index], anchor=W)
+        self.act_tree.heading('Role', text=roleText[self.GUI_lang_index], anchor=W)
 
-        self.act_tree.column('#0'       ,minwidth=20,width=20)
-        self.act_tree.column('OccName'  ,minwidth=20,width=120)
-        self.act_tree.column('PartName' ,minwidth=20,width=80)
-        self.act_tree.column('Involved' ,minwidth=20,width=80)
-        self.act_tree.column('Kind'     ,minwidth=20,width=60)
-        self.act_tree.column('Role'     ,minwidth=20,width=60)
+        self.act_tree.column('#0', minwidth=20, width=20)
+        self.act_tree.column('OccName', minwidth=20, width=120)
+        self.act_tree.column('PartName', minwidth=20, width=80)
+        self.act_tree.column('Involved', minwidth=20, width=80)
+        self.act_tree.column('Kind', minwidth=20, width=60)
+        self.act_tree.column('Role', minwidth=20, width=60)
 
-        #actLbl.grid (column=0,row=0,sticky=EW)
-        self.act_tree.grid(column=0,row=1,sticky=NSEW)
+        #actLbl.grid (column=0, row=0, sticky=EW)
+        self.act_tree.grid(column=0, row=1, sticky=NSEW)
 
-        self.act_tree.columnconfigure(0,weight=0)
-        self.act_tree.columnconfigure(1,weight=1)
-        self.act_tree.columnconfigure(2,weight=1)
-        self.act_tree.columnconfigure(3,weight=1)
-        self.act_tree.columnconfigure(4,weight=1)
-        self.act_tree.columnconfigure(5,weight=1)
-        self.act_tree.rowconfigure(0,weight=0)
-        self.act_tree.rowconfigure(1,weight=1)
+        self.act_tree.columnconfigure(0, weight=0)
+        self.act_tree.columnconfigure(1, weight=1)
+        self.act_tree.columnconfigure(2, weight=1)
+        self.act_tree.columnconfigure(3, weight=1)
+        self.act_tree.columnconfigure(4, weight=1)
+        self.act_tree.columnconfigure(5, weight=1)
+        self.act_tree.rowconfigure(0, weight=0)
+        self.act_tree.rowconfigure(1, weight=1)
 
         self.act_tree.tag_configure('uom_tag', option=None, background='#ccf')
         self.act_tree.tag_configure('actTag', option=None, background='#dfd')
 
-        actScroll = Scrollbar(self.act_frame,orient=VERTICAL,command=self.act_tree.yview)
-        actScroll.grid (column=0,row=1,sticky=NS+E)
+        actScroll = Scrollbar(self.act_frame, orient=VERTICAL, command=self.act_tree.yview)
+        actScroll.grid (column=0, row=1, sticky=NS+E)
         self.act_tree.config(yscrollcommand=actScroll.set)
 
 
@@ -3386,13 +3385,13 @@ class Display_views():
         if len(self.occ_model) > 0:
             self.top_occurrences = []
             for occ_line in self.occ_model:
-                #print('==OccTree:',occ_line)
+                # Debug print('==OccTree:',occ_line)
                 # If higher part (occ_linen[2]) is blank
                 # then occ_line[0] contains top occ_UID
                 if occ_line[2] == '':
                     top_occ = self.uid_dict[occ_line[0]]
                     self.top_occurrences.append(top_occ)
-                level  = 0
+                level = 0
                 # Display self.act_tree line
                 self.Display_occurrence_tree(occ_line, level) #,wholes
 
@@ -3403,31 +3402,31 @@ class Display_views():
     def Display_occurrence_tree(self, occ_line, level):
         """ Display occurrences compositions with inputs and outputs and roles.
             occ_line = line in occ_model
-            occ_model.append([occ.uid, occ.name, higher.name, involv.uid, \
-                              kind_occ.uid,\
-                              occ.name, part_occ.name, involv.name, \
+            occ_model.append([occ.uid, occ.name, higher.name, involv.uid,
+                              kind_occ.uid,
+                              occ.name, part_occ.name, involv.name,
                               kind_part_occ.name, role_of_involved])
             involv_table: occ, involved, inv_role_kind, inv_kind_name
         """
-        #print('Occ_line:', occ_line)
+        # Debug print('Occ_line:', occ_line)
 
         self.act_tree.tag_configure('occTag', option=None, background='#ddf')
-        self.act_tree.tag_configure('ioTag' , option=None, background='#eef')
+        self.act_tree.tag_configure('ioTag', option=None, background='#eef')
         space = ''
 
         # Display the occurrence
         id = self.act_tree.insert(occ_line[2], index='end', values=(occ_line),
-                                  iid=occ_line[1], text=occ_line[1], tags='occTag' , open=True)
+                                  iid=occ_line[1], text=occ_line[1], tags='occTag', open=True)
 
         # Find and display its inputs and outputs
         # involv_table = occ, involved_obj, inv_role_kind, inv_kind_name
         for io_objects in self.involv_table:
-            io_line = ['','','','','','','', io_objects[1].name, io_objects[3], io_objects[2].name]
-            #print('involv-line:', occ_line[1], io_objects[0].uid, io_objects[1].uid, io_line)
+            io_line = ['', '', '', '', '', '', '', io_objects[1].name, io_objects[3], io_objects[2].name]
+            # Debug print('involv-line:', occ_line[1], io_objects[0].uid, io_objects[1].uid, io_line)
             # If uid of occurrence == uid of object
             # that has inputs or outputs then display io_line
             if occ_line[0] == io_objects[0].uid:
-                self.act_tree.insert(id, index='end', values=(io_line), tags='ioTag' , open=True)
+                self.act_tree.insert(id, index='end', values=(io_line), tags='ioTag', open=True)
         level = 1
 
     def Define_and_display_documents(self):
@@ -3444,46 +3443,46 @@ class Display_views():
             self.doc_tree.insert('',index='end',values=info_line,tags='docTag')
 
     def Define_documents_sheet(self):
-        documents = ['Documents','Documenten']
+        documents = ['Documents', 'Documenten']
         self.doc_frame = Frame(self.views_noteb)
-        self.doc_frame.grid (column=0, row=0,sticky=NSEW) #pack(fill=BOTH, expand=1)
-        self.doc_frame.columnconfigure(0,weight=1)
-        self.doc_frame.rowconfigure(0,weight=0)
+        self.doc_frame.grid (column=0, row=0, sticky=NSEW) #pack(fill=BOTH, expand=1)
+        self.doc_frame.columnconfigure(0, weight=1)
+        self.doc_frame.rowconfigure(0, weight=0)
         self.views_noteb.add(self.doc_frame, text=documents[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end",self.doc_frame,sticky=NSEW)
-        headings = ['info','obj','carrier','directory','infoName','infoKind', 'dirName',\
-                    'objName','fileName','fileKind']
+        self.views_noteb.insert("end",self.doc_frame, sticky=NSEW)
+        headings = ['info', 'obj', 'carrier', 'directory', 'infoName', 'infoKind', 'dirName',
+                    'objName', 'fileName', 'fileKind']
         display_cols = headings[4:]
-        self.doc_tree = Treeview(self.doc_frame, columns=(headings),\
+        self.doc_tree = Treeview(self.doc_frame, columns=(headings),
                                  displaycolumns=display_cols, selectmode='browse', height=30)
-        self.doc_tree.heading('info' ,text='info'    ,anchor=W)
-        self.doc_tree.heading('obj'  ,text='obj'     ,anchor=W)
-        self.doc_tree.heading('carrier'  ,text='carrier'   ,anchor=W)
-        self.doc_tree.heading('directory',text='directory' ,anchor=W)
-        self.doc_tree.heading('infoName' ,text='Document'  ,anchor=W)
-        self.doc_tree.heading('infoKind' ,text='Doc type'  ,anchor=W)
-        self.doc_tree.heading('dirName'  ,text='Directory'  ,anchor=W)
-        self.doc_tree.heading('objName'  ,text='about Object' ,anchor=W)
-        self.doc_tree.heading('fileName' ,text='File name' ,anchor=W)
-        self.doc_tree.heading('fileKind' ,text='File type' ,anchor=W)
+        self.doc_tree.heading('info', text='info', anchor=W)
+        self.doc_tree.heading('obj', text='obj', anchor=W)
+        self.doc_tree.heading('carrier', text='carrier', anchor=W)
+        self.doc_tree.heading('directory', text='directory', anchor=W)
+        self.doc_tree.heading('infoName', text='Document', anchor=W)
+        self.doc_tree.heading('infoKind', text='Doc type', anchor=W)
+        self.doc_tree.heading('dirName', text='Directory', anchor=W)
+        self.doc_tree.heading('objName', text='about Object', anchor=W)
+        self.doc_tree.heading('fileName', text='File name', anchor=W)
+        self.doc_tree.heading('fileKind', text='File type', anchor=W)
 
-        self.doc_tree.column('#0'        ,minwidth=10,width=10)
-        self.doc_tree.column('infoName'  ,minwidth=100,width=150)
-        self.doc_tree.column('infoKind'  ,minwidth=100,width=150)
-        self.doc_tree.column('dirName'   ,minwidth=100,width=150)
-        self.doc_tree.column('objName'   ,minwidth=100,width=150)
-        self.doc_tree.column('fileName'  ,minwidth=100,width=150)
-        self.doc_tree.column('fileKind'  ,minwidth=100,width=150)
+        self.doc_tree.column('#0', minwidth=10, width=10)
+        self.doc_tree.column('infoName', minwidth=100, width=150)
+        self.doc_tree.column('infoKind', minwidth=100, width=150)
+        self.doc_tree.column('dirName', minwidth=100, width=150)
+        self.doc_tree.column('objName', minwidth=100, width=150)
+        self.doc_tree.column('fileName', minwidth=100, width=150)
+        self.doc_tree.column('fileKind', minwidth=100, width=150)
 
-        self.doc_tree.grid(column=0,row=0,sticky=NSEW)
+        self.doc_tree.grid(column=0, row=0, sticky=NSEW)
 
-        self.doc_tree.columnconfigure(0,weight=1)
-        self.doc_tree.rowconfigure(0,weight=0)
+        self.doc_tree.columnconfigure(0, weight=1)
+        self.doc_tree.rowconfigure(0, weight=0)
 
         self.doc_tree.tag_configure('docTag', option=None, background='#cfc')
 
-        docScroll = Scrollbar(self.doc_frame,orient=VERTICAL,command=self.doc_tree.yview)
-        docScroll.grid (column=0,row=0,sticky=NS+E)
+        docScroll = Scrollbar(self.doc_frame, orient=VERTICAL, command=self.doc_tree.yview)
+        docScroll.grid (column=0, row=0, sticky=NS+E)
         self.doc_tree.config(yscrollcommand=docScroll.set)
 
         self.doc_tree.bind(sequence='<Double-1>', func=self.Doc_detail_view)
@@ -3503,8 +3502,8 @@ class Display_views():
             'Display product details of: {}'.format(selected_obj.name),
             'Weergave van productdetails van: {}'.format(selected_obj.name))
 
-        if selected_obj.category in ['kind', 'kind of physical object', \
-                                     'kind of occurrence', 'kind of aspect', \
+        if selected_obj.category in ['kind', 'kind of physical object',
+                                     'kind of occurrence', 'kind of aspect',
                                      'kind of role', 'kind of relation']:
             self.Define_and_display_kind_detail_view(selected_obj)
         else:
@@ -3564,7 +3563,7 @@ class Display_views():
         if len(tree_values) > 0:
             if tree_values[4] == '' or tree_values[4] == 'unknown':
                 self.Display_message(
-                    'Classifying kind of object is unknown.',\
+                    'Classifying kind of object is unknown.',
                     'Classificerende soort object is onbekend.')
             else:
                 kind_uid = str(tree_values[4])
@@ -3586,10 +3585,10 @@ class Display_views():
         self.modified_object = self.uid_dict[to_be_classified_object_uid]
         self.Display_message(
             'Present the taxonomy of the kind <{}> that classifies <{}> '
-            'for selection of a subtype that classifies the object'.\
+            'for selection of a subtype that classifies the object'.
             format(kind.name, self.modified_object.name),
             'Presenteer de taxonomie van de soort <{}> die classificeerder is van <{}> '
-            'voor het selecteren van een subtype die het object classificeert'.\
+            'voor het selecteren van een subtype die het object classificeert'.
             format(kind.name, self.modified_object.name))
 
         # Formulate query_spec including conditions from aspects of individual, if any
@@ -3613,7 +3612,7 @@ class Display_views():
             in the network_model that is displayed in the network_tree view.
         """
         tree_values = self.Determine_network_tree_values()
-        #print('Network object detail view:', cur_item, tree_values)
+        # Debug print('Network object detail view:', cur_item, tree_values)
         if len(tree_values) > 0:
             if sel.num == 1:
                 chosen_object_uid = tree_values[0]
@@ -3631,7 +3630,7 @@ class Display_views():
             tree_values = list(item_dict['values'])
         else:
             self.Display_message(
-                'No item in focus. Fist select a row, then click a button.',\
+                'No item in focus. Fist select a row, then click a button.',
                 'Geen object gevonden. Selecteer eerst een rij, click daarna op een knop.')
         return tree_values
 
@@ -3639,14 +3638,14 @@ class Display_views():
         ''' Determine kind of chosen object and as a consequence models and views
         '''
         description_text = ['description', 'beschrijving']
-        obj_descr_title  = ['Information about ', 'Informatie over ']
+        obj_descr_title = ['Information about ', 'Informatie over ']
 
         if chosen_object_uid != '':
-            selected_obj   = self.uid_dict[str(chosen_object_uid)]
+            selected_obj = self.uid_dict[str(chosen_object_uid)]
 
             # If info_kind is a description then display the destription in messagebox
             if len(tree_values) > 8 and tree_values[8] in description_text:
-                messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name,\
+                messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name,
                                     selected_obj.description)
             else:
                 self.Display_message(
@@ -3665,12 +3664,12 @@ class Display_views():
         """ Find the selected left hand object from a user selection with left button
             in the kind_table that is displayed in the kind_tree view."""
         description_text = ['description', 'beschrijving']
-        obj_descr_title  = ['Information about ', 'Informatie over ']
+        obj_descr_title = ['Information about ', 'Informatie over ']
         cur_item = self.kind_tree.focus()
         item_dict = self.kind_tree.item(cur_item)
         tree_values = list(item_dict['values'])
-        #print('Kind_detail_left:', cur_item, tree_values) #[0], tree_values[1], tree_values[2:]
-        selected_obj   = self.uid_dict[str(tree_values[0])]
+        # Debug print('Kind_detail_left:', cur_item, tree_values) #[0], tree_values[1], tree_values[2:]
+        selected_obj = self.uid_dict[str(tree_values[0])]
 
         # If info_kind is a description then display the destription in messagebox
         if tree_values[7] in description_text:
@@ -3692,11 +3691,11 @@ class Display_views():
         cur_item = self.kind_tree.focus()
         item_dict = self.kind_tree.item(cur_item)
         tree_values = list(item_dict['values'])
-        #print('Comp_detail_middle:', sel.type, sel.keysym, cur_item, tree_values)
+        # Debug print('Comp_detail_middle:', sel.type, sel.keysym, cur_item, tree_values)
 
         if len(tree_values) > 0:
             if tree_values[1] > 0:
-                selected_obj   = self.uid_dict[str(tree_values[1])]
+                selected_obj = self.uid_dict[str(tree_values[1])]
 
                 # Save sel.type being either 'ButtonPress' or 'KeyPress' with sel.keysym = 'c'
                 self.sel_type = sel.type
@@ -3713,11 +3712,11 @@ class Display_views():
                     self.Define_and_display_documents()
             else:
                 self.Display_message(
-                    'The classifying kind of the object is unknown.',\
+                    'The classifying kind of the object is unknown.',
                     'De classificerende soort van het object is onbekend.')
         else:
             self.Display_message(
-                'Select a line before clicking the second mouse button.',\
+                'Select a line before clicking the second mouse button.',
                 'Selecteer een regel voor het clicken van de twee knop op de muis.')
 
 #------------------------------------------------------------------------
@@ -3725,19 +3724,19 @@ class Display_views():
         """ Find the selected kind of aspect or file from a user selection with right button
             in the kind_table that is displayed in the kind_tree view."""
 
-        cur_item  = self.kind_tree.focus()
+        cur_item = self.kind_tree.focus()
         if cur_item == '':
             self.Display_message(
                 'No item is selected. '
                 '\nFirst select a line with a single left mouse button click, '
-                '\nthen click the right mouse button.',\
+                '\nthen click the right mouse button.',
                 'Er is geen object geselecteerd. '
                 '\nSelecteer eerst een regel met een enkele lenker muisclick '
                 '\nclick daarna de rechter muisknop.')
             return
         item_dict = self.kind_tree.item(cur_item)
         tree_values = list(item_dict['values'])
-        #print('Kind_detail_right:',cur_item, tree_values)
+        # Debug print('Kind_detail_right:',cur_item, tree_values)
 
         if len(tree_values) > 8:
             # If tree_values[8] contains a dot (.)
@@ -3747,14 +3746,14 @@ class Display_views():
             if len(parts) == 1:
                 self.Display_message(
                     'The name <{}> does not contain a file extension, although expected. '
-                    'The name is now interpreted as a kind of aspect.'.\
-                    format(tree_values[8]),\
+                    'The name is now interpreted as a kind of aspect.'.
+                    format(tree_values[8]),
                     'De naam <{}> bevat geen file extensie, hoewel dat wel verwacht wordt. '
-                    'Die naam is nu geïnterpreteerd als een soort aspect.'.\
+                    'Die naam is nu geïnterpreteerd als een soort aspect.'.
                     format(tree_values[8]))
                 selected_obj = tree_values[2]
                 self.Display_message(
-                    'Display the aspect details of: {}'.format(selected_obj.name),\
+                    'Display the aspect details of: {}'.format(selected_obj.name),
                     'Weergave van de aspectdetails van: {}'.format(selected_obj.name))
                 # Display taxonomy of selected kind
                 self.Define_and_display_taxonomy_of_kinds()
@@ -3766,7 +3765,7 @@ class Display_views():
                 open_file(normalized_path)
         else:
             self.Display_message(
-                'There is no right hand object found to be displayed.',\
+                'There is no right hand object found to be displayed.',
                 'Er is geen rechter object gevonden om weergegeven te worden.')
 
     def Prod_detail_view_left(self, sel):
@@ -3778,11 +3777,11 @@ class Display_views():
             in the prod_table that is displayed in the prod_tree view.
         """
         description_text = ['description', 'beschrijving']
-        obj_descr_title  = ['Information about ', 'Informatie over ']
+        obj_descr_title = ['Information about ', 'Informatie over ']
         cur_item = self.prod_tree.focus()
         item_dict = self.prod_tree.item(cur_item)
         tree_values = list(item_dict['values'])
-        #print('Prod_detail_left:', cur_item, tree_values)
+        # Debug print('Prod_detail_left:', cur_item, tree_values)
         if len(tree_values) > 0:
             if tree_values[0] != '':
                 selected_obj = self.uid_dict[str(tree_values[0])]
@@ -3790,11 +3789,11 @@ class Display_views():
                 # If info_kind is a description
                 # then display the destription in messagebox
                 if tree_values[7] in description_text:
-                    messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name,\
+                    messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name,
                                         selected_obj.description)
                 else:
                     self.Display_message(
-                        'Display of product details of: {}'.format(selected_obj.name),\
+                        'Display of product details of: {}'.format(selected_obj.name),
                         'Weergave van de productdetails van: {}'.format(selected_obj.name))
                     self.Define_and_display_individual_detail_view(selected_obj)
 
@@ -3816,7 +3815,7 @@ class Display_views():
         cur_item = self.prod_tree.focus()
         item_dict = self.prod_tree.item(cur_item)
         tree_values = list(item_dict['values'])
-        #print('Prod_detail_middle:', sel.type, sel.keysym, cur_item, tree_values, type(tree_values[1]))
+        # Debug print('Prod_detail_middle:', sel.type, sel.keysym, cur_item, tree_values, type(tree_values[1]))
 
         if len(tree_values) > 0:
             kind_uid = str(tree_values[1])
@@ -3825,7 +3824,7 @@ class Display_views():
                 # Verify sel.type being either 'Button-2 Press' for display of taxonomy
                 # or 'KeyPress' with sel.keysym = 'c'
                 # (for display for classification by selection of subtype)
-                #print('sel.type', sel.type, sel.keysym, sel.char)
+                # Debug print('sel.type', sel.type, sel.keysym, sel.char)
                 if sel.keysym == 'c':
                     # Perform a classification process by display the taxonomy of kind
                     # and selection of one of its subtypes
@@ -3833,9 +3832,9 @@ class Display_views():
                 else:
                     # Mouse Button-2 Press: Build views for selected kind and display views
                     self.Display_message(
-                        'Display taxonomy and possibilities of kind: {}'.\
-                        format(selected_obj.name),\
-                        'Weergave van de taxonomie en mogelijkheden van soort: {}'.\
+                        'Display taxonomy and possibilities of kind: {}'.
+                        format(selected_obj.name),
+                        'Weergave van de taxonomie en mogelijkheden van soort: {}'.
                         format(selected_obj.name))
                     obj_list = []
                     obj_list.append(selected_obj)
@@ -3855,7 +3854,7 @@ class Display_views():
             self.Display_message(
                 "Select an item, then click the classification button "
                 "or the second mouse button or press 'c' key "
-                "for classying the object.",\
+                "for classying the object.",
                 "Selecteer een regel, click dan de classifikatieknop "
                 "of click met de tweede muisknop of kies de 'c' toets "
                 "voor het classificeren van het object.")
@@ -3864,18 +3863,18 @@ class Display_views():
         """ Find the selected aspect or file from a user selection with right button
             in the prod_table that is displayed in the prod_tree view."""
 
-        cur_item  = self.prod_tree.focus()
+        cur_item = self.prod_tree.focus()
         if cur_item == '':
             self.Display_message(
                 'No item selected. First select item with single left button click. '
-                'Then click right button.',\
+                'Then click right button.',
                 'Er is geen object deselecteerd. '
                 'Kies eerst een regel met een enkele click van de linkermuisknop. '
                 'Click daarna met de rechtermuisknop.')
             return
         item_dict = self.prod_tree.item(cur_item)
         tree_values = list(item_dict['values'])
-        #print('Prod_detail_right:',cur_item, tree_values)
+        # Debug print('Prod_detail_right:',cur_item, tree_values)
 
         if len(tree_values) > 8:
             # If tree_values[8] contains a dot (.)
@@ -3885,19 +3884,19 @@ class Display_views():
             if len(parts) == 1:
                 if str(tree_values[2]) == '':
                     self.Display_message(
-                        'There is no right hand object found to be displayed.',\
+                        'There is no right hand object found to be displayed.',
                         'Er is geen rechter object gevonden om weergegeven te worden.')
                 else:
                     self.Display_message(
                         'The name of right hand object {} does not contain a file extension. '
-                        'It is interpreted as an aspect.'.\
-                        format(tree_values[8]),\
+                        'It is interpreted as an aspect.'.
+                        format(tree_values[8]),
                         'De naam van het rechter object <{}> bevat geen file extensie. '
-                        'Het is geïnterpreteerd als een aspect.'.\
+                        'Het is geïnterpreteerd als een aspect.'.
                         format(tree_values[8]))
                     selected_obj = self.uid_dict[str(tree_values[2])]
                     self.Display_message(
-                        'Display aspect details of: {}'.format(selected_obj.name),\
+                        'Display aspect details of: {}'.format(selected_obj.name),
                         'Weergave van aspectdetails van: {}'.format(selected_obj.name))
                     self.Define_and_display_individual_detail_view(selected_obj)
             else:
@@ -3908,7 +3907,7 @@ class Display_views():
                 open_file(normalized_path)
         else:
             self.Display_message(
-                'There is no right hand object found to be displayed.',\
+                'There is no right hand object found to be displayed.',
                 'Er is geen rechter object gevonden om weergegeven te worden.')
 
     def Taxon_detail_view(self, sel):
@@ -3919,7 +3918,7 @@ class Display_views():
         cur_item = self.taxon_tree.focus()
         item_dict = self.taxon_tree.item(cur_item)
         tree_values = list(item_dict['values'])
-        #print('Taxon values, sel.', tree_values)
+        # Debug print('Taxon values, sel.', tree_values)
         selected_obj = self.uid_dict[str(tree_values[0])]
 
         if sel.num == 1:
@@ -3927,10 +3926,10 @@ class Display_views():
             # Verify whether object is an individual thing due to being classified
             parts = str(tree_values[2]).partition(' ')
             if parts[0] in classifier:
-                #print('Display details of individual:', tree_values[0], selected_obj.name)
+                # Debug print('Display details of individual:', tree_values[0], selected_obj.name)
                 self.Define_and_display_individual_detail_view(selected_obj)
             else:
-                #print('Display details of kind:',tree_values[0], selected_obj.name)
+                # Debug print('Display details of kind:',tree_values[0], selected_obj.name)
                 self.Define_and_display_kind_detail_view(selected_obj)
         elif self.modification == 'classification started':
             # if sel.type = 'KeyPress' with sel.keysym = 'c' then
@@ -3943,17 +3942,17 @@ class Display_views():
                 self.Define_and_display_individual_detail_view(self.modified_object)
                 self.Display_message(
                     'A classification of <{}> by classifier <{}> is added '
-                    'to the semantic network'.\
-                    format(self.modified_object.name, selected_obj.name),\
+                    'to the semantic network'.
+                    format(self.modified_object.name, selected_obj.name),
                     'Een classifikatie van <{}> door classificeerder <{}> is toegevoegd '
-                    'aan het semantische netwerk.'.\
+                    'aan het semantische netwerk.'.
                     format(self.modified_object.name, selected_obj.name))
             else:
                 self.modification = 'classification completed'
                 self.Display_message(
-                    'The classification of {} by classifier {} is NOT performed.'.\
-                    format(self.modified_object.name, selected_obj.name),\
-                    'De classifikatie van <{}> door classificeerder <{}> is NIET uitgevoerd.'.\
+                    'The classification of {} by classifier {} is NOT performed.'.
+                    format(self.modified_object.name, selected_obj.name),
+                    'De classifikatie van <{}> door classificeerder <{}> is NIET uitgevoerd.'.
                     format(self.modified_object.name, selected_obj.name))
 
     def Add_classification_relation(self, modified_object, selected_object):
@@ -3977,9 +3976,9 @@ class Display_views():
                 self.idea_uids.append(idea_uid)
                 break
             self.Display_message(
-                'There is no uid for the idea available in the range {} to {}.'.\
-                format(self.num_idea_uid, 212000000),\
-                'Er is geen uid voor het idee beschikbaar in de range {} tot {}.'.\
+                'There is no uid for the idea available in the range {} to {}.'.
+                format(self.num_idea_uid, 212000000),
+                'Er is geen uid voor het idee beschikbaar in de range {} tot {}.'.
                 format(self.num_idea_uid, 212000000))
 
         lang_uid = modified_object.names_in_contexts[0][0]
@@ -3995,11 +3994,11 @@ class Display_views():
         description = ''
         intent_uid_name = ['491285', statement[self.GUI_lang_index]]
         rel_type = self.uid_dict['1225']
-        gellish_expr = Create_gellish_expression(lang_comm, idea_uid, intent_uid_name,\
-                                                 lh_uid_name, rel_uid_phrase_type,\
-                                                 rh_role_uid_name, rh_uid_name, \
+        gellish_expr = Create_gellish_expression(lang_comm, idea_uid, intent_uid_name,
+                                                 lh_uid_name, rel_uid_phrase_type,
+                                                 rh_role_uid_name, rh_uid_name,
                                                  uom_uid_name, description)
-        relation = Relation(modified_object, rel_type, selected_object, \
+        relation = Relation(modified_object, rel_type, selected_object,
                             basePhraseUID, '', gellish_expr)
         modified_object.add_relation(relation)
         selected_object.add_relation(relation)
@@ -4011,11 +4010,11 @@ class Display_views():
         #item_dict = self.summ_tree.selection()
         cur_item = self.summ_tree.focus()
         item_dict = self.summ_tree.item(cur_item)
-        #print('Detail view item:', item_dict['values'])
+        # Debug print('Detail view item:', item_dict['values'])
         tree_values = list(item_dict['values'])
 
         selected_obj = self.uid_dict[str(tree_values[0])]
-        #print('Display of product details of:',tree_values[0], selected_obj.name)
+        # Debug print('Display of product details of:',tree_values[0], selected_obj.name)
         # Create a detail view
         self.Define_and_display_individual_detail_view(selected_obj)
 
@@ -4026,11 +4025,11 @@ class Display_views():
         #item_dict = self.possib_tree.selection()
         cur_item = self.possib_tree.focus()
         item_dict = self.possib_tree.item(cur_item)
-        #print('Detail view item:', item_dict['values'])
+        # Debug print('Detail view item:', item_dict['values'])
         tree_values = list(item_dict['values'])
 
         selected_obj = self.uid_dict[str(tree_values[0])]
-        #print('Display product details of:',tree_values[0], selected_obj.name)
+        # Debug print('Display product details of:',tree_values[0], selected_obj.name)
         # Create a detail view
         self.Define_and_display_kind_detail_view(selected_obj)
 
@@ -4041,11 +4040,11 @@ class Display_views():
         #item_dict = self.indiv_tree.selection()
         cur_item = self.indiv_tree.focus()
         item_dict = self.indiv_tree.item(cur_item)
-        #print('Detail view item:', item_dict['values'])
+        # Debug print('Detail view item:', item_dict['values'])
         tree_values = list(item_dict['values'])
 
         selected_obj = self.uid_dict[str(tree_values[0])]
-        #print('Display product details of:',tree_values[0], selected_obj.name)
+        # Debug print('Display product details of:',tree_values[0], selected_obj.name)
         # Create a detail view
         self.Define_and_display_individual_detail_view(selected_obj)
 
@@ -4111,15 +4110,15 @@ class Display_views():
     def Doc_detail_view(self, sel):
         """ Find the selected object from a user selection
             in the info_model that is displayed in the doc_tree view.
-            - info_row ('values') = [info.uid, obj.uid, carrier.uid, directory_name,\
-                                    info.name, super_info_name, obj.name, \
+            - info_row ('values') = [info.uid, obj.uid, carrier.uid, directory_name,
+                                    info.name, super_info_name, obj.name,
                                     carrier.name, carrier_kind_name]
         """
 
         cur_item = self.doc_tree.focus()
         item_dict = self.doc_tree.item(cur_item)
         info_row = list(item_dict['values'])
-        #print('Doc_detail_view:', cur_item, info_row)
+        # Debug print('Doc_detail_view:', cur_item, info_row)
 
         # If right hand mouse button is pressed (sel.num == 3),
         # then determine and display a product view of the object
@@ -4127,8 +4126,8 @@ class Display_views():
         if sel.num == 3:
             if len(info_row) > 1:
                 if info_row[1] != '':
-                    selected_obj   = self.uid_dict[str(info_row[1])]
-                    #print('Display product details of: {}'.format(selected_obj.name))
+                    selected_obj = self.uid_dict[str(info_row[1])]
+                    # Debug print('Display product details of: {}'.format(selected_obj.name))
                     self.Define_and_display_kind_detail_view(selected_obj)
 
                     if len(self.info_model) > 0:
@@ -4136,12 +4135,12 @@ class Display_views():
         else:
             # Left hand mouse button is pressed
             # If info_kind is a description then display the destription
-            description_text  = ['description', 'beschrijving']
+            description_text = ['description', 'beschrijving']
             description_title = ['Information about ', 'Informatie over ']
             if info_row[5] in description_text:
-                #print('Information {} is not presented on a carrier but is as follows:\n   {}'.\
+                # Debug print('Information {} is not presented on a carrier but is as follows:\n   {}'.
                 #      format(info_row[4], info_row[2]))
-                messagebox.showinfo(description_title[self.GUI_lang_index] + info_row[6], \
+                messagebox.showinfo(description_title[self.GUI_lang_index] + info_row[6],
                                     info_row[2])
 
             # Verify whether file name (info_row[7]) is presented on a file
@@ -4149,7 +4148,7 @@ class Display_views():
             parts = info_row[8].rsplit('.', maxsplit=1)
             if len(parts) == 1:
                 self.Display_message(
-                    'File name {} does not have a file extension'.format(info_row[7]),\
+                    'File name {} does not have a file extension'.format(info_row[7]),
                     'Filenaam {} bevat geen file extensie'.format(info_row[7]))
             else:
                 # Open the file in the file format that is defined by its file extension
