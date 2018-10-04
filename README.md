@@ -7,6 +7,14 @@ This project aim to develop a web based version that uses RemiGUI instead of Tki
 RemiGUI creates HTML and uses an ordaniry browser such as Safari to create and display input and output.
 For the time being this is done in a separate repository, because this is an experimental version.
 
+
+## Getting started
+
+    pip install remi
+    cd Web-Communicator
+    python User_interface.py
+
+
 ## Tests
 
 There are no test yet, but `make test` will check the project for coding style
