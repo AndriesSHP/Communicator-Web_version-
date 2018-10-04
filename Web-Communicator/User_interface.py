@@ -15,8 +15,9 @@ from Create_output_file import Convert_numeric_to_integer
 
 
 class MyTabBox(gui.TabBox):
+    ''' Sub-class of TabBox that enables to remove a tab that is identified by its name.'''
     def remove_tab_by_name(self, name):
-        """ Removes a tab identified by its name """
+        ''' Removes a tab that is identified by its name.'''
         identifier = None
         for a, li, holder in self._tabs.values():
             if a.children['text'] == name:
@@ -187,6 +188,7 @@ class Communicator(App):
         return
 
     def start_up(self, user_db):
+        ''' Intended for authentication, providing or preventing unauthorized access.''' 
         party = 'Andries'   #input("User name: ")
         self.user = SU.User(party)
         sesam = self.user.Providing_Access(party, user_db)
@@ -209,7 +211,7 @@ class Communicator(App):
             self.gel_net.build_network()
 
     def load_net(self):
-        # Load semantic network from pickle binary file.
+        ''' Load semantic network from pickle binary file.'''
         self.load_pickle_db(self.pickle_file_name)
         if self.gel_net is None:
             print("Network '{}' is not loaded. File is not found".
@@ -222,6 +224,7 @@ class Communicator(App):
                 print('- {}'.format(file.path_and_name))
 
     def load_pickle_db(self, fname):
+        ''' Load a semantic network from a pickle file. '''
         try:
             infile = open(fname, "br")
         except FileNotFoundError:
@@ -243,7 +246,7 @@ class Communicator(App):
         '''
         if GUI_lang_name in self.GUI_lang_name_dict:
             self.GUI_lang_name = GUI_lang_name
-            self.GUI_lang_uid  = self.GUI_lang_name_dict[GUI_lang_name]
+            self.GUI_lang_uid = self.GUI_lang_name_dict[GUI_lang_name]
             if GUI_lang_name == 'Nederlands':
                 self.GUI_lang_index = 1
             else:
@@ -408,7 +411,7 @@ class Communicator(App):
         '''
         if reply_lang_name in self.reply_lang_name_dict:
             self.reply_lang_name = reply_lang_name
-            self.reply_lang_uid  = self.reply_lang_name_dict[reply_lang_name]
+            self.reply_lang_uid = self.reply_lang_name_dict[reply_lang_name]
             if self.reply_lang_uid == '910036':
                 # Set default preferences at international, English, American
                 self.reply_lang_pref_uids = ['589211', '910036', '911689']
@@ -425,7 +428,7 @@ class Communicator(App):
                 'De antwoordtaal {} is onbekend. Default = English wordt gebruikt.'.
                 format(reply_lang_name))
             self.reply_lang_name = 'English'
-            self.reply_lang_uid  = '910037'
+            self.reply_lang_uid = '910037'
 
     def Determine_name_in_context(self, obj, base_or_inverse = 'normal'):
         ''' Given an object and preferred language sequence uids and community sequence uids,
@@ -529,6 +532,7 @@ class Communicator(App):
 
 
 class Semantic_network():
+    ''' Dummy class for testing only.'''
     def __init__(self):
         self.GUI_lang_index = 0
         self.GUI_lang_name = 'English'
@@ -541,6 +545,7 @@ class Semantic_network():
         pass
 
 class Network():
+    ''' Dummy class for testing only.'''
     def __init__(self):
         self.gel_net = Semantic_network()
 
