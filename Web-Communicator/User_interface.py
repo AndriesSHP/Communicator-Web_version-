@@ -309,8 +309,7 @@ class Communicator(App):
     def read_files(self):
         ''' Read the file(s) that are selected in the file selection dialog
         '''
-        #self.file_path_names = ''
-        #print('Selected file(s):',self.file_path_names)
+        # Debug print('Selected file(s):',self.file_path_names)
         if self.file_path_names == []:
             self.Message_UI(
                 'The file name is blank or the inclusion is cancelled. There is no file read.',
@@ -342,9 +341,8 @@ class Communicator(App):
             self.current_file.Import_Gellish_from_file()
 
     def on_fileselection_dialog_confirm(self, widget, filelist):
-        # a list() of filenames and folders is returned
-        #self.lbl.set_text('Selected files: %s' % ','.join(filelist))
-        #print('File list: {}'.format(filelist))
+        ''' A list() of filenames and folders is returned'''
+        # Debug print('File list: {}'.format(filelist))
         self.file_path_names = filelist
         if len(filelist):
             self.read_files()
@@ -353,11 +351,10 @@ class Communicator(App):
         self.set_root_widget(self.container)
 
     def Message_UI(self, mess_text_EN, mess_text_NL):
+        ''' Display a message in the log_frake in any of the languages'''
         if self.GUI_lang_index == 1:
-            #print(mess_text_NL)
             self.log_frame.append(mess_text_NL)
         else:
-            #print(mess_text_EN)
             self.log_frame.append(mess_text_EN)
 
     def user_manual(self, widget):
