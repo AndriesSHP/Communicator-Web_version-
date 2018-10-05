@@ -541,7 +541,7 @@ class Semantic_network():
     def reset_and_build_network(self):
         pass
 
-    def save_pickle_db(self):
+    def save_pickle_db(self, widget):
         pass
 
 class Network():

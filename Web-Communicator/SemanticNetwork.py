@@ -1246,7 +1246,7 @@ class Semantic_Network():
                 uid = 2000000000 + number
         return uid
 
-    def save_pickle_db(self):
+    def save_pickle_db(self, widget):
         ''' Save the semantic network by a pickle dump '''
         semantic_net = open(self.semantic_file_name, "bw")
         pickle.dump(self, semantic_net)
