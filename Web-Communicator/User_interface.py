@@ -65,8 +65,7 @@ class Communicator(App):
 
     # Define the main window
     def main(self):
-        """ Define a main_window with select options and GUI language choice.
-        """
+        ''' Define a main_window with select options and GUI language choice.'''
         main_menu = ['Main Menu', 'Hoofdmenu']
         login = ['Login/Register', 'Login/Registreer']
         read_file = ['Read file', 'Lees file']
@@ -82,7 +81,7 @@ class Communicator(App):
         user_db = SU.UserDb()
         self.start_up(user_db)
         self.start_net()
-
+        
         # Set GUI language default = English: GUI_lang_names[0]
         self.Set_GUI_language(self.GUI_lang_names[0])
 
@@ -100,7 +99,7 @@ class Communicator(App):
         self.read_file_tag.attributes['title'] = import_text[self.GUI_lang_index]
         self.read_file_tag.onclick.connect(self.read_verify_and_merge_files)
         self.menubar.append(self.read_file_tag)
-
+        
         self.search_tag = gui.MenuItem(search[self.GUI_lang_index], width=100, height=20)
         self.search_tag.attributes['title'] = 'Open a search window'
         self.search_tag.onclick.connect(self.search_net)
@@ -138,11 +137,7 @@ class Communicator(App):
                                     style='background-color:#eeffdd')
         self.lang_label.attributes['title'] = 'Select a language for specification of a search'
 
-<<<<<<< HEAD
         self.lang_container.append(self.lang_label)
-=======
-        self.lang_container.append(self.lang_label) #self.main_frame, width=10)
->>>>>>> 19f2d284360743cc55cb5f02f3aa561ddfb52404
         # Set default language: GUI_lang_names[0] = English, [1] = Nederlands
         self.lang_default = self.GUI_lang_names[0]
         self.lang_select = gui.DropDown(self.GUI_lang_names, width=100, height=20,
@@ -170,11 +165,11 @@ class Communicator(App):
         self.Define_notebook()
 
         return self.container
-
+    
     def Define_notebook(self):
-        """ Defines a Notebook with various view layouts and displays view contents.
+        ''' Defines a Notebook with various view layouts and displays view contents.
             Starting in grid on row 1.
-        """
+        '''
         # Define the overall views_notebook
         self.views_noteb = MyTabBox(height='100%', width='100%', style='background-color:#eeffdd')
         self.main_frame.append(self.views_noteb)
@@ -266,7 +261,7 @@ class Communicator(App):
                 # Set default preferences at international, user_language, English
                 self.GUI_lang_pref_uids = ['589211', self.GUI_lang_uid, '910036']
         else:
-            self.Message_UI(
+            self.message_ui(
                 'The GUI language {} is unknown. Default = English.'.format(GUI_lang_name),
                 'De GUI taal {} is onbekend. Default = English.'.format(GUI_lang_name))
             GUI_set = False
@@ -279,7 +274,7 @@ class Communicator(App):
         GUI_lang_name = selection #self.lang_box.get()
         self.Set_GUI_language(GUI_lang_name)
 
-        self.Message_UI(
+        self.message_ui(
             'The user interface language is {}.'.format(self.GUI_lang_name),
             'De GUI taal is {}.'.format(self.GUI_lang_name))
 
@@ -295,14 +290,14 @@ class Communicator(App):
                 self.combine_files_with_network()
 
     def combine_files_with_network(self):
-        """ Select one or more Gellish files in a dialog
+        ''' Select one or more Gellish files in a dialog
             and import the files,
             after syntactic verification.
             The merge the file content in the semantic network.
-        """
-        self.subContainerRead = gui.Widget(style={'width': '220px', 'display': 'block',
-                                                  'overflow': 'auto', 'text-align': 'center'})
-        self.container.append(self.subContainerRead)
+        '''
+        self.read_file_container = gui.Widget(style={'width':'220px', 'display':'block',
+                                                     'overflow':'auto', 'text-align':'center'})
+        self.container.append(self.read_file_container)
         # Select one or more files to be imported
         self.dialog = gui.FileSelectionDialog('File selection dialog',
                                               'Select one or more CSV or JSON files',
@@ -314,11 +309,10 @@ class Communicator(App):
         self.dialog.show(self)
 
     def read_files(self):
-        ''' Read the file(s) that are selected in the file selection dialog
-        '''
+        ''' Read the file(s) that are selected in the file selection dialog.'''
         # Debug print('Selected file(s):',self.file_path_names)
         if self.file_path_names == []:
-            self.Message_UI(
+            self.message_ui(
                 'The file name is blank or the inclusion is cancelled. There is no file read.',
                 'De file naam is blanco of het inlezen is gecancelled. Er is geen file ingelezen.')
             return
@@ -328,13 +322,13 @@ class Communicator(App):
             # Split file_path_and_name in file path and file name
             path_name = file_path_and_name.rsplit('/', maxsplit=1)
             if len(path_name) == 2:
-                self.Message_UI(
+                self.message_ui(
                     'Reading file <{}> from directory {}.'.format(path_name[1], path_name[0]),
                     'Lees file <{}> van directory {}.'.format(path_name[1], path_name[0]))
                 file_name = path_name[1]
                 file_path = path_name[0]
             else:
-                self.Message_UI(
+                self.message_ui(
                     'Reading file <{}> from current directory.'.format(file_path_and_name),
                     'Lees file <{}> van actuele directory.'.format(file_path_and_name))
                 file_name = file_path_and_name
@@ -357,7 +351,7 @@ class Communicator(App):
     def on_dialog_cancel(self, widget):
         self.set_root_widget(self.container)
 
-    def Message_UI(self, mess_text_EN, mess_text_NL):
+    def message_ui(self, mess_text_EN, mess_text_NL):
         ''' Display a message in the log_frake in any of the languages'''
         if self.GUI_lang_index == 1:
             self.log_frame.append(mess_text_NL)
@@ -426,7 +420,7 @@ class Communicator(App):
                 # Set default preferences at international, user_language, English
                 self.reply_lang_pref_uids = ['589211', self.reply_lang_uid, '910036']
         else:
-            self.Message_UI(
+            self.message_ui(
                 'The reply language {} is unknown. Default = English is used.'.
                 format(reply_lang_name),
                 'De antwoordtaal {} is onbekend. Default = English wordt gebruikt.'.
@@ -506,7 +500,7 @@ class Communicator(App):
                 self.obj_without_name_in_context.append(obj)
                 numeric_uid, integer = Convert_numeric_to_integer(obj.uid)
                 if integer is False or numeric_uid not in range(1000000000, 3000000000):
-                    self.Message_UI(
+                    self.message_ui(
                         'There is no name in context known for {}'.format(obj.name),
                         'Er is geen naam in context bekend voor {}'.format(obj.name))
             obj_name = obj.name

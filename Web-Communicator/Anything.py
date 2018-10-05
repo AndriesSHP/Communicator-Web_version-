@@ -8,6 +8,11 @@ from Bootstrapping import *
 from Expr_Table_Def import *
 
 class Anything:
+    ''' Anything is an instance of the class.
+        However, not everything has the same attributes.
+        The attributes of something is determined by its category according to the taxonomy. 
+    '''
+
     def __init__(self, uid, name, category = None):
         self.uid = uid
         # Name (out of context) at time of creation of the object
@@ -97,10 +102,10 @@ class Anything:
         for nam in self.names_in_contexts:
             if len(nam) > 0:
                 if nam[4] != '':
-                    print('  Name: %s %s.'    % (nam[2], nam[0:2]))
+                    print('  Name: %s %s.' % (nam[2], nam[0:2]))
                     print('  Description: %s' % (nam[4]))
                 else:
-                    print('  Name: %s %s.'    % (nam[2], nam[0:2]))
+                    print('  Name: %s %s.' % (nam[2], nam[0:2]))
             else:
                 print('  Name: %s %s.' % (self.name))
         # Show all relations
@@ -119,10 +124,10 @@ class Anything:
             else:
                 rh_pref_name = rh.name
             print('  Idea {}: ({}) {} ({}) {} ({}) {}'.format\
-                  (rel.uid, \
-                   rel.expression[lh_uid_col]      , lh_pref_name,\
-                   rel.expression[rel_type_uid_col], rel.expression[rel_type_name_col], \
-                   rel.expression[rh_uid_col]      , rh_pref_name))
+                  (rel.uid,
+                   rel.expression[lh_uid_col], lh_pref_name,
+                   rel.expression[rel_type_uid_col], rel.expression[rel_type_name_col],
+                   rel.expression[rh_uid_col], rh_pref_name))
             query_results.append(rel.expression)
 
         save_on_file = input('\nSave query results on output file? (y/n): ')
@@ -146,55 +151,25 @@ class Anything:
         if phrase_in_context[2] not in self.inverse_phrases:
             self.inverse_phrases.append(phrase_in_context[2])
 
-##    def add_first_kind_of_role(self, first_role_type):
-##        self.first_role_type = first_role_type
-##
-##    def add_second_kind_of_role(self, second_role_type):
-##        self.second_role_type = second_role_type
-
-##class Object(Anything):
-##    pass
-##
-##class Individual(Object):
-##    #category = "individual thing"
-##    pass
-##
-##class Kind(Object):
-##    #category = "kind"
-##    pass
-##
-##class RelationType(Kind):
-####    def __init__(self, uid, category = "kind of relation"):
-####        Kind.__init__(self, uid, category = None):
-####            self.base_phrases    = []
-####            self.inverse_phrases = []
-##    pass
-##
-##class Intention_type(Kind):
-##    #category = "intention"
-##    pass
-
 class Relation(Anything):
     ''' lh, rel_type, rh, phrase_type, uom and expression
         that expresses a binary relation with contextual facts.
         Contextual facts are about this object.
         Default category is 'binary relation'
     '''
-    def __init__(self, lh_obj, rel_type, rh_obj, phrase_type_uid, uom, expression, \
+    def __init__(self, lh_obj, rel_type, rh_obj, phrase_type_uid, uom, expression,
                  category = None):
         # intention_type = None
-        self.uid        = expression[idea_uid_col]
-        self.lh_obj     = lh_obj
-        self.rel_type   = rel_type
-        self.rh_obj     = rh_obj
+        self.uid = expression[idea_uid_col]
+        self.lh_obj = lh_obj
+        self.rel_type = rel_type
+        self.rh_obj = rh_obj
         self.phrase_type_uid = phrase_type_uid
-        self.uom        = uom
+        self.uom = uom
         # The intention_type default is 491285 (statement)
-##        statement_uid = 491285
-##        self.intention_type = intention_type if intention_type is not None else statement_uid
         self.expression = expression
         # The category of a relation (default: 'binary relation') is the highlevel category.
-        self.category   = category if category is not None else 'binary relation'
+        self.category = category if category is not None else 'binary relation'
 
     def add_contextual_fact(self, cont_fact):
         try:
@@ -204,29 +179,30 @@ class Relation(Anything):
 
     def __repr__(self):
         #return(self.uid, self.lh_uid, self.rel_type_uid, self.phrase_type_uid, self.rh_uid)
-        return("Idea %i %i (%i) %i %i" % (self.uid, self.lh_uid, self.rel_type_uid,\
+        return("Idea %i %i (%i) %i %i" % (self.uid, self.lh_uid, self.rel_type_uid,
                                           self.phrase_type_uid, self.rh_uid))
-#------------------------------------------------------------------------------------
+
+
 if __name__ == "__main__":
     import TestData.TestDBcontent as Exprs
 
     net_name = 'Semantic network'
     gel_net = Semantic_Network(net_name)
     for ex in Exprs.expr:
-        langUID   = ex[1];   langName   = ex[2] ; commUID = ex[3]    ; commName = ex[4] ;
-        intentUID = ex[6];   intentName = ex[7] ; lhobUID = ex[9]    ; lhobName = ex[10];
-        ideaUID   = ex[15];  ideaName   = ex[16]; relTypeUID = ex[17]; relTypePhrase = ex[18];
-        rhobUID  = ex[23];
-        rhobName  = ex[24];  fullDef    = ex[25]; uomUID  = ex[26]   ; uomName  = ex[27]
+        langUID = ex[1]; langName = ex[2]; commUID = ex[3]; commName = ex[4];
+        intentUID = ex[6]; intentName = ex[7]; lhobUID = ex[9]; lhobName = ex[10];
+        ideaUID = ex[15]; ideaName = ex[16]; relTypeUID = ex[17]; relTypePhrase = ex[18];
+        rhobUID = ex[23];
+        rhobName = ex[24]; fullDef = ex[25]; uomUID = ex[26]; uomName = ex[27]
         print("Expression: ",langName, commName, intentName, lhobName, relTypePhrase, rhobName)
 
         # Interpret an expression and create things, and main relation if they do not yet exist.
 
-        rel = Relation(ex) #ideaName, intentUID, intentName, \
-                       #lhobUID, lhobName, relTypeUID, relTypePhrase, phraseTypeUID, \
+        rel = Relation(ex) #ideaName, intentUID, intentName,
+                       #lhobUID, lhobName, relTypeUID, relTypePhrase, phraseTypeUID,
                        #rhobUID, rhobName, uomUID, uomName)
 
-        R1 = ['0'   , "has approval status",'790375', "accepted"]
+        R1 = ['0', "has approval status",'790375', "accepted"]
         R2 = ['6023', "has as originator",'0',"Andries van Renssen"]
         rel.add_contextual_fact(R1)
         rel.add_contextual_fact(R2)
@@ -260,8 +236,8 @@ if __name__ == "__main__":
     root.title("Semantic model server")
     root.minsize(1000,400)
     myStyle = Style()
-    myStyle.configure("TFrame"   ,background="#dfd")
+    myStyle.configure("TFrame", background="#dfd")
     root.configure(background="#ddf")
-    root.columnconfigure (0,weight=1)
-    root.rowconfigure    (0,weight=0)
-    root.rowconfigure    (1,weight=1)
+    root.columnconfigure(0,weight=1)
+    root.rowconfigure(0,weight=0)
+    root.rowconfigure(1,weight=1)
