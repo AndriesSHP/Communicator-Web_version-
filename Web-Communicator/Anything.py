@@ -40,7 +40,7 @@ class Anything:
         self.parts = []
         # Aspects are the aspects and intrinsic aspects of kinds or of individual things
         # (duplicates possession relations)
-        #self.aspects = [] 
+        #self.aspects = []
 
     # add name or alias to collection of names:
     # name_in_context = (lanuageUID, communityUID, naming_relationUID, name).
@@ -54,7 +54,7 @@ class Anything:
             self.relations.append(relation)
         else:
             print('Duplicate relation uid {} ignored: ',format(relation.uid))
-    
+
     def add_classifier(self, classifier):   # only applicable for individuals
         if classifier not in self.classifiers:
             self.classifiers.append(classifier)
@@ -74,7 +74,7 @@ class Anything:
     def add_part(self, part):   # applicable for individual things and for kinds
         if part not in self.parts:
             self.parts.append(part)
-    
+
     def add_first_role(self, kind_of_role):
         self.first_role = kind_of_role
 
@@ -117,14 +117,14 @@ class Anything:
                 # pref_name should be determined by preferences
                 rh_pref_name = rh.names_in_contexts[0][2]
             else:
-                rh_pref_name = rh.name 
+                rh_pref_name = rh.name
             print('  Idea {}: ({}) {} ({}) {} ({}) {}'.format\
                   (rel.uid, \
                    rel.expression[lh_uid_col]      , lh_pref_name,\
                    rel.expression[rel_type_uid_col], rel.expression[rel_type_name_col], \
                    rel.expression[rh_uid_col]      , rh_pref_name))
             query_results.append(rel.expression)
-            
+
         save_on_file = input('\nSave query results on output file? (y/n): ')
         if save_on_file == 'y':
             lang_name = 'Naderlands'
@@ -162,7 +162,7 @@ class Anything:
 ##class Kind(Object):
 ##    #category = "kind"
 ##    pass
-##    
+##
 ##class RelationType(Kind):
 ####    def __init__(self, uid, category = "kind of relation"):
 ####        Kind.__init__(self, uid, category = None):
@@ -207,9 +207,9 @@ class Relation(Anything):
         return("Idea %i %i (%i) %i %i" % (self.uid, self.lh_uid, self.rel_type_uid,\
                                           self.phrase_type_uid, self.rh_uid))
 #------------------------------------------------------------------------------------
-if __name__ == "__main__":   
+if __name__ == "__main__":
     import TestData.TestDBcontent as Exprs
-    
+
     net_name = 'Semantic network'
     gel_net = Semantic_Network(net_name)
     for ex in Exprs.expr:

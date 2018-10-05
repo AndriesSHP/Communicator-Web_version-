@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 
 # ignore compiled Python files
 *.pyc
 env/
 Web-Communicator/Web-Communicator/
+=======
+# ignore compiled Python files
+*.pyc
+env/
+>>>>>>> 19f2d284360743cc55cb5f02f3aa561ddfb52404

@@ -82,7 +82,7 @@ class Communicator(App):
         user_db = SU.UserDb()
         self.start_up(user_db)
         self.start_net()
-        
+
         # Set GUI language default = English: GUI_lang_names[0]
         self.Set_GUI_language(self.GUI_lang_names[0])
 
@@ -100,7 +100,7 @@ class Communicator(App):
         self.read_file_tag.attributes['title'] = import_text[self.GUI_lang_index]
         self.read_file_tag.onclick.connect(self.read_verify_and_merge_files)
         self.menubar.append(self.read_file_tag)
-        
+
         self.search_tag = gui.MenuItem(search[self.GUI_lang_index], width=100, height=20)
         self.search_tag.attributes['title'] = 'Open a search window'
         self.search_tag.onclick.connect(self.search_net)
@@ -138,7 +138,11 @@ class Communicator(App):
                                     style='background-color:#eeffdd')
         self.lang_label.attributes['title'] = 'Select a language for specification of a search'
 
+<<<<<<< HEAD
         self.lang_container.append(self.lang_label)
+=======
+        self.lang_container.append(self.lang_label) #self.main_frame, width=10)
+>>>>>>> 19f2d284360743cc55cb5f02f3aa561ddfb52404
         # Set default language: GUI_lang_names[0] = English, [1] = Nederlands
         self.lang_default = self.GUI_lang_names[0]
         self.lang_select = gui.DropDown(self.GUI_lang_names, width=100, height=20,
@@ -166,7 +170,7 @@ class Communicator(App):
         self.Define_notebook()
 
         return self.container
-    
+
     def Define_notebook(self):
         """ Defines a Notebook with various view layouts and displays view contents.
             Starting in grid on row 1.
