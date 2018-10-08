@@ -10,7 +10,7 @@ For the time being this is done in a separate repository, because this is an exp
 
 ## Getting started
 
-    pip install remi
+    pip install remi rdflib
     cd Web-Communicator
     python User_interface.py
 
