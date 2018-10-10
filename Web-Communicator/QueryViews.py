@@ -493,8 +493,8 @@ class Query_view():
 
             Search in vocabulary for left hand term as part of building a question.
 
-            == OptionsTable: option_nr,whetherKnown,langUIDres,commUIDres,
-                             result_string,resultUID,is_called_uid,kindKnown,kind
+            == OptionsTable: option_nr, whetherKnown, langUIDres, commUIDres,
+                             result_string, resultUID, is_called_uid, kindKnown,kind
         """
         # Tkinter options to be done: if event.keysym not in ['Shift_L', 'Shift_R']:
         self.string_commonality = self.cs + self.fe
@@ -581,8 +581,8 @@ class Query_view():
             Search in vocabulary for left hand, relation type and right hand terms 
             and build a question
 
-            == Options: option_nr,whetherKnown,langUIDres,commUIDres,
-                        result_string,resultUID,is_called_uid,kindKnown,kind
+            == Options: option_nr, whetherKnown, langUIDres, commUIDres,
+                        result_string, resultUID, is_called_uid, kindKnown,kind
         """
 
         # Debug print('Rel Entry:',event.char)
@@ -646,8 +646,8 @@ class Query_view():
             Search for string in vocabulary for candidates for right hand term 
             and build a question
 
-            == Options: option_nr,whetherKnown,langUIDres,commUIDres,
-                        result_string,resultUID,is_called_uid,kindKnown,kind
+            == Options: option_nr, whetherKnown, langUIDres, commUIDres,
+                        result_string, resultUID, is_called_uid, kindKnown,kind
         """
         # Debug print('Rh Entry:',event.char)
         if event.keysym not in ['Shift_L', 'Shift_R']:
