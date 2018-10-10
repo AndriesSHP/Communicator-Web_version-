@@ -407,7 +407,7 @@ class Query_view():
     def Lh_uid_command(self, widget, new_value):
         """ Search for UID in semantic network
             Search in vocabulary for left hand uid.
-            == OptionsTable: optionNr, whetherKnown, langUIDres, commUIDres,
+            == OptionsTable: option_nr, whetherKnown, langUIDres, commUIDres,
                              result_string, resultUID, is_called_uid, kindKnown, kind
         """
         self.lh_options[:] = []
@@ -427,7 +427,7 @@ class Query_view():
             lh = self.gel_net.uid_dict[lh_uid]
 
             # Debug print("  Found lh: ", lh_uid, lh.name)
-            # => lh_options: optionNr, whetherKnown, langUIDres, commUIDres, result_string,
+            # => lh_options: option_nr, whetherKnown, langUIDres, commUIDres, result_string,
             #                resultUID, is_called_uid, kindKnown, kind
             if len(lh.names_in_contexts) > 0:
                 # Debug print('Lang_prefs:', self.gel_net.reply_lang_pref_uids)
@@ -481,10 +481,10 @@ class Query_view():
 
     def Lh_search_cmd(self, widget, new_value):
         """ Search or Query in semantic network
-            An entry in QueryWindow can be just a name (lhString)
+            An entry in QueryWindow can be just a name (lh_string)
             (for search on UID see Lh_uid_command)
             or a full question with possible condition expressions:
-            (lhString, relString, rhString optionally followed by one or more conditions):
+            (lh_string, rel_string, rh_string optionally followed by one or more conditions):
 
             lhCommonality = case sensitivity: 'cs/ci';
                                   (partially/front end) identical 'i/pi/fi'
@@ -493,7 +493,7 @@ class Query_view():
 
             Search in vocabulary for left hand term as part of building a question.
 
-            == OptionsTable: optionNr,whetherKnown,langUIDres,commUIDres,
+            == OptionsTable: option_nr,whetherKnown,langUIDres,commUIDres,
                              result_string,resultUID,is_called_uid,kindKnown,kind
         """
         # Tkinter options to be done: if event.keysym not in ['Shift_L', 'Shift_R']:
@@ -512,13 +512,13 @@ class Query_view():
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
 
         # Determine lh_options for lh term in query
-        self.lhString = new_value #self.q_lh_name_widget.get()
+        self.search_string = new_value #self.q_lh_name_widget.get()
         self.found_lh_uid, self.lh_options = \
-                           self.Solve_unknown(self.lhString)
-        # Debug print("  Found lh: ", self.lhString, self.unknown_quid,
+                           self.Solve_unknown()
+        # Debug print("  Found lh: ", self.lh_string, self.unknown_quid,
         #      self.lh_options[0:3])
 
-        # => lh_options: optionNr, whetherKnown, langUIDres, commUIDres, result_string,
+        # => lh_options: option_nr, whetherKnown, langUIDres, commUIDres, result_string,
         #                resultUID, is_called_uid, kindKnown, kind
         # Sort the list of options alphabetically by name,
         # and determine lang_names and display options
@@ -572,7 +572,7 @@ class Query_view():
     def Rel_search_cmd(self, widget):
         """ Search or Query in Ontology and Model
             Entry in QueryWindow is a question with possible condition expressions
-            (lhString, relString, rhString):
+            (lh_string, rel_string, rh_string):
 
             lhCommonality = 'csfi'
             lhCommonality = input('Lh-commonality
@@ -581,7 +581,7 @@ class Query_view():
             Search in vocabulary for left hand, relation type and right hand terms 
             and build a question
 
-            == Options: optionNr,whetherKnown,langUIDres,commUIDres,
+            == Options: option_nr,whetherKnown,langUIDres,commUIDres,
                         result_string,resultUID,is_called_uid,kindKnown,kind
         """
 
@@ -596,21 +596,22 @@ class Query_view():
             x = self.rel_options_tree.get_children()
             for item in x: self.rel_options_tree.delete(item)
 
-            # Get relation type name (relString) from user interface
-            #if event != '': relString = relString # + event.char
-            if relString == 'any':
+            # Get relation type name (rel_string) from user interface
+            #if event != '': rel_string = rel_string # + event.char
+            if rel_string == 'any':
                 if self.GUI_lang_index == 1:
-                    relString = 'binaire relatie'
+                    rel_string = 'binaire relatie'
                 else:
-                    relString = 'binary relation'
-            if relString == '':
-                relString = 'binary relation'
+                    rel_string = 'binary relation'
+            if rel_string == '':
+                rel_string = 'binary relation'
             self.string_commonality = 'csfi'
+            self.search_string = rel_string
             self.foundRel, self.rel_options = \
-                           self.Solve_unknown(relString)
+                           self.Solve_unknown()
             # Debug print('  OptRel:',self.rel_options)
 
-            # == rel_opions: optionNr,whetherKnown,langUIDres,commUIDres,
+            # == rel_opions: option_nr,whetherKnown,langUIDres,commUIDres,
             #                result_string,resultUID,is_called_uid,kindKnown,kind 
             # If rel_options are available, then sort the list and display in rel_options tree
             if len(self.rel_options) > 0:
@@ -636,7 +637,7 @@ class Query_view():
 
     def Rh_search_cmd(self, widget):
         """ Search or Query in Ontology and Model
-            An entry in QueryWindow (lhString, relString, rhString)
+            An entry in QueryWindow (lh_string, rel_string, rh_string)
             is a question with possible condition expressions:
 
             rhCommonality = input('Rh-commonality
@@ -645,7 +646,7 @@ class Query_view():
             Search for string in vocabulary for candidates for right hand term 
             and build a question
 
-            == Options: optionNr,whetherKnown,langUIDres,commUIDres,
+            == Options: option_nr,whetherKnown,langUIDres,commUIDres,
                         result_string,resultUID,is_called_uid,kindKnown,kind
         """
         # Debug print('Rh Entry:',event.char)
@@ -657,12 +658,13 @@ class Query_view():
             for item in x: self.rh_options_tree.delete(item)
 
             # Get the rh_string and search for options in the dictionary
-            rhString = self.q_rh_name_widget.get()
+            rh_string = self.q_rh_name_widget.get()
+            self.search_string = rh_string
             self.foundRh, self.rh_options = \
-                          self.Solve_unknown(rhString)
+                          self.Solve_unknown()
             # Debug print('  OptRh:',self.rh_options);
 
-            # == rh_options: optionNr,whetherKnown,langUIDres,commUIDres,
+            # == rh_options: option_nr,whetherKnown,langUIDres,commUIDres,
             #                result_string,resultUID,is_called_uid,kindKnown,kind
             # If rh_options are available,
             # then sort the list and display them in the rh_options tree
@@ -695,16 +697,15 @@ class Query_view():
         aspect_value = []
         self.query.aspect_values = []
         for val in row.children.values():
-            print('Aspect value:', val.get_text())
+            # Debug print('Aspect value:', val.get_text())
             aspect_value.append(val.get_text())
         # Debug print('Query aspects:', aspect_value)
         self.query.aspect_values.append(aspect_value)
 
-    def Solve_unknown(self, search_string):
+    def Solve_unknown(self):
         """ Determine the available options (UIDs and names) in the dictionary
             that match the search_string.
             Collect options in lh, rel and rh optionsTables for display and selection.
-
             - search_string = the string to be found in Gel_dict
               with corresponding lang_uid and comm_uid.
             - self.string_commonality is one of:
@@ -713,7 +714,7 @@ class Query_view():
 
             Returnparameters:
             == options (Lh, Rel or Rh):
-               optionNr, whetherKnown, langUIDres, commUIDres, result_string,
+               option_nr, whetherKnown, langUIDres, commUIDres, result_string,
                resultUID, isCalled, objectTypeKnown, kind (of resultUID).
                OptionTables have basically the same table structure
                  as the namingTable, but is extended with extra columns.
@@ -735,20 +736,20 @@ class Query_view():
 
         # If search string denotes an unknown from the list unknown_terms
         # then add unknown to the list of options
-        if search_string in unknown_terms:
-            if search_string == '':
+        if self.search_string in unknown_terms:
+            if self.search_string == '':
                 result_string = 'blank';
                 return found_uid, options
             else:
-                result_string = search_string
+                result_string = self.search_string
             if result_string not in self.names_of_unknowns:
                 # Create an object for the (list of) unknown(s)
                 self.unknown_quid += 1
                 unknown = Anything(str(self.unknown_quid), result_string)
                 self.unknowns.append(unknown)
                 self.names_of_unknowns.append(result_string)
-                optionNr = 1
-                option.append(optionNr) 
+                option_nr = 1
+                option.append(option_nr) 
                 option.append(whetherKnown)
                 option.append(self.GUI_lang_pref_uids[1])
                 option.append(self.comm_pref_uids[0])
@@ -764,7 +765,7 @@ class Query_view():
                 # Search in earlier collected list of unknowns
                 # for object with name search_string
                 for unknown in self.unknowns:
-                    if unknown.name == search_string:
+                    if unknown.name == self.search_string:
                         found_uid = unknown.uid
                         continue
             if found_uid == '':
@@ -774,12 +775,12 @@ class Query_view():
             return found_uid, options
 
         # Search for full search_string in GellishDict
-        candidates = self.gel_net.Query_network_dict(search_string, self.string_commonality)
+        candidates = self.gel_net.Query_network_dict(self.search_string, self.string_commonality)
 
         # Collect found option in 'options' list for display and selection
         if len(candidates) > 0:
             # Debug print ("nr of candidates:",len(candidates), self.GUI_lang_pref_uids)
-            optionNr = 0
+            option_nr = 0
             for candidate in candidates:
                 # Only add the candidate if uid of language
                 # corresponds with uid from GUI_lang_pref_uids
@@ -788,8 +789,8 @@ class Query_view():
                     continue
                 whetherKnown = 'known'
                 option = []
-                optionNr = optionNr + 1
-                option.append(optionNr)
+                option_nr += +1
+                option.append(option_nr)
                 option.append(whetherKnown)
                 # Add candidate fields to option (in column (2,3,4),(5,6,7)
                 for part in candidate:
@@ -797,7 +798,7 @@ class Query_view():
                         option.append(field)
                 # Debug print ("option:",len(candidates), option)
 
-                #== option: optionNr, whetherKnown, langUID, commUID, result_string,
+                #== option: option_nr, whetherKnown, langUID, commUID, result_string,
                 #           resultUID, objectTypeKnown, kind_name (of resultUID).
 
                 # If result_uid is a known uid (being alphanumeric or >= 100) then
@@ -839,37 +840,37 @@ class Query_view():
 
         # If not found in vocabulary, return with name of search_string
         # (being the unknown) and next UID.
-        else:   # nrOfFounds == 0:
-            if search_string not in self.names_of_unknowns:
-                # Create an object for the (list of) unknown(s)
-                self.unknown_quid += 1
-                unknown = Anything(str(self.unknown_quid), search_string)
-                self.unknowns.append(unknown)
-                whetherKnown = 'unknown'
-                self.names_of_unknowns.append(search_string)
-                optionNr = 1
-                option.append(optionNr)
-                option.append(whetherKnown)
-                option.append(self.GUI_lang_pref_uids[1])
-                option.append(self.comm_pref_uids[0])
-                option.append(search_string)
-                option.append(str(self.unknown_quid))
-                option.append(is_called_uid)
-                option.append(objectTypeKnown)
-                option.append(self.unknown_kind[self.GUI_lang_index])
-
-                options.append(option)
+        else:
+            if self.search_string not in self.names_of_unknowns:
+##                # Create an object for the (list of) unknown(s)
+##                self.unknown_quid += 1
+##                unknown = Anything(str(self.unknown_quid), self.search_string)
+##                self.unknowns.append(unknown)
+##                whetherKnown = 'unknown'
+##                self.names_of_unknowns.append(self.search_string)
+##                option_nr = 1
+##                option.append(option_nr)
+##                option.append(whetherKnown)
+##                option.append(self.GUI_lang_pref_uids[1])
+##                option.append(self.comm_pref_uids[0])
+##                option.append(self.search_string)
+##                option.append(str(self.unknown_quid))
+##                option.append(is_called_uid)
+##                option.append(objectTypeKnown)
+##                option.append(self.unknown_kind[self.GUI_lang_index])
+##
+##                options.append(option)
 
                 self.user_interface.message_ui(
-                    'String <{}> is not found in the dictionary. UID = {}. '.
-                    format(search_string, self.unknown_quid),
-                    'Term <{}> is niet gevonden in het woordenboek. UID = {}. '.
-                    format(search_string, self.unknown_quid))
+                    'String "{}" is not found in the dictionary. UID = {}. '.
+                    format(self.search_string, self.unknown_quid),
+                    'Term "{}" is niet gevonden in het woordenboek. UID = {}. '.
+                    format(self.search_string, self.unknown_quid))
                 found_uid = self.unknown_quid
             else:
                 # Search in unknowns for object with name search_string
                 for obj in self.unknowns:
-                    if obj.name == search_string:
+                    if obj.name == self.search_string:
                         found_uid = obj.uid
                         break
             if found_uid == '':
@@ -897,22 +898,28 @@ class Query_view():
         full_def = ''
         # Determine the selected object via its uid
         int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
-        # If not unknown
-        if integer is False or int_q_lh_uid >= 100:
-            obj = self.gel_net.uid_dict[self.query.q_lh_uid]
-
-            # Determine the full definition and preferred_name
-            # of the selected object in the preferred language
-            lang_name, comm_name, preferred_name, full_def = \
-                       self.user_interface.Determine_name_in_context(obj)
-            # Debug print('FullDef:',self.query.q_lh_uid, self.query.q_lh_name,
-            #      self.query.q_lh_category,full_def)
+        # If object is unknown then display message
+        if integer is True and int_q_lh_uid < 100:
+            search_string = values[1].get_text()
+            self.user_interface.message_ui(
+                'Selected object with name "{}" is unknown'.format(search_string),
+                'Geselecteerd object met naam "{}" is onbekend'.format(search_string))
+            return
+        # Find object
+        obj = self.gel_net.uid_dict[self.query.q_lh_uid]
+        # Determine the full definition and preferred_name
+        # of the selected object in the preferred language
+        lang_name, comm_name, preferred_name, full_def = \
+                   self.user_interface.Determine_name_in_context(obj)
+        # Debug print('FullDef:',self.query.q_lh_uid, self.query.q_lh_name,
+        #      self.query.q_lh_category,full_def)
+        
         # Display full definition
         self.full_def_widget.set_text(full_def)
 
         # Display selected UID and Name in selection fields
         self.q_lh_uid_widget.set_text(self.query.q_lh_uid)
-        selected_name = preferred_name # row[1]
+        selected_name = preferred_name
         self.q_lh_name_widget.set_text(selected_name)
 
         self.q_aspects[:] = []
@@ -1203,9 +1210,7 @@ class Query_view():
         # LH: Get selected option (textString)
         # from the presented list of options (lh_options_tree) in QueryWindow
         lh_uid_init = self.q_lh_uid_widget.get_text()
-        print('lh_uid_init', lh_uid_init)
         if lh_uid_init == '':
-            # Debug print('Warning: Left hand option not yet selected. Please try again.')
             self.user_interface.message_ui(
                 'Left hand option is not yet selected. Please try again.',
                 'Linker optie is nog niet geselecteerd. Probeer nogmaals.')
@@ -1229,7 +1234,7 @@ class Query_view():
             # Determine the full definition of the selected object in the preferred language
             lang_name, comm_name, preferred_name, full_def = \
                        self.user_interface.Determine_name_in_context(self.query.q_lh_obj)
-            # Debug print('Full def:', self.query.q_lh_uid, self.lhString,
+            # Debug print('Full def:', self.query.q_lh_uid, self.lh_string,
             #             self.query.q_lh_category, full_def)
             # Display full definition
             self.full_def_widget.set_text(full_def)
@@ -1305,7 +1310,6 @@ class Query_view():
             # Verify whether a rh name is specified
             rh_uid_init = self.q_rh_uid_widget.get()
             if rh_uid_init == '':
-                print('Right hand option is not (yet) selected.')
                 self.user_interface.message_ui(
                     'Right hand option ís not (yet) selected.',
                     'Rechter optie is nog niet geselecteerd.')
