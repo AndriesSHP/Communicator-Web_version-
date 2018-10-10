@@ -1,4 +1,5 @@
 # ignore compiled Python files
 *.pyc
+__pycache__/
 # ignore the Python virtualenv
 env/
