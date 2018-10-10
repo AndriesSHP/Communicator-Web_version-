@@ -10,6 +10,7 @@ from Create_output_file import Create_gellish_expression, Convert_numeric_to_int
      Open_output_file
 from Occurrences_diagrams import Occurrences_diagram
 from utils import open_file
+from QueryViews import MyTable
 
 
 class Display_views():
@@ -2064,7 +2065,7 @@ class Display_views():
 
     def Display_notebook_views(self):
         ''' For non-empty models define and display a treeview in a notebook tab.'''
-
+        done = False
         # Define and display Network view sheet
         if len(self.network_model) > 0:
             self.Define_and_display_network()
@@ -2075,73 +2076,51 @@ class Display_views():
 
         # Define and display Possibilities_view sheet of kind
         if len(self.possibilities_model) > 0:
-            self.Define_and_display_possibilities_of_kind()
+            # === Temporary skipped
+            if done:
+                self.Define_and_display_possibilities_of_kind()
 
         # Define and display model of a Kind
         if len(self.kind_model) > 0:
-            self.Define_and_display_kind_view()
+            # === Temporary skipped
+            if done:
+                self.Define_and_display_kind_view()
 
-        # Define Summary_view sheet for individual products
+        # Define and display summary_view sheet for individual products
         if len(self.summ_model) > 0:
-            # Destroy earlier summary_frame
-            try:
-                self.summ_frame.destroy()
-            except AttributeError:
-                pass
+            # === Temporary skipped
+            if done:
+                self.Define_and_display_summary_sheet()
 
-            self.Define_summary_sheet()
-
-            self.Display_summary_view()
-
-        # Define Individual_view sheet
+        # Define and display individual_view sheet
         if len(self.indiv_model) > 0:
-            self.Define_and_display_individual_model()
+            # === Temporary skipped
+            if done:
+                self.Define_and_display_individual_model()
 
-        # Define Product_model_sheet view
+        # Define and display product_model_sheet view
         if len(self.prod_model) > 0:
-            # Debug print('prod_model',self.prod_model)
-            # Destroy earlier product_frame
-            try:
-                self.prod_frame.destroy()
-            except AttributeError:
-                pass
+            # === Temporary skipped
+            if done:
+                self.Define_and_display_product_sheet()
 
-            self.Define_product_model_sheet()
-            # Debug print('len prod model', len(self.prod_model))
-
-            # Display prod_model in Composition_sheet view
-            self.Display_product_model_view()
-
-        # Define Data_sheet view
+        # Define and display data_sheet view
         if len(self.prod_model) > 0:
-            # Destroy earlier data sheet
-            try:
-                self.data_sheet.destroy()
-            except AttributeError:
-                pass
-
-            self.Define_data_sheet()
-
-            # Display prod_model in Data_sheet view
-            self.Display_data_sheet_view()
+            # === Temporary skipped
+            if done:
+                self.Define_and_display_data_sheet()
 
         # Activities view
         if len(self.occ_model) > 0:
-            # Destroy earlier activity sheet
-            try:
-                self.act_frame.destroy()
-            except AttributeError:
-                pass
-
-            self.Define_activity_sheet()
-
-            # Display occ_model in Activity sheet view
-            self.Display_occ_model_view()
+            # === Temporary skipped
+            if done:
+                self.Define_and_display_activity_sheet()
 
         # Define and display Documents_view sheet
         if len(self.info_model) > 0:
             self.Define_and_display_documents()
 
+        # Define and Display Expression sheet view
         # Define Expressions_view sheet
         # Destroy earlier expression_frame
         try:
@@ -2149,11 +2128,13 @@ class Display_views():
         except AttributeError:
             pass
 
-        self.Define_expressions_sheet()
+        # === Temporary skipped
+        if done:
+            self.Define_expressions_sheet()
 
-        # Display expressions from self.expr_table in Treeview:
-        for query_line in self.expr_table:
-            self.expr_tree.insert('', index='end', values=query_line, tags='val_tag')
+            # Display expressions from self.expr_table in Treeview:
+            for query_line in self.expr_table:
+                self.expr_tree.insert('', index='end', values=query_line, tags='val_tag')
 
     def Display_message(self, text_en, text_nl):
         if self.GUI_lang_index == 1:
@@ -2180,7 +2161,7 @@ class Display_views():
         self.network_frame = gui.VBox(width='100%', height='100%',
                                       style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.network_frame,
-                                 network_text[self.GUI_lang_index], self.tab_cb)
+                                                network_text[self.GUI_lang_index], self.tab_cb)
 
         net_button_text = ['Display network of left-object', 'Toon netwerk van linker object']
         lh_button_text = ['Display details of left object', 'Toon details van linker object']
@@ -2201,8 +2182,10 @@ class Display_views():
         self.rh_button.attributes['title'] = 'Press button after selection of right hand object'
         self.rh_button.onclick.connect(self.Prepare_rh_network_object_detail_view)
 
-        self.classif_button = gui.Button(classif_button_text[self.GUI_lang_index], width=200, height=20)
-        self.classif_button.attributes['title'] = 'Press button after selection of left hand individual object'
+        self.classif_button = gui.Button(classif_button_text[self.GUI_lang_index],
+                                         width=200, height=20)
+        self.classif_button.attributes['title'] = \
+            'Press button after selection of left hand individual object'
         self.classif_button.onclick.connect(self.Prepare_for_classification)
 
         self.button_row.append(self.net_button)
@@ -2212,11 +2195,11 @@ class Display_views():
         self.network_frame.append(self.button_row)
 
         nr_of_cols = 7 # len(self.taxon_column_names)
-        self.network_tree = gui.Table(width='100%',
-                                      style={"overflow":"auto", "background-color":"#eeffaa",
-                                             "border-width":"2px", "border-style":"solid",
-                                             "font-size":"12px", 'table-layout':'auto',
-                                             'text-align':'left'})
+        self.network_tree = MyTable(width='100%',
+                                    style={"overflow":"auto", "background-color":"#eeffaa",
+                                           "border-width":"2px", "border-style":"solid",
+                                           "font-size":"12px", 'table-layout':'auto',
+                                           'text-align':'left'})
         eqal_head = ['>=<', '>=<']
         valu_head = ['Value', 'Waarde']
         unit_head = ['Unit', 'Eenheid']
@@ -2253,7 +2236,7 @@ class Display_views():
                 # Skip duplicate line
                 row_duplicate = False
                 name = network_line[6]
-                # Include omly lines that are not already included yet
+                # Include only lines that are not already included yet
                 if network_line not in included:
                     included.append(network_line)
                     if upper_concept == '':
@@ -2292,60 +2275,81 @@ class Display_views():
         ''' Define a taxonomy sheet for display of taxon_model (a list of taxon_rows)
             for display in a tab of Notebook
         '''
-        self.taxon_frame = Frame(self.views_noteb)
-        self.taxon_frame.grid (column=0, row=0, sticky=NSEW, rowspan=2)
-        self.taxon_frame.columnconfigure(0, weight=1)
-        self.taxon_frame.rowconfigure(0, weight=0)
-        self.taxon_frame.rowconfigure(1, weight=1)
-
         taxon_text = ['Taxonomy', 'Taxonomie']
-        self.views_noteb.add(self.taxon_frame, text=taxon_text[self.GUI_lang_index], sticky=NSEW)
-        #self.views_noteb.insert("end", self.taxon_frame, sticky=NSEW)
+        self.taxon_frame = gui.VBox(width='100%', height='100%',
+                                    style='background-color:#eeffdd')
+        self.user_interface.views_noteb.add_tab(self.taxon_frame,
+                                                taxon_text[self.GUI_lang_index], self.tab_cb)
+##        self.taxon_frame = Frame(self.views_noteb)
+##        self.taxon_frame.grid (column=0, row=0, sticky=NSEW, rowspan=2)
+##        self.taxon_frame.columnconfigure(0, weight=1)
+##        self.taxon_frame.rowconfigure(0, weight=0)
+##        self.taxon_frame.rowconfigure(1, weight=1)
+##
+##        self.views_noteb.add(self.taxon_frame, text=taxon_text[self.GUI_lang_index], sticky=NSEW)
+##        #self.views_noteb.insert("end", self.taxon_frame, sticky=NSEW)
 
-        taxon_head = ['Hierarchy of kinds and aspects per object of a particular kind',
-                      'Hiërarchie van soorten en aspecten per object van een bepaalde soort']
-        taxon_lbl = Label(self.taxon_frame, text=taxon_head[self.GUI_lang_index])
+##        taxon_head = ['Hierarchy of kinds and aspects per object of a particular kind',
+##                      'Hiërarchie van soorten en aspecten per object van een bepaalde soort']
+##        taxon_lbl = Label(self.taxon_frame, text=taxon_head[self.GUI_lang_index])
 
         headings = ['UID', 'Name', 'Kind', 'Community',
                     'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4',
                     'Aspect5', 'Aspect6', 'Aspect7', 'Aspect8', 'Aspect9', 'Aspect10']
         nr_of_cols = len(self.taxon_column_names)
-        display_cols = headings[3:nr_of_cols]
+        display_cols = []
+        display_cols.append(tuple(headings[3:nr_of_cols]))
 
-        self.taxon_tree = Treeview(self.taxon_frame,columns=(headings[0:nr_of_cols]),
-                                  displaycolumns=display_cols, selectmode='browse', height=30)
+        self.taxon_tree = MyTable(width='100%',
+                                  style={"overflow":"auto", "background-color":"#eeffaa",
+                                         "border-width":"2px", "border-style":"solid",
+                                         "font-size":"12px", 'table-layout':'auto',
+                                         'text-align':'left'})
+        self.taxon_tree.append_from_list(display_cols, fill_title=True)
+        self.taxon_frame.append(self.taxon_tree)
+##        self.taxon_tree = Treeview(self.taxon_frame,columns=(headings[0:nr_of_cols]),
+##                                   displaycolumns=display_cols, selectmode='browse', height=30)
+##
+##        self.taxon_tree.heading('#0', text='Object', anchor=W)
+##        self.taxon_tree.heading('UID', text='UID', anchor=W)
+##        self.taxon_tree.heading('Name', text='Name', anchor=W)
+##        self.taxon_tree.heading('Kind', text='Kind', anchor=W)
+##        self.taxon_tree.heading('Community', text='Community', anchor=W)
+##
+##        self.taxon_tree.column ('#0', minwidth=100, width=200)
+##        self.taxon_tree.column ('Community', minwidth=20, width=50)
+##        asp = 0
+##        for column in self.taxon_column_names[4:]:
+##            asp += 1
+##            Asp_name = 'Aspect' + str(asp)
+##            self.taxon_tree.heading(Asp_name, text=self.taxon_column_names[asp +3], anchor=W)
+##            self.taxon_tree.column (Asp_name, minwidth=20, width=50)
 
-        self.taxon_tree.heading('#0', text='Object', anchor=W)
-        self.taxon_tree.heading('UID', text='UID', anchor=W)
-        self.taxon_tree.heading('Name', text='Name', anchor=W)
-        self.taxon_tree.heading('Kind', text='Kind', anchor=W)
-        self.taxon_tree.heading('Community', text='Community', anchor=W)
+##        self.taxon_tree.tag_configure('rel_tag', option=None, background='#afa')
+##        self.taxon_tree.tag_configure('uom_tag', option=None, background='#ccf')
+##        self.taxon_tree.tag_configure('sum_tag', option=None, background='#cfc')
 
-        self.taxon_tree.column ('#0', minwidth=100, width=200)
-        self.taxon_tree.column ('Community', minwidth=20, width=50)
-        asp = 0
-        for column in self.taxon_column_names[4:]:
-            asp += 1
-            Asp_name = 'Aspect' + str(asp)
-            self.taxon_tree.heading(Asp_name, text=self.taxon_column_names[asp +3], anchor=W)
-            self.taxon_tree.column (Asp_name, minwidth=20, width=50)
+##        taxon_scroll = Scrollbar(self.taxon_frame, orient=VERTICAL, command=self.taxon_tree.yview)
+##        taxon_lbl.grid       (column=0, row=0, sticky=EW)
+##        self.taxon_tree.grid (column=0, row=1, sticky=NSEW)
+##        taxon_scroll.grid    (column=0, row=1, sticky=NS+E)
+##        self.taxon_tree.config(yscrollcommand=taxon_scroll.set)
+##
+##        self.taxon_tree.bind(sequence='<Double-1>', func=self.Taxon_detail_view)
+##        self.taxon_tree.bind(sequence='c', func=self.Taxon_detail_view)
+        self.taxon_tree.on_table_row_click.connect(self.Taxon_detail_view)
+        # Request for classification of the earlier selected individual thing
+        # self.taxon_tree.on_table_row_click_right.connect(self.Taxon_detail_view)
 
-        self.taxon_tree.tag_configure('rel_tag', option=None, background='#afa')
-        self.taxon_tree.tag_configure('uom_tag', option=None, background='#ccf')
-        self.taxon_tree.tag_configure('sum_tag', option=None, background='#cfc')
-
-        taxon_scroll = Scrollbar(self.taxon_frame, orient=VERTICAL, command=self.taxon_tree.yview)
-        taxon_lbl.grid       (column=0, row=0, sticky=EW)
-        self.taxon_tree.grid (column=0, row=1, sticky=NSEW)
-        taxon_scroll.grid    (column=0, row=1, sticky=NS+E)
-        self.taxon_tree.config(yscrollcommand=taxon_scroll.set)
-
-        self.taxon_tree.bind(sequence='<Double-1>', func=self.Taxon_detail_view)
-        self.taxon_tree.bind(sequence='c', func=self.Taxon_detail_view)
+        # Display header row with units of measure
+        # Color = uomtag = '#ccf'
+        taxon_uom_heading = []
+        taxon_uom_heading.append(tuple(self.taxon_uom_names))
+        self.taxon_tree.append_from_list(taxon_uom_heading, fill_title=False)
 
     def Display_taxonomy_view(self):
-        # Display header row with units of measure
-        self.taxon_tree.insert('', index='end', values=self.taxon_uom_names, tags='uom_tag')
+        ''' Display a treeview with the taxonomy of the object in focus.'''
+
         # Display self.taxon_model rows in self.taxon_tree
         parents = []
         for taxon_line in self.taxon_model:
@@ -2353,20 +2357,38 @@ class Display_views():
             # Verify whether taxon_line[2], being the supertype,
             # is blank or in the list of parents
             if taxon_line[2] == '' or taxon_line[2] in parents:
-                # Skip duplicates
-                if self.taxon_tree.exists(taxon_line[1]):
-                    continue
-                else:
-                    color_tag = 'sum_tag'
-                    rel_tag = ''
-                    term = taxon_line[1].partition(' ')
-                    if term[0] in ['has', 'heeft', 'classifies', 'classificeert']:
-                        rel_tag = 'rel_tag'
-                    self.taxon_tree.insert(taxon_line[2],index='end',values=taxon_line,
-                                           tags=rel_tag,
-                                           iid=taxon_line[1], text=taxon_line[1], open=True)
-                    parents.append(taxon_line[1])
+##                # Skip duplicates
+##                if self.taxon_tree.exists(taxon_line[1]):
+##                    continue
+##                else:
+                name = taxon_line[1]
+                relation = False
+                color = '#eeffdd'
+                term = taxon_line[1].partition(' ')
+                if term[0] in ['has', 'heeft', 'classifies', 'classificeert']:
+                    relation = True
+                    color = '#aaffaa'
+##                    self.taxon_tree.insert(taxon_line[2],index='end',values=taxon_line,
+##                                           tags=rel_tag,
+##                                           iid=taxon_line[1], text=taxon_line[1], open=True)
+                taxon_row_widget = gui.TableRow(style={'text-align':'left',
+                                                       'background-color':color})
+                for index, field in enumerate(taxon_line[1:]):
+                    taxon_row_item = gui.TableItem(text=field)
+                    if relation == False or index < 2:
+                        taxon_row_widget.append(taxon_row_item, field)
+                self.taxon_tree.append(taxon_row_widget, name)
+                parents.append(taxon_line[1])
 
+    def Define_and_display_summary_sheet(self):
+            # Destroy earlier summary_frame
+            try:
+                self.summ_frame.destroy()
+            except AttributeError:
+                pass
+            self.Define_summary_sheet()
+            self.Display_summary_view()
+            
     def Define_summary_sheet(self):
         ''' Define a summary_sheet for display of summ_model (a list of summary_rows)
             for display in a tab of Notebook
@@ -2976,6 +2998,19 @@ class Display_views():
                 elif kindLine[6] != '':
                     previusPart = level2Part
 
+    def Define_and_display_product_sheet(self):
+        # Debug print('prod_model',self.prod_model)
+        # Destroy earlier product_frame
+        try:
+            self.prod_frame.destroy()
+        except AttributeError:
+            pass
+
+        self.Define_product_model_sheet()
+        # Debug print('len prod model', len(self.prod_model))
+        # Display prod_model in Composition_sheet view
+        self.Display_product_model_view()
+
     def Define_product_model_sheet(self):
         ''' Product_model view tab sheet in Notebook
             Preceded by a frame with a number of buttons corresponding with binds
@@ -3166,6 +3201,17 @@ class Display_views():
                 elif prod_line[6] != '':
                     previusPart = level2Part
 
+    def Define_and_display_data_sheet(self):
+        # Destroy earlier data sheet
+        try:
+            self.data_sheet.destroy()
+        except AttributeError:
+            pass
+
+        self.Define_data_sheet()
+        # Display prod_model in Data_sheet view
+        self.Display_data_sheet_view()
+
     def Define_data_sheet(self):
         # Define ProductView tab in Notebook = = = = = = = = = = = = = = = = = = =
         # Product_sheet is canvas for scrollbar
@@ -3320,6 +3366,17 @@ class Display_views():
                                    .grid(row=line_nr, column=column_nr, columnspan=span,
                                          sticky=EW)
 
+    def Define_and_display_activity_sheet(self):
+        # Destroy earlier activity sheet
+        try:
+            self.act_frame.destroy()
+        except AttributeError:
+            pass
+
+        self.Define_activity_sheet()
+        # Display occ_model in Activity sheet view
+        self.Display_occ_model_view()
+
     def Define_activity_sheet(self):
         activity = ['Activities', 'Activiteiten']
         self.act_frame = Frame(self.views_noteb)
@@ -3430,6 +3487,7 @@ class Display_views():
         level = 1
 
     def Define_and_display_documents(self):
+        ''' Define documents view and display documents in view.'''
         # Destroy earlier documents sheet
         try:
             self.doc_frame.destroy()
@@ -3437,58 +3495,51 @@ class Display_views():
             pass
 
         self.Define_documents_sheet()
-
-        # Documents: Display documents and files for selection for display
-        for info_line in self.info_model:
-            self.doc_tree.insert('',index='end',values=info_line,tags='docTag')
+        self.Display_documents_sheet()
 
     def Define_documents_sheet(self):
-        documents = ['Documents', 'Documenten']
-        self.doc_frame = Frame(self.views_noteb)
-        self.doc_frame.grid (column=0, row=0, sticky=NSEW) #pack(fill=BOTH, expand=1)
-        self.doc_frame.columnconfigure(0, weight=1)
-        self.doc_frame.rowconfigure(0, weight=0)
-        self.views_noteb.add(self.doc_frame, text=documents[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end",self.doc_frame, sticky=NSEW)
-        headings = ['info', 'obj', 'carrier', 'directory', 'infoName', 'infoKind', 'dirName',
-                    'objName', 'fileName', 'fileKind']
-        display_cols = headings[4:]
-        self.doc_tree = Treeview(self.doc_frame, columns=(headings),
-                                 displaycolumns=display_cols, selectmode='browse', height=30)
-        self.doc_tree.heading('info', text='info', anchor=W)
-        self.doc_tree.heading('obj', text='obj', anchor=W)
-        self.doc_tree.heading('carrier', text='carrier', anchor=W)
-        self.doc_tree.heading('directory', text='directory', anchor=W)
-        self.doc_tree.heading('infoName', text='Document', anchor=W)
-        self.doc_tree.heading('infoKind', text='Doc type', anchor=W)
-        self.doc_tree.heading('dirName', text='Directory', anchor=W)
-        self.doc_tree.heading('objName', text='about Object', anchor=W)
-        self.doc_tree.heading('fileName', text='File name', anchor=W)
-        self.doc_tree.heading('fileKind', text='File type', anchor=W)
+        doc_text = ['Documents', 'Documenten']
+        self.doc_frame = gui.VBox(width='100%', height='100%',
+                                  style='background-color:#eeffdd')
+        self.user_interface.views_noteb.add_tab(self.doc_frame,
+                                                doc_text[self.GUI_lang_index], self.tab_cb)
+        headings = ['info', 'obj', 'carrier', 'directory', 'Info', 'Kind of info', 'Directory',
+                    'Name of object', 'File name', 'Kind of file']
+        display_cols = list(headings[4:])
+        doc_heading = []
+        doc_heading.append(tuple(display_cols))
+        self.doc_tree = MyTable(width='100%',
+                                style={"overflow":"auto", "background-color":"#eeffaa",
+                                       "border-width":"2px", "border-style":"solid",
+                                       "font-size":"12px", 'table-layout':'auto',
+                                       'text-align':'left'})
+        self.doc_tree.append_from_list(doc_heading, fill_title=True)
+        self.doc_frame.append(self.doc_tree)
 
-        self.doc_tree.column('#0', minwidth=10, width=10)
-        self.doc_tree.column('infoName', minwidth=100, width=150)
-        self.doc_tree.column('infoKind', minwidth=100, width=150)
-        self.doc_tree.column('dirName', minwidth=100, width=150)
-        self.doc_tree.column('objName', minwidth=100, width=150)
-        self.doc_tree.column('fileName', minwidth=100, width=150)
-        self.doc_tree.column('fileKind', minwidth=100, width=150)
+        # If left hand mouse button is pressed, then
+        #   if info_kind is a description then display the destription
+        #   else open the file in the file format that is defined by its file extension
+        self.doc_tree.on_table_row_click.connect(self.Doc_detail_view)
+        # If right hand mouse button is pressed,
+        # then determine and display a product view of the object
+        # about which the document provides info
+        #=== tbd ===
+        # self.doc_tree.on_table_row_click_right.connect(self.Doc_detail_view)
 
-        self.doc_tree.grid(column=0, row=0, sticky=NSEW)
+    def Display_documents_sheet(self):
+        ''' Display documents and files for selection for display.'''
+        color = '#eeffdd'
+        for info_line in self.info_model:
+            name = info_line[1]
+            info_row_widget = gui.TableRow()
+##            self.doc_tree.insert('',index='end',values=info_line,tags='docTag')
+            for index, field in enumerate(info_line[4:]):
+                info_row_item = gui.TableItem(text=field,
+                                              style={'text-align':'left',
+                                                     'background-color':color})
+                info_row_widget.append(info_row_item, field)
+            self.doc_tree.append(info_row_widget, name)
 
-        self.doc_tree.columnconfigure(0, weight=1)
-        self.doc_tree.rowconfigure(0, weight=0)
-
-        self.doc_tree.tag_configure('docTag', option=None, background='#cfc')
-
-        docScroll = Scrollbar(self.doc_frame, orient=VERTICAL, command=self.doc_tree.yview)
-        docScroll.grid (column=0, row=0, sticky=NS+E)
-        self.doc_tree.config(yscrollcommand=docScroll.set)
-
-        self.doc_tree.bind(sequence='<Double-1>', func=self.Doc_detail_view)
-        self.doc_tree.bind(sequence='<Button-3>', func=self.Doc_detail_view)
-
-#------------------------------------------------------------------------
     def Expr_detail_view(self, sel):
         """ Find the selected object from a user selection
             in the expr_table that is displayed in the expr_tree view."""
@@ -3509,7 +3560,6 @@ class Display_views():
         else:
             self.Define_and_display_individual_detail_view(selected_obj)
 
-#------------------------------------------------------------------------
     def Prepare_lh_object_network_view(self):
         ''' Set the uid of the left hand object in a selected treeview row
             as the chosen object
@@ -3659,7 +3709,6 @@ class Display_views():
             if len(self.info_model) > 0:
                 self.Define_and_display_documents()
 
-#------------------------------------------------------------------------
     def Kind_detail_view_left(self, sel):
         """ Find the selected left hand object from a user selection with left button
             in the kind_table that is displayed in the kind_tree view."""
