@@ -2158,7 +2158,7 @@ class Display_views():
             for display in a tab of Notebook
         '''
         network_text = ['Network', 'Netwerk']
-        self.network_frame = gui.VBox(width='100%', height='100%',
+        self.network_frame = gui.VBox(width='100%', height='80%',
                                       style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.network_frame,
                                                 network_text[self.GUI_lang_index], self.tab_cb)

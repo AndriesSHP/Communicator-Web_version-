@@ -171,7 +171,8 @@ class Communicator(App):
             Starting in grid on row 1.
         '''
         # Define the overall views_notebook
-        self.views_noteb = MyTabBox(height='100%', width='100%', style='background-color:#eeffdd')
+        self.views_noteb = MyTabBox(width='100%', height='80%',
+                                    style='background-color:#eeffdd')
         self.main_frame.append(self.views_noteb)
 
         self.Define_log_sheet()
@@ -179,9 +180,18 @@ class Communicator(App):
     def Define_log_sheet(self):
         ''' Define a tab and frame for errors and warnings'''
         log_head = ['Messages and warnings','Berichten en foutmeldingen']
-        self.log_frame = gui.ListView(width='100%', height='100%', style='background-color:#eeffdd')
-        self.log_frame.attributes['title'] = 'Display messages and warnings'
-        self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], self.tab_cb)
+        self.mess_frame = gui.VBox(width='100%', height='20%')
+        self.mess_frame.attributes['title'] = 'Display area for messages and warnings'
+        self.main_frame.append(self.mess_frame)
+        #self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], self.tab_cb)
+        self.log_head = gui.HBox(width='100%', height=20)
+        self.log_label = gui.Label(log_head[self.GUI_lang_index], width='100%', height=20,
+                                            style='background-color:#eeffdd')
+        self.log_head.append(self.log_label)
+        self.log_frame = gui.ListView(width='100%', height='100%',
+                                      style='background-color:#ffdddd')
+        self.mess_frame.append(self.log_head)
+        self.mess_frame.append(self.log_frame)
 
     def tab_cb(self):
         return
