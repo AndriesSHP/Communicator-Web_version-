@@ -5,8 +5,8 @@
 '''
 # TODO: import specific names
 from tkinter import ttk, Toplevel, Canvas, NSEW, E, NS, S, EW, W, \
-     VERTICAL, HORIZONTAL, LAST
-from tkinter.ttk import Notebook
+    VERTICAL, HORIZONTAL, LAST, CENTER
+#from tkinter.ttk import Notebook
 
 
 class Occurrences_diagram():
@@ -103,7 +103,7 @@ class Occurrences_diagram():
         maxBoxesPerSheet = 7
         firstBox = 0
 
-        nrOfSheets = (totalNrOfBoxes - 1)/maxBoxesPerSheet + 1
+        nrOfSheets = (totalNrOfBoxes - 1) / maxBoxesPerSheet + 1
         intSheet = int(nrOfSheets)
         rest = totalNrOfBoxes - (intSheet - 1) * maxBoxesPerSheet
         shText = str(parentID)
@@ -136,7 +136,7 @@ class Occurrences_diagram():
             childID = str(parentID) + '.' + str(seq)
             for whole, part, kind_of_part in self.part_whole_occs:
                 # If the whole appears on previous sheet, then there is a part:
-                if  whole == topOcc:
+                if whole == topOcc:
                     parts_present = True
                     parts.append(part)
             # Draw part occurrences on sheet(s)
@@ -168,12 +168,12 @@ class Occurrences_diagram():
         self.drawings[self.sheet_nr].rowconfigure(0, weight=1)
         self.drawings[self.sheet_nr].config(borderwidth=5)
         self.occ_notebook.add(self.drawings[self.sheet_nr], text=sheetName, sticky=NSEW)
-        self.occ_notebook.insert("end",self.drawings[self.sheet_nr], sticky=NSEW)
+        self.occ_notebook.insert("end", self.drawings[self.sheet_nr], sticky=NSEW)
 
         # self.sheets = Canvas(drawing, width=self.screen_width,
         #                     height=self.screen_height, background='#ddf')
-        self.sheets.append(Canvas(self.drawings[self.sheet_nr], width=self.screen_width-100,
-                                  height=self.screen_height-200, background='#ddf')) # Canvas
+        self.sheets.append(Canvas(self.drawings[self.sheet_nr], width=self.screen_width - 100,
+                                  height=self.screen_height - 200, background='#ddf')) # Canvas
         self.sheets[self.sheet_nr].grid(column=0, row=0, columnspan=2, sticky=NSEW)
         self.sheets[self.sheet_nr].bind('<Button-2>', self.RightMouseButton)
         self.sheets[self.sheet_nr].columnconfigure(0, weight=1)
@@ -182,12 +182,12 @@ class Occurrences_diagram():
         self.draw_y_scroll.append(ttk.Scrollbar(self.drawings[self.sheet_nr],
                                                 orient=VERTICAL,
                                                 command=self.sheets[self.sheet_nr].yview))
-        self.draw_y_scroll[self.sheet_nr].grid(column=2, row=0, sticky=NS+E)
+        self.draw_y_scroll[self.sheet_nr].grid(column=2, row=0, sticky=NS + E)
         self.sheets[self.sheet_nr].config(yscrollcommand=self.draw_y_scroll[self.sheet_nr].set)
         self.draw_x_scroll.append(ttk.Scrollbar(self.drawings[self.sheet_nr],
                                                 orient=HORIZONTAL,
                                                 command=self.sheets[self.sheet_nr].xview))
-        self.draw_x_scroll[self.sheet_nr].grid(column=0, row=1, columnspan=2, sticky=S+EW)
+        self.draw_x_scroll[self.sheet_nr].grid(column=0, row=1, columnspan=2, sticky=S + EW)
         self.sheets[self.sheet_nr].config(xscrollcommand=self.draw_x_scroll[self.sheet_nr].set)
 
         # Stream Frames - left and right
@@ -266,23 +266,21 @@ class Occurrences_diagram():
 
         self.leftStrScroll.append(ttk.Scrollbar(self.leftStrFrame[self.sheet_nr], orient=VERTICAL,
                                                 command=self.leftStrTree[self.sheet_nr].yview))
-        self.leftStrScroll[self.sheet_nr].grid(column=0, row=0, sticky=NS+E)
-        self.leftStrTree[self.sheet_nr].config(yscrollcommand=\
+        self.leftStrScroll[self.sheet_nr].grid(column=0, row=0, sticky=NS + E)
+        self.leftStrTree[self.sheet_nr].config(yscrollcommand=
                                                self.leftStrScroll[self.sheet_nr].set)
 
         self.rightStrScroll.append(ttk.Scrollbar(self.drawings[self.sheet_nr], orient=VERTICAL,
                                                  command=self.rightStrTree[self.sheet_nr].yview))
         self.rightStrScroll[self.sheet_nr].grid(column=2, row=2, sticky=NS+E)
-        self.rightStrTree[self.sheet_nr].config(yscrollcommand=\
+        self.rightStrTree[self.sheet_nr].config(yscrollcommand=
                                                 self.rightStrScroll[self.sheet_nr].set)
 
     def Draw_DrawingOfOneSheet(self, nrOfOccs, occs, parentID):
         ''' - parentID: the ID of the whole occurrence(box)
             of which the occNames(occurrences) are parts.
         '''
-        test = False
-
-        outputUID = '640019'      # output role
+        outputUID = '640019'     # output role
         inputUID = '640016'      # input role
         actorUID = '5036'        # actor role (supertype of mechanism)
         subOutputs, subOutputUIDs = self.gel_net.Determine_subtype_list(outputUID)
@@ -298,29 +296,31 @@ class Occurrences_diagram():
 
         boxWidth = 100          # pixels
         boxHeight = 100          # pixels
-        self.boxW2 = boxWidth  / 2   # 1/2Width  of boxes
+        self.boxW2 = boxWidth / 2   # 1/2Width  of boxes
         self.boxH2 = boxHeight / 2   # 1/2Height of boxes
 
-        deltaX = self.screen_width/(nrOfOccs+1)
-        deltaY = self.screen_height/(nrOfOccs+1)
+        deltaX = self.screen_width/(nrOfOccs + 1)
+        deltaY = self.screen_height/(nrOfOccs + 1)
         dxC = 8                 # corner rounding
         dyC = 8
         # dx = 8                 # shifted start point for line on box
         dy = 8
 
+        # Initialize inputs, outputs, controls and mechanisms according to IDEF0.
+        # occCon, occMech, occConUp and 0ccMechUp not yet used, but later exprected
         occIn = []
         occOut = []
-        occCon = []
-        occMech= []
+        #occCon = []
+        #occMech = []
         occInUp = []
         occOutUp = []
-        occConUp = []
-        occMechUp= []
-        # Draw boxes (occurrences), return midpts[i] = N(x,y),S(x,y),E(x,y),W(x,y)
-        for boxNr in range(0,nrOfOccs):
-            centerX.append(deltaX + boxNr*deltaX)     # X of center of box canvas
-            centerY.append(deltaY + boxNr*deltaY)     # Y of center of box canvas
-            self.boxID = str(parentID) + '.' + str(boxNr+1)
+        #occConUp = []
+        #occMechUp = []
+        # Draw boxes (occurrences), return midpts[i] = N(x,y), S(x,y), E(x,y), W(x,y)
+        for boxNr in range(0, nrOfOccs):
+            centerX.append(deltaX + boxNr * deltaX)     # X of center of box canvas
+            centerY.append(deltaY + boxNr * deltaY)     # Y of center of box canvas
+            self.boxID = str(parentID) + '.' + str(boxNr + 1)
 
             midPts.append(self.BoxType1(self.sheets[self.sheet_nr],
                                         centerX[boxNr], centerY[boxNr],
@@ -330,14 +330,14 @@ class Occurrences_diagram():
         self.boxes.append(boxesOnSheet)
 
         # Initialize number of I/O/C/M down and upwards for each occurrence on sheet
-        occIn = [0 for i in range(0,nrOfOccs)]  # input stream nr of deltas downward
-        occOut = [0 for i in range(0,nrOfOccs)]
-        occCon = [0 for i in range(0,nrOfOccs)]  # control stream nr of deltas right
-        occMech = [0 for i in range(0,nrOfOccs)]
-        occInUp = [0 for i in range(0,nrOfOccs)]  # input stream nr of deltas upward
-        occOutUp = [0 for i in range(0,nrOfOccs)]
-        occConUp = [0 for i in range(0,nrOfOccs)]  # control stream nr of deltas left
-        occMechUp = [0 for i in range(0,nrOfOccs)]
+        occIn = [0 for i in range(0, nrOfOccs)]  # input stream nr of deltas downward
+        occOut = [0 for i in range(0, nrOfOccs)]
+        #occCon = [0 for i in range(0, nrOfOccs)]  # control stream nr of deltas right
+        #occMech = [0 for i in range(0, nrOfOccs)]
+        occInUp = [0 for i in range(0, nrOfOccs)]  # input stream nr of deltas upward
+        occOutUp = [0 for i in range(0, nrOfOccs)]
+        #occConUp = [0 for i in range(0, nrOfOccs)]  # control stream nr of deltas left
+        #occMechUp = [0 for i in range(0, nrOfOccs)]
 
         # Draw lines (streams)
         strNr = 0
@@ -374,22 +374,23 @@ class Occurrences_diagram():
                     strNr = strNr + 1
                     strID = str(strNr)
                     endPt = midPts[indexTo][3]
-                    beginPt = [border,midPts[indexTo][3][1]]
+                    beginPt = [border, midPts[indexTo][3][1]]
 
                     x = (beginPt[0] + endPt[0]) / 2
-                    y =  beginPt[1]
+                    y = beginPt[1]
                     rhombus = self.RhombusPolygon(self.sheets[self.sheet_nr], x, y, strID, rsize)
 
                     lConnPt = rhombus[3]
                     rConnPt = rhombus[2]
-                    line1Pts = [beginPt,lConnPt]
-                    line2Pts = [rConnPt,endPt]
+                    line1Pts = [beginPt, lConnPt]
+                    line2Pts = [rConnPt, endPt]
 
                     line1 = self.sheets[self.sheet_nr].create_line(line1Pts, fill='blue',
                                                                    width=thick, arrow=LAST)
                     line2 = self.sheets[self.sheet_nr].create_line(line2Pts, fill='blue',
                                                                    width=thick, arrow=LAST)
                     linesOnSheet.append(line1)
+                    linesOnSheet.append(line2)
                     if left is True:
                         self.leftStrTree[self.sheet_nr].insert('', index='end',
                                                                values=(strID, streamName,
@@ -431,7 +432,7 @@ class Occurrences_diagram():
                 # Determine index (in list of occs) of boxFrom and boxTo
                 indexFrom = -1
                 indexTo = -1
-                for index in range(0,len(occs)):
+                for index in range(0, len(occs)):
                     if occUIDFrom == occs[index].uid:
                         indexFrom = index
                     if occUIDTo == occs[index].uid:
@@ -451,7 +452,7 @@ class Occurrences_diagram():
                     # occOut[indexTo] += 1         # indexTo == -1
                     # midPts(occNr, East, x / y)
                     beginPt = [midPts[indexFrom][2][0], midPts[indexFrom][2][1] + ddyFrom]
-                    endPt = [self.screen_width-border, beginPt[1]]
+                    endPt = [self.screen_width - border, beginPt[1]]
                     x = (beginPt[0] + endPt[0]) / 2
                     y = beginPt[1]
                     # Rhombus on vertical line
@@ -469,10 +470,10 @@ class Occurrences_diagram():
                     occOut[indexTo] += 1
                     beginPt = [midPts[indexFrom][2][0], midPts[indexFrom][2][1] + ddyFrom]
                     endPt = [midPts[indexTo][3][0], midPts[indexTo][3][1] + ddyTo]
-                    mid1Pt = [(beginPt[0] + midPts[indexFrom+1][3][0]) / 2 - dxC, beginPt[1]]
-                    mid2Pt = [(beginPt[0] + midPts[indexFrom+1][3][0]) / 2, beginPt[1] + dyC]
-                    mid3Pt = [(beginPt[0] + midPts[indexFrom+1][3][0]) / 2, endPt[1] - dyC]
-                    mid4Pt = [(beginPt[0] + midPts[indexFrom+1][3][0]) / 2 + dxC, endPt[1]]
+                    mid1Pt = [(beginPt[0] + midPts[indexFrom + 1][3][0]) / 2 - dxC, beginPt[1]]
+                    mid2Pt = [(beginPt[0] + midPts[indexFrom + 1][3][0]) / 2, beginPt[1] + dyC]
+                    mid3Pt = [(beginPt[0] + midPts[indexFrom + 1][3][0]) / 2, endPt[1] - dyC]
+                    mid4Pt = [(beginPt[0] + midPts[indexFrom + 1][3][0]) / 2 + dxC, endPt[1]]
                     x = mid2Pt[0]
                     y = (mid2Pt[1] + mid3Pt[1]) / 2
                     rhombus = self.RhombusPolygon(self.sheets[self.sheet_nr], x, y, strID, rsize)
@@ -489,17 +490,17 @@ class Occurrences_diagram():
                     occOutUp[indexTo] += 1
                     beginPt = [midPts[indexFrom][2][0], midPts[indexFrom][2][1] - ddyUpFrom]
                     endPt = [midPts[indexTo][3][0], midPts[indexTo][3][1] - ddyUpTo]
-                    mid1Pt = [(beginPt[0] + midPts[indexFrom+1][3][0]) / 2 - dxC, beginPt[1]]
-                    mid2Pt = [(beginPt[0] + midPts[indexFrom+1][3][0]) / 2, beginPt[1] - dyC]
-                    mid3Pt = [(beginPt[0] + midPts[indexFrom+1][3][0]) / 2,
+                    mid1Pt = [(beginPt[0] + midPts[indexFrom + 1][3][0]) / 2 - dxC, beginPt[1]]
+                    mid2Pt = [(beginPt[0] + midPts[indexFrom + 1][3][0]) / 2, beginPt[1] - dyC]
+                    mid3Pt = [(beginPt[0] + midPts[indexFrom + 1][3][0]) / 2,
                               endPt[1] - boxHeight + dyC]
-                    mid4Pt = [(beginPt[0] + midPts[indexFrom+1][3][0])/2 - dxC,
+                    mid4Pt = [(beginPt[0] + midPts[indexFrom + 1][3][0]) / 2 - dxC,
                               endPt[1] - boxHeight]
                     mid5Pt = [(endPt[0] - boxWidth / 2) + dxC, endPt[1] - boxHeight]
                     mid6Pt = [(endPt[0] - boxWidth / 2), endPt[1] - boxHeight + dyC]
                     mid7Pt = [(endPt[0] - boxWidth / 2), endPt[1] - dyC]
-                    mid8Pt = [(endPt[0] - boxWidth / 2) + dxC, endPt[1]                  ]
-                    x =  mid2Pt[0]
+                    mid8Pt = [(endPt[0] - boxWidth / 2) + dxC, endPt[1]]
+                    x = mid2Pt[0]
                     y = (mid2Pt[1] + mid3Pt[1]) / 2
                     rhombus = self.RhombusPolygon(self.sheets[self.sheet_nr], x, y, strID, rsize)
                     uConnPt = rhombus[0]
@@ -535,6 +536,7 @@ class Occurrences_diagram():
                 line2 = self.sheets[self.sheet_nr].create_line(line2Pts, fill='blue',
                                                                width=thick, arrow=LAST)
                 linesOnSheet.append(line1)
+                linesOnSheet.append(line2)
 
                 # Record stream in leftStrTree[self.sheet_nr](s)
                 if left is True:
@@ -551,38 +553,38 @@ class Occurrences_diagram():
         self.lines.append(linesOnSheet)
 
     def BoxType1(self, sheet, X, Y, name):
-        """ Draw a box around (X,Y) = Xcenter and Ycenter
+        """ Draw a box with name on sheet around (X,Y) = Xcenter and Ycenter
             Return midpts = N(x,y), S(x,y), E(x,y), W(x,y)
             (X,Y) = center of box on canvas
         """
 
-        x0,y0 = X - self.boxW2, Y - self.boxH2        # TopLeft of box
-        x1,y1 = X + self.boxW2, Y + self.boxH2        # BottomRight of box
+        x0, y0 = X - self.boxW2, Y - self.boxH2        # TopLeft of box
+        x1, y1 = X + self.boxW2, Y + self.boxH2        # BottomRight of box
 
-        boxNr = sheet.create_rectangle(x0, y0, x1, y1,
-                                       fill='#dfd', outline='black')
-        boxName = sheet.create_text(X, Y, justify=CENTER, text=name)
-        boxIdent = sheet.create_text(X, Y + 15, justify=CENTER, text=str(self.boxID))
+        sheet.create_rectangle(x0, y0, x1, y1,
+                               fill='#dfd', outline='black')
+        sheet.create_text(X, Y, justify=CENTER, text=name)
+        sheet.create_text(X, Y + 15, justify=CENTER, text=str(self.boxID))
 
         midNorth = [X, Y - self.boxH2]
         midSouth = [X, Y + self.boxH2]
         midEast = [X + self.boxW2, Y]
         midWest = [X - self.boxW2, Y]
 
-        return midNorth,midSouth,midEast,midWest
+        return midNorth, midSouth, midEast, midWest
 
     def RhombusPolygon(self, sheet, X, Y, strID, rsize):
         """ Draw a rhombus polygon on position X,Y
             with its strID as text in the middle on sheet.
         """
 
-        x0,y0 = X - rsize, Y    # midWest
-        x1,y1 = X, Y - rsize    # midNorth
-        x2,y2 = X + rsize, Y    # midEast
-        x3,y3 = X, Y + rsize    # midSouth
-        rhomNr = sheet.create_polygon(x0, y0, x1, y1, x2, y2, x3, y3,
-                                      fill='#dfd', smooth=0, outline='black')
-        strIdent = sheet.create_text(X, Y, justify=CENTER, text=strID)
+        x0, y0 = X - rsize, Y    # midWest
+        x1, y1 = X, Y - rsize    # midNorth
+        x2, y2 = X + rsize, Y    # midEast
+        x3, y3 = X, Y + rsize    # midSouth
+        sheet.create_polygon(x0, y0, x1, y1, x2, y2, x3, y3,
+                             fill='#dfd', smooth=0, outline='black')
+        sheet.create_text(X, Y, justify=CENTER, text=strID)
 
         midNorth = [x1, y1]
         midSouth = [x3, y3]
@@ -593,4 +595,4 @@ class Occurrences_diagram():
 
     def exit_python(self, event):
         '''Exit Python when the event 'event' occurs.'''
-        quit() # no arguments to quit
+        quit()  # no arguments to quit
