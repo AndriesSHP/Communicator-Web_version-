@@ -26,8 +26,9 @@ class MyTabBox(gui.TabBox):
                 holder.get_parent().remove_child(holder)
                 self._tab_cbs.pop(holder.identifier)
                 identifier = holder.identifier
-            if identifier != None:
+            if identifier is not None:
                 self._tabs.pop(holder.identifier)
+
 
 class Communicator(App):
     ''' The opening window of the Communicator program
@@ -35,7 +36,6 @@ class Communicator(App):
         The options start queries that are executed
         and the resulting models are displayed in model views.
     '''
-
     def __init__(self, *args):
         self.net_name = "Gellish semantic network"
         self.pickle_file_name = "Gellish_net_db"
@@ -45,20 +45,20 @@ class Communicator(App):
         self.user_interface = None
         #self.views_noteb = None
 
-        self.GUI_lang_name_dict = {"English":'910036',
-                                   "Nederlands":'910037'}
+        self.GUI_lang_name_dict = {"English": '910036',
+                                   "Nederlands": '910037'}
         self.GUI_lang_names = ['English', 'Nederlands']
 
         self.extended_query = False
         self.obj_without_name_in_context = []
 
-        self.reply_lang_name_dict = {'English':'910036',
-                                     'Nederlands':'910037',
-                                     'American':'911689',
-                                     'Chinese':'911876',
-                                     'Deutsch':'910038',
-                                     'Francais':'910039'}
-        self.comm_pref_uids = ['492014', 'any'] # Default: 492014 = 'Gellish'
+        self.reply_lang_name_dict = {'English': '910036',
+                                     'Nederlands': '910037',
+                                     'American': '911689',
+                                     'Chinese': '911876',
+                                     'Deutsch': '910038',
+                                     'Francais': '910039'}
+        self.comm_pref_uids = ['492014', 'any']  # Default: 492014 = 'Gellish'
         self.file_path_names = []
 
         super(Communicator, self).__init__(*args)
@@ -66,11 +66,11 @@ class Communicator(App):
     # Define the main window
     def main(self):
         ''' Define a main_window with select options and GUI language choice.'''
-        main_menu = ['Main Menu', 'Hoofdmenu']
-        login = ['Login/Register', 'Login/Registreer']
+        # main_menu = ['Main Menu', 'Hoofdmenu']
+        # login = ['Login/Register', 'Login/Registreer']
         read_file = ['Read file', 'Lees file']
         search = ['Search', 'Zoek']
-        query = ['Query', 'Vraag']
+        # query = ['Query', 'Vraag']
         admin = ['DB Admin', 'DB Admin']
         new_net = ['New network', 'Nieuw netwerk']
         save_as = ['Save net', 'Opslaan']
@@ -81,7 +81,7 @@ class Communicator(App):
         user_db = SU.UserDb()
         self.start_up(user_db)
         self.start_net()
-        
+
         # Set GUI language default = English: GUI_lang_names[0]
         self.Set_GUI_language(self.GUI_lang_names[0])
 
@@ -99,7 +99,7 @@ class Communicator(App):
         self.read_file_tag.attributes['title'] = import_text[self.GUI_lang_index]
         self.read_file_tag.onclick.connect(self.read_verify_and_merge_files)
         self.menubar.append(self.read_file_tag)
-        
+
         self.search_tag = gui.MenuItem(search[self.GUI_lang_index], width=100, height=20)
         self.search_tag.attributes['title'] = 'Open a search window'
         self.search_tag.onclick.connect(self.search_net)
@@ -116,7 +116,8 @@ class Communicator(App):
         self.menubar.append(self.wiki_tag)
 
         self.admin_tag = gui.MenuItem(admin[self.GUI_lang_index], width=100, height=20)
-        self.admin_tag.attributes['title'] = 'Save network on file or delete old and create new network'
+        self.admin_tag.attributes['title'] = 'Save network on file '\
+                                             'or delete old and create new network'
         self.menubar.append(self.admin_tag)
 
         self.save_as_tag = gui.MenuItem(save_as[self.GUI_lang_index], width=100, height=20)
@@ -165,7 +166,7 @@ class Communicator(App):
         self.Define_notebook()
 
         return self.container
-    
+
     def Define_notebook(self):
         ''' Defines a Notebook with various view layouts and displays view contents.
             Starting in grid on row 1.
@@ -179,14 +180,13 @@ class Communicator(App):
 
     def Define_log_sheet(self):
         ''' Define a tab and frame for errors and warnings'''
-        log_head = ['Messages and warnings','Berichten en foutmeldingen']
+        log_head = ['Messages and warnings', 'Berichten en foutmeldingen']
         self.mess_frame = gui.VBox(width='100%', height='20%')
         self.mess_frame.attributes['title'] = 'Display area for messages and warnings'
         self.main_frame.append(self.mess_frame)
-        #self.views_noteb.add_tab(self.log_frame, log_head[self.GUI_lang_index], self.tab_cb)
         self.log_head = gui.HBox(width='100%', height=20)
         self.log_label = gui.Label(log_head[self.GUI_lang_index], width='100%', height=20,
-                                            style='background-color:#eeffdd')
+                                   style='background-color:#eeffdd')
         self.log_head.append(self.log_label)
         self.log_frame = gui.ListView(width='100%', height='100%',
                                       style='background-color:#ffdddd')
@@ -197,8 +197,8 @@ class Communicator(App):
         return
 
     def start_up(self, user_db):
-        ''' Intended for authentication, providing or preventing unauthorized access.''' 
-        party = 'Andries'   #input("User name: ")
+        ''' Intended for authentication, providing or preventing unauthorized access.'''
+        party = 'Andries'   # input("User name: ")
         self.user = SU.User(party)
         sesam = self.user.Providing_Access(party, user_db)
         if sesam is False:
@@ -242,7 +242,6 @@ class Communicator(App):
             return()
         try:
             self.gel_net = pickle.load(infile)
-            #self = pickle.load(f)
         except EOFError:
             print("Input pickle file could not be read: {}".
                   format(fname))
@@ -272,8 +271,10 @@ class Communicator(App):
                 self.GUI_lang_pref_uids = ['589211', self.GUI_lang_uid, '910036']
         else:
             self.message_ui(
-                'The GUI language {} is unknown. Default = English.'.format(GUI_lang_name),
-                'De GUI taal {} is onbekend. Default = English.'.format(GUI_lang_name))
+                'The GUI language {} is unknown. Default = English.'.
+                format(GUI_lang_name),
+                'De GUI taal {} is onbekend. Default = English.'.
+                format(GUI_lang_name))
             GUI_set = False
         return GUI_set
 
@@ -281,7 +282,7 @@ class Communicator(App):
         ''' Determine which language for the user interface and query specification
             is spacified by the user.
         '''
-        GUI_lang_name = selection #self.lang_box.get()
+        GUI_lang_name = selection  # self.lang_box.get()
         self.Set_GUI_language(GUI_lang_name)
 
         self.message_ui(
@@ -305,8 +306,8 @@ class Communicator(App):
             after syntactic verification.
             The merge the file content in the semantic network.
         '''
-        self.read_file_container = gui.Widget(style={'width':'220px', 'display':'block',
-                                                     'overflow':'auto', 'text-align':'center'})
+        self.read_file_container = gui.Widget(style={'width': '220px', 'display': 'block',
+                                                     'overflow': 'auto', 'text-align': 'center'})
         self.container.append(self.read_file_container)
         # Select one or more files to be imported
         self.dialog = gui.FileSelectionDialog('File selection dialog',
@@ -335,14 +336,14 @@ class Communicator(App):
                 self.message_ui(
                     'Reading file <{}> from directory {}.'.format(path_name[1], path_name[0]),
                     'Lees file <{}> van directory {}.'.format(path_name[1], path_name[0]))
-                file_name = path_name[1]
-                file_path = path_name[0]
+                # file_name = path_name[1]
+                # file_path = path_name[0]
             else:
                 self.message_ui(
                     'Reading file <{}> from current directory.'.format(file_path_and_name),
                     'Lees file <{}> van actuele directory.'.format(file_path_and_name))
                 file_name = file_path_and_name
-                file_path = ''
+                # file_path = ''
 
             # Create file object
             self.current_file = Gellish_file(file_path_and_name, self.gel_net)
@@ -438,7 +439,7 @@ class Communicator(App):
             self.reply_lang_name = 'English'
             self.reply_lang_uid = '910037'
 
-    def Determine_name_in_context(self, obj, base_or_inverse = 'normal'):
+    def Determine_name_in_context(self, obj, base_or_inverse='normal'):
         ''' Given an object and preferred language sequence uids and community sequence uids,
             determine lang_name, comm_name, preferred obj_name for user interface.
             base_or_inverse denotes whether the preferred name should be found
@@ -487,13 +488,12 @@ class Communicator(App):
                     # No definition found,
                     # then search for def in any name in context in pref_languages
                     for lang_uid in self.reply_lang_pref_uids:
-                       for name_in_context in obj.names_in_contexts:
-                           if name_in_context[0] == lang_uid \
-                              and name_in_context[4] != '':
-                               part_def = name_in_context[4]
-                               break
-                       if part_def:
-                           break
+                        for name_in_context in obj.names_in_contexts:
+                            if name_in_context[0] == lang_uid and name_in_context[4] != '':
+                                part_def = name_in_context[4]
+                                break
+                        if part_def:
+                            break
             else:
                 # No name is available in the preferred language,
                 # then use the first available name and its definition
@@ -544,13 +544,14 @@ class Semantic_network():
     def __init__(self):
         self.GUI_lang_index = 0
         self.GUI_lang_name = 'English'
-        self.uid_dict = {} # key = uid; value = obj (an instance of Anything)
+        self.uid_dict = {}  # key = uid; value = obj (an instance of Anything)
 
     def reset_and_build_network(self):
         pass
 
     def save_pickle_db(self, widget):
         pass
+
 
 class Network():
     ''' Dummy class for testing only.'''
@@ -559,6 +560,7 @@ class Network():
 
     def build_network(self):
         print('Build network')
+
 
 if __name__ == "__main__":
     sys.setrecursionlimit(100000)
