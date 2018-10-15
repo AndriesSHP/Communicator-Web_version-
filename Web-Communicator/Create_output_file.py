@@ -1,13 +1,19 @@
-import os
+# import os
 import csv
 import datetime
 import json
-from rdflib import Graph, Literal, BNode, Namespace, RDF, URIRef, RDFS
+from rdflib import Graph, Namespace, URIRef, RDFS
+# Literal, RDF, BNode
 from tkinter import filedialog
 
 from Bootstrapping import ini_out_path
-from Expr_Table_Def import *
-from Expr_Table_Def import expr_col_ids, header3, default_row
+# from Expr_Table_Def import *
+from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col,\
+     intent_uid_col, intent_name_col, idea_uid_col, lh_uid_col, lh_name_col,\
+     rel_type_uid_col, rel_type_name_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col,\
+     rh_uid_col, rh_name_col, full_def_col, uom_uid_col, uom_name_col, status_col,\
+     expr_col_ids, header3, default_row
+#    lh_role_uid_col, lh_role_name_col, part_def_col
 from utils import open_file
 
 
@@ -30,20 +36,20 @@ def Create_gellish_expression(lang_comm, idea_uid, intent_uid_name,
     gellish_expr[phrase_type_uid_col] = rel_uid_phrase_type[2]
     gellish_expr[rh_role_uid_col] = rh_role_uid_name[0]
     gellish_expr[rh_role_name_col] = rh_role_uid_name[1]
-    gellish_expr[full_def_col] = full_description
     gellish_expr[rh_uid_col] = rh_uid_name[0]
     gellish_expr[rh_name_col] = rh_uid_name[1]
+    gellish_expr[full_def_col] = full_description
     gellish_expr[uom_uid_col] = uom_uid_name[0]
     gellish_expr[uom_name_col] = uom_uid_name[1]
     gellish_expr[status_col] = 'accepted'
     return gellish_expr
+
 
 def Open_output_file(expressions, subject_name, lang_name, serialization):
     """ Open a file for saving expressions in some format
         such as the CSV in Gellish Expression Format:
         Serialization is either 'csv', 'xml', 'n3' or 'json'.
     """
-
     date = datetime.date.today()
     # Create header line 1 and an initial file name
     if lang_name == 'Nederlands':
@@ -63,17 +69,17 @@ def Open_output_file(expressions, subject_name, lang_name, serialization):
     if serialization == 'json':
         ini_file_name = res + subject_name + '.json.json'
 
-    #header2 = expr_col_ids  # from Bootstrapping
+    # header2 = expr_col_ids  # from Bootstrapping
 
     # Select file name and directory
     # Ini_out_path from Bootstrapping
     title = serialization + ' files'
     extension = '*.' + serialization
-    output_file = filedialog.asksaveasfilename(filetypes = ((title, extension),
-                                                           ("All files", "*.*")),
-                                               title = "Enter a file name",
-                                               initialdir = ini_out_path,
-                                               initialfile = ini_file_name)
+    output_file = filedialog.asksaveasfilename(filetypes=((title, extension),
+                                                         ("All files", "*.*")),
+                                               title="Enter a file name",
+                                               initialdir=ini_out_path,
+                                               initialfile=ini_file_name)
     if output_file == '':
         output_file = 'Results.' + serialization
         if lang_name == 'Nederlands':
@@ -83,6 +89,7 @@ def Open_output_file(expressions, subject_name, lang_name, serialization):
             print('***File name for saving is blank or file selection is cancelled. '
                   'The file is saved under name ' + output_file)
     Save_expressions_in_file(expressions, output_file, header1, serialization)
+
 
 def Save_expressions_in_file(expressions, output_file, header1, serialization):
     '''Write expressions to an output file in an CSV or RDF serialization'''
@@ -110,22 +117,21 @@ def Save_expressions_in_file(expressions, output_file, header1, serialization):
 
     elif serialization in ['xml', 'n3']:
         g1 = Graph()
-
         uri = "http://www.formalenglish.net/dictionary"
-        gel = Namespace("http://www.formalenglish.net/dictionary")
-        g1.bind('gel',"http://www.formalenglish.net/dictionary")
+        # gel = Namespace("http://www.formalenglish.net/dictionary")
+        g1.bind('gel', "http://www.formalenglish.net/dictionary")
 
-        #rdfs = {1146: 'subClassOf'}
+        # rdfs = {1146: 'subClassOf'}
 
         for expr in expressions:
             rel_name = str(expr[3]).replace(" ", "_")
             if expr[2] == 1146:
                 rel = RDFS.subClassOf
             else:
-                rel = URIRef(uri+rel_name)
+                rel = URIRef(uri + rel_name)
 
-            lh = URIRef(uri+str(expr[1]))
-            rh = URIRef(uri+str(expr[5]))
+            lh = URIRef(uri + str(expr[1]))
+            rh = URIRef(uri + str(expr[5]))
             g1.add((lh, rel, rh))
 
         if serialization == 'n3':
@@ -145,9 +151,10 @@ def Save_expressions_in_file(expressions, output_file, header1, serialization):
     # Open written file in a viewer
     open_file(output_file)
 
+
 def Convert_numeric_to_integer(numeric_text):
     ''' Convert a numeric string into integer value removing dots(.), commas(,) and spaces( )
-        If string is not numeric, return string and integer = False
+        If string is not numeric, return string and integer = False.
     '''
     integer = True
     try:
@@ -162,6 +169,7 @@ def Convert_numeric_to_integer(numeric_text):
             integer = False
             return numeric_text, integer
     return int_val, integer
+
 
 def Message(GUI_lang_index, mess_text_EN, mess_text_NL):
     if GUI_lang_index == 1:
