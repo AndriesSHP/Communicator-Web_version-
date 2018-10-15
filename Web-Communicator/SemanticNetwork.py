@@ -13,7 +13,9 @@ from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_
 #    intent_uid_col, intent_name_col, rel_type_name_col, full_def_col, status_col
 from Gellish_file import Gellish_file
 from Anything import Anything, Relation
-# from Bootstrapping import *
+from Bootstrapping import basePhraseUID, inversePhraseUID, binRelUID,\
+     first_role_uid, second_role_uid,\
+     is_called_uid, by_def_role_of_ind, subtypeRoleUID, Dutch_uid
 from GellishDict import GellishDict
 from Create_output_file import Convert_numeric_to_integer, Message
 
@@ -49,8 +51,6 @@ class Semantic_Network():
         self.GUI_lang_index = 0
         self.lang_uid_dict = {}
         self.community_dict = {}
-        # self.English_uid = '910036'
-        self.Dutch_uid = '910037'
         self.lang_dict_EN = {'910036': "English",
                              '910037': "Dutch",
                              '589211': "international",
@@ -282,13 +282,13 @@ class Semantic_Network():
 
         # If the left or right hand object name is blank then give it the name 'nameless'
         if lh_name == '':
-            if lang_uid == self.Dutch_uid:
+            if lang_uid == Dutch_uid:
                 lh_name = self.nameless[1]
             else:
                 lh_name = self.nameless[0]
 
         if rh_name == '':
-            if lang_uid == self.Dutch_uid:
+            if lang_uid == Dutch_uid:
                 rh_name = self.nameless[1]
             else:
                 rh_name = self.nameless[0]
@@ -326,7 +326,7 @@ class Semantic_Network():
             # thus creating the new name: nameless-uid
             if lh_name in self.nameless:  # ['nameless', 'naamloos', '']
                 ind = 0
-                if lang_uid == self.Dutch_uid:
+                if lang_uid == Dutch_uid:
                     ind = 1
                 lh_name = self.nameless[ind] + '-' + str(lh_uid)
 
@@ -384,7 +384,7 @@ class Semantic_Network():
             # If existing lh.name is 'nameless-uid', but new lh_name is given,
             #    then insert name_and_descr and change the name from nameless into the given name
             ind = 0
-            if lang_uid == self.Dutch_uid:
+            if lang_uid == Dutch_uid:
                 ind = 1
             if lh.name == self.nameless[ind] + '-' + str(lh_uid) \
                and lh_name not in self.nameless:

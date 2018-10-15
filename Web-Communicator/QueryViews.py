@@ -2,7 +2,7 @@ import os
 import remi.gui as gui
 from operator import itemgetter
 
-from Bootstrapping import ini_out_path
+from Bootstrapping import ini_out_path, is_called_uid
 from Expr_Table_Def import *
 from Query import Query
 from Anything import Anything
@@ -611,8 +611,8 @@ class Query_view():
                            self.Solve_unknown()
             # Debug print('  OptRel:',self.rel_options)
 
-            # == rel_opions: option_nr,whetherKnown,langUIDres,commUIDres,
-            #                result_string,resultUID,is_called_uid,kindKnown,kind 
+            # == rel_opions: option_nr,whetherKnown, langUIDres, commUIDres,
+            #                result_string, resultUID, is_called_uid, kindKnown,kind 
             # If rel_options are available, then sort the list and display in rel_options tree
             if len(self.rel_options) > 0:
                 self.query.q_rel_uid = self.rel_options[0][5]
@@ -664,8 +664,8 @@ class Query_view():
                           self.Solve_unknown()
             # Debug print('  OptRh:',self.rh_options);
 
-            # == rh_options: option_nr,whetherKnown,langUIDres,commUIDres,
-            #                result_string,resultUID,is_called_uid,kindKnown,kind
+            # == rh_options: option_nr, whetherKnown, langUIDres, commUIDres,
+            #                result_string, resultUID, is_called_uid, kindKnown,kind
             # If rh_options are available,
             # then sort the list and display them in the rh_options tree
             if len(self.rh_options) > 0:
@@ -732,7 +732,7 @@ class Query_view():
         unknown_terms = ['', '?', 'any', 'what', 'which', 'who', 'where',
                          'wat', 'welke', 'wie', 'waar']
         found_uid = ''
-        is_called_uid = '5117'
+##        is_called_uid = '5117'
 
         # If search string denotes an unknown from the list unknown_terms
         # then add unknown to the list of options

@@ -3,11 +3,12 @@
 # from tkinter import filedialog
 # from tkinter import *
 # from tkinter.ttk import *
+import datetime
 
 # from Bootstrapping import *
 from Expr_Table_Def import idea_uid_col, \
      lh_uid_col, rel_type_uid_col, rel_type_name_col, rh_uid_col
-from Create_output_file import Open_output_file, Save_expressions_in_file, header1
+from Create_output_file import Open_output_file, Save_expressions_in_file
 
 
 class Anything:
@@ -49,6 +50,10 @@ class Anything:
         # Aspects are the aspects and intrinsic aspects of kinds or of individual things
         # (duplicates possession relations)
 ##        self.aspects = []
+        date = datetime.date.today()
+        subject_name = self.name
+        self.header1 = ['Gellish', 'English', 'Version', '9.0', date, 'Results',
+                        'about ' + subject_name]
 
     def add_name_in_context(self, name_in_context):
         ''' add name or alias to collection of names:
@@ -137,10 +142,10 @@ class Anything:
 
         save_on_file = input('\nSave query results on output file? (y/n): ')
         if save_on_file == 'y':
-            lang_name = 'Naderlands'
+            lang_name = 'English'
             serialization = 'CSV'
             output_file = Open_output_file(query_results, self.name, lang_name, serialization)
-            Save_expressions_in_file(query_results, output_file, header1, serialization)
+            Save_expressions_in_file(query_results, output_file, self.header1, serialization)
 
     def __repr__(self):
         # return(self.uid, self.names_in_contexts)

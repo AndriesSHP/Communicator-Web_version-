@@ -5,11 +5,13 @@ import json
 import logging
 #import remi.gui as gui
 
-from Bootstrapping import ignores
+from Bootstrapping import ignores, subtypeRoleUID, supertypeRoleUID, subtypeName, supertypeName
 from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col,\
      intent_uid_col, intent_name_col, lh_uid_col, lh_name_col, lh_role_uid_col, lh_role_name_col,\
+     idea_uid_col,\
      rel_type_uid_col, rel_type_name_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col,\
-     rh_uid_col, rh_name_col, part_def_col, full_def_col, uom_uid_col, uom_name_col, status_col
+     rh_uid_col, rh_name_col, part_def_col, full_def_col, uom_uid_col, uom_name_col, status_col,\
+     file_name_col, expr_col_ids, default_row
 from Create_output_file import Create_gellish_expression, Open_output_file,\
      Convert_numeric_to_integer, Message
 from Mapping_tables_IB import keys_map, attributes_map, value_key_map, values_map
