@@ -1,22 +1,24 @@
 #!/usr/bin/python3
-import sys
+# import sys
 import os
-import csv
-import sqlite3
+# import csv
+# import sqlite3
 import pickle
-import remi.gui as gui
+# import remi.gui as gui
 
-from Expr_Table_Def import *
+from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col,\
+     lh_uid_col, lh_name_col, lh_role_uid_col, lh_role_name_col, idea_uid_col,\
+     rel_type_uid_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col,\
+     rh_uid_col, rh_name_col, part_def_col, uom_uid_col, uom_name_col
+#    intent_uid_col, intent_name_col, rel_type_name_col, full_def_col, status_col
 from Gellish_file import Gellish_file
 from Anything import Anything, Relation
-from Bootstrapping import *
+# from Bootstrapping import *
 from GellishDict import GellishDict
-from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer, \
-     Open_output_file, Message
+from Create_output_file import Convert_numeric_to_integer, Message
 
 class Semantic_Network():
     ''' Build and query a Semantic_Network model.
-
         Build the network from Gellish expressions read in Expression_list.
         Every node in the network is an instance of Anything.
         Every binary relation is an instance of Relation which is a subtype of Anything.
@@ -24,7 +26,7 @@ class Semantic_Network():
         the concepts (including relations) and their names and synonyms in the network.
         Start initially with bootstrapping base relation types,
               base_phrases being bootstrapping base phrases for binary relations
-              and inverse_phrases being bootstrapping inverse phrases
+              and inverse_phrases being bootstrapping inverse phrases.
     '''
     def __init__(self, net_name):
         self.name = net_name
@@ -33,11 +35,11 @@ class Semantic_Network():
         self.Gellish_files = []
         self.rels = []
         self.idea_uids = []
-        self.rel_types = [] # initialize and collect all binary relation types
-                            # (being 'binary relation' and its subtypes)
+        self.rel_types = []  # initialize and collect all binary relation types
+        #                      (being 'binary relation' and its subtypes)
         self.rel_type_uids = base_rel_type_uids
-        self.uid_dict = {}     # key = uid; value = obj (an instance of Anything)
-        #self.rel_uid_dict = {} # key = uid; value = binary relation (an instance of Anything)
+        self.uid_dict = {}   # key = uid; value = obj (an instance of Anything)
+        # self.rel_uid_dict = {}  # key = uid; value = binary relation (an instance of Anything)
         self.objects = []
         self.undefined_objects = []
         self.languages = []
@@ -45,9 +47,10 @@ class Semantic_Network():
         self.dictionary = GellishDict('Dictionary of Gellish formal languages')
 
         self.GUI_lang_index = 0
-
         self.lang_uid_dict = {}
         self.community_dict = {}
+        # self.English_uid = '910036'
+        self.Dutch_uid = '910037'
         self.lang_dict_EN = {'910036': "English",
                              '910037': "Dutch",
                              '589211': "international",
@@ -65,8 +68,12 @@ class Semantic_Network():
 
         self.total_base_phrases = boot_base_phrasesEN + boot_base_phrasesNL
         self.total_inverse_phrases = boot_inverse_phrasesEN + boot_inverse_phrasesNL
-        self.specialRelUIDs = ['1146'] # 1146 base UID for 'is a kind of'
-        self.classifUIDs = []       # 1225 base UID for 'is classified as a'
+        # UIDs that define a taxonomy: subtypes of 1146: the base UID for 'is a kind of'
+        self.specialRelUIDs = ['1146', '1726', '5277', '6022', '5396', '5683']
+        # Some UIDs that are classification relations, being subtypes of 1225:
+        self.classifUIDs = ['1225', '1588']   # 1225 base UID for 'is classified as a'
+##        UIDs that imply a new UoM in units and currencies table.
+##        uom_def_uids = ['1726', '5708', '1981']
         self.subComposUIDs = []
         self.subConcComposUIDs = []
         self.alias_uids = boot_alias_uids
@@ -201,24 +208,23 @@ class Semantic_Network():
             Determine the list of kinds of binary relations (subtypes of 'binary relation').
             Then complete and verify the base semantic network.
         '''
-
         # Complete and Verify base semantic network
         # Determine all subtypes of binary relation (5935)
         # and first_roles and second_roles and role players for all subtypes of binary relation
         # thus extending the list of kinds of relations, base phrases and inverse phrases
 
-        kind_rel = self.uid_dict[binRelUID] # uid = 5935
+        kind_rel = self.uid_dict[binRelUID]  # uid = 5935
         kind_rel.category = 'kind of relation'
 
         # Determine list of all subtypes of binary relation (5935)
         # and specify their self.category as 'kind of relation'
         # and determine their first and second kind of role (self.first_role and self.second_role)
-        self.rel_types, self.rel_type_uids = self.Determine_subtype_list(binRelUID) 
+        self.rel_types, self.rel_type_uids = self.Determine_subtype_list(binRelUID)
         Message(self.GUI_lang_index,
-            'Base network: {} contains {} objects and {} relations and {} kinds of relations.'.
-            format(self.name, len(self.objects), len(self.rels), len(self.rel_type_uids)),
-            'Basisnetwerk: {} bevat {} objecten en {} relaties en {} soorten relaties.'.
-            format(self.name, len(self.objects), len(self.rels), len(self.rel_type_uids)))
+                'Base network: {} contains {} objects and {} relations and {} kinds of relations.'.
+                format(self.name, len(self.objects), len(self.rels), len(self.rel_type_uids)),
+                'Basisnetwerk: {} bevat {} objecten en {} relaties en {} soorten relaties.'.
+                format(self.name, len(self.objects), len(self.rels), len(self.rel_type_uids)))
 
         # Check whether each concept has at least one supertype concept
         # (except for anything = 730000)
@@ -228,10 +234,10 @@ class Semantic_Network():
                                 'kind of role', 'kind of relation']:
                 if len(obj.supertypes) == 0 and obj.uid != '730000':
                     Message(self.GUI_lang_index,
-                        'Kind ({}) {} in the base ontology has no supertype(s).'.
-                        format(obj.uid, obj.name),
-                        'Soort ({}) {} in de basisontologie heeft geen supertype(s).'.
-                        format(obj.uid, obj.name))
+                            'Kind ({}) {} in the base ontology has no supertype(s).'.
+                            format(obj.uid, obj.name),
+                            'Soort ({}) {} in de basisontologie heeft geen supertype(s).'.
+                            format(obj.uid, obj.name))
 
         # Determine lists of various kinds and their subtypes
         self.BuildHierarchies()
@@ -265,23 +271,24 @@ class Semantic_Network():
         idea_uid = row[idea_uid_col]
         lang_uid = row[lang_uid_col]
         comm_uid = row[comm_uid_col]
-        intent_uid = row[intent_uid_col] 
+        # intent_uid = row[intent_uid_col]
         lh_uid, lh_name = row[lh_uid_col], row[lh_name_col]
         rh_uid, rh_name = row[rh_uid_col], row[rh_name_col]
-        rel_type_uid, rel_type_name = row[rel_type_uid_col], row[rel_type_name_col]
+        rel_type_uid = row[rel_type_uid_col]
+        # rel_type_name = row[rel_type_name_col]
         phrase_type_uid = row[phrase_type_uid_col]
         description = row[part_def_col]
         uom_uid, uom_name = row[uom_uid_col], row[uom_name_col]
 
         # If the left or right hand object name is blank then give it the name 'nameless'
         if lh_name == '':
-            if lang_uid == Dutch_uid:
+            if lang_uid == self.Dutch_uid:
                 lh_name = self.nameless[1]
             else:
                 lh_name = self.nameless[0]
 
         if rh_name == '':
-            if lang_uid == Dutch_uid:
+            if lang_uid == self.Dutch_uid:
                 rh_name = self.nameless[1]
             else:
                 rh_name = self.nameless[0]
@@ -289,15 +296,15 @@ class Semantic_Network():
         # Collect used languages for naming left hand objects in dict.
         # (for use by preferences)
         if lang_uid not in self.lang_uid_dict:
-           self.lang_uid_dict[lang_uid] = row[lang_name_col]
-           if lang_uid not in self.uid_dict:
-               lang = Anything(lang_uid, row[lang_name_col])
-               lang.defined = False
-               self.objects.append(lang)
-               self.uid_dict[lang_uid] = lang
-           # Add language object to list of undefined_objects
-           # for later verification of the presence of a definition
-           self.undefined_objects.append(lang)
+            self.lang_uid_dict[lang_uid] = row[lang_name_col]
+            if lang_uid not in self.uid_dict:
+                lang = Anything(lang_uid, row[lang_name_col])
+                lang.defined = False
+                self.objects.append(lang)
+                self.uid_dict[lang_uid] = lang
+            # Add language object to list of undefined_objects
+            # for later verification of the presence of a definition
+            self.undefined_objects.append(lang)
 
         # Collect language communities for naming left hand objects in dict.
         # (for use by preferences)
@@ -319,7 +326,7 @@ class Semantic_Network():
             # thus creating the new name: nameless-uid
             if lh_name in self.nameless:  # ['nameless', 'naamloos', '']
                 ind = 0
-                if lang_uid == Dutch_uid:
+                if lang_uid == self.Dutch_uid:
                     ind = 1
                 lh_name = self.nameless[ind] + '-' + str(lh_uid)
 
@@ -338,12 +345,14 @@ class Semantic_Network():
                 verification_triple = self.dictionary[lh_name_in_context]
                 if verification_triple[0] != lh_uid:
                     Message(self.GUI_lang_index,
-                        'The same name <{}> in the same language and language community '
-                        'shall have the same UIDs instead of {} and {}. Idea {} ignored.'.
-                        format(lh_name_in_context[2], lh_uid, verification_triple[0], idea_uid),
-                        'Dezelfde naam <{}> in dezelfde taal en taalgemeenschap moeten '
-                        'dezelfde UIDs hebben, in plaats van {} en {}. Idee {} is genegeerd'.
-                        format(lh_name_in_context[2], lh_uid, verification_triple[0], idea_uid))
+                            'The same name <{}> in the same language and language community '
+                            'shall have the same UIDs instead of {} and {}. Idea {} ignored.'.
+                            format(lh_name_in_context[2], lh_uid,
+                                   verification_triple[0], idea_uid),
+                            'Dezelfde naam <{}> in dezelfde taal en taalgemeenschap moeten '
+                            'dezelfde UIDs hebben, in plaats van {} en {}. Idee {} is genegeerd'.
+                            format(lh_name_in_context[2], lh_uid,
+                                   verification_triple[0], idea_uid))
                     return
             else:
                 # Add name_in_context to dictionary of names in contexts
@@ -369,13 +378,13 @@ class Semantic_Network():
                     lh.names_in_contexts.append(name_and_description)
 
         else:
-            # lh_uid is known, thus find the existing lh object from its uid in uid_dict. 
+            # lh_uid is known, thus find the existing lh object from its uid in uid_dict.
             lh = self.uid_dict[lh_uid]
 
             # If existing lh.name is 'nameless-uid', but new lh_name is given,
             #    then insert name_and_descr and change the name from nameless into the given name
             ind = 0
-            if lang_uid == Dutch_uid:
+            if lang_uid == self.Dutch_uid:
                 ind = 1
             if lh.name == self.nameless[ind] + '-' + str(lh_uid) \
                and lh_name not in self.nameless:
@@ -385,17 +394,16 @@ class Semantic_Network():
 
             # If rel_type is an alias relation, then add name_in_context to object and to dict
             if rel_type_uid in self.alias_uids:
-                if lh_name not in self.nameless and lh_name != self.nameless[ind] + '-' + str(lh_uid):
+                if lh_name not in self.nameless \
+                   and lh_name != self.nameless[ind] + '-' + str(lh_uid):
                     naming_uid = rel_type_uid
                     self.Add_name_in_context_to_obj_and_dict(
                         lh, lang_uid, comm_uid, lh_name, lh_uid, naming_uid, description)
-
                 # If alias names and descriptions in other languages are available add them as well
                 if len(names_and_descriptions) > 0:
                     for name_and_description in names_and_descriptions:
                         if name_and_description not in lh.names_in_contexts:
                             lh.names_in_contexts.append(name_and_description)
-
             # If rel_type is a subtyping relation then add name_in_context to object and to dict
             elif rel_type_uid in self.specialRelUIDs or rel_type_uid in self.classifUIDs:
                 if lh_name not in self.nameless and lh_name != self.nameless[ind] + '-' + str(lh_uid):
@@ -403,7 +411,6 @@ class Semantic_Network():
                     lh.defined = True
                     self.Add_name_in_context_to_obj_and_dict(
                         lh, lang_uid, comm_uid, lh_name, lh_uid, naming_uid, description)
-
                 # If names and descriptions in other languages are available add them as well
                 if len(names_and_descriptions) > 0:
                     for name_and_description in names_and_descriptions:
@@ -444,10 +451,10 @@ class Semantic_Network():
         if uom_uid != '' and uom_uid != '0':
             if uom_uid not in self.uid_dict:
                 Message(self.GUI_lang_index,
-                    'The unit of measure {} ({}) is used before being defined.'.
-                    format(uom_name, uom_uid),
-                    'De meeteenheid {} ({}) is gebruikt voordat hij is gedefinieerd.'.
-                    format(uom_name, uom_uid))
+                        'The unit of measure {} ({}) is used before being defined.'.
+                        format(uom_name, uom_uid),
+                        'De meeteenheid {} ({}) is gebruikt voordat hij is gedefinieerd.'.
+                        format(uom_name, uom_uid))
                 uom = Anything(uom_uid, uom_name)
                 uom.defined = False
                 uom.candidate_names.append(uom_name)
@@ -474,7 +481,7 @@ class Semantic_Network():
                 # If no lh or rh kinds of roles are given then allocate kind of role
                 # conform first and second role of kind of relation
                 if row[lh_role_uid_col] == '':
-                    if phrase_type_uid == basePhraseUID: 
+                    if phrase_type_uid == basePhraseUID:
                         row[lh_role_uid_col] = rel_type.first_role.uid
                         row[lh_role_name_col] = rel_type.first_role.name
                     else:
@@ -500,28 +507,27 @@ class Semantic_Network():
             self.rels.append(relation)
 
             # Add information to object depending in kind of relation (rel_type_uid)
-
             # If rel_type is a specialization relation (1146 or one of its subtypes),
             # then add subtype and supertype to lh and rh object
-            if rel_type_uid in specialRelUIDs:
+            if rel_type_uid in self.specialRelUIDs:
                 if phrase_type_uid == basePhraseUID:
                     lh.name = lh_name
                     lh.add_supertype(rh)
                     lh.kind = lh.supertypes[0]
                     rh.add_subtype(lh)
-
                     # Set lh object category as 'kind' after check
                     # on consistency with earlier categorization
                     if lh.category != 'anything' and lh.category not in self.categories_of_kinds:
                         Message(self.GUI_lang_index,
-                            "Warning: Idea {}: Object '{}' category '{}' is inconsistent "
-                            "with earlier categorization as 'kind'.".
-                            format(idea_uid, lh_name, lh.category),
-                            "Warning: Idea {}: Object '{}' category '{}' is inconsistent "
-                            "with earlier categorization as 'kind'.".
-                            format(idea_uid, lh_name, lh.category))
+                                "Warning: Idea {}: Object '{}' category '{}' is inconsistent "
+                                "with earlier categorization as 'kind'.".
+                                format(idea_uid, lh_name, lh.category),
+                                "Warning: Idea {}: Object '{}' category '{}' is inconsistent "
+                                "with earlier categorization as 'kind'.".
+                                format(idea_uid, lh_name, lh.category))
                     else:
-                        # lh category is not yet categorized (initially by default set as 'anything')
+                        # lh category is not yet categorized
+                        # (initially by default set as 'anything')
                         if rh.category == 'anything':
                             lh.category = 'kind'
                             rh.category = 'kind'
@@ -546,12 +552,12 @@ class Semantic_Network():
                         if lh.category not in ['individual', 'physical object',
                                                'aspect', 'occurrence', 'role']:
                             Message(self.GUI_lang_index,
-                                "Error: Idea {}: Object '{}' category '{}' should "
-                                "be 'individual object'".
-                                format(idea_uid, lh_name, lh.category),
-                                "Fout: Idee {}: Object '{}' categorie '{}' zou "
-                                "'individueel object' moeten zijn".
-                                format(idea_uid, lh_name, lh.category))
+                                    "Error: Idea {}: Object '{}' category '{}' should "
+                                    "be 'individual object'".
+                                    format(idea_uid, lh_name, lh.category),
+                                    "Fout: Idee {}: Object '{}' categorie '{}' zou "
+                                    "'individueel object' moeten zijn".
+                                    format(idea_uid, lh_name, lh.category))
                             lh.category = 'individual'
                     else:
                         # lh object category is still the default ('anything')
@@ -565,21 +571,20 @@ class Semantic_Network():
                                                  'kind of role', 'kind of relation',
                                                  'number']:
                             Message(self.GUI_lang_index,
-                                "Error: Idea {}: Object '{}' category '{}' should be 'kind'".
-                                format(idea_uid, rh_name, rh.category),
-                                "Fout: Idee {}: Object '{}' categorie '{}' zou 'soort' moeten "
-                                "zijn".
-                                format(idea_uid, rh_name, rh.category))
+                                    "Error: Idea {}: Object '{}' category '{}' should be 'kind'".
+                                    format(idea_uid, rh_name, rh.category),
+                                    "Fout: Idee {}: Object '{}' categorie '{}' zou 'soort' moeten "
+                                    "zijn".
+                                    format(idea_uid, rh_name, rh.category))
                             rh.category = 'kind'
                 else:
                     lh.add_individual(rh)
                     rh.add_classifier(lh)
-
             # If part-whole relation (composUID 1260 or concComposUID 1261
             # or one of their subtypes),
             # then add part to collection of parts of the whole object
             elif rel_type_uid in self.subComposUIDs \
-                 or rel_type_uid in self.subConcComposUIDs:
+               or rel_type_uid in self.subConcComposUIDs:
                 if phrase_type_uid == basePhraseUID:
                     rh.add_part(lh)
                 else:
@@ -595,7 +600,7 @@ class Semantic_Network():
                     lh.add_second_role(rh)
 
             # If rel_type_uid == uid of <is by definition a role of a> kind of role player,
-            # then add the kind of role_player to the kind of role 
+            # then add the kind of role_player to the kind of role
             elif rel_type_uid == by_def_role_of_ind:
                 lh.add_role_player(rh)
                 if phrase_type_uid == basePhraseUID:
@@ -604,17 +609,18 @@ class Semantic_Network():
                         lh.category = 'kind of role'
                     elif lh.category != 'kind of role':
                         Message(self.GUI_lang_index,
-                            "** Warning: Idea {} object ({}) {} expects being "
-                            "a kind of role and not a {}".
-                            format(idea_uid, lh.uid, lh.name, lh.category),
-                            "** Waarschuwing: Idee {}: object ({}) {} wordt verwacht "
-                            "een soort rol te zijn en niet een {}".
-                            format(idea_uid, lh.uid, lh.name, lh.category))
+                                "** Warning: Idea {} object ({}) {} expects being "
+                                "a kind of role and not a {}".
+                                format(idea_uid, lh.uid, lh.name, lh.category),
+                                "** Waarschuwing: Idee {}: object ({}) {} wordt verwacht "
+                                "een soort rol te zijn en niet een {}".
+                                format(idea_uid, lh.uid, lh.name, lh.category))
         else:
             # lh_uid == rh_uid
             # If rel_type_uid == uid of <is a base phrase for> (6066) name of a kind of relation
-            # or rel_type_uid == uid of <is a inverse phrase for> (1986) name of a kind of relation,
-            # then add the name in context to the list of base phrases resp. inverse phrase in context
+            # or rel_type_uid == uid of <is a inverse phrase for> (1986)name of a kind of relation,
+            # then add the name in context to the list of base phrases
+            #      resp. inverse phrase in context
             # for the object and add the name to the list of base_phrases or inverse_phrases
             # Including phrases for possible other languages
             if rel_type_uid == basePhraseUID:
@@ -622,7 +628,8 @@ class Semantic_Network():
                 lh.add_base_phrase(phrase_in_context)
                 lh.base_phrases.append(lh_name)
                 self.total_base_phrases.append(lh_name)
-                # If base phrases (and descriptions) in other languages are available add them as well
+                # If base phrases (and descriptions) in other languages are available
+                # then add them as well
                 if len(names_and_descriptions) > 0:
                     for name_and_description in names_and_descriptions:
                         lh.add_base_phrase(name_and_description)
@@ -633,15 +640,16 @@ class Semantic_Network():
                 lh.add_inverse_phrase(phrase_in_context)
                 lh.inverse_phrases.append(lh_name)
                 self.total_inverse_phrases.append(lh_name)
-                # If inverse phrases and descriptions in other languages are available add them as well
+                # If inverse phrases and descriptions in other languages are available
+                # then add them as well
                 if len(names_and_descriptions) > 0:
                     for name_and_description in names_and_descriptions:
                         lh.add_inverse_phrase(name_and_description)
                         lh.inverse_phrases.append(name_and_description[2])
                         self.total_inverse_phrases.append(name_and_description[2])
 
-    def Add_name_in_context_to_obj_and_dict(self,
-        lh, lang_uid, comm_uid, lh_name, lh_uid, naming_uid, description):
+    def Add_name_in_context_to_obj_and_dict(self, lh, lang_uid, comm_uid,
+                                            lh_name, lh_uid, naming_uid, description):
         ''' Create tuples for name_in_context and name_in_context_plus_description
             and add them to dictionary and to object resp.
         '''
@@ -655,7 +663,7 @@ class Semantic_Network():
 
     def BuildHierarchies(self):
         ''' Build lists of subtype concepts and subtype concept_uids of various kinds,
-            including the kinds themselves
+            including the kinds themselves.
         '''
         # Determine lists of various kinds and their subtypes
         self.sub_classifs, self.sub_classif_uids = self.Determine_subtype_list(classifUID)
@@ -663,7 +671,7 @@ class Semantic_Network():
         self.indOrMixRels, self.indOrMixRelUIDs = self.Determine_subtype_list(indOrMixRelUID)
         # indivRelUID = 4658 binary relation between individual things
         self.indivBinRels, self.indivBinRelUIDs = self.Determine_subtype_list(indivRelUID)
-        self.kindHierRels, self.kindHierRelUIDs = self.Determine_subtype_list(kindHierUID) 
+        self.kindHierRels, self.kindHierRelUIDs = self.Determine_subtype_list(kindHierUID)
         self.kindKindRels, self.kindKindRelUIDs = self.Determine_subtype_list(kindKindUID)
         self.kindBinRels, self.kindBinRelUIDs = self.Determine_subtype_list(kindRelUID)
         self.mixedBinRels, self.mixedBinRelUIDs = self.Determine_subtype_list(mixedRelUID)
@@ -676,11 +684,14 @@ class Semantic_Network():
         # concPossAspUID = 2069
         self.subConcPossAsps, self.subConcPossAspUIDs = self.Determine_subtype_list(concPossAspUID)
         # concComplRelUID = 4902
-        self.subConcComplRels, self.subConcComplRelUIDs = self.Determine_subtype_list(concComplRelUID)
-        self.qualSubtypes, self.qualSubtypeUIDs = self.Determine_subtype_list(qualSubtypeUID)  # 4328
-        self.qualOptionss, self.qualOptionsUIDs = self.Determine_subtype_list(qualOptionsUID)  # 4848
-        self.concCompls, self.concComplUIDs = self.Determine_subtype_list(concComplUID)    # 4951
-        self.concQuants, self.concQuantUIDs = self.Determine_subtype_list(concQuantUID)    # 1791
+        self.subConcComplRels, self.subConcComplRelUIDs = \
+                               self.Determine_subtype_list(concComplRelUID)
+        # qualSubtypeUID = 4328
+        self.qualSubtypes, self.qualSubtypeUIDs = self.Determine_subtype_list(qualSubtypeUID)
+        # qualOptionsUID = 4848
+        self.qualOptionss, self.qualOptionsUIDs = self.Determine_subtype_list(qualOptionsUID)
+        self.concCompls, self.concComplUIDs = self.Determine_subtype_list(concComplUID)   # 4951
+        self.concQuants, self.concQuantUIDs = self.Determine_subtype_list(concQuantUID)   # 1791
         self.subQuals, self.subQualUIDs = self.Determine_subtype_list(qualifUID)
         # quantUID = 2044 quantification
         self.subQuants, self.subQuantUIDs = self.Determine_subtype_list(quantUID)
@@ -695,7 +706,7 @@ class Semantic_Network():
         # concComponUID = conceptual component role and its subtypes
         self.subConcCompons, self.subConcComponUIDs = self.Determine_subtype_list(concComponUID)
         # 4546 = being a second role in an <involvement in an occurrence> relation
-        #self.subInvolveds, self.subInvolvedUIDs = self.Determine_subtype_list(involvedUID)
+        # self.subInvolveds, self.subInvolvedUIDs = self.Determine_subtype_list(involvedUID)
         # involvUID = 4767 = involvement in an occurrence (relation)
         self.subInvolvs, self.subInvolvUIDs = self.Determine_subtype_list(involvUID)
         # nextUID = 5333 next element (role)
@@ -709,9 +720,10 @@ class Semantic_Network():
         self.classifs, self.classifUIDs = self.Determine_subtype_list(classifUID)
         self.specials, self.specialUIDs = self.Determine_subtype_list(specialUID)
         # concBinRelKindsUID = 1231 = conc.bin. relation between things of specified kinds.
-        self.concBinRelbetKinds,self.concBinRelbetKinds = self.Determine_subtype_list(concBinRelKindsUID)
-        #self.props, self.propUIDs = self.Determine_subtype_list(propUID)       # 551004 = property
-        # 4714 = can be a role of a 
+        self.concBinRelbetKinds, self.concBinRelbetKinds = \
+                                 self.Determine_subtype_list(concBinRelKindsUID)
+        # self.props, self.propUIDs = self.Determine_subtype_list(propUID)  # 551004 = property
+        # 4714 = can be a role of a
         self.conc_playings, self.conc_playing_uids = self.Determine_subtypes_of_kind('4714')
 
     def Determine_subtypes_of_kind(self, kind_uid):
@@ -719,10 +731,10 @@ class Semantic_Network():
         kind = self.uid_dict[kind_uid]
         all_subs = []
         all_sub_uids = []
-        if kind == None:
+        if kind is None:
             Message(self.GUI_lang_index,
-                'The kind {} is not found.'.format(kind_uid),
-                'De soort {} is niet gevonden.'.format(kind_uid))
+                    'The kind {} is not found.'.format(kind_uid),
+                    'De soort {} is niet gevonden.'.format(kind_uid))
         else:
             direct_subs = kind.subtypes
             if len(direct_subs) > 0:
@@ -748,10 +760,10 @@ class Semantic_Network():
     def Determine_subtype_list(self, kind_uid):
         ''' Determine the list of a kind and its subtypes and the list of their uids'''
         kind = self.uid_dict[kind_uid]
-        if kind == None:
+        if kind is None:
             Message(self.GUI_lang_index,
-                'The kind {} is not found.'.format(kind_uid),
-                'De soort {} is niet gevonden.'.format(kind_uid))
+                    'The kind {} is not found.'.format(kind_uid),
+                    'De soort {} is niet gevonden.'.format(kind_uid))
         sub_kinds, sub_kind_uids = self.Determine_subtypes(kind)
         sub_kinds.insert(0, kind)
         sub_kind_uids.insert(0, kind_uid)
@@ -774,7 +786,7 @@ class Semantic_Network():
 
         # Collect the subtypes of the supertype in focus
         subs = supertype.subtypes
-        if len(subs) > 0: 
+        if len(subs) > 0:
             for sub in subs:
                 # Add each subtype to the list of subtypes
                 if sub not in all_subtype_objects:
@@ -788,7 +800,7 @@ class Semantic_Network():
                         self.Inherit_kinds_of_roles(sub, supertype)
                 # Debug print ('Supertype:',supertype.uid,"Subtypes:",subs,subtypeRow)
 
-            # For each subtype determine the further subtypes                
+            # For each subtype determine the further subtypes
             for subX in subs:
                 # List of subtypes if possibly empty! Then the loop terminates
                 sub_subs = subX.subtypes
@@ -810,50 +822,50 @@ class Semantic_Network():
         ''' If rel (a kind of relation) has no defined (first or second) kind of role, then
             allocate the kind of role of the supertype to the subtype kind of relation.
             If the kind of relation has a defined kind of role, then
-            verify whether that kind of role has one or more supertypes and if yes, then 
+            verify whether that kind of role has one or more supertypes and if yes, then
             verify whether one of those supertypes
             is equal to the kind of role of the supertype of the kind of relation.
         '''
         rel.category = 'kind of relation'
         try:
-            if rel.first_role: # != None:
+            if rel.first_role:  # != None:
                 # Check whether the supertype of the kind of role == the role
                 # of the supertype of the kind of relation
-                equality = False
+                # equality = False
                 if len(rel.first_role.supertypes) > 0:
                     for supertype_role in rel.first_role.supertypes:
                         if supertype_role == supertype.first_role:
-                            equality = True
+                            # equality = True
                             break
                 else:
                     Message(self.GUI_lang_index,
-                        'The first kind of role <{}> has no supertypes'.
-                        format(rel.first_role.name),
-                        'De eerste soort rol <{}> heeft geen supertypes'.
-                        format(rel.first_role.name))
+                            'The first kind of role <{}> has no supertypes'.
+                            format(rel.first_role.name),
+                            'De eerste soort rol <{}> heeft geen supertypes'.
+                            format(rel.first_role.name))
                 # Debug print('rel.first_role_def:', rel.first_role.name)
-            #else:
+            # else:
                 # Debug print('rel.first_role_inh:', rel.first_role.name)
         except AttributeError:
             rel.first_role = supertype.first_role
             # Debug print('rel.inherited first_role', rel.name, rel.uid, rel.first_role.name)
 
         try:
-            if rel.second_role != None:
+            if rel.second_role is not None:
                 # Check whether the supertype of the kind of role == the role
                 # of the supertype of the kind of relation
-                equality = False
+                # equality = False
                 if len(rel.second_role.supertypes) > 0:
                     for supertype_role in rel.second_role.supertypes:
                         if supertype_role == supertype.second_role:
-                            equality = True
+                            # equality = True
                             break
                 else:
                     Message(self.GUI_lang_index,
-                        'The second kind of role <{}> has no supertypes'.
-                        format(rel.second_role.name),
-                        'De tweede soort rol <{}> heeft geen supertypes'.
-                        format(rel.second_role.name))
+                            'The second kind of role <{}> has no supertypes'.
+                            format(rel.second_role.name),
+                            'De tweede soort rol <{}> heeft geen supertypes'.
+                            format(rel.second_role.name))
         except AttributeError:
             rel.second_role = supertype.second_role
 
@@ -890,14 +902,16 @@ class Semantic_Network():
                 rolePlayerTypeLH = 'kind'
                 rolePlayerTypeRH = 'kind'
 
-            #elif rel_uid in self.kindBinRelUIDs:     # subtypes of 5937 = binary relation between kinds of things
+            # kindBinRelUIDs: subtypes of 5937 = binary relation between kinds of things
+            # elif rel_uid in self.kindBinRelUIDs:
             #    rolePlayersTypes = 'kinds'
 
             # If rel_uid is a subtype of 6068 = binary relation between an individual thing and any
             # (kind or individual)
             elif rel_uid == indOrMixRelUID:
                 rolePlayersTypes = 'individualsOrMixed'  # is related to (a)
-                # Debug print('RolePlayers-IndividualsOrMixed:',rolePlayersTypes,relName,self.total_base_phrases)
+                # Debug print('RolePlayers-IndividualsOrMixed:',
+                #              rolePlayersTypes, relName, self.total_base_phrases)
 
             # If rel_uid is a subtype of binary relation between an individual thing and a kind
             elif rel_uid in self.mixedBinRelUIDs:
@@ -911,8 +925,8 @@ class Semantic_Network():
                 rolePlayersTypes = 'other'
         else:
             Message(self.GUI_lang_index,
-                'The uid {} of a kind of relation is unknown.'.format(rel_uid),
-                'De uid {} van een soort relatie is onbekend.'.format(rel_uid))
+                    'The uid {} of a kind of relation is unknown.'.format(rel_uid),
+                    'De uid {} van een soort relatie is onbekend.'.format(rel_uid))
         return rolePlayersTypes, rolePlayerTypeLH, rolePlayerTypeRH
 
     def Verify_network(self):
@@ -928,22 +942,22 @@ class Semantic_Network():
                                 'kind of role', 'kind of relation']:
                 if len(obj.supertypes) == 0 and obj.uid != '730000':
                     Message(self.GUI_lang_index,
-                        'Kind ({}) {} has no supertype(s).'.format(obj.uid, obj.name),
-                        'Soort ({}) {} heeft geen supertype(s).'.format(obj.uid, obj.name))
+                            'Kind ({}) {} has no supertype(s).'.format(obj.uid, obj.name),
+                            'Soort ({}) {} heeft geen supertype(s).'.format(obj.uid, obj.name))
             elif obj.category in ['individual', 'physical object', 'occurrence', 'aspect',
                                   'role', 'relation']:
                 if len(obj.classifiers) == 0:
                     Message(self.GUI_lang_index,
-                        'Individual object ({}) {} has no classifier(s).'.
-                        format(obj.uid, obj.name),
-                        'Individueel object ({}) {} heeft geen classificeerder(s).'.
-                        format(obj.uid, obj.name))
+                            'Individual object ({}) {} has no classifier(s).'.
+                            format(obj.uid, obj.name),
+                            'Individueel object ({}) {} heeft geen classificeerder(s).'.
+                            format(obj.uid, obj.name))
             elif obj.category not in ['number', 'anything']:
                 Message(self.GUI_lang_index,
-                    'The category of object {} ({}) is {}, which is unexpected.'.
-                    format(obj.name, obj.uid, obj.category),
-                    'De categorie van object {} ({}) is {}, hetgeen onverwacht is.'.
-                    format(obj.name, obj.uid, obj.category))
+                        'The category of object {} ({}) is {}, which is unexpected.'.
+                        format(obj.name, obj.uid, obj.category),
+                        'De categorie van object {} ({}) is {}, hetgeen onverwacht is.'.
+                        format(obj.name, obj.uid, obj.category))
 
     def Query_network_dict(self, search_string, string_commonality):
         '''Search for string as (part of) name in a names_in_contexts dictionary.
@@ -977,7 +991,7 @@ class Semantic_Network():
                     ref_list = candids[:]
                 # Debug print('Chunks:', ref_list)
 
-        #candidates = list(cand_dict)
+        # candidates = list(cand_dict)
         # Debug print('Nr of candidates for {} is {}'.format(search_string, len(candidates)))
         return ref_list
 
@@ -992,7 +1006,7 @@ class Semantic_Network():
         # Debug print("  Search for object with name '%s'." % (name))
         uid_unknown = False
         candid_nr = 0
-        self.uid_name_desc_list [:] = []
+        self.uid_name_desc_list[:] = []
 
         # Determine the uid for an integer when the name is a positive or negative whole number.
         int_uid = self.Determine_uid_for_integer(name)
@@ -1007,7 +1021,7 @@ class Semantic_Network():
             value_triple = [str(int_uid), is_called_uid, 'decimal number ' + name]
             candidates.append([term_in_context, value_triple])
             # Debug print('Whole number', candidates[0])
-        else:  
+        else:
             # Search for list of candidates: [term_in_context, value_triple]
             candidates = self.Query_network_dict(name, string_commonality)
 
@@ -1016,13 +1030,13 @@ class Semantic_Network():
                 candid_nr += 1
                 # The uid is the first value in the value_triple
                 obj_uid = candidate[1][0]
-                if len(candidates) > 1:
+                # if len(candidates) > 1:
                     # Candidate[0] is lang_uid, comm_uid, obj_name of first candidate
-                    comm_name = self.comm_dict_NL[candidate[0][1]]
+                    # comm_name = self.comm_dict_NL[candidate[0][1]]
                     # Debug print("    Candidate {}: object {}, {} ({})".
                     #      format(candid_nr, candidate[0][2], comm_name, obj_uid))
                 # UID_name_desc is list [uid, name, description]
-                uid_name_desc = [obj_uid, candidate[0][2], candidate[1][2]] 
+                uid_name_desc = [obj_uid, candidate[0][2], candidate[1][2]]
                 self.uid_name_desc_list.append(uid_name_desc)
         else:
             # No candidates available, thus name is unknown.
@@ -1035,21 +1049,21 @@ class Semantic_Network():
                     unknown_uid = str(self.new_obj_uid)
                 else:
                     Message(self.GUI_lang_index,
-                        'The upper limit for the range of UIDs {} is reached. '
-                        'The unknown object {} is ignored.'.
-                        format(self.current_file.upper_obj_range_uid, name),
-                        'De bovengrens van de range van UIDs {} is bereikt. '
-                        'Het onbekende object {} is genegeerd.'.
-                        format(self.current_file.upper_obj_range_uid, name))
+                            'The upper limit for the range of UIDs {} is reached. '
+                            'The unknown object {} is ignored.'.
+                            format(self.current_file.upper_obj_range_uid, name),
+                            'De bovengrens van de range van UIDs {} is bereikt. '
+                            'Het onbekende object {} is genegeerd.'.
+                            format(self.current_file.upper_obj_range_uid, name))
                     unknown_uid = '0'
             else:
                 unknown_uid = self.new_things[name]
             candid_nr += 1
             Message(self.GUI_lang_index,
-                "No candidates for mapping found. Unknown {}: object ({}) {}".
-                format(candid_nr, unknown_uid, name),
-                "Geen kandidaten voor de mapping gevonden. Onbekende {}: object ({}) {}".
-                format(candid_nr, unknown_uid, name))
+                    "No candidates for mapping found. Unknown {}: object ({}) {}".
+                    format(candid_nr, unknown_uid, name),
+                    "Geen kandidaten voor de mapping gevonden. Onbekende {}: object ({}) {}".
+                    format(candid_nr, unknown_uid, name))
             uid_name_desc = [unknown_uid, name, '']
             self.uid_name_desc_list.append(uid_name_desc)
 
@@ -1058,14 +1072,15 @@ class Semantic_Network():
         while selected is False:
             # If two candidates with identical UIDs then select the first one
             if len(candidates) == 2 \
-               and self.uid_name_desc_list[0][0] == self.uid_name_desc_list [1][0]:
+               and self.uid_name_desc_list[0][0] == self.uid_name_desc_list[1][0]:
                 selected_uid_name_desc = self.uid_name_desc_list[0]
                 selected = True
             elif len(candidates) > 1:
                 if selected is False:
-                    # If candidate selected earlier, then make the same selection             
+                    # If candidate selected earlier, then make the same selection
                     for uid_name_desc in self.uid_name_desc_list:
-                        # Debug print('Compare {} with {}'.format(uid_name_desc[0], self.select_dict))
+                        # Debug print('Compare {} with {}'.format(uid_name_desc[0],
+                        #                                        self.select_dict))
                         if uid_name_desc[0] in self.select_dict:
                             selected_uid_name_desc = uid_name_desc
                             selected = True
@@ -1075,13 +1090,13 @@ class Semantic_Network():
                     if cand_str != '':
                         cand_nr = int(cand_str)
                         if cand_nr > 0 and cand_nr <= len(candidates):
-                            selected_uid_name_desc = self.uid_name_desc_list[cand_nr-1]
+                            selected_uid_name_desc = self.uid_name_desc_list[cand_nr - 1]
                             selected = True
                             self.select_dict[selected_uid_name_desc[0]] = selected_uid_name_desc
                         else:
                             Message(self.GUI_lang_index,
-                                "Incorrect entry '" + cand_nr + "'. Select again.",
-                                "Foutieve input '" + cand_nr + "'. Selecteer nogmaals.")
+                                    "Incorrect entry '" + cand_nr + "'. Select again.",
+                                    "Foutieve input '" + cand_nr + "'. Selecteer nogmaals.")
                     else:
                         # Selection = '', thus select the first candidate
                         selected_uid_name_desc = self.uid_name_desc_list[0]
@@ -1119,19 +1134,19 @@ class Semantic_Network():
         pickle.dump(self, semantic_net)
         semantic_net.close()
         Message(self.GUI_lang_index,
-            "Network '{}' is saved in file {}.".
-            format(self.name, self.semantic_file_name),
-            "Netwerk '{}' is opgeslagen in file {}.".
-            format(self.name, self.semantic_file_name))
+                "Network '{}' is saved in file {}.".
+                format(self.name, self.semantic_file_name),
+                "Netwerk '{}' is opgeslagen in file {}.".
+                format(self.name, self.semantic_file_name))
 
 
 if __name__ == "__main__":
-    from SystemUsers import User
-    
+##    from SystemUsers import User
+
     # Create and initialize a semantic network
     net_name = 'Semantic network'
     network = Semantic_Network(net_name)
-    
+
     # Choose GUI language and formal language
     formal_language = "English"
 
@@ -1148,10 +1163,11 @@ if __name__ == "__main__":
     # Query things in network
     qtext = input("\nEnter query string: ")
     while qtext != "quit" and qtext != "exit":
-        com = input("\nEnter string commonality (cspi, csi): ") #(cipi, cspi, cii, csi, cifi, csfi)
+        # (cipi, cspi, cii, csi, cifi, csfi)
+        com = input("\nEnter string commonality (cspi, csi): ")
         # string_commonality 'csi' = 'case sensitive identical'
         #                    'cspi' = 'case sensitive partially identical'
-    
+
         candidates = network.Query_network_dict(qtext, string_commonality)
         if len(candidates) > 0:
             for candidate in candidates:
