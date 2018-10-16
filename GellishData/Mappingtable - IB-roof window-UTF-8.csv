@@ -1,0 +1,25 @@
+"Gellish mapping tables";"English";26-01-18;"IB";"roof window";;;;;
+1;"Main keys map";;;;;;;;
+0;"IB";;"Gellish";;;;;;
+;"articleId     ";730066;"kind";;;;;;
+;"description   ";5605;"synonym denotation";;;;;;
+;"properties    ";493676;"collection of expressions";;;;;;
+2;"Attributes map";;;;;;;;
+0;"IB";;"Gellish";;"Gellish";;"Gellish";"IB";"IB"
+;"ibProductsoort";730066;"kind";5396;"is a model                      ";3817;"supertype";" ";"    "
+;"breedteMm     ";730066;"kind";5527;"has by definition as aspect a";550464;"width";"value";"unit"
+;"hoogteMm      ";730066;"kind";5527;"has by definition as aspect a";550126;"height";"value";"unit"
+;"gewichtKg     ";730066;"kind";5527;"has by definition as aspect a";550047;"weight";"value";"unit"
+3;"Keys for values map";;;;;;;;
+0;"IB";;"Gellish";;;;;;
+;"label          ";910300;"label";;;;;;
+;"name           ";3817;"supertype";;;;;;
+;"value          ";910130;"name";;;;;;
+;"unit           ";1733;"scale";;;;;;
+4;"Allowed values map";;;;;;;;
+0;"IB";;"Gellish";;;;;;
+;"Dakramen|Ramen";43769;"roof window";;;;;;
+5;"Allowed units map";;;;;;;;
+0;"IB";;"Gellish";;;;;;
+;"mm";570423;"mm";;;;;;
+;"kg";570039;"kg";;;;;;

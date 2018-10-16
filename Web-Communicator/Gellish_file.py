@@ -1,14 +1,20 @@
-import os
+#import os
 import sys
 import csv
 import json
 import logging
-import remi.gui as gui
+#import remi.gui as gui
 
-from Bootstrapping import *
-from Expr_Table_Def import *
-from Create_output_file import *
-from Mapping_tables_IB import *
+from Bootstrapping import ignores, subtypeRoleUID, supertypeRoleUID, subtypeName, supertypeName
+from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col,\
+     intent_uid_col, intent_name_col, lh_uid_col, lh_name_col, lh_role_uid_col, lh_role_name_col,\
+     idea_uid_col,\
+     rel_type_uid_col, rel_type_name_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col,\
+     rh_uid_col, rh_name_col, part_def_col, full_def_col, uom_uid_col, uom_name_col, status_col,\
+     file_name_col, expr_col_ids, default_row
+from Create_output_file import Create_gellish_expression, Open_output_file,\
+     Convert_numeric_to_integer, Message
+from Mapping_tables_IB import keys_map, attributes_map, value_key_map, values_map
 from Anything import Anything
 
 logger = logging.getLogger(__name__)
@@ -37,27 +43,26 @@ class Gellish_file:
             parts2 = path_and_name.rsplit('/', maxsplit=1)
             if len(parts2) == 1:
                 Message(self.gel_net.GUI_lang_index,
-                    'File name {} has no directory.'.format(path_and_name),
-                    'Filenaam {} heeft geen directory.'.format(path_and_name))
+                        'File name {} has no directory.'.format(path_and_name),
+                        'Filenaam {} heeft geen directory.'.format(path_and_name))
                 self.name = parts2[0]
             else:
                 self.name = parts2[1]
         else:
             self.name = parts[1]
-        #logger.debug(self.name)
 
         # Determine the file extension from path_and_name
         name_ext = self.path_and_name.rsplit('.', maxsplit=1)
         if len(name_ext) == 1:
             Message(self.gel_net.GUI_lang_index,
-                'File name {} has no file extension.'.format(path_and_name),
-                'Filenaam {} heeft geen file extensie.'.format(path_and_name))
+                    'File name {} has no file extension.'.format(path_and_name),
+                    'Filenaam {} heeft geen file extensie.'.format(path_and_name))
             self.extension = ''
             return
         elif name_ext[1] not in ['csv', 'json']:
             Message(self.gel_net.GUI_lang_index,
-                'File name extension {} is not (yet) supported.'.format(name_ext[1]),
-                'Filenaam extensie {} wordt (nog) niet ondersteund.'.format(name_ext[1]))
+                    'File name extension {} is not (yet) supported.'.format(name_ext[1]),
+                    'Filenaam extensie {} wordt (nog) niet ondersteund.'.format(name_ext[1]))
             self.extension = ''
         else:
             # Allocate file extension to file
@@ -71,14 +76,14 @@ class Gellish_file:
             and extent the semantic network with its content.
         """
         Message(self.gel_net.GUI_lang_index,
-            '>>> Read file {}'.format(self.path_and_name),
-            '>>> Lees file {}'.format(self.path_and_name))
+                '>>> Read file {}'.format(self.path_and_name),
+                '>>> Lees file {}'.format(self.path_and_name))
         try:
             f = open(self.path_and_name, "r", encoding="utf-8")
         except IOError:
             Message(self.gel_net.GUI_lang_index,
-                "File '{}' does not exist or is not readable.".format(self.name),
-                "File '{}' bestaat niet of is niet leesbaar.".format(self.name))
+                    "File '{}' does not exist or is not readable.".format(self.name),
+                    "File '{}' bestaat niet of is niet leesbaar.".format(self.name))
             sys.exit()
 
         # Determine the file extension of the current file
@@ -87,7 +92,7 @@ class Gellish_file:
 ##            sample = f.read(4096)
 ##            dialect = csv.Sniffer().sniff(sample, delimiters=';')
 ##
-##            # rewind to start
+            # rewind to start
 ##            f.seek(0)
 ##
             # Initialise csv reading and read first line
@@ -104,20 +109,20 @@ class Gellish_file:
             self.header = self.json_list[0]
         else:
             Message(self.gel_net.GUI_lang_index,
-                'File extension {} is not supported.'.format(self.extension),
-                'File extensie {} wordt niet ondersteund.'.format(self.extension))
+                    'File extension {} is not supported.'.format(self.extension),
+                    'File extensie {} wordt niet ondersteund.'.format(self.extension))
             return
 
         # Read first line and determine whether the current file is a Gellish file or not
         # Debug print('Header line:', self.header)
         if self.header[0] != "Gellish":
             Message(self.gel_net.GUI_lang_index,
-                "File {} is not in Gellish expression format, "\
-                "because the first field <{}> has not as content 'Gellish'.".
-                format(self.name, self.header[0]),
-                "File {} is niet in Gellish expressie formaat, "\
-                "want het eerste veld <{}> heeft niet als inhoud 'Gellish'.".
-                format(self.name, self.header[0]))
+                    "File {} is not in Gellish expression format, "
+                    "because the first field <{}> has not as content 'Gellish'.".
+                    format(self.name, self.header[0]),
+                    "File {} is niet in Gellish expressie formaat, "
+                    "want het eerste veld <{}> heeft niet als inhoud 'Gellish'.".
+                    format(self.name, self.header[0]))
             if self.extension == 'json':
                 self.Interpret_non_gellish_JSON_file()
         else:
@@ -215,15 +220,15 @@ class Gellish_file:
                                 #   2. for quantification of the intrinsic aspect
                                 elif attrib_map[1][1] == '5527':
                                     self.object_uid += + 1
-                                    self.idea_uid   += +1
+                                    self.idea_uid += +1
                                     lh_uid_name = [article_uid, article_identifier]
                                     rel_uid_phrase_type = list(attrib_map[1][1:4])
                                     # rh_uid_name e.g. 550464 , 'breedte'
                                     rh_uid_name = list(attrib_map[1][4:6])
                                     rh_role_uid_name = [str(self.object_uid),
-                                                        rh_uid_name[1]
-                                                        + of_text[self.gel_net.reply_lang_index]
-                                                        + article_identifier]
+                                                        rh_uid_name[1] +
+                                                        of_text[self.gel_net.reply_lang_index] +
+                                                        article_identifier]
                                     uom_uid_name = ['', '']
                                     description = ''
                                     intent_uid_name = ['491285', 'bewering']
@@ -251,13 +256,13 @@ class Gellish_file:
                                         # If the value without dots is numeric,
                                         # then create a uid for a floating point number
                                         if dots_removed.isdecimal():
-                                            self.object_uid += + 1
-                                            value_uid_name = [str(self.object_uid),commas_replaced]
+                                            self.object_uid += 1
+                                            value_uid_name = [str(self.object_uid), commas_replaced]
                                         else:
                                             # Value[2] is not numeric
                                             # value_uid_name e.g. '310024' , 'grenen'
                                             value_uid_name = values_map[values[2]]
-                                    self.idea_uid += +1
+                                    self.idea_uid += 1
                                     rh_role_uid_name_2 = ['', '']
                                     uom_uid_name = list(values_map[values[3]])
                                     description = ''
@@ -301,10 +306,10 @@ class Gellish_file:
                 int_val, is_integer = Convert_numeric_to_integer(col_id)
                 if is_integer is False:
                     Message(self.gel_net.GUI_lang_index,
-                        'Value {} on row 2 is not a whole number. Column is ignored'.
-                        format(int_val),
-                        'Waarde {} op rij 2 is geen geheel getal. Kolom wordt genegeerd'.
-                        format(int_val))
+                            'Value {} on row 2 is not a whole number. Column is ignored'.
+                            format(int_val),
+                            'Waarde {} op rij 2 is geen geheel getal. Kolom wordt genegeerd'.
+                            format(int_val))
                     int_val = 0
             in_col.append(int(int_val))
         source_ids = list(map(int, in_col))
@@ -312,10 +317,10 @@ class Gellish_file:
         # Check if idea_uid column is present
         if 1 not in source_ids:
             Message(self.gel_net.GUI_lang_index,
-                'Warning: Column for UID of idea is missing. '
-                'The file is not added to the semantic network.',
-                'Waarschuwing: Kolom voor UID van idee ontbreekt. '
-                'De file is niet toegevoegd aan het semantische netwerk.')
+                    'Warning: Column for UID of idea is missing. '
+                    'The file is not added to the semantic network.',
+                    'Waarschuwing: Kolom voor UID van idee ontbreekt. '
+                    'De file is niet toegevoegd aan het semantische netwerk.')
             self.idea_col_in = 0
         else:
             # the column nr where idea_uid is located (for error messageing)
@@ -324,10 +329,10 @@ class Gellish_file:
         # Check if status column is present
         if 8 not in source_ids:
             Message(self.gel_net.GUI_lang_index,
-                'Warning: Column for status is missing. '
-                'File is not added to the semantic network.',
-                'Waarschuwing: Kolom voor status ontbreekt. '
-                'De file is niet toegevoegd aan het semantische netwerk.')
+                    'Warning: Column for status is missing. '
+                    'File is not added to the semantic network.',
+                    'Waarschuwing: Kolom voor status ontbreekt. '
+                    'De file is niet toegevoegd aan het semantische netwerk.')
             self.status_col_in = 0
         else:
             self.status_col_in = source_ids.index(8)
@@ -343,15 +348,11 @@ class Gellish_file:
         # (thus not in the sql_database)
         # but will be stored in the dictionary only)
         self.source_id_dict = {}
-        #self.test = True
-        #dest_ids = []
         for source_id in source_ids:
             if source_id in expr_col_ids:
                 self.source_id_dict[source_id] = expr_col_ids.index(source_id)
-                #dest_ids.append(expr_col_ids.index(source_id))
             else:
                 self.source_id_dict[source_id] = 0
-                #dest_ids.append(0)
                 # If source_id indicates another language column or definition column,
                 # and that language does not exist yet, then create a language object
                 str_id = str(source_id)
@@ -370,9 +371,8 @@ class Gellish_file:
                     lang_descr_col_id[source_id] = source_ids.index(source_id)
                 else:
                     Message(self.gel_net.GUI_lang_index,
-                        'Column ID {} is unknown. Column is ignored.'.format(source_id),
-                        'Kolom ID {} is onbekend. De kolom is genegeerd.'.format(source_id))
-                    #lang_name_col_id[source_id] = 0    # source_ids.index(source_id)
+                            'Column ID {} is unknown. Column is ignored.'.format(source_id),
+                            'Kolom ID {} is onbekend. De kolom is genegeerd.'.format(source_id))
         # Debug print('Source_ids: ', source_ids)
         # Debug print('Source_id_dict', self.source_id_dict)
 
@@ -428,14 +428,16 @@ class Gellish_file:
                     # Debug print('Idea_uid {} added'.format(idea_uid))
                 else:
                     Message(self.gel_net.GUI_lang_index,
-                        'UID {} already used in the network'.format(self.gel_net.new_idea_uid),
-                        'UID {} is al gebruikt in het netwerk'.format(self.gel_net.new_idea_uid))
+                            'UID {} already used in the network'.
+                            format(self.gel_net.new_idea_uid),
+                            'UID {} is al gebruikt in het netwerk'.
+                            format(self.gel_net.new_idea_uid))
             elif idea_uid not in self.gel_net.idea_uids:
                     self.gel_net.idea_uids.append(idea_uid)
             else:
                 Message(self.gel_net.GUI_lang_index,
-                    'Duplicate idea UID {}. Latter idea ignored.'.format(idea_uid),
-                    'Dubbele idea UID {}. De laatste is genegeerd.'.format(idea_uid))
+                        'Duplicate idea UID {}. Latter idea ignored.'.format(idea_uid),
+                        'Dubbele idea UID {}. De laatste is genegeerd.'.format(idea_uid))
                 continue
 
             # VERIFY input row values, amend where applicable
@@ -498,8 +500,8 @@ class Gellish_file:
                 names_and_descriptions.clear()
 
         Message(self.gel_net.GUI_lang_index,
-            '<<< File read: {}'.format(self.name),
-            '<<< File gelezen: {}'.format(self.name))
+                '<<< File read: {}'.format(self.name),
+                '<<< File gelezen: {}'.format(self.name))
 
         # If the current file contains a query or mapping then save expressions
         # in a CSV file (if required)
@@ -533,9 +535,9 @@ class Gellish_file:
             self.content_type = "dictionary"
 
         elif self.header[5] in ['Product models', 'Process models', 'Product and process models',
-                           'Productmodellen', 'Procesmodellen', 'Product- en procesmodellen',
-                           'Productmodel', 'Product model',
-                           'Product type model', 'Producttypemodel', 'Producttypemodellen']:
+                                'Productmodellen', 'Procesmodellen', 'Product- en procesmodellen',
+                                'Productmodel', 'Product model',
+                                'Product type model', 'Producttypemodel', 'Producttypemodellen']:
             self.content_type = "product_model"
 
         elif self.header[5] in ['Query', 'Queries', 'Vraag', 'Vragen']:
@@ -548,10 +550,10 @@ class Gellish_file:
         else:
             # A file with unknown content type
             Message(self.gel_net.GUI_lang_index,
-                "File type '{}' is not standard. File with title '{}' processed".
-                format(self.header[5], self.header[6]),
-                "File type '{}' is niet standaard. File met titel '{}' is verwerkt".
-                format(self.header[5], self.header[6]))
+                    "File type '{}' is not standard. File with title '{}' processed".
+                    format(self.header[5], self.header[6]),
+                    "File type '{}' is niet standaard. File met titel '{}' is verwerkt".
+                    format(self.header[5], self.header[6]))
             self.content_type = "unknown"
 
         # Read the file description
@@ -575,10 +577,10 @@ class Gellish_file:
             self.comm_name = "Gellish"    # default
         else:
             Message(self.gel_net.GUI_lang_index,
-                'Name of file language {} is unknown. File is ignored.'.
-                format(self.lang_name),
-                'De naam van de taal voor de file {} is onbekend. De file is genegeerd.'.
-                format(self.lang_name))
+                    'Name of file language {} is unknown. File is ignored.'.
+                    format(self.lang_name),
+                    'De naam van de taal voor de file {} is onbekend. De file is genegeerd.'.
+                    format(self.lang_name))
             return
 
         # Create language object if not yet existing
@@ -607,22 +609,22 @@ class Gellish_file:
                     if value_parts[0] == params[0]:
                         self.prefix = value_parts[2]
                     elif value_parts[0] == params[1]:
-                        self.lower_obj_range_uid = number # self.UID_range_limit(number, 100)
+                        self.lower_obj_range_uid = number  # self.UID_range_limit(number, 100)
                     elif value_parts[0] == params[2]:
-                        self.upper_obj_range_uid = number # self.UID_range_limit(number, 499)
+                        self.upper_obj_range_uid = number  # self.UID_range_limit(number, 499)
                     elif value_parts[0] == params[3]:
-                        self.lower_idea_range_uid = number # self.UID_range_limit(number, 500)
+                        self.lower_idea_range_uid = number  # self.UID_range_limit(number, 500)
                     elif value_parts[0] == params[4]:
-                        self.upper_idea_range_uid = number # self.UID_range_limit(number, 999)
+                        self.upper_idea_range_uid = number  # self.UID_range_limit(number, 999)
 
             # Verify whether values indicate proper ranges
             if self.upper_obj_range_uid <= self.lower_obj_range_uid \
                     or self.lower_idea_range_uid <= self.upper_obj_range_uid \
                     or self.upper_idea_range_uid <= self.lower_idea_range_uid:
                 Message(self.gel_net.GUI_lang_index,
-                    'Object range UIDs are not in proper position or sequence.',
-                    'Object range UIDs staan niet op de juiste plaats '
-                    'of in de juiste volgorde.')
+                        'Object range UIDs are not in proper position or sequence.',
+                        'Object range UIDs staan niet op de juiste plaats '
+                        'of in de juiste volgorde.')
 
         print('    Prefix: {}, Obj_range_UIDs: {}, {}, Rel_range_UIDs: {} {}'.
               format(self.prefix,
@@ -673,9 +675,9 @@ class Gellish_file:
     def Clean_whole_number(self, number):
         ''' Ensure that a whole number is coded as an integer '''
         integer = True
-        dots_removed = number.replace('.','')
-        commas_removed = dots_removed.replace(',','')
-        spaces_removed = commas_removed.replace(' ','')
+        dots_removed = number.replace('.', '')
+        commas_removed = dots_removed.replace(',', '')
+        spaces_removed = commas_removed.replace(' ', '')
         if spaces_removed.isdecimal():
             uid = int(spaces_removed)
         else:
@@ -697,9 +699,8 @@ class Gellish_file:
                 continue
             else:
                 # Remove commas and convert source_id to integer
-                #if self.test == True:
-                    # Debug print('source_id', source_id, source_ids.index(source_id),
-                    #      in_row[source_ids.index(source_id)])
+                # Debug print('source_id', source_id, source_ids.index(source_id),
+                #      in_row[source_ids.index(source_id)])
                 if source_id in \
                    set([69, 71, 5, 2, 72, 19, 1, 60, 85, 74, 15, 66,
                         76, 70, 67, 11, 6, 78, 53, 50]):
@@ -713,10 +714,10 @@ class Gellish_file:
                 if source_id in [2, 1, 60, 15]:
                     if self.idea_col_in != 0 and value == '':
                         Message(self.gel_net.GUI_lang_index,
-                            'Idea {} - UID in column {} is missing'.
-                            format(in_row[self.idea_col_in], source_id),
-                            'Idee {} - UID in kolom {} ontbreekt'.
-                            format(in_row[self.idea_col_in], source_id))
+                                'Idea {} - UID in column {} is missing'.
+                                format(in_row[self.idea_col_in], source_id),
+                                'Idee {} - UID in kolom {} ontbreekt'.
+                                format(in_row[self.idea_col_in], source_id))
         return db_row
 
     def Verify_row(self, db_row):
@@ -735,20 +736,20 @@ class Gellish_file:
             # then lang_uid and name must be in or added to lang_dict_NL
             if self.lang_ind == 1:
                 if lang_uid not in self.gel_net.lang_dict_NL:
-                   self.gel_net.lang_dict_NL[lang_uid] = db_row[lang_name_col]
+                    self.gel_net.lang_dict_NL[lang_uid] = db_row[lang_name_col]
                 try:
                     if db_row[lang_name_col] == self.gel_net.lang_dict_NL[lang_uid]:
                         pass
                 except KeyError:
                     Message(self.gel_net.GUI_lang_index,
-                        'The name of the language {} does not correspond '
-                        'with an earlier name {} for UID {}'.
-                        format(db_row[lang_name_col],
-                               self.gel_net.lang_dict_NL[lang_uid], lang_uid),
-                        'De naam van de taal {} correspondeert '
-                        'niet met eerdere naam {} voor UID {}'.
-                        format(db_row[lang_name_col],
-                               self.gel_net.lang_dict_NL[lang_uid], lang_uid))
+                            'The name of the language {} does not correspond '
+                            'with an earlier name {} for UID {}'.
+                            format(db_row[lang_name_col],
+                                   self.gel_net.lang_dict_NL[lang_uid], lang_uid),
+                            'De naam van de taal {} correspondeert '
+                            'niet met eerdere naam {} voor UID {}'.
+                            format(db_row[lang_name_col],
+                                   self.gel_net.lang_dict_NL[lang_uid], lang_uid))
             elif self.lang_ind == 0:
                 # If the modeling language of the current file is English
                 # then lang_uid and name must be in or added to lang_dict_EN
@@ -759,20 +760,20 @@ class Gellish_file:
                         pass
                 except KeyError:
                     Message(self.gel_net.GUI_lang_index,
-                        'Language name {} does not correspond '
-                        'to earlier name {} for UID {}'.
-                        format(db_row[lang_name_col],
-                               self.gel_net.lang_dict_EN[lang_uid], lang_uid),
-                        'Naam van de taal {} correspondeert niet '
-                        'met de eerdere naam {} voor UID {}'.
-                        format(db_row[lang_name_col],
-                               self.gel_net.lang_dict_EN[lang_uid], lang_uid))
+                            'Language name {} does not correspond '
+                            'to earlier name {} for UID {}'.
+                            format(db_row[lang_name_col],
+                                   self.gel_net.lang_dict_EN[lang_uid], lang_uid),
+                            'Naam van de taal {} correspondeert niet '
+                            'met de eerdere naam {} voor UID {}'.
+                            format(db_row[lang_name_col],
+                                   self.gel_net.lang_dict_EN[lang_uid], lang_uid))
             else:
                 Message(self.gel_net.GUI_lang_index,
-                    'Language of file {} is not English or Nederlands'.
-                    format(self.lang_name),
-                    'De taal van file {} is niet English of Nederlands'.
-                    format(self.lang_name))
+                        'Language of file {} is not English or Nederlands'.
+                        format(self.lang_name),
+                        'De taal van file {} is niet English of Nederlands'.
+                        format(self.lang_name))
         else:
             # No lang_uid present: check whether lang_name present
             if db_row[lang_name_col] != '':
@@ -792,12 +793,12 @@ class Gellish_file:
                             continue
                 if recognized is False:
                     Message(self.gel_net.GUI_lang_index,
-                        'Language name {} not recognized. '
-                        'File language added as default'.
-                        format(db_row[lang_name_col]),
-                        'De naam van de taal {} is niet herkend. '
-                        'De taal van de file is toegevoegd als default'.
-                        format(db_row[lang_name_col]))
+                            'Language name {} not recognized. '
+                            'File language added as default'.
+                            format(db_row[lang_name_col]),
+                            'De naam van de taal {} is niet herkend. '
+                            'De taal van de file is toegevoegd als default'.
+                            format(db_row[lang_name_col]))
                     db_row[lang_uid_col] = self.lang_uid
                     db_row[lang_name_col] = self.lang_name
             else:
@@ -815,34 +816,34 @@ class Gellish_file:
                     self.gel_net.comm_dict_NL[comm_uid] = db_row[comm_name_col]
                 if db_row[comm_name_col] != self.gel_net.comm_dict_NL[comm_uid]:
                     Message(self.gel_net.GUI_lang_index,
-                        'Language community name {} does not correspond '
-                        'to the earlier name {} for UID {}.'.
-                        format(db_row[comm_name_col],
-                               self.gel_net.comm_dict_NL[comm_uid], comm_uid),
-                        'De naam van de taalgemeenschap {} '
-                        'correspondeert niet met de eerdere naam {} voor UID {}.'.
-                        format(db_row[comm_name_col],
-                               self.gel_net.comm_dict_NL[comm_uid], comm_uid))
+                            'Language community name {} does not correspond '
+                            'to the earlier name {} for UID {}.'.
+                            format(db_row[comm_name_col],
+                                   self.gel_net.comm_dict_NL[comm_uid], comm_uid),
+                            'De naam van de taalgemeenschap {} '
+                            'correspondeert niet met de eerdere naam {} voor UID {}.'.
+                            format(db_row[comm_name_col],
+                                   self.gel_net.comm_dict_NL[comm_uid], comm_uid))
             else:
                 if comm_uid not in self.gel_net.comm_dict_EN:
                     self.gel_net.comm_dict_EN[comm_uid] = db_row[comm_name_col]
                 if db_row[comm_name_col] != self.gel_net.comm_dict_EN[comm_uid]:
                     Message(self.gel_net.GUI_lang_index,
-                        'Language community name {} does not correspond '
-                        'to the earlier name {} for UID {}.'.
-                        format(db_row[comm_name_col],
-                               self.gel_net.comm_dict_EN[comm_uid], comm_uid),
-                        'De naam van de taalgemeenschap {} '
-                        'correspondeert niet met de eerdere naam {} voor UID {}.'.
-                        format(db_row[comm_name_col],
-                               self.gel_net.comm_dict_NL[comm_uid], comm_uid))
+                            'Language community name {} does not correspond '
+                            'to the earlier name {} for UID {}.'.
+                            format(db_row[comm_name_col],
+                                   self.gel_net.comm_dict_EN[comm_uid], comm_uid),
+                            'De naam van de taalgemeenschap {} '
+                            'correspondeert niet met de eerdere naam {} voor UID {}.'.
+                            format(db_row[comm_name_col],
+                                   self.gel_net.comm_dict_NL[comm_uid], comm_uid))
         else:
             # No community_uid present: check whether comm_name present
             if db_row[comm_name_col] != '':
                 comm_recognized = False
                 # Find the comm_uid for a given comm_name in db_row[comm_name_col]
                 if self.lang_ind == 1:
-                    for key,value in self.gel_net.comm_dict_NL.items():
+                    for key, value in self.gel_net.comm_dict_NL.items():
                         if db_row[comm_name_col] == value:
                             db_row[comm_uid_col] = key
                             comm_recognized = True
@@ -856,12 +857,12 @@ class Gellish_file:
                 if comm_recognized is False:
                     self.lower_obj_range_uid += 1
                     Message(self.gel_net.GUI_lang_index,
-                        'The language community name {} is not yet known. '
-                        'A new UID {} and the new name is added.'.
-                        format(db_row[comm_name_col], self.lower_obj_range_uid),
-                        'De naam van de taalgemeenschap {} is nog niet bekend. '
-                        'Een nieuwe UID {} en de nieuwe naar zijn toegevoegd.'.
-                        format(db_row[comm_name_col], self.lower_obj_range_uid))
+                            'The language community name {} is not yet known. '
+                            'A new UID {} and the new name is added.'.
+                            format(db_row[comm_name_col], self.lower_obj_range_uid),
+                            'De naam van de taalgemeenschap {} is nog niet bekend. '
+                            'Een nieuwe UID {} en de nieuwe naar zijn toegevoegd.'.
+                            format(db_row[comm_name_col], self.lower_obj_range_uid))
                     db_row[comm_uid_col] = str(self.lower_obj_range_uid)
                     if self.lang_ind == 1:
                         self.gel_net.comm_dict_NL[db_row[comm_uid_col]] = db_row[comm_name_col]
@@ -881,12 +882,12 @@ class Gellish_file:
         stripped_name = db_row[rel_type_name_col].strip()
         if stripped_name != db_row[rel_type_name_col]:
             Message(self.gel_net.GUI_lang_index,
-                'The name of the kind of relation {} in idea {} contains leading '
-                'and/or trailing spaces, which are removed.'.
-                format(db_row[rel_type_name_col], db_row[idea_uid_col]),
-                'De naam van de soort relatie {} in idee {} bevat begin- '
-                "en/of eindspaties. Die zijn verwijderd.".
-                format(db_row[rel_type_name_col], db_row[idea_uid_col]))
+                    'The name of the kind of relation {} in idea {} contains leading '
+                    'and/or trailing spaces, which are removed.'.
+                    format(db_row[rel_type_name_col], db_row[idea_uid_col]),
+                    'De naam van de soort relatie {} in idee {} bevat begin- '
+                    "en/of eindspaties. Die zijn verwijderd.".
+                    format(db_row[rel_type_name_col], db_row[idea_uid_col]))
             db_row[rel_type_name_col] = stripped_name
 
         # REL_uid: If rel_type_uid is unknown,
@@ -899,12 +900,12 @@ class Gellish_file:
             # Debug print('rel_map:', rel_map)
             if uid_new:
                 Message(self.gel_net.GUI_lang_index,
-                    'The unknown name of a kind of relation {} in idea {}; '
-                    'should be added to the language definition before being used.'.
-                    format(db_row[rel_type_name_col], db_row[idea_uid_col]),
-                    'De onbekende naam van een soort relatie {} in idee {}; zou toegevoegd '
-                    'moeten zijn aan de taaldefinitie voordat hij gebruikt wordt.'.
-                    format(db_row[rel_type_name_col], db_row[idea_uid_col]))
+                        'The unknown name of a kind of relation {} in idea {}; '
+                        'should be added to the language definition before being used.'.
+                        format(db_row[rel_type_name_col], db_row[idea_uid_col]),
+                        'De onbekende naam van een soort relatie {} in idee {}; zou toegevoegd '
+                        'moeten zijn aan de taaldefinitie voordat hij gebruikt wordt.'.
+                        format(db_row[rel_type_name_col], db_row[idea_uid_col]))
         else:
             # rel_map = uid, name, blank
             rel_map = [db_row[rel_type_uid_col], db_row[rel_type_name_col], '']
@@ -913,12 +914,12 @@ class Gellish_file:
         stripped_name = db_row[rh_name_col].strip()
         if stripped_name != db_row[rh_name_col]:
             Message(self.gel_net.GUI_lang_index,
-                "The name of the right hand object '{}' in idea {} contains leading "
-                "and/or trailing spaces, which are removed.".
-                format(db_row[rh_name_col], db_row[idea_uid_col]),
-                "De naam van het rechter object '{}' in idee {} bevat begin- "
-                "en/of eindspaties. Die zijn verwijderd.".
-                format(db_row[rh_name_col], db_row[idea_uid_col]))
+                    "The name of the right hand object '{}' in idea {} contains leading "
+                    "and/or trailing spaces, which are removed.".
+                    format(db_row[rh_name_col], db_row[idea_uid_col]),
+                    "De naam van het rechter object '{}' in idee {} bevat begin- "
+                    "en/of eindspaties. Die zijn verwijderd.".
+                    format(db_row[rh_name_col], db_row[idea_uid_col]))
             db_row[rh_name_col] = stripped_name
 
         # RH_uid (in case of alias relation, rel_type_phrase_uid == 6066 is assumed)
@@ -938,12 +939,12 @@ class Gellish_file:
         stripped_name = db_row[lh_name_col].strip()
         if stripped_name != db_row[lh_name_col]:
             Message(self.gel_net.GUI_lang_index,
-                "The name of the left hand object '{}' in idea {} contains leading "
-                "and/or trailing spaces, which are removed.".
-                format(db_row[lh_name_col], db_row[idea_uid_col]),
-                "De naam van het linker object '{}' in idee {} bevat begin- "
-                "en/of eindspaties. Die zijn verwijderd.".
-                format(db_row[lh_name_col], db_row[idea_uid_col]))
+                    "The name of the left hand object '{}' in idea {} contains leading "
+                    "and/or trailing spaces, which are removed.".
+                    format(db_row[lh_name_col], db_row[idea_uid_col]),
+                    "De naam van het linker object '{}' in idee {} bevat begin- "
+                    "en/of eindspaties. Die zijn verwijderd.".
+                    format(db_row[lh_name_col], db_row[idea_uid_col]))
             db_row[lh_name_col] = stripped_name
 
         # LH_uid: check after rel and rh, because in case of alias lh_uid = rh_uid
@@ -974,14 +975,14 @@ class Gellish_file:
             if db_row[rel_type_uid_col] in self.gel_net.alias_uids:
                 if db_row[lh_uid_col] != db_row[lh_uid_col]:
                     Message(self.gel_net.GUI_lang_index,
-                        'The alias relation of idea {} requires '
-                        'that the uid of the left hand object {} '
-                        'is equal to the uid of the right hand object {}'.
-                        format(db_row[idea_uid_col], db_row[lh_uid_col], db_row[rh_uid_col]),
-                        'De alias relatie van idee {} vereist '
-                        'dat de uid van het linker object {} '
-                        'gelijk is aan de uid van het rechter object {}'.
-                        format(db_row[idea_uid_col], db_row[lh_uid_col], db_row[rh_uid_col]))
+                            'The alias relation of idea {} requires '
+                            'that the uid of the left hand object {} '
+                            'is equal to the uid of the right hand object {}'.
+                            format(db_row[idea_uid_col], db_row[lh_uid_col], db_row[rh_uid_col]),
+                            'De alias relatie van idee {} vereist '
+                            'dat de uid van het linker object {} '
+                            'gelijk is aan de uid van het rechter object {}'.
+                            format(db_row[idea_uid_col], db_row[lh_uid_col], db_row[rh_uid_col]))
             lh_map = [db_row[lh_uid_col], db_row[lh_name_col], db_row[part_def_col]]
 
         # UOM (unit of measure)
@@ -991,10 +992,10 @@ class Gellish_file:
                                                                  string_commonality)
             if new_name:
                 Message(self.gel_net.GUI_lang_index,
-                    'The name of the unit of measure <{}> in idea {} is unknown.'.
-                    format(db_row[uom_name_col], db_row[idea_uid_col]),
-                    'De naam van de eenheid <{}> in idee {} is onbekend.'.
-                    format(db_row[uom_name_col], db_row[idea_uid_col]))
+                        'The name of the unit of measure <{}> in idea {} is unknown.'.
+                        format(db_row[uom_name_col], db_row[idea_uid_col]),
+                        'De naam van de eenheid <{}> in idee {} is onbekend.'.
+                        format(db_row[uom_name_col], db_row[idea_uid_col]))
 
         # If comm_uid and name still unknown, then use defaults
         if db_row[comm_uid_col] == '':
@@ -1017,12 +1018,12 @@ class Gellish_file:
         rel_type_uid = db_row[rel_type_uid_col]
         if rel_type_uid not in self.gel_net.rel_type_uids:
             Message(self.gel_net.GUI_lang_index,
-                "The kind of relation ({}) '{}' is not (yet) defined "
-                "as a binary relation. The idea {} is ignored.".
-                format(rel_type_uid, db_row[rel_type_name_col], db_row[idea_uid_col]),
-                "De soort relatie ({}) '{}' is (nog) niet gedefinieerd "
-                "als een binaire relatie. Idee {} is genegeerd.".
-                format(rel_type_uid, db_row[rel_type_name_col], db_row[idea_uid_col]))
+                    "The kind of relation ({}) '{}' is not (yet) defined "
+                    "as a binary relation. The idea {} is ignored.".
+                    format(rel_type_uid, db_row[rel_type_name_col], db_row[idea_uid_col]),
+                    "De soort relatie ({}) '{}' is (nog) niet gedefinieerd "
+                    "als een binaire relatie. Idee {} is genegeerd.".
+                    format(rel_type_uid, db_row[rel_type_name_col], db_row[idea_uid_col]))
             db_row[rel_type_uid_col] = '5935' # binary relation
             correct = False
 
@@ -1046,12 +1047,12 @@ class Gellish_file:
                 db_row[phrase_type_uid_col] = '1986'
             else:
                 Message(self.gel_net.GUI_lang_index,
-                    "Phrase <{}> ({}) not yet defined. Idea {} ignored".
-                    format(db_row[rel_type_name_col], db_row[rel_type_uid_col],
-                           db_row[idea_uid_col]),
-                    "Frase <{}> ({}) is nog niet gedefinieerd. Idee {} is genegeerd.".
-                    format(db_row[rel_type_name_col], db_row[rel_type_uid_col],
-                           db_row[idea_uid_col]))
+                        "Phrase <{}> ({}) not yet defined. Idea {} ignored".
+                        format(db_row[rel_type_name_col], db_row[rel_type_uid_col],
+                               db_row[idea_uid_col]),
+                        "Frase <{}> ({}) is nog niet gedefinieerd. Idee {} is genegeerd.".
+                        format(db_row[rel_type_name_col], db_row[rel_type_uid_col],
+                               db_row[idea_uid_col]))
                 correct = False
 
         # If partial_definition known, then delete full_definition.
@@ -1062,13 +1063,13 @@ class Gellish_file:
         # load them with defaults
         if correct and db_row[rel_type_uid_col] in ['1146']:
             if db_row[lh_role_uid_col] == '':
-                  db_row[lh_role_uid_col] = subtypeRoleUID
+                db_row[lh_role_uid_col] = subtypeRoleUID
             if db_row[lh_role_name_col] == '':
-                  db_row[lh_role_name_col] = subtypeName[self.lang_ind]
+                db_row[lh_role_name_col] = subtypeName[self.lang_ind]
             if db_row[rh_role_uid_col] == '':
-                  db_row[rh_role_uid_col] = supertypeRoleUID
+                db_row[rh_role_uid_col] = supertypeRoleUID
             if db_row[rh_role_name_col] == '':
-                  db_row[rh_role_name_col] = supertypeName[self.lang_ind]
+                db_row[rh_role_name_col] = supertypeName[self.lang_ind]
 
         # Store row in self.expressions
         if correct:
