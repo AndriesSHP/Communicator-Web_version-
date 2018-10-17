@@ -43,7 +43,6 @@ class Communicator(App):
         self.gel_net = None
         self.user = None
         self.user_interface = None
-        #self.views_noteb = None
 
         self.GUI_lang_name_dict = {"English": '910036',
                                    "Nederlands": '910037'}
@@ -342,7 +341,7 @@ class Communicator(App):
                 self.message_ui(
                     'Reading file <{}> from current directory.'.format(file_path_and_name),
                     'Lees file <{}> van actuele directory.'.format(file_path_and_name))
-                file_name = file_path_and_name
+                # file_name = file_path_and_name
                 # file_path = ''
 
             # Create file object

@@ -7,7 +7,7 @@ import datetime
 
 # from Bootstrapping import *
 from Expr_Table_Def import idea_uid_col, \
-     lh_uid_col, rel_type_uid_col, rel_type_name_col, rh_uid_col
+    lh_uid_col, rel_type_uid_col, rel_type_name_col, rh_uid_col
 from Create_output_file import Open_output_file, Save_expressions_in_file
 
 
@@ -49,7 +49,7 @@ class Anything:
         self.parts = []
         # Aspects are the aspects and intrinsic aspects of kinds or of individual things
         # (duplicates possession relations)
-##        self.aspects = []
+
         date = datetime.date.today()
         subject_name = self.name
         self.header1 = ['Gellish', 'English', 'Version', '9.0', date, 'Results',
@@ -62,13 +62,12 @@ class Anything:
         if name_in_context not in self.names_in_contexts:
             self.names_in_contexts.append(name_in_context)
 
-
     def add_relation(self, relation):
         ''' add relation object to collection of relations with self.'''
         if relation not in self.relations:
             self.relations.append(relation)
         else:
-            print('Duplicate relation uid {} ignored: ',format(relation.uid))
+            print('Duplicate relation uid {} ignored: '.format(relation.uid))
 
     def add_classifier(self, classifier):   # only applicable for individuals
         if classifier not in self.classifiers:
@@ -189,77 +188,6 @@ class Relation(Anything):
             self.cont_facts = [cont_fact]
 
     def __repr__(self):
-        #return(self.uid, self.lh_uid, self.rel_type_uid, self.phrase_type_uid, self.rh_uid)
+        # return(self.uid, self.lh_uid, self.rel_type_uid, self.phrase_type_uid, self.rh_uid)
         return("Idea %i %i (%i) %i %i" % (self.uid, self.lh_uid, self.rel_type_uid,
                                           self.phrase_type_uid, self.rh_uid))
-
-
-if __name__ == "__main__":
-    import TestData.TestDBcontent as Exprs
-
-    net_name = 'Semantic network'
-    gel_net = Semantic_Network(net_name)
-    for ex in Exprs.expr:
-        langUID = ex[1]
-        langName = ex[2]
-        commUID = ex[3]
-        commName = ex[4]
-        intentUID = ex[6]
-        intentName = ex[7]
-        lhobUID = ex[9]
-        lhobName = ex[10]
-        ideaUID = ex[15]
-        ideaName = ex[16]
-        relTypeUID = ex[17]
-        relTypePhrase = ex[18]
-        rhobUID = ex[23]
-        rhobName = ex[24]
-        fullDef = ex[25]
-        uomUID = ex[26]
-        uomName = ex[27]
-        print("Expression: ", langName, commName, intentName, lhobName, relTypePhrase, rhobName)
-
-        # Interpret an expression and create things, and main relation if they do not yet exist.
-        rel = Relation(ex)  # ideaName, intentUID, intentName,
-        #                     lhobUID, lhobName, relTypeUID, relTypePhrase, phraseTypeUID,
-        #                     rhobUID, rhobName, uomUID, uomName)
-
-        R1 = ['0', "has approval status", '790375', "accepted"]
-        R2 = ['6023', "has as originator", '0', "Andries van Renssen"]
-        rel.add_contextual_fact(R1)
-        rel.add_contextual_fact(R2)
-        rel.show(gel_net)
-
-        naming_rel_uid = '5117'
-        description = 'text'
-        O1 = Object(lhobUID, fullDef)
-        if O1 not in gel_net.obj_uids:
-            gel_net.obj_uids.append(O1)
-            lhob_name_in_context = [langUID, commUID, lhobName, naming_rel_uid, description]
-            O1.add_name_in_context(lhob_name_in_context)
-        Q1.show(gel_net)
-
-        O2 = Object(rhobUID, '')
-        if O2 not in gel_net.obj_uids and O2 not in gel_net.rh_obj_uids:
-            gel_net.rh_obj_uids.append(O2)
-            O2.add_name_in_context(rhobName)
-        Q2.show(gel_net)
-
-        RT = Anything('1260', 'name', 'cat')
-        rt_name_in_context = [langUID, commUID, "composition relation between an individual thing"
-                              " and a composed individual thing", naming_rel_uid, description]
-        RT.add_name_in_context(rt_name_in_context)
-        RT.add_base_phrase("is a part of")
-        RT.add_inverse_phrase("has as part")
-        RT.show(gel_net)
-    GUI_index = 0
-    categoryInFocus = 'kind'
-    root = Tk()
-    root.title("Semantic model server")
-    root.minsize(1000, 400)
-    myStyle = Style()
-    myStyle.configure("TFrame", background="#dfd")
-    root.configure(background="#ddf")
-    root.columnconfigure(0, weight=1)
-    root.rowconfigure(0, weight=0)
-    root.rowconfigure(1, weight=1)

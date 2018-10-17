@@ -1,7 +1,7 @@
 class GellishDict(dict):
     ''' A dictionary for names in a context that refer to the denoted concepts.
         The roles of the names are indicated by alias relation_type_UIDs,
-        such as for <is a code for>: 
+        such as for <is a code for>:
         key   = name_in_context(tuple) = (languageUID, communityUID, name).
         value = value_triple = (UID, naming_relation_type_UID, description)
     '''
@@ -13,7 +13,7 @@ class GellishDict(dict):
             # self.key = name_in_context(tuple) = (lanuageUID, communityUID, name).
             # self.value = value_triple = (UID, naming_relation_type_UID, description)
             self[name_in_context] = value_triple
-            print('add: ',name_in_context, self[name_in_context])
+            print('add: ', name_in_context, self[name_in_context])
         else:
             value_triple2 = self.find_anything(name_in_context)
             print('Error: Name in context: {}, {} is already known by uid ({})'.
@@ -24,7 +24,7 @@ class GellishDict(dict):
             print('Found: ', q_name_in_context, self[q_name_in_context])
             return(self[q_name_in_context])
         else:
-            print('Not found: ',q_name_in_context)
+            print('Not found: ', q_name_in_context)
             return(None)
 
     def filter_on_key(self, q_string, string_commonality):
@@ -66,12 +66,8 @@ class GellishDict(dict):
 
         # use the filter to create a *list* of items that match the filter
         result_list = filter(filt, items)
-
-        # convert the list to a Gellish dictionary
-##        result = GellishDict(result_list)
-
-        # and return the resulting list of filtered items
         return(result_list)
+
 
 class Preferences(dict):
     ''' A dictionary for preferences and defaults for the owner of the table of preferences.'''

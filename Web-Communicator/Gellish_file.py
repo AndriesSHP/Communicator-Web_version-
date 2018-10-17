@@ -1,21 +1,22 @@
-#import os
+# import os
 import sys
 import csv
 import json
 import logging
-#import remi.gui as gui
+# import remi.gui as gui
 
 from Bootstrapping import ignores, subtypeRoleUID, supertypeRoleUID, subtypeName, supertypeName
 from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col,\
-     intent_uid_col, intent_name_col, lh_uid_col, lh_name_col, lh_role_uid_col, lh_role_name_col,\
-     idea_uid_col,\
-     rel_type_uid_col, rel_type_name_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col,\
-     rh_uid_col, rh_name_col, part_def_col, full_def_col, uom_uid_col, uom_name_col, status_col,\
-     file_name_col, expr_col_ids, default_row
+    intent_uid_col, intent_name_col, lh_uid_col, lh_name_col, lh_role_uid_col, lh_role_name_col,\
+    idea_uid_col,\
+    rel_type_uid_col, rel_type_name_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col,\
+    rh_uid_col, rh_name_col, part_def_col, full_def_col, uom_uid_col, uom_name_col, status_col,\
+    file_name_col, expr_col_ids, default_row
 from Create_output_file import Create_gellish_expression, Open_output_file,\
-     Convert_numeric_to_integer, Message
+    Convert_numeric_to_integer, Message
 from Mapping_tables_IB import keys_map, attributes_map, value_key_map, values_map
 from Anything import Anything
+from Query import Query
 
 logger = logging.getLogger(__name__)
 
@@ -89,14 +90,14 @@ class Gellish_file:
         # Determine the file extension of the current file
         if self.extension == 'csv':
             # Determine the CSV dialect (appears not working properly ==> can be improved?)
-##            sample = f.read(4096)
-##            dialect = csv.Sniffer().sniff(sample, delimiters=';')
-##
+            # sample = f.read(4096)
+            # dialect = csv.Sniffer().sniff(sample, delimiters=';')
+
             # rewind to start
-##            f.seek(0)
-##
+            # f.seek(0)
+
             # Initialise csv reading and read first line
-##            self.reader = csv.reader(f, dialect)
+            # self.reader = csv.reader(f, dialect)
             reader = csv.reader(f, delimiter=';')
             self.header = next(reader)
         elif self.extension == 'json':
@@ -147,7 +148,7 @@ class Gellish_file:
         self.gel_net.reply_lang_index = 0
         lang_comm = ['910036', 'English', '910037', 'Nederlands', '2700929', 'IB']
         while new_article:
-            #list_of_keys = list(self.json_dict.keys())
+            # list_of_keys = list(self.json_dict.keys())
             # Find article name as value of a first level key
             for key_map in keys_map:
                 if key_map[0] in self.json_dict:
@@ -450,8 +451,8 @@ class Gellish_file:
                 # Debug print('Col_ids',lang_name_col_id)
                 for col_id in lang_name_col_id:
                     # Only for rows with a specialization and alias relation
-                    if (db_row[rel_type_uid_col] in self.gel_net.specialRelUIDs or \
-                        db_row[rel_type_uid_col] in self.gel_net.alias_uids):
+                    if (db_row[rel_type_uid_col] in self.gel_net.specialRelUIDs or
+                       db_row[rel_type_uid_col] in self.gel_net.alias_uids):
                         # Check whether column value (name of object) is not blank,
                         # then include name_in_context in the dictionary (if not yet present)
                         if in_row[lang_name_col_id[col_id]] != '':
@@ -461,7 +462,7 @@ class Gellish_file:
                                 # Collect base_phrase or inverse_phrase
                                 # of additional language column
                                 if db_row[rel_type_uid_col] == '6066':
-                                    self.gel_net.total_base_phrases.append(\
+                                    self.gel_net.total_base_phrases.append(
                                         in_row[lang_name_col_id[col_id]])
                                 elif db_row[rel_type_uid_col] == '1986':
                                     self.gel_net.total_inverse_phrases.append(
@@ -515,7 +516,8 @@ class Gellish_file:
 
         # If the current file contains a query then create a query object and query_spec
         if self.content_type == 'queries':
-            query = Query(self.gel_net, main)
+            # === user_interface is unknown === to be done ===
+            # query = Query(self.gel_net, self.user_interface)
             # Create query_spec
             query.query_spec = self.query_lines
             query.Interpret_query_spec()
@@ -754,7 +756,7 @@ class Gellish_file:
                 # If the modeling language of the current file is English
                 # then lang_uid and name must be in or added to lang_dict_EN
                 if lang_uid not in self.gel_net.lang_dict_EN:
-                   self.gel_net.lang_dict_EN[lang_uid] = db_row[lang_name_col]
+                    self.gel_net.lang_dict_EN[lang_uid] = db_row[lang_name_col]
                 try:
                     if db_row[lang_name_col] == self.gel_net.lang_dict_EN[lang_uid]:
                         pass
@@ -780,13 +782,13 @@ class Gellish_file:
                 recognized = False
                 if self.lang_ind == 1:
                     # Find the lang_uid for a given lang_name in db_row[lang_name_col]
-                    for key,value in self.gel_net.lang_dict_NL.items():
+                    for key, value in self.gel_net.lang_dict_NL.items():
                         if db_row[lang_name_col] == value:
                             db_row[lang_uid_col] = key
                             recognized = True
                             continue
                 else:
-                    for key,value in self.gel_net.lang_dict_EN.items():
+                    for key, value in self.gel_net.lang_dict_EN.items():
                         if db_row[lang_name_col] == value:
                             db_row[lang_uid_col] = key
                             recognized = True
@@ -849,7 +851,7 @@ class Gellish_file:
                             comm_recognized = True
                             continue
                 else:
-                    for key,value in self.gel_net.comm_dict_EN.items():
+                    for key, value in self.gel_net.comm_dict_EN.items():
                         if db_row[comm_name_col] == value:
                             db_row[comm_uid_col] = key
                             comm_recognized = True
@@ -876,7 +878,7 @@ class Gellish_file:
         # then search for its name in network to find uid.
         # and select from candidates or confirm single candidate.
         string_commonality = 'csi'
-        mapping = False
+        # mapping = False
 
         # REL_name: Remove leading and/or trailing whitespaces in rel_name if applicable.
         stripped_name = db_row[rel_type_name_col].strip()
@@ -896,7 +898,7 @@ class Gellish_file:
             uid_new, rel_map = self.gel_net.Find_object_by_name(db_row[rel_type_name_col],
                                                                 string_commonality)
             db_row[rel_type_uid_col] = rel_map[0]
-            mapping = True
+            # mapping = True
             # Debug print('rel_map:', rel_map)
             if uid_new:
                 Message(self.gel_net.GUI_lang_index,
@@ -930,7 +932,7 @@ class Gellish_file:
             uid_new, rh_map = self.gel_net.Find_object_by_name(db_row[rh_name_col],
                                                                string_commonality)
             db_row[rh_uid_col] = rh_map[0]
-            mapping = True
+            # mapping = True
             # Debug print('rh_map :', rh_map)
         else:
             rh_map = [db_row[rh_uid_col], db_row[rh_name_col], '']
@@ -1024,7 +1026,7 @@ class Gellish_file:
                     "De soort relatie ({}) '{}' is (nog) niet gedefinieerd "
                     "als een binaire relatie. Idee {} is genegeerd.".
                     format(rel_type_uid, db_row[rel_type_name_col], db_row[idea_uid_col]))
-            db_row[rel_type_uid_col] = '5935' # binary relation
+            db_row[rel_type_uid_col] = '5935'  # binary relation
             correct = False
 
         # Collect base_phrases and inverse_phrases in list of totals

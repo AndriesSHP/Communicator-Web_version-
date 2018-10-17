@@ -6,18 +6,30 @@ import os
 import pickle
 # import remi.gui as gui
 
-from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col,\
-     lh_uid_col, lh_name_col, lh_role_uid_col, lh_role_name_col, idea_uid_col,\
-     rel_type_uid_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col,\
-     rh_uid_col, rh_name_col, part_def_col, uom_uid_col, uom_name_col
-#    intent_uid_col, intent_name_col, rel_type_name_col, full_def_col, status_col
+from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col, \
+    lh_uid_col, lh_name_col, lh_role_uid_col, lh_role_name_col, idea_uid_col, \
+    rel_type_uid_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col, \
+    rh_uid_col, rh_name_col, part_def_col, uom_uid_col, uom_name_col
+#   intent_uid_col, intent_name_col, rel_type_name_col, full_def_col, status_col
 from Gellish_file import Gellish_file
 from Anything import Anything, Relation
-from Bootstrapping import basePhraseUID, inversePhraseUID, binRelUID,\
-     first_role_uid, second_role_uid,\
-     is_called_uid, by_def_role_of_ind, subtypeRoleUID, Dutch_uid
+from Bootstrapping import boot_base_phrasesEN, boot_base_phrasesNL, \
+    boot_inverse_phrasesEN, boot_inverse_phrasesNL, boot_alias_uids, \
+    basePhraseUID, inversePhraseUID, binRelUID, classifUID, classifiedUID, \
+    indOrMixRelUID, indivRelUID, kindHierUID, kindKindUID, kindRelUID, mixedRelUID, \
+    specialRelUID, possAspUID, possessorUID, transRelUID, concPossAspUID, \
+    concComplRelUID, qualSubtypeUID, qualOptionsUID, concComplUID, concQuantUID, \
+    qualifUID, quantUID, informativeUID, occurrenceUID, composUID, componUID, \
+    concComposUID, concComponUID, involvUID, nextUID, shallUID, aliasUID, \
+    concWholeUID, concPosessorUID, transUID, specialUID, concBinRelKindsUID, \
+    indOrMixRelUID, kindAndMixRelUID, \
+    first_role_uid, second_role_uid, base_rel_type_uids, \
+    is_called_uid, by_def_role_of_ind, subtypeRoleUID, Dutch_uid, \
+    dict_file_names, dict_dirs, model_file_names, model_dirs, prod_file_names, prod_dirs, \
+    base_onto_file_name
 from GellishDict import GellishDict
 from Create_output_file import Convert_numeric_to_integer, Message
+
 
 class Semantic_Network():
     ''' Build and query a Semantic_Network model.
@@ -72,13 +84,13 @@ class Semantic_Network():
         self.specialRelUIDs = ['1146', '1726', '5277', '6022', '5396', '5683']
         # Some UIDs that are classification relations, being subtypes of 1225:
         self.classifUIDs = ['1225', '1588']   # 1225 base UID for 'is classified as a'
-##        UIDs that imply a new UoM in units and currencies table.
-##        uom_def_uids = ['1726', '5708', '1981']
+#        UIDs that imply a new UoM in units and currencies table.
+#        uom_def_uids = ['1726', '5708', '1981']
         self.subComposUIDs = []
         self.subConcComposUIDs = []
         self.alias_uids = boot_alias_uids
-        #self.allBinRel_types = [] # initialize and collect all binary relation types
-                                # (being 'binary relation' and its subtypes)
+        # self.allBinRel_types = []  # initialize and collect all binary relation types
+        #                              (being 'binary relation' and its subtypes)
         self.new_obj_uid = 100  # default start UID for new things in model mappings
         self.new_things = {}   # collection of new things in model mappings
         self.new_idea_uid = 500  # default start UID for unknown relations in model mappings
@@ -127,7 +139,7 @@ class Semantic_Network():
         # Read base ontology (base language definition) from Gellish file
         # and build base semantic network
         self.Import_Base_Ontology()
-        #self.Create_base_reltype_objects()
+
         # Verify base semantic network and collect rel_types for validation
         self.Verify_Base_Semantic_Network()
 
@@ -200,7 +212,7 @@ class Semantic_Network():
             rel_type = Anything(rel_type_uid, rel_type_name, 'kind of relation')
             self.rel_types.append(rel_type)
             self.uid_dict[rel_type_uid] = rel_type
-            #self.rel_uid_dict[rel_type_uid] = rel_type
+            # self.rel_uid_dict[rel_type_uid] = rel_type
 
     def Verify_Base_Semantic_Network(self):
         ''' Verify and complete the base Semantic Network
@@ -246,8 +258,7 @@ class Semantic_Network():
         # Add kinds of role_players to kinds of binary relations because of relation types
         for rel_type in self.rel_types:
             rel_type.role_players_types, rel_type.role_player_type_lh, \
-                                         rel_type.role_player_type_rh \
-                                         = self.Determine_role_players_types(rel_type.uid)
+                rel_type.role_player_type_rh = self.Determine_role_players_types(rel_type.uid)
 
     def Add_name_in_context(self, lang_uid, comm_uid, name, naming_uid, description):
         ''' Add a name_in_context and description to object.names_in_contexts
@@ -340,7 +351,7 @@ class Semantic_Network():
             lh_name_in_context = (lang_uid, comm_uid, lh_name)
             if lh_name_in_context in self.dictionary:
                 # Check whether the same name in the same language and language community
-                # has indeed the same uid (otherwise it should be a homonym 
+                # has indeed the same uid (otherwise it should be a homonym
                 # with different language and/or language community)
                 verification_triple = self.dictionary[lh_name_in_context]
                 if verification_triple[0] != lh_uid:
@@ -406,7 +417,8 @@ class Semantic_Network():
                             lh.names_in_contexts.append(name_and_description)
             # If rel_type is a subtyping relation then add name_in_context to object and to dict
             elif rel_type_uid in self.specialRelUIDs or rel_type_uid in self.classifUIDs:
-                if lh_name not in self.nameless and lh_name != self.nameless[ind] + '-' + str(lh_uid):
+                if lh_name not in self.nameless \
+                   and lh_name != self.nameless[ind] + '-' + str(lh_uid):
                     naming_uid = is_called_uid
                     lh.defined = True
                     self.Add_name_in_context_to_obj_and_dict(
@@ -685,7 +697,7 @@ class Semantic_Network():
         self.subConcPossAsps, self.subConcPossAspUIDs = self.Determine_subtype_list(concPossAspUID)
         # concComplRelUID = 4902
         self.subConcComplRels, self.subConcComplRelUIDs = \
-                               self.Determine_subtype_list(concComplRelUID)
+            self.Determine_subtype_list(concComplRelUID)
         # qualSubtypeUID = 4328
         self.qualSubtypes, self.qualSubtypeUIDs = self.Determine_subtype_list(qualSubtypeUID)
         # qualOptionsUID = 4848
@@ -721,13 +733,13 @@ class Semantic_Network():
         self.specials, self.specialUIDs = self.Determine_subtype_list(specialUID)
         # concBinRelKindsUID = 1231 = conc.bin. relation between things of specified kinds.
         self.concBinRelbetKinds, self.concBinRelbetKinds = \
-                                 self.Determine_subtype_list(concBinRelKindsUID)
+            self.Determine_subtype_list(concBinRelKindsUID)
         # self.props, self.propUIDs = self.Determine_subtype_list(propUID)  # 551004 = property
         # 4714 = can be a role of a
         self.conc_playings, self.conc_playing_uids = self.Determine_subtypes_of_kind('4714')
 
     def Determine_subtypes_of_kind(self, kind_uid):
-        ''' Determine the list of a kind and its subtypes and the list of their uids''' 
+        ''' Determine the list of a kind and its subtypes and the list of their uids.'''
         kind = self.uid_dict[kind_uid]
         all_subs = []
         all_sub_uids = []
@@ -933,7 +945,6 @@ class Semantic_Network():
         ''' Execute various checks on completeness
             and consistency of the semantic network.
         '''
-
         # Check whether each concept has at least
         # one supertype concept or at least one classifier.
         for obj in self.objects:
@@ -1031,10 +1042,10 @@ class Semantic_Network():
                 # The uid is the first value in the value_triple
                 obj_uid = candidate[1][0]
                 # if len(candidates) > 1:
-                    # Candidate[0] is lang_uid, comm_uid, obj_name of first candidate
-                    # comm_name = self.comm_dict_NL[candidate[0][1]]
-                    # Debug print("    Candidate {}: object {}, {} ({})".
-                    #      format(candid_nr, candidate[0][2], comm_name, obj_uid))
+                #     Candidate[0] is lang_uid, comm_uid, obj_name of first candidate
+                #     comm_name = self.comm_dict_NL[candidate[0][1]]
+                #     Debug print("    Candidate {}: object {}, {} ({})".
+                #          format(candid_nr, candidate[0][2], comm_name, obj_uid))
                 # UID_name_desc is list [uid, name, description]
                 uid_name_desc = [obj_uid, candidate[0][2], candidate[1][2]]
                 self.uid_name_desc_list.append(uid_name_desc)
@@ -1129,7 +1140,7 @@ class Semantic_Network():
         return uid
 
     def save_pickle_db(self, widget):
-        ''' Save the semantic network by a pickle dump '''
+        ''' Save the semantic network by a pickle dump.'''
         semantic_net = open(self.semantic_file_name, "bw")
         pickle.dump(self, semantic_net)
         semantic_net.close()
@@ -1141,8 +1152,6 @@ class Semantic_Network():
 
 
 if __name__ == "__main__":
-##    from SystemUsers import User
-
     # Create and initialize a semantic network
     net_name = 'Semantic network'
     network = Semantic_Network(net_name)
@@ -1167,13 +1176,13 @@ if __name__ == "__main__":
         com = input("\nEnter string commonality (cspi, csi): ")
         # string_commonality 'csi' = 'case sensitive identical'
         #                    'cspi' = 'case sensitive partially identical'
-
+        string_commonality = 'cspi'
         candidates = network.Query_network_dict(qtext, string_commonality)
         if len(candidates) > 0:
             for candidate in candidates:
                 obj_uid = candidate[1][0]
                 # Debug print("candidate %s %s" % (obj_uid, candidate[0][2]))
-                obj = network.uid_dict[obj_uid]     #find_object(obj_uid)
+                obj = network.uid_dict[obj_uid]     # find_object(obj_uid)
                 s = obj.show(network)
         else:
             print("No candidates found")
