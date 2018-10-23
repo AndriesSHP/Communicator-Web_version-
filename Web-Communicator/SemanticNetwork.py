@@ -22,7 +22,7 @@ from Bootstrapping import boot_base_phrasesEN, boot_base_phrasesNL, \
     qualifUID, quantUID, informativeUID, occurrenceUID, composUID, componUID, \
     concComposUID, concComponUID, involvUID, nextUID, shallUID, aliasUID, \
     concWholeUID, concPosessorUID, transUID, specialUID, concBinRelKindsUID, \
-    indOrMixRelUID, kindAndMixRelUID, \
+    kindAndMixRelUID, \
     first_role_uid, second_role_uid, base_rel_type_uids, \
     is_called_uid, by_def_role_of_ind, subtypeRoleUID, Dutch_uid, \
     dict_file_names, dict_dirs, model_file_names, model_dirs, prod_file_names, prod_dirs, \
@@ -595,8 +595,8 @@ class Semantic_Network():
             # If part-whole relation (composUID 1260 or concComposUID 1261
             # or one of their subtypes),
             # then add part to collection of parts of the whole object
-            elif rel_type_uid in self.subComposUIDs \
-               or rel_type_uid in self.subConcComposUIDs:
+            elif rel_type_uid in self.subComposUIDs or \
+              rel_type_uid in self.subConcComposUIDs:
                 if phrase_type_uid == basePhraseUID:
                     rh.add_part(lh)
                 else:

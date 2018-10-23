@@ -30,6 +30,6 @@ value_key_map = [('label', 910300, 'label'),
 
 # Allowed values and units
 #              IB               Gellish
-values_map = {'Dakramen|Ramen':(43769, 'dakvenster'),
+values_map = {'Dakramen|Ramen': (43769, 'dakvenster'),
               'mm': (570423, 'mm'),
               'kg': (570039, 'kg')}

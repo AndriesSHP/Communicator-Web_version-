@@ -2,24 +2,24 @@ import os
 
 import remi.gui as gui
 # from operator import itemgetter
-from tkinter import ttk, Frame, Scrollbar, Button, Canvas, NSEW, E, NS, S, EW, W, \
-    VERTICAL, HORIZONTAL
+from tkinter import ttk, Frame, Scrollbar, Button, Canvas, NSEW, E, NS, S, EW, W, N, \
+    VERTICAL, HORIZONTAL, filedialog, messagebox, Tk
 #   Toplevel, LAST, CENTER
 from tkinter.ttk import Label, Treeview
 
 from Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
-from Expr_Table_Def import rel_type_uid_col, rel_type_name_col, \
-    lh_name_col, rel_type_name_col, rh_name_col, status_col, \
+from Expr_Table_Def import lh_name_col, rel_type_name_col, rh_name_col, status_col, \
     lh_uid_col, rel_type_uid_col, rh_uid_col, phrase_type_uid_col, \
     uom_uid_col, uom_name_col, full_def_col, \
-    lh_role_uid_col, lh_role_name_col, rh_role_uid_col, rh_role_name_col
+    lh_role_uid_col, lh_role_name_col, rh_role_uid_col, rh_role_name_col, \
+    expr_col_ids, header3
 # from Query import Query
 from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer, \
     Open_output_file
 from Occurrences_diagrams import Occurrences_diagram
 from utils import open_file
 from QueryViews import MyTable
-
+from Anything import Relation
 
 class Display_views():
     ''' Various models about object(s)
@@ -261,7 +261,7 @@ class Display_views():
                 self.possibilities_model.append(possib_row)
 
             # Find kinds of aspects for kind in focus
-            nr_of_aspects = self.Find_kinds_of_aspects(obj, role)
+            self.Find_kinds_of_aspects(obj, role)
 
             # Find kinds of parts of kind in focus and their conceptual or qualitative aspects
             self.Find_kinds_of_parts_and_their_aspects(obj)
@@ -426,15 +426,15 @@ class Display_views():
         prod_line_1 = ['', '', '', 2, '', descr_text[self.GUI_lang_index], description,
                        '', '', '', '', '', '', '']
 
-        prod_head_NL2I= ['', '', '', 3, '', '', '', '', 'Aspect', 'Soort aspect',
-                         '>=<', 'Waarde', 'Eenheid', 'Status']
-        prod_head_NL2K= ['', '', '', 3, '', '', '', '', 'Soort aspect', '',
-                         '>=<', 'Waarde', 'Eenheid', 'Status']
+        prod_head_NL2I = ['', '', '', 3, '', '', '', '', 'Aspect', 'Soort aspect',
+                          '>=<', 'Waarde', 'Eenheid', 'Status']
+        prod_head_NL2K = ['', '', '', 3, '', '', '', '', 'Soort aspect', '',
+                          '>=<', 'Waarde', 'Eenheid', 'Status']
 
-        prod_head_EN2I= ['', '', '', 3, '', '', '', '', 'Aspect', 'Aspect type',
-                         '>=<', 'Value', 'UoM', 'Status']
-        prod_head_EN2K= ['', '', '', 3, '', '', '', '', 'Kind of aspect', '',
-                         '>=<', 'Value', 'UoM', 'Status']
+        prod_head_EN2I = ['', '', '', 3, '', '', '', '', 'Aspect', 'Aspect type',
+                          '>=<', 'Value', 'UoM', 'Status']
+        prod_head_EN2K = ['', '', '', 3, '', '', '', '', 'Kind of aspect', '',
+                          '>=<', 'Value', 'UoM', 'Status']
 
         self.line_nr = 3
 
@@ -471,9 +471,9 @@ class Display_views():
             if len(obj.classifiers) > 1:
                 for classifier in obj.classifiers[1:]:
                     lang_name, comm_name, classifier_name, descr = \
-                               self.user_interface.Determine_name_in_context(classifier)
-                    self.prod_model.append([obj.uid,classifier.uid, '',1,
-                                            '', '', '', '', '',classifier_name])
+                        self.user_interface.Determine_name_in_context(classifier)
+                    self.prod_model.append([obj.uid, classifier.uid, '', 1,
+                                            '', '', '', '', '', classifier_name])
             self.prod_model.append(prod_line_1)
             if self.user_interface.GUI_lang_name == 'Nederlands':
                 self.prod_model.append(prod_head_NL2I)
@@ -510,7 +510,7 @@ class Display_views():
         else:
             # Determine the preferred name of the first classifier of the individual object
             lang_name_cl, comm_name_cl, pref_cl_name, descr = \
-                          self.user_interface.Determine_name_in_context(indiv.classifiers[0])
+                self.user_interface.Determine_name_in_context(indiv.classifiers[0])
             indiv.kind_uid = indiv.classifiers[0].uid
             indiv.kind_name = pref_cl_name
 
@@ -539,8 +539,8 @@ class Display_views():
                         'De uid van de soort frase van idee {} is niet compatibel '
                         'met de uitdrukking.'.format(expr.uid))
             # And for the inverse
-            elif indiv.uid == expr[rh_uid_col] \
-               and expr[rel_type_uid_col] in self.gel_net.subPossAspUIDs:
+            elif indiv.uid == expr[rh_uid_col] and \
+              expr[rel_type_uid_col] in self.gel_net.subPossAspUIDs:
                 if expr[phrase_type_uid_col] == inversePhraseUID:
                     aspect_uid = expr[lh_uid_col]
                     qualifier = 'quantitative'
@@ -554,13 +554,13 @@ class Display_views():
                 # It is not a possession of (intrinsic) aspect relation,
                 # thus search for possession of a qualitative aspect relations
                 # and for an <is made of> relation
-                if indiv.uid == expr[lh_uid_col] \
-                   and expr[rel_type_uid_col] in ['5843', '5423']:
+                if indiv.uid == expr[lh_uid_col] and \
+                  expr[rel_type_uid_col] in ['5843', '5423']:
                     if expr[phrase_type_uid_col] == basePhraseUID:
                         aspect_uid = expr[rh_uid_col]
                         qualifier = 'qualitative'
-                elif indiv.uid == expr[rh_uid_col] \
-                   and expr[rel_type_uid_col] in ['5843', '5423']:
+                elif indiv.uid == expr[rh_uid_col] and \
+                  expr[rel_type_uid_col] in ['5843', '5423']:
                     if expr[phrase_type_uid_col] == inversePhraseUID:
                         aspect_uid = expr[lh_uid_col]
                         qualifier = 'qualitative'
@@ -1197,20 +1197,20 @@ class Display_views():
                 expr = rel_obj.expression
                 # Find expression with poss_of_aspect relations about the object
                 # (or its supertype)
-                if expr[lh_uid_col] == obj_i.uid \
-                   and (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs
-                        and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
+                if expr[lh_uid_col] == obj_i.uid and \
+                  (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs and not
+                   expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
                     aspect_uid = expr[rh_uid_col]
                     aspect_name = expr[rh_name_col]
                     role_uid = expr[rh_role_uid_col]
                     role_name = expr[rh_role_name_col]
-                elif expr[rh_uid_col] == obj_i.uid \
-                   and (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs
-                        and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
+                elif expr[rh_uid_col] == obj_i.uid and \
+                  (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs and not
+                   expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
                     aspect_uid = expr[lh_uid_col]
                     aspect_name = expr[lh_name_col]
                     role_uid = expr[lh_role_uid_col]
-                    role_name = expr[lh_role_name_col]
+                    # role_name = expr[lh_role_name_col]
                 else:
                     continue
 
@@ -1236,14 +1236,14 @@ class Display_views():
                         expr2 = rel_obj2.expression
                         # Find collection of qualitative aspects for intrinsic aspect (=role),
                         # if any.
-                        if role_uid == expr2[lh_uid_col] \
-                           and expr2[rel_type_uid_col] in self.gel_net.qualOptionsUIDs:
+                        if role_uid == expr2[lh_uid_col] and \
+                          expr2[rel_type_uid_col] in self.gel_net.qualOptionsUIDs:
                             value_uid = expr2[rh_uid_col]   # collection of allowed values
                             value_name = expr2[rh_name_col]
                             value_presence = True
                             break
-                        elif role_uid == expr2[rh_uid_col] \
-                           and expr2[rel_type_uid_col] in self.gel_net.qualOptionsUIDs:
+                        elif role_uid == expr2[rh_uid_col] and \
+                          expr2[rel_type_uid_col] in self.gel_net.qualOptionsUIDs:
                             value_uid = expr2[lh_uid_col]   # collection of allowed values
                             value_name = expr2[lh_name_col]
                             value_presence = True
@@ -1251,14 +1251,14 @@ class Display_views():
 
                         # Find conceptual compliancy criterion, (4951)
                         # for intrinsic aspect (=role), if any.
-                        elif role_uid == expr2[lh_uid_col] \
-                           and expr2[lh_role_uid_col] in self.gel_net.concComplUIDs:
+                        elif role_uid == expr2[lh_uid_col] and \
+                          expr2[lh_role_uid_col] in self.gel_net.concComplUIDs:
                             value_uid = expr2[rh_uid_col]   # compliancy criterion or constraint
                             value_name = expr2[rh_name_col]
                             value_presence = True
                             break
-                        elif role_uid == expr2[rh_uid_col] \
-                           and expr2[rh_role_uid_col] in self.gel_net.concComplUIDs:
+                        elif role_uid == expr2[rh_uid_col] and \
+                          expr2[rh_role_uid_col] in self.gel_net.concComplUIDs:
                             value_uid = expr2[lh_uid_col]   # compliancy criterion or constraint
                             value_name = expr2[lh_name_col]
                             value_presence = True
@@ -1266,16 +1266,16 @@ class Display_views():
 
                         # Find conceptual quantification (1791) for intrinsic aspect (=role),
                         # if any.
-                        elif role_uid == expr2[lh_uid_col] \
-                           and expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs:
+                        elif role_uid == expr2[lh_uid_col] and \
+                          expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs:
                             value_uid = expr2[rh_uid_col]   # value (on a scale)
                             value_name = expr2[rh_name_col]
                             uom_uid = expr2[uom_uid_col]
                             uom_name = expr2[uom_name_col]
                             value_presence = True
                             break
-                        elif role_uid == expr2[rh_uid_col] \
-                           and expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs:
+                        elif role_uid == expr2[rh_uid_col] and \
+                          expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs:
                             value_uid = expr2[lh_uid_col]   # value (on a scale)
                             value_name = expr2[lh_name_col]
                             uom_uid = expr2[uom_uid_col]
@@ -1285,15 +1285,15 @@ class Display_views():
 
                         # Find conceptual compliance criterion/qualif (4902)
                         # for intrinsic aspect (=role), if any.
-                        elif role_uid == expr2[lh_uid_col] \
-                           and expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs:
+                        elif role_uid == expr2[lh_uid_col] and \
+                          expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs:
                             # Compliance criterion or def qualification
                             value_uid = expr2[rh_uid_col]
                             value_name = expr2[rh_name_col]
                             value_presence = True
                             break
-                        elif role_uid == expr2[rh_uid_col] \
-                           and expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs:
+                        elif role_uid == expr2[rh_uid_col] and \
+                          expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs:
                             # Compliance criterion or def qualification
                             value_uid = expr2[lh_uid_col]
                             value_name = expr2[lh_name_col]
@@ -1445,24 +1445,24 @@ class Display_views():
                             # If lh_uid is the kind of intr_aspect
                             # and rel_type is <is by definition an intrinsic aspect of a> (5738)
                             # then rh_obj is the kind of part  (and inverse)
-                            if expr_asp[lh_uid_col] == aspect_uid \
-                               and expr_asp[rel_type_uid_col] == '5738':
+                            if expr_asp[lh_uid_col] == aspect_uid and \
+                              expr_asp[rel_type_uid_col] == '5738':
                                 part_uid = expr_asp[rh_uid_col]
                                 part_name = expr_asp[rh_name_col]
-                            elif expr_asp[rh_uid_col] == aspect_uid \
-                               and expr_asp[rel_type_uid_col] == '5738':
+                            elif expr_asp[rh_uid_col] == aspect_uid and \
+                              expr_asp[rel_type_uid_col] == '5738':
                                 part_uid = expr_asp[lh_uid_col]
                                 part_name = expr_asp[lh_name_col]
 
                             # If lh_uid is the kind of intr_aspect
                             # and rel_type is <is by definition an intrinsic> (5817)
                             # then rh_obj is the kind of aspect of the kind of part  (and inverse)
-                            if expr_asp[lh_uid_col] == aspect_uid \
-                               and expr_asp[rel_type_uid_col] == '5817':
+                            if expr_asp[lh_uid_col] == aspect_uid and \
+                              expr_asp[rel_type_uid_col] == '5817':
                                 asp_of_part_uid = expr_asp[rh_uid_col]
                                 asp_of_part_name = expr_asp[rh_name_col]
-                            if expr_asp[rh_uid_col] == aspect_uid \
-                               and expr_asp[rel_type_uid_col] == '5817':
+                            if expr_asp[rh_uid_col] == aspect_uid and \
+                              expr_asp[rel_type_uid_col] == '5817':
                                 asp_of_part_uid = expr_asp[lh_uid_col]
                                 asp_of_part_name = expr_asp[lh_name_col]
 
@@ -1593,9 +1593,9 @@ class Display_views():
                     part_name = expr[rh_name_col]
                     # role_uid = expr[rh_role_uid_col]
                     # role_name = expr[rh_role_name_col]
-                elif expr[rh_uid_col] == obj.uid \
-                   and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs \
-                   and expr[phrase_type_uid_col] == '6066'  :
+                elif expr[rh_uid_col] == obj.uid and \
+                  expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs and \
+                  expr[phrase_type_uid_col] == '6066':
                     part_uid = expr[lh_uid_col]
                     part_name = expr[lh_name_col]
                     # role_uid = expr[lh_role_uid_col]
@@ -1699,7 +1699,7 @@ class Display_views():
                                par3Head[self.GUI_lang_index],
                                kindHead[self.GUI_lang_index], '', '', '', '', '']
                 if len(self.kind_model) < self.max_nr_of_rows:
-                    self.kind_model.append(prod_head_4) # Header of part list
+                    self.kind_model.append(prod_head_4)  # Header of part list
                 self.part_head_req = False
 
             # Create kind_model lines of part
@@ -1831,12 +1831,12 @@ class Display_views():
         # (involver role players)
         for rel_obj in obj.relations:
             expr = rel_obj.expression
-            if (expr[rh_uid_col] == obj.uid
-               and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+            if (expr[rh_uid_col] == obj.uid and
+              expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
                 occ_uid = expr[lh_uid_col]
                 # occ_name = expr[lh_name_col]
-            elif expr[lh_uid_col] == obj.uid \
-               and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
+            elif expr[lh_uid_col] == obj.uid and \
+              expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                 occ_uid = expr[rh_uid_col]
                 # occ_name = expr[rh_name_col]
             else:
@@ -1902,15 +1902,15 @@ class Display_views():
                 # Search <is involved in> or <is involving>
                 # or any of its subtypes relations in occ
                 # excluding the object in focus (obj)
-                if expr_occ[rh_uid_col] != obj.uid \
-                   and (expr_occ[lh_uid_col] == occ.uid
-                        and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+                if expr_occ[rh_uid_col] != obj.uid and \
+                  (expr_occ[lh_uid_col] == occ.uid and
+                   expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
                     involved_uid = expr_occ[rh_uid_col]
                     # involved_name = expr_occ[rh_name_col]
                     inv_role_name = expr_occ[rh_role_name_col]
-                elif expr_occ[lh_uid_col] != obj.uid \
-                   and (expr_occ[rh_uid_col] == occ.uid
-                        and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+                elif expr_occ[lh_uid_col] != obj.uid and \
+                  (expr_occ[rh_uid_col] == occ.uid and
+                   expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
                     involved_uid = expr_occ[lh_uid_col]
                     # involved_name = expr_occ[lh_name_col]
                     inv_role_name = expr_occ[lh_role_name_col]
@@ -1955,8 +1955,8 @@ class Display_views():
             self.Determine_sequences_of_occurrences(occ)
 
             # Search for parts of found occurrence and parts of parts, etc.
-            occ_level = 1
-            self.PartOfOccur(occ, occ_level)
+            occ_part_level = 1
+            self.PartOfOccur(occ, occ_part_level)
 
     def Determine_sequences_of_occurrences(self, occ):
         """ Build occurrences (activities or processes or events)
@@ -1987,8 +1987,8 @@ class Display_views():
                 nr_of_sequences += 1
 
             # Search for inputs and outputs (streams) in involv_table
-            elif expr[lh_uid_col] == occ.uid \
-               and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
+            elif expr[lh_uid_col] == occ.uid and \
+              expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                 involved = self.uid_dict[expr[rh_uid_col]]
                 if len(involved.classifiers) > 0:
                     inv_kind_name = involved.classifiers[0].name
@@ -2001,8 +2001,8 @@ class Display_views():
                 nr_of_ins_and_outs += 1
 
             # Search for inverse relation
-            elif expr[rh_uid_col] == occ.uid \
-               and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
+            elif expr[rh_uid_col] == occ.uid and \
+              expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                 involved = self.uid_dict[expr[lh_uid_col]]
                 if len(involved.classifiers) > 0:
                     inv_kind_name = involved.classifiers[0].name
@@ -2019,7 +2019,7 @@ class Display_views():
             for part_occ in occ.parts:
                 self.Determine_sequences_of_occurrences(part_occ)
 
-    def PartOfOccur(self, occ, occ_level):
+    def PartOfOccur(self, occ, occ_part_level):
         """ Determine whole-parts hierarchy for occurrences
             Store results in prod_model
         """
@@ -2059,7 +2059,7 @@ class Display_views():
                     kind_part_occ_uid = '0'
                     kind_part_occ_name = self.unknown[self.GUI_lang_index]
 
-                if occ_level < 2:
+                if occ_part_level < 2:
                     self.line_nr += + 1
                     prod_line_8 = [part_occ.uid, kind_part_occ_uid, '', self.line_nr, '',
                                    part_occ.name, '',
@@ -2076,7 +2076,7 @@ class Display_views():
                 self.part_whole_occs.append([occ, part_occ, kind_part_occ])
 
                 # Search for part on next decomposition level (part_of_part of occurrence)
-                part_level = occ_level + 1
+                part_level = occ_part_level + 1
                 self.PartOfOccur(part_occ, part_level)
 
     def Display_notebook_views(self):
@@ -2215,7 +2215,7 @@ class Display_views():
                                     style={"overflow": "auto", "background-color": "#eeffaa",
                                            "border-width": "2px", "border-style": "solid",
                                            "font-size": "12px", 'table-layout': 'auto',
-                                           'text-align':'left'})
+                                           'text-align': 'left'})
         eqal_head = ['>=<', '>=<']
         valu_head = ['Value', 'Waarde']
         unit_head = ['Unit', 'Eenheid']
@@ -2246,17 +2246,17 @@ class Display_views():
         for network_line in self.network_model:
             # Verify whether network_line[7], being the parent (typically intermediate),
             # is blank or is in the list of parents
-            openness = False
+            # openness = False
             upper_concept = network_line[7]
             if upper_concept == '' or upper_concept in parents:
                 # Skip duplicate line
-                row_duplicate = False
+                # row_duplicate = False
                 name = network_line[6]
                 # Include only lines that are not already included yet
                 if network_line not in included:
                     included.append(network_line)
-                    if upper_concept == '':
-                        openness = True
+                    # if upper_concept == '':
+                    #     openness = True
                     relation = False
                     color = '#ffff99'
                     term = name.partition(' ')
@@ -2267,12 +2267,12 @@ class Display_views():
                     row_widget = gui.TableRow()
                     for index, field in enumerate(network_line[5:]):
                         row_item = gui.TableItem(text=field,
-                                                 style={'text-align':'left',
-                                                        'background-color':color})
-                        if relation == False or index < 2:
+                                                 style={'text-align': 'left',
+                                                        'background-color': color})
+                        if relation is False or index < 2:
                             row_widget.append(row_item, field)
                     self.network_tree.append(row_widget, name)
-                            # Set color of line in table (rel_tag) === to be done ===
+                    # Set color of line in table (rel_tag) === to be done ===
                     if name not in parents:
                         parents.append(name)
 
@@ -2307,8 +2307,8 @@ class Display_views():
         self.taxon_tree = MyTable(width='100%',
                                   style={"overflow": "auto", "background-color": "#eeffaa",
                                          "border-width": "2px", "border-style": "solid",
-                                         "font-size": "12px", 'table-layout':'auto',
-                                         'text-align':'left'})
+                                         "font-size": "12px", 'table-layout': 'auto',
+                                         'text-align': 'left'})
         self.taxon_tree.append_from_list(display_cols, fill_title=True)
         self.taxon_frame.append(self.taxon_tree)
         self.taxon_tree.on_table_row_click.connect(self.Taxon_detail_view)
@@ -2332,9 +2332,9 @@ class Display_views():
             # is blank or in the list of parents
             if taxon_line[2] == '' or taxon_line[2] in parents:
                 # Skip duplicates
-#                if self.taxon_tree.exists(taxon_line[1]):
-#                    continue
-#                else:
+                # if self.taxon_tree.exists(taxon_line[1]):
+                #     continue
+                # else:
                 name = taxon_line[1]
                 relation = False
                 color = '#eeffdd'
@@ -2342,8 +2342,8 @@ class Display_views():
                 if term[0] in ['has', 'heeft', 'classifies', 'classificeert']:
                     relation = True
                     color = '#aaffaa'
-                taxon_row_widget = gui.TableRow(style={'text-align':'left',
-                                                       'background-color':color})
+                taxon_row_widget = gui.TableRow(style={'text-align': 'left',
+                                                       'background-color': color})
                 for index, field in enumerate(taxon_line[1:]):
                     taxon_row_item = gui.TableItem(text=field)
                     if relation is False or index < 2:
@@ -2359,7 +2359,7 @@ class Display_views():
                 pass
             self.Define_summary_sheet()
             self.Display_summary_view()
-            
+
     def Define_summary_sheet(self):
         ''' Define a summary_sheet for display of summ_model(a list of summary_rows)
             for display in a tab of Notebook
@@ -2476,7 +2476,7 @@ class Display_views():
         self.views_noteb.insert("end", self.possib_frame, sticky=NSEW)
 
         possib_head = ['Possible aspects per object of a particular kind',
-                        'Mogelijke aspecten per object van een bepaalde soort']
+                       'Mogelijke aspecten per object van een bepaalde soort']
         possib_label = Label(self.possib_frame, text=possib_head[self.GUI_lang_index])
         headings = ['UID', 'Name', 'Ext_name', 'Parent', 'Kind', 'Community',
                     'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4', 'Aspect5',
@@ -2501,7 +2501,7 @@ class Display_views():
         for column in self.possib_column_names[6:]:
             asp += 1
             Asp_name = 'Aspect' + str(asp)
-            self.possib_tree.heading(Asp_name, text=self.possib_column_names[asp +4], anchor=W)
+            self.possib_tree.heading(Asp_name, text=self.possib_column_names[asp + 4], anchor=W)
             self.possib_tree.column(Asp_name, minwidth=20, width=50)
 
         self.possib_tree.columnconfigure(0, weight=1)
@@ -2555,7 +2555,7 @@ class Display_views():
         nr_of_cols = len(self.indiv_column_names)
         display_cols = headings[3:nr_of_cols]
 
-        self.indiv_tree = Treeview(self.indiv_frame,columns=(headings[0:nr_of_cols]),
+        self.indiv_tree = Treeview(self.indiv_frame, columns=(headings[0:nr_of_cols]),
                                    displaycolumns=display_cols, selectmode='browse', height=30)
 
         self.indiv_tree.heading('#0', text='Object', anchor=W)
@@ -2572,7 +2572,7 @@ class Display_views():
         for column in self.indiv_column_names[5:]:
             asp += 1
             Asp_name = 'Aspect' + str(asp)
-            self.indiv_tree.heading(Asp_name, text=self.indiv_column_names[asp +4], anchor=W)
+            self.indiv_tree.heading(Asp_name, text=self.indiv_column_names[asp + 4], anchor=W)
             self.indiv_tree.column(Asp_name, minwidth=20, width=50)
 
         self.indiv_tree.columnconfigure(0, weight=1)
@@ -2603,7 +2603,7 @@ class Display_views():
             # Indiv_line[2] is the whole
             if indiv_line[2] == '' or indiv_line[2] in indiv_parents:
                 self.indiv_tree.insert(indiv_line[2], index='end',
-                                       values=indiv_line,tags='sum_tag',iid=indiv_line[1],
+                                       values=indiv_line, tags='sum_tag', iid=indiv_line[1],
                                        text=indiv_line[1], open=True)
                 indiv_parents.append(indiv_line[1])
 
@@ -2623,7 +2623,7 @@ class Display_views():
         save_on_JSON_file = ['Save on JSON file', 'Opslaan op JSON file']
 
         self.views_noteb.add(self.expr_frame, text=expressions[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end",self.expr_frame, sticky=NSEW)
+        self.views_noteb.insert("end", self.expr_frame, sticky=NSEW)
         # Define button for display of contextual facts
         details_button = Button(self.expr_frame, text='Context', command=self.Contextual_facts)
         save_CSV_button = Button(self.expr_frame, text=save_on_CSV_file[self.GUI_lang_index],
@@ -2632,9 +2632,10 @@ class Display_views():
                                   command=self.Save_on_JSON_file)
 
         header = ['Model expressions in Gellish', 'Uitdrukkingen in Gellish']
-        expr_lbl = Label(self.expr_frame, text=header[self.GUI_lang_index],justify='left')
+        expr_lbl = Label(self.expr_frame, text=header[self.GUI_lang_index], justify='left')
 
-        self.expr_tree = Treeview(self.expr_frame,
+        self.expr_tree = Treeview(
+            self.expr_frame,
             columns=('seq', 'langUID', 'langName', 'commUID', 'commName',
                      'reality', 'intentUID', 'intentName', 'lhCard', 'lhUID',
                      'lhName', 'lhRoleUID', 'lhRoleName', 'validUID', 'validName',
@@ -2645,12 +2646,12 @@ class Display_views():
                      'reason', 'succUID', 'dateStartVal', 'dateStartAv', 'dateCC',
                      'dateLatChE', 'orignatorUID', 'originatorName', 'authorUID', 'authorName',
                      'addrUID', 'addrName', 'refs', 'exprUID', 'collUID',
-                     'collName', 'fileName', 'lhComm', 'rhComm', 'relComm' ),
+                     'collName', 'fileName', 'lhComm', 'rhComm', 'relComm'),
             displaycolumns=('langName', 'commName', 'ideaUID', 'lhUID', 'lhName', 'reltypeUID',
                             'reltypeName', 'rhUID', 'rhName', 'fullDef', 'uomUID', 'uomName',
                             'remarks', 'status'),
             selectmode='browse', height=20
-                                  )
+            )
 
         self.expr_tree.heading('seq', text='Seq', anchor=W)
         self.expr_tree.heading('langUID', text='langUID', anchor=W)
@@ -2751,8 +2752,8 @@ class Display_views():
         date = time.strftime("%x")
         # Create 3 header records of file
         header1 = ['Gellish', 'Nederlands', 'Version', '9.0', date, 'Query results',
-                   'Query results about '+self.object_in_focus.name, '', '', '', '', '']
-        # header2 = expr_col_ids from initial settings
+                   'Query results about ' + self.object_in_focus.name, '', '', '', '', '']
+        # header2 = expr_col_ids from initial settings in Expr_Table_Def
         # header3 is taken from Expr_Table_Def
 
         # Open an output file for saving the header lines and the expr_table
@@ -2760,12 +2761,12 @@ class Display_views():
         #       to avoid interpretation as a Unicode string (and thus giving an error)
         # ini_out_path from bootstrapping
         ini_file_name = 'QueryResults.csv'
-        outputFile = filedialog.asksaveasfilename(filetypes = (("CSV files","*.csv"),
-                                                               ("All files","*.*")),
-                                                  title = "Enter a file name",
-                                                  initialdir = ini_out_path,
-                                                  initialfile= ini_file_name,
-                                                  parent = self.expr_frame)
+        outputFile = filedialog.asksaveasfilename(filetypes=(("CSV files", "*.csv"),
+                                                             ("All files", "*.*")),
+                                                  title="Enter a file name",
+                                                  initialdir=ini_out_path,
+                                                  initialfile=ini_file_name,
+                                                  parent=self.expr_frame)
         if outputFile == '':
             outputFile = ini_file_name
             self.Display_message(
@@ -2776,8 +2777,8 @@ class Display_views():
                 'Indien de file is gemaakt, dan is hij opgeslagen met de naam <{}>'.
                 format(outputFile))
 
-        queryFile = open(outputFile,mode='w',newline='')
-        fileWriter = csv.writer(queryFile,dialect='excel',delimiter=';')
+        queryFile = open(outputFile, mode='w', newline='')
+        fileWriter = csv.writer(queryFile, dialect='excel', delimiter=';')
 
         # Save the expr_table results in a CSV file, including three header lines
         # Write the three header lines and then the file content from expr_table
@@ -2823,15 +2824,15 @@ class Display_views():
 
         comp = ['Model of a kind', 'Model van een soort']
         self.views_noteb.add(self.kind_frame, text=comp[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end",self.kind_frame, sticky=NSEW)
+        self.views_noteb.insert("end", self.kind_frame, sticky=NSEW)
 
         structure = ['Tree structure', 'Boomstructuur']
 
-        kind_label = Label(self.kind_frame, text=structure[self.GUI_lang_index],justify='left')
+        kind_label = Label(self.kind_frame, text=structure[self.GUI_lang_index], justify='left')
         heads = ['uid_1', 'uid_2', 'uid-3', 'inFocus', 'Level1', 'Level2', 'Level3', 'kind',
-                'aspect', 'kAspect', '>=<', 'value', 'UoM', 'status']
+                 'aspect', 'kAspect', '>=<', 'value', 'UoM', 'status']
         display_heads = heads[3:]
-        self.kind_tree = Treeview(self.kind_frame,columns=(heads), displaycolumns=display_heads,
+        self.kind_tree = Treeview(self.kind_frame, columns=(heads), displaycolumns=display_heads,
                                   selectmode='browse', height=30, padding=2)
         self.kind_treeHead = [('LineNr', 'Object', '', '', 'Kind', 'Aspect', 'Kind of aspect',
                                '>=<', 'Value', 'UoM', 'Status'),
@@ -2898,7 +2899,7 @@ class Display_views():
             tags='focus_tag',open=True)
         '''
         unknownVal = ['unknown value', 'onbekende waarde']
-        unknownKind = ['unknown kind', 'onbekende soort']
+        # unknownKind = ['unknown kind', 'onbekende soort']
         level0Part = ''
         level1Part = ''
         level2Part = ''
@@ -2915,7 +2916,7 @@ class Display_views():
                 head_line.append('')
                 head_line.append('')
                 head_line.append(kindLine[9])
-                nameInFocus = head_line[4]
+                # nameInFocus = head_line[4]
                 level0Part = self.kind_tree.insert('', index='end', values=head_line,
                                                    tags='focus_tag', open=True)
                 previusPart = level0Part
@@ -2924,13 +2925,13 @@ class Display_views():
             elif kindLine[3] > 3:
 
                 # Set value_tags at 'val_tag' or 'head_tag' for each field
-                value_tags = 11*['val_tag']
+                value_tags = 11 * ['val_tag']
                 # If the line is a header line, then set value_tag to 'head_tag'
                 if kindLine[4] in self.comp_head or kindLine[4] in self.occ_head or \
                    kindLine[4] in self.info_head or kindLine[8] in self.aspect_head or \
                    kindLine[5] in self.part_occ_head or kindLine[4] in self.subs_head:
                     head = True
-                    value_tags = 11*['head_tag']
+                    value_tags = 11 * ['head_tag']
                 # If the line is a value line (thus not a header line)
                 # and there is a name of a part
                 # then remember the part as a previous part
@@ -2951,11 +2952,12 @@ class Display_views():
                     value_tags[7] = 'missing'
                 # Insert line
                 # Debug print('Value tags:', value_tags)
-                id = self.kind_tree.insert(level0Part, index='end', values=kindLine,
+                # First argument (previousPart) was level0Part === correct ???
+                id = self.kind_tree.insert(previusPart, index='end', values=kindLine,
                                            tags=value_tags, open=True)
 
                 # If the line is a header line, then continue to next line
-                if head == True:
+                if head is True:
                     continue
                 # If the line is a value line and there is a name of a part
                 #    then remember the part as a previous part
@@ -2993,12 +2995,12 @@ class Display_views():
 
         prod_text = ['Product model', 'Productmodel']
         self.views_noteb.add(self.prod_frame, text=prod_text[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end",self.prod_frame, sticky=NSEW)
+        self.views_noteb.insert("end", self.prod_frame, sticky=NSEW)
 
         heads = ['uid_1', 'uid_2', 'uid-3', 'inFocus', 'Level1', 'Level2', 'Level3', 'kind',
                  'aspect', 'kAspect', '>=<', 'value', 'UoM', 'status']
         display_heads = heads[5:]
-        self.prod_tree = Treeview(self.prod_frame,columns=(heads), displaycolumns=display_heads,
+        self.prod_tree = Treeview(self.prod_frame, columns=(heads), displaycolumns=display_heads,
                                   selectmode='browse', height=30, padding=2)
 
         self.prod_tree.grid(column=0, row=1, columnspan=6, sticky=NSEW)
@@ -3065,7 +3067,7 @@ class Display_views():
             tags='focus_tag',open=True)
         '''
         unknownVal = ['unknown value', 'onbekende waarde']
-        unknownKind = ['unknown kind', 'onbekende soort']
+        # unknownKind = ['unknown kind', 'onbekende soort']
         further_part = ['Further part', 'Verder deel']
         kind_of_part = ['Kind of part', 'Soort deel']
         possible_roles = False  # No roles expected
@@ -3099,20 +3101,20 @@ class Display_views():
                 # nameInFocus = prod_line[5]
                 prod_name = prod_line[4]
                 level0Part = self.prod_tree.insert('', index='end', values=prod_line,
-                                                   text=prod_name, tags='focus_tag',open=True)
+                                                   text=prod_name, tags='focus_tag', open=True)
                 previusPart = level0Part
 
             # In prod_tree view line_type 2 to 3 (indicated in prod_line[3]) are not displayed.
             elif prod_line[3] > 4:
                 # Set value_tags at 'val_tag' or 'head_tag' for each field
-                value_tags = 11*['val_tag']
+                value_tags = 11 * ['val_tag']
 
                 # If the line is a header line, then set value_tag to 'head_tag'
                 if prod_line[4] in self.comp_head or prod_line[4] in self.occ_head or \
                    prod_line[4] in self.info_head or prod_line[8] in self.aspect_head or \
                    prod_line[5] in self.part_occ_head or prod_line[4] in self.subs_head:
                     head = True
-                    value_tags = 11*['head_tag']
+                    value_tags = 11 * ['head_tag']
                     prod_name = prod_line[4]
                     # Determine whether roles may appear in prod_line[4]
                     # in lines following the header line
@@ -3149,7 +3151,7 @@ class Display_views():
                 if prod_line[7] in unknownVal:
                     value_tags[7] = 'missing'
 
-                if possible_roles == True and prod_line[4] == '':
+                if possible_roles is True and prod_line[4] == '':
                     prod_name = ''
 
                 # Insert line
@@ -3158,7 +3160,7 @@ class Display_views():
                                            text=prod_name, tags=value_tags, open=True)
 
                 # If the line is a header line, then continue to next line
-                if head == True:
+                if head is True:
                     continue
                 # If the line is a value line and the there is a name of a part
                 #   then remember the part as a previous part
@@ -3192,7 +3194,7 @@ class Display_views():
         # self.data_sheet.rowconfigure(1, weight=0)
         prodText = ['Data sheet', 'Data sheet']
         self.views_noteb.add(self.data_sheet, text=prodText[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end",self.data_sheet, sticky=NSEW)
+        self.views_noteb.insert("end", self.data_sheet, sticky=NSEW)
 
         data_canvas = Canvas(self.data_sheet, background='#ddf')
         # data_canvas.pack()
@@ -3235,93 +3237,92 @@ class Display_views():
             line_nr += 1
             column_nr = -1
             head = False
-            header1 = False
-            header2 = False
-            header3 = False
+            header_1 = False
+            header_2 = False
+            header_3 = False
             body = False
             back = 'white'
             fore = 'black'
             for field_value in line:
                 column_nr += + 1
-                fieldStr = StringVar()
+                # fieldStr = StringVar()
                 span = 1
                 column_width = col_width[column_nr]
 
                 # Detect start of header line 1:
                 # Field_value 1 in column 0 means line_type_1 and header_1
                 if column_nr == 0 and field_value == 1:
-                    header1 = True
-                if header1 == True:
-                    if column_nr == 2: span=3
-                    elif column_nr == 6: span=5
+                    header_1 = True
+                if header_1 is True:
+                    if column_nr == 2:
+                        span = 3
+                    elif column_nr == 6:
+                        span = 5
 
                 # Display on line 1 the line nr, 'Product form' label and the 'kind' label
-                if header1 == True and column_nr in [0, 1, 5]:
+                if header_1 is True and column_nr in [0, 1, 5]:
                     back = '#dfb'  # light green
                     fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   justify='left', background=back, foreground=fore)\
-                                   .grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
+                                   justify='left', background=back, foreground=fore)
+                    fd.grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
 
                 # Display on line 1 the product_name and kind_name (with another background color)
-                if header1 == True and column_nr in [2, 6]:
+                if header_1 is True and column_nr in [2, 6]:
                     back = 'white'
                     fore = 'black'
                     fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   background=back, foreground=fore, borderwidth=0)\
-                                   .grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
+                                   background=back, foreground=fore, borderwidth=0)
+                    fd.grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
 
-                # Detect start of header line 2: Value 2 in column 0 means line_type2 and header2
+                # Detect start of header line 2: Value 2 in column 0 means line_type2 and header_2
                 if column_nr == 0 and field_value == 2:
-                    header2 = True
+                    header_2 = True
 
                 # Display on line 2 the description text
-                if header2 == True and column_nr == 3:
+                if header_2 is True and column_nr == 3:
                     span = 8
                     back = 'white'
                     fore = 'black'
                     fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   justify='left', background=back, foreground=fore)\
-                                   .grid(row=line_nr, column=column_nr, columnspan=span,
-                                         rowspan=2, sticky=EW)
+                                   justify='left', background=back, foreground=fore)
+                    fd.grid(row=line_nr, column=column_nr, columnspan=span, rowspan=2, sticky=EW)
                 # Display on line 2 the description label
-                if header2 == True and column_nr in range(0,3):
+                if header_2 is True and column_nr in range(0,3):
                     back = '#dfb'
                     fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   justify='left', background=back, foreground=fore)\
-                                   .grid(row=line_nr, column=column_nr, columnspan=span,
-                                         rowspan=2, sticky=EW)
+                                   justify='left', background=back, foreground=fore)
+                    fd.grid(row=line_nr, column=column_nr, columnspan=span, rowspan=2, sticky=EW)
 
                 # Detect start of header line 3:
-                # Value 3 in column 0 means line_type3 and header3
+                # Value 3 in column 0 means line_type3 and header_3
                 if column_nr == 0 and field_value == 3:
-                    header3 = True
+                    header_3 = True
                     line_nr += + 1
 
                 # Display the line 3 subsequent values
-                if header3 == True:
+                if header_3 is True:
                     back = '#dfb'
                     fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   justify="center", background=back, foreground=fore)\
-                                   .grid(row=line_nr, column=column_nr, columnspan=span,
-                                         sticky=EW)
+                                   justify="center", background=back, foreground=fore)
+                    fd.grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
 
                 # Detect start of body values: Value >3 in column 0 means body of values
                 if column_nr == 0 and field_value > 3:
                     body = True
                 # Display the subsequent body values on line type > 3
-                if body == True:
+                if body is True:
                     # Set background color
                     # depending on either header, value present or 'unknown'
-                    if (column_nr == 1 and (field_value in self.comp_head \
-                                            or field_value in self.occ_head \
-                                            or field_value in self.info_head)) \
-                        or (column_nr == 2 and (field_value in self.part_occ_head)):
+                    if (column_nr == 1 and (field_value in self.comp_head or
+                                            field_value in self.occ_head or
+                                            field_value in self.info_head)) or \
+                      (column_nr == 2 and (field_value in self.part_occ_head)):
                         # Header line detected; set background color accordingly
                         head = True
                         back = '#dfb'
                     if column_nr == 8 and field_value != '':
                         back = 'yellow'
-                    elif head != True:
+                    elif head is not True:
                         back = 'white'
                     if field_value in unknownVal:
                         field_value = unknownVal[self.GUI_lang_index]
@@ -3332,9 +3333,8 @@ class Display_views():
                     # Display subsequent body values
                     fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
                                    background=back, foreground=fore,
-                                   wraplength=200, borderwidth=0, relief='ridge')\
-                                   .grid(row=line_nr, column=column_nr, columnspan=span,
-                                         sticky=EW)
+                                   wraplength=200, borderwidth=0, relief='ridge')
+                    fd.grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
 
     def Define_and_display_activity_sheet(self):
         # Destroy earlier activity sheet
@@ -3355,7 +3355,7 @@ class Display_views():
         self.act_frame.rowconfigure(0, weight=0)
         self.act_frame.rowconfigure(1, weight=0)
         self.views_noteb.add(self.act_frame, text=activity[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end",self.act_frame, sticky=NSEW)
+        self.views_noteb.insert("end", self.act_frame, sticky=NSEW)
 
         headings = ['OccUID', 'OccName', 'WholeOccName', 'InvolvUID', 'KindOccUID',
                     'OccName', 'PartName', 'Involved', 'Kind', 'Role']
@@ -3402,7 +3402,6 @@ class Display_views():
         actScroll.grid(column=0, row=1, sticky=NS + E)
         self.act_tree.config(yscrollcommand=actScroll.set)
 
-
     def Display_occ_model_view(self):
         ''' Display activities and occurrences in self.act_tree
             Followed by a display of IDEF0 diagram(s)
@@ -3418,15 +3417,15 @@ class Display_views():
                 if occ_line[2] == '':
                     top_occ = self.uid_dict[occ_line[0]]
                     self.top_occurrences.append(top_occ)
-                level = 0
+                self.occ_level = 0
                 # Display self.act_tree line
-                self.Display_occurrence_tree(occ_line, level)  # ,wholes
+                self.Display_occurrence_tree(occ_line)  # ,wholes
 
             # IDEF0: Display drawings of occurrences
             diagram = Occurrences_diagram(self.user_interface, self.gel_net)
             diagram.Create_occurrences_diagram(self.top_occurrences)
 
-    def Display_occurrence_tree(self, occ_line, level):
+    def Display_occurrence_tree(self, occ_line):
         """ Display occurrences compositions with inputs and outputs and roles.
             occ_line = line in occ_model
             occ_model.append([occ.uid, occ.name, higher.name, involv.uid,
@@ -3439,7 +3438,6 @@ class Display_views():
 
         self.act_tree.tag_configure('occTag', option=None, background='#ddf')
         self.act_tree.tag_configure('ioTag', option=None, background='#eef')
-        space = ''
 
         # Display the occurrence
         id = self.act_tree.insert(occ_line[2], index='end', values=(occ_line),
@@ -3448,13 +3446,15 @@ class Display_views():
         # Find and display its inputs and outputs
         # involv_table = occ, involved_obj, inv_role_kind, inv_kind_name
         for io_objects in self.involv_table:
-            io_line = ['', '', '', '', '', '', '', io_objects[1].name, io_objects[3], io_objects[2].name]
-            # Debug print('involv-line:', occ_line[1], io_objects[0].uid, io_objects[1].uid, io_line)
+            io_line = ['', '', '', '', '', '', '',
+                       io_objects[1].name, io_objects[3], io_objects[2].name]
+            # Debug print('involv-line:', occ_line[1],
+            #             io_objects[0].uid, io_objects[1].uid, io_line)
             # If uid of occurrence == uid of object
             # that has inputs or outputs then display io_line
             if occ_line[0] == io_objects[0].uid:
                 self.act_tree.insert(id, index='end', values=(io_line), tags='ioTag', open=True)
-        level = 1
+        self.occ_level = 1
 
     def Define_and_display_documents(self):
         ''' Define documents view and display documents in view.'''
@@ -3479,10 +3479,10 @@ class Display_views():
         doc_heading = []
         doc_heading.append(tuple(display_cols))
         self.doc_tree = MyTable(width='100%',
-                                style={"overflow":"auto", "background-color":"#eeffaa",
-                                       "border-width":"2px", "border-style":"solid",
-                                       "font-size":"12px", 'table-layout':'auto',
-                                       'text-align':'left'})
+                                style={"overflow": "auto", "background-color": "#eeffaa",
+                                       "border-width": "2px", "border-style": "solid",
+                                       "font-size": "12px", 'table-layout': 'auto',
+                                       'text-align': 'left'})
         self.doc_tree.append_from_list(doc_heading, fill_title=True)
         self.doc_frame.append(self.doc_tree)
 
@@ -3633,10 +3633,10 @@ class Display_views():
         tree_values = self.Determine_network_tree_values()
         # Debug print('Network object detail view:', cur_item, tree_values)
         if len(tree_values) > 0:
-            if sel.num == 1:
-                chosen_object_uid = tree_values[0]
-            else:
-                chosen_object_uid = tree_values[4]
+            # if sel.num == 1:
+            chosen_object_uid = tree_values[0]
+            # else:
+            #     chosen_object_uid = tree_values[4]
             self.Determine_category_of_object_view(chosen_object_uid, tree_values)
 
     def Determine_network_tree_values(self):
@@ -3830,12 +3830,14 @@ class Display_views():
         cur_item = self.prod_tree.focus()
         item_dict = self.prod_tree.item(cur_item)
         tree_values = list(item_dict['values'])
-        # Debug print('Prod_detail_middle:', sel.type, sel.keysym, cur_item, tree_values, type(tree_values[1]))
+        # Debug print('Prod_detail_middle:', sel.type, sel.keysym,
+        #             cur_item, tree_values, type(tree_values[1]))
 
         if len(tree_values) > 0:
             kind_uid = str(tree_values[1])
             individual_object_uid = str(tree_values[0])
             if kind_uid != '':
+                selected_obj = self.uid_dict[individual_object_uid]
                 # Verify sel.type being either 'Button-2 Press' for display of taxonomy
                 # or 'KeyPress' with sel.keysym = 'c'
                 # (for display for classification by selection of subtype)
@@ -4083,7 +4085,7 @@ class Display_views():
         except AttributeError:
             pass
 
-        # Define Expressions view sheet = = = = = = = = = = = = = = = = = = =
+        # Define Expressions view sheet
         self.Define_expressions_sheet()
 
         # Expressions view: Display expressions from self.expr_table in Treeview:
@@ -4115,7 +4117,7 @@ class Display_views():
             self.expr_frame.destroy()
         except AttributeError:
             pass
-        # Define Expressions view sheet = = = = = = = = = = = = = = = = = = =
+        # Define Expressions view sheet
         self.Define_expressions_sheet()
 
         # Expressions view: Display expressions from self.expr_table in Treeview:
@@ -4153,7 +4155,8 @@ class Display_views():
             description_text = ['description', 'beschrijving']
             description_title = ['Information about ', 'Informatie over ']
             if info_row[5] in description_text:
-                # Debug print('Information {} is not presented on a carrier but is as follows:\n   {}'.
+                # Debug print('Information {} is not presented on a carrier '
+                #             'but is as follows:\n   {}'.
                 #      format(info_row[4], info_row[2]))
                 messagebox.showinfo(description_title[self.GUI_lang_index] + info_row[6],
                                     info_row[2])
@@ -4181,6 +4184,7 @@ class Display_views():
     def Contextual_facts(self):
         print('Contextual_facts')
 
+
 class User_interface():
     def __init__(self):
         pass
@@ -4196,6 +4200,12 @@ class User_interface():
 
     def Dump_net(self):
         print('Dump_net')
+
+
+class Semantic_network():
+    def __init__(self, name):
+        self.name = name
+
 
 if __name__ == "__main__":
     root = Tk()

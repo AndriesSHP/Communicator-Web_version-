@@ -29,21 +29,21 @@ dict_file_names = [
     # "colors - RAL codes and names - multilingual-UTF-8.csv",
     # "RDF, RDFS, OWL concepts-UTF-8.csv",
     # "EN 16323-2010 - Multi lingual Glossary of wastewater terms-UTF-8.csv"
-                  ]
+    ]
 
 # Knowledge, Requirements and Product type file paths
 model_dirs = ["../GellishData"]
 model_file_names = [
     "Taxonomic Dictionary+Knowledge about Roads-UTF-8.csv",
     # "Kennisboek WEGEN - v5-UTF-8.csv"
-                   ]
+    ]
 
 # Product & Processes Models file paths
 prod_dirs = ["../GellishData"]
 prod_file_names = [
     # "Semantic model of a road network - UTF-8.csv",
     # "Semantisch model van een Wegennet met Huis - v5.2-UTF-8.csv"
-                  ]
+    ]
 
 # Default output path name
 ini_out_path = r"../Data"
