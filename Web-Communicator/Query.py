@@ -7,8 +7,9 @@
 # from tkinter import *
 # from tkinter.ttk import *
 
-from Expr_Table_Def import intent_name_col, lh_uid_col, lh_name_col, \
-    rel_type_uid_col, rel_type_name_col, rh_uid_col, rh_name_col, uom_uid_col, uom_name_col
+from Expr_Table_Def import intent_name_col, lh_uid_col, lh_name_col, phrase_type_uid_col, \
+    rel_type_uid_col, rel_type_name_col, rh_uid_col, rh_name_col, uom_uid_col, uom_name_col, \
+    rh_role_uid_col, rh_role_name_col
 # from Anything import Anything, Object, Individual, Kind, Relation, RelationType
 from Bootstrapping import basePhraseUID, by_def_role_of_ind
 from GellishDict import GellishDict
@@ -465,12 +466,12 @@ class Query:
         # query item: [self.q_lh_uid, self.q_lh_name, self.q_rel_uid, self.q_rel_name,
         #              self.q_rh_uid, self.q_rh_name, self.q_uom_uid, self.uom_name,
         #              self.q_phrase_type_uid]
-        # q_lh_uid_index = 0  # Not used
-        q_lh_name_index = 1
-        q_rel_uid_index = 2
+        self.q_lh_uid_index = 0
+        self.q_lh_name_index = 1
+        self.q_rel_uid_index = 2
         # q_rel_name_index = 3  # Not used
-        # q_rh_uid_index = 4  # Not used
-        q_rh_name_index = 5
+        self.q_rh_uid_index = 4
+        self.q_rh_name_index = 5
         # self.q_phrase_type_index = 8  # Not used
         # Binary relation between an individual thing and something (indiv or kind) = 6068
         # indOrMixRelUID = 6068
@@ -486,11 +487,11 @@ class Query:
         # then lh_object may not be a kind or kind of occurrence; idem for rh_object
         int_q_lh_uid, lh_integer = Convert_numeric_to_integer(self.q_lh_uid)
         int_q_rh_uid, rh_integer = Convert_numeric_to_integer(self.q_rh_uid)
-        if self.rolePlayersQTypes == 'individuals' \
-           and (((lh_integer is False or int_q_lh_uid >= 100)
-                 and self.q_lh_category in list_of_categories)
-                or ((rh_integer is False or int_q_rh_uid >= 100)
-                    and self.q_rh_category in list_of_categories)):
+        if self.rolePlayersQTypes == 'individuals' and \
+           (((lh_integer is False or int_q_lh_uid >= 100) and
+             self.q_lh_category in list_of_categories) or
+            ((rh_integer is False or int_q_rh_uid >= 100) and
+             self.q_rh_category in list_of_categories)):
             print('Warning: Relation type <{}> relates individual things, '
                   'but one or both related things are kinds of things. Try again.'.
                   format(self.q_rel_name, self.q_lh_uid, self.q_lh_category,
@@ -498,12 +499,12 @@ class Query:
 
         # If relation type specifies a relation between kinds and the lh_object is known
         # then lh_object shall be a kind or kind of occurrence; idem for rh_object
-        elif (self.rolePlayersQTypes == 'hierOfKinds'
-              or self.rolePlayersQTypes == 'thingsOfKinds') \
-            and (((lh_integer is False or int_q_lh_uid >= 100)
-                    and self.q_lh_category not in list_of_categories)
-                   or ((rh_integer is False or int_q_rh_uid >= 100)
-                       and self.q_rh_category not in list_of_categories)):
+        elif (self.rolePlayersQTypes == 'hierOfKinds' or
+              self.rolePlayersQTypes == 'thingsOfKinds') and \
+           (((lh_integer is False or int_q_lh_uid >= 100) and
+             self.q_lh_category not in list_of_categories) or
+            ((rh_integer is False or int_q_rh_uid >= 100) and
+              self.q_rh_category not in list_of_categories)):
             print('Warning: Relation type <{}> relates kinds of things, '
                   'but left {} ({}) or right {} ({}) related things are not kinds. '
                   'Try again.'.
@@ -535,19 +536,19 @@ class Query:
         # Determine UIDs of subtypes of relation type
         # to enable searching also the subtypes of the relation type
         self.q_rel_subtype_uids[:] = []
-        self.q_rel_subtype_uids.append(self.query_expr[q_rel_uid_index])
+        self.q_rel_subtype_uids.append(self.query_expr[self.q_rel_uid_index])
 
         # If relUID of query (self.query_expr) known
         # then determine rel_type object and its list of subtypes
         int_q_rel_uid, rel_integer = \
-            Convert_numeric_to_integer(self.query_expr[q_rel_uid_index])
+            Convert_numeric_to_integer(self.query_expr[self.q_rel_uid_index])
         if rel_integer is False or int_q_rel_uid >= 100:
-            rel_type = self.gel_net.uid_dict[self.query_expr[q_rel_uid_index]]
+            rel_type = self.gel_net.uid_dict[self.query_expr[self.q_rel_uid_index]]
             # Find subtypes of specified relation type
             self.q_rel_subtypes, self.q_rel_subtype_uids = \
                 self.gel_net.Determine_subtypes(rel_type)
             # Debug print('Subtypes of relation', self.query_expr[q_rel_uid_index], ':', subRels)
-            self.q_rel_subtype_uids.append(self.query_expr[q_rel_uid_index])
+            self.q_rel_subtype_uids.append(self.query_expr[self.q_rel_uid_index])
         # Debug print('Relation type and subtypes:', self.q_rel_subtype_uids)
 
         # Candidate answers ========
@@ -633,8 +634,8 @@ class Query:
                     #           and if yes, by which kinds of relations
                     print('=== to be done === by which kinds of relations '
                           'are lh object {} and rh object {} related?'.
-                          format(self.query_expr[q_lh_name_index],
-                                 self.query_expr[q_rh_name_index]))
+                          format(self.query_expr[self.q_lh_name_index],
+                                 self.query_expr[self.q_rh_name_index]))
 
             # If rh_object of query is also unknown (q_rh_uid < 100) ('what-2')
             # then error meassage
@@ -697,32 +698,32 @@ class Query:
 
                     # If self.q_lh_uid and self.q_rh_uid are both known,
                     #                then: is the question confirmed?
-                    if self.query_expr[q_lh_uid_index] > 99 \
-                       and self.query_expr[q_rh_uid_index] > 99:
+                    if self.query_expr[self.q_lh_uid_index] > 99 \
+                       and self.query_expr[self.q_rh_uid_index] > 99:
                         if self.q_lh_uid == expr[lh_uid_col]:
-                            matchChain = TransitiveMatchChain(
-                                         self.query_expr[q_lh_uid_index],
-                                         self.query_expr[q_rh_uid_index], self.q_phrase_type_uid)
+                            matchChain = self.TransitiveMatchChain(
+                                self.query_expr[self.q_lh_uid_index],
+                                self.query_expr[self.q_rh_uid_index], self.q_phrase_type_uid)
                         elif self.q_lh_uid == expr[rh_uid_col]:
-                            matchChain = TransitiveMatchChain(
-                                         self.query_expr[q_rh_uid_index],
-                                         self.query_expr[q_lh_uid_index], self.q_phrase_type_uid)
+                            matchChain = self.TransitiveMatchChain(
+                                self.query_expr[self.q_rh_uid_index],
+                                self.query_expr[self.q_lh_uid_index], self.q_phrase_type_uid)
                         if matchChain[0]:
                             because = ['because...', 'omdat...']
                             print('  {}: {} {} {} {} {}'.
                                   format(indeed[self.gel_net.GUI_lang_index],
                                          expr[intent_name_col],
-                                         self.query_expr[q_lh_name_index], self.q_rel_name,
-                                         self.query_expr[q_rh_name_index],
+                                         self.query_expr[self.q_lh_name_index], self.q_rel_name,
+                                         self.query_expr[self.q_rh_name_index],
                                          because[self.gel_net.GUI_lang_index]))
                             for step in reversed(matchChain[1:]):
-                                print('    {} <{}> {}'.format(step[1], self.q_rel_name,step[3]))
+                                print('    {} <{}> {}'.format(step[1], self.q_rel_name, step[3]))
                         else:
                             denial = ['No, it is not true that', 'Nee, het niet waar dat']
                             print('  {}: {} {} {}'.
                                   format(denial[self.gel_net.GUI_lang_index],
-                                         self.query_expr[q_lh_name_index],
-                                         self.q_rel_name, self.query_expr[q_rh_name_index]))
+                                         self.query_expr[self.q_lh_name_index],
+                                         self.q_rel_name, self.query_expr[self.q_rh_name_index]))
                             return
                 else:                   # self.q_lh_uid not on expr
                     # if self.rolePlayersQTypes == 'kindAndIndividual' \
@@ -730,8 +731,8 @@ class Query:
                     #   or self.rolePlayersQTypes == 'hierOfKinds' \
                     #   or self.rolePlayersQTypes == 'thingsOfKinds':
                     if self.rolePlayerQTypeLH == 'kind':
-                        if expr[lh_uid_col] in self.q_lh_subtype_uids \
-                            or expr[rh_uid_col] in self.q_lh_subtype_uids:
+                        if expr[lh_uid_col] in self.q_lh_subtype_uids or \
+                           expr[rh_uid_col] in self.q_lh_subtype_uids:
                             self.Record_and_verify_candidate_object(expr)
 
         # Unknown relation type: Any relation type is O.K.
@@ -774,12 +775,12 @@ class Query:
                           format(satisText[self.gel_net.GUI_lang_index],
                                  len(self.answer_expressions), candid_expr[lh_name_col],
                                  candid_expr[rel_type_name_col], candid_expr[rh_name_col]))
-#            if len(self.query_spec) > 1:
-                 # Verify conditions on candidates
-                 #    (self.candidates / self.candid_expressions)
-                 # and storeresults in self.answer_expressions
-#                for candid in self.candidates:
-#                    self.Verify_conditions(candid, candid_expr)
+            # if len(self.query_spec) > 1:
+            # Verify conditions on candidates
+            #    (self.candidates / self.candid_expressions)
+            # and storeresults in self.answer_expressions
+            #    for candid in self.candidates:
+            #        self.Verify_conditions(candid, candid_expr)
 
         print('Start generating views of {} candidate objects. Role player types: {}.'
               .format(len(self.candid_expressions), self.rolePlayersQTypes))
@@ -818,8 +819,7 @@ class Query:
             self.gel_net.Build_single_product_view(object_in_focus)
 
         # Else if lh and rh role players of query expression are an individual and a kind
-        elif self.rolePlayersQTypes \
-           in ['mixed', 'individualAndKind', 'kindAndIndividual']:
+        elif self.rolePlayersQTypes in ['mixed', 'individualAndKind', 'kindAndIndividual']:
             obj_list = []
             for expr in self.answer_expressions:
                 object_in_focus = self.gel_net.uid_dict[expr[lh_uid_col]]
@@ -919,12 +919,12 @@ class Query:
         self.Transitive_match(base_objects, rel_subtype_uids, phrase_type_uid)
 
     def Transitive_match(self, base_objects, rel_subtype_uids, phrase_type_uid):
-        #base_phrase_type_uid = '6066'
+        # base_phrase_type_uid = '6066'
         new_direct_related_uids = []
         for obj in base_objects:
             for rel_obj in obj.relations:
                 expr = rel_obj.expression
-                # Search in relations of obj for expressions of type q_rel or its subtypes 
+                # Search in relations of obj for expressions of type q_rel or its subtypes
                 if expr[rel_type_uid_col] in rel_subtype_uids:
                     if expr[lh_uid_col] == obj.uid \
                        and expr[phrase_type_uid_col] == phrase_type_uid:
@@ -938,7 +938,7 @@ class Query:
 
                     # Search for relations in inverse expressions
                     elif expr[rh_uid_col] == obj.uid \
-                         and expr[phrase_type_uid_col] != phrase_type_uid:
+                       and expr[phrase_type_uid_col] != phrase_type_uid:
                         related_uid = expr[lh_uid_col]
                         if related_uid not in self.net_uids:
                             self.net_uids.append(related_uid)
@@ -958,18 +958,17 @@ class Query:
         self.answer_expressions = []
         condition = []
         condText = ['Condition', 'Voorwaarde']
-        cond_satisfied = True
 
         if self.user_interface.extended_query is False:
             return
 
         # Get conditions and find condition UIDs
-        for condNr in range(0,3):
+        for condNr in range(0, 3):
             lh_cond_name = self.lhCondVal[condNr].get()
             # Empty lh condition name marks the end of the conditions
             if lh_cond_name == '':
                 continue
-            string_commonality = 'csi' # case sensitive identical
+            string_commonality = 'csi'  # case sensitive identical
             # Find uid, name and description of lh_cond_name
             unknown_lh, lh_uid_name_desc = \
                 self.gel_net.Find_object_by_name(lh_cond_name, string_commonality)
@@ -992,7 +991,7 @@ class Query:
 
             rh_cond_name = self.rhCondVal[condNr].get()
             unknown_rh, rh_uid_name_desc = \
-                        self.gel_net.Find_object_by_name(rh_cond_name, string_commonality)
+                self.gel_net.Find_object_by_name(rh_cond_name, string_commonality)
             if unknown_rh is False:
                 rh_cond_uid = rh_uid_name_desc[0]
             else:
@@ -1002,7 +1001,7 @@ class Query:
             uom_cond_name = self.uomCondVal[condNr].get()
             if uom_cond_name != '':
                 unknown_uom, uom_uid_name_desc = \
-                             self.gel_net.Find_object_by_name(uom_cond_name, string_commonality)
+                    self.gel_net.Find_object_by_name(uom_cond_name, string_commonality)
                 if unknown_uom is False:
                     uom_cond_uid = uom_uid_name_desc[0]
                 else:
@@ -1011,7 +1010,7 @@ class Query:
             else:
                 uom_cond_uid = 0
             condition = [lh_cond_uid, lh_cond_name, rel_cond_uid, rel_cond_name,
-                           rh_cond_uid, rh_cond_name, uom_cond_uid, uom_cond_name]
+                         rh_cond_uid, rh_cond_name, uom_cond_uid, uom_cond_name]
             print('\n{} {} {} ({}) {} ({}) {} ({}) {} ({})'.
                   format(condText[self.gel_net.GUI_lang_index], condNr + 1,
                          lh_cond_name, lh_cond_uid,
@@ -1026,6 +1025,7 @@ class Query:
             and store the results in the self.answer_expressions
             with the same column definitions as the expressions.
         '''
+        cond_satisfied = True
         candid_expr = candidate_expr
         # Conditions found thus check candidate expressions on conditions
         answerHead = ['Answer', 'Antwoord']
@@ -1158,7 +1158,7 @@ class Query:
 
                             # 5494 = shall have on scale a value less than;
                             # 6052 = has by definition on scale a value less than;
-                            # 5027 = has on scale a value less than 
+                            # 5027 = has on scale a value less than
                             elif condit[2] in ['5494', '6052', '5027']:
                                 if float(expr[rh_name_col]) < float(condit[5]):
                                     print('Condition satisfied that {} < {}'.
@@ -1198,11 +1198,11 @@ class Query:
                 # If rel_cond_uid is a transitive relation type
                 # then: is the condition satisfied?
                 if condit[2] in self.gel_net.transitiveRelUIDs:
-                    matchChain = TransitiveMatchChain(expr[lh_uid_col],
-                                                      condit_rel_subs, condit[4])
+                    matchChain = self.TransitiveMatchChain(expr[lh_uid_col],
+                                                           condit_rel_subs, condit[4])
                     # elif expr[rh_uid_col] == ? :
-                    #    matchChain = TransitiveMatchChain(expr[rh_uid_col],
-                    #                                      condit[2], condit[4])
+                    #    matchChain = self.TransitiveMatchChain(expr[rh_uid_col],
+                    #                                           condit[2], condit[4])
                     if matchChain[0]:
                         indeed = ['Indeed', 'Inderdaad']
                         because = ['because...', 'omdat...']
@@ -1211,7 +1211,7 @@ class Query:
                                      expr[lh_name_col], condit[3],
                                      condit[5], because[self.gel_net.GUI_lang_index]))
                         for step in reversed(matchChain[1:]):
-                            print('      {} <{}> {}'.format(step[1],condit[3],step[3]))
+                            print('      {} <{}> {}'.format(step[1], condit[3], step[3]))
                         cond_satisfied = True
                         continue
                     else:
@@ -1233,7 +1233,7 @@ class Query:
                          condit[1], condit[3], condit[5], condit[7]))
             first = True
             for candidAspect in candidAspectExpr:
-                if first == True:
+                if first is True:
                     print('    {} <{}> <{}> <{}> <{}>'.
                           format(becauseText[self.gel_net.GUI_lang_index],
                                  candidAspect[lh_name_col],
@@ -1267,49 +1267,94 @@ class Query:
         shallUID = '5735'
         subtypesOfShall, subShallUIDs = self.gel_net.Determine_subtype_list(shallUID)
         for obj in self.objects_in_focus:
+            nameInF = obj.name
             print('Verify model of {} on requirements about {}'.
                   format(nameInF, self.kindName))
             for obj_rel in obj.relations:
                 expr = obj_rel.expression
-                if expr[rel_type_uid_col] in subtypesOfShall:
-                    lh = expr[lh_name_col]
-                    rel = expr[rel_type_name_col]
-                    rh = expr[rh_name_col]
-                    # Debug print('Requirement for {}: {} <{}> {}'.
-                    #      format(nameInF,lh,rel,rh))
+                # if expr[rel_type_uid_col] in subtypesOfShall:
+                #    lh = expr[lh_name_col]
+                #    rel = expr[rel_type_name_col]
+                #    rh = expr[rh_name_col]
+                #    Debug print('Requirement for {}: {} <{}> {}'.
+                #         format(nameInF,lh,rel,rh))
 # Transform and search for satisfaction in expressions table
 # To be written
 
+    def TransitiveMatchChain(self, baseUID, relUIDSubs, targetUID, phraseTypeUIDQ):
+        """ Search whether a targetUID is related to a baseUID in a chain of relations of type relUID.
+            This results in a tree of branches (matchTreeUIDs of pairs of 'from-to' UIDs),
+            ending in the found leave (targetUID), if any.
+            Then following the chain from that leave to the root (baseUID) the chain is found.
+        """
+        global matchTree, matchTreeUIDs
+        
+        matchTree = []
+        matchTreeUIDs = []
+        match = self.TransitiveMatch(baseUID, relUIDSubs, targetUID, phraseTypeUIDQ)
+        chain = []
+        chain.append(match)
+        previousUID = targetUID
+        if match == True:
+            for branch in reversed(matchTree):       # better: walk in the inverse direction
+                if branch[2] == previousUID:
+                    chain.append(branch)
+                    previousUID = branch[0]
+        return chain
 
-if __name__ == "__main__":
-
-    # Create and initialize a semantic network
-    net_name = 'Language definition network'
-    network = Semantic_Network(net_name)
-
-    # Choose GUI language and formal language
-    formal_language = "English"
-
-    # Create a naming dictionary
-    dict_name = 'Gellish Multilingual Taxonomic Dictionary'
-    Gel_dict = GellishDict(dict_name)
-    print('Created dictionary:', Gel_dict.name)
-
-    # Query things in network
-    qtext = input("\nEnter query string: ")
-    while qtext != "quit" and qtext != "exit":
-        # String commonalities: #(cipi, cspi, cii, csi, cifi, csfi)
-        com = input("\nEnter string commonality (cspi, csi): ")
-        # string_commonality 'csi' = 'case sensitive identical',
-        #                   'cspi' = 'case sensitive partially identical'
-
-        candidates = network.Query_network_dict(qtext, string_commonality)
-        if len(candidates) > 0:
-            for candidate in candidates:
-                obj_uid = candidate[1][0]
-                # Debug print("candidate %s %s" % (obj_uid, candidate[0][2]))
-                obj = network.uid_dict[obj_uid]     # find_object(obj_uid)
-                s = obj.show(network)
-        else:
-            print("No candidates found")
-        qtext = input("\nEnter query string: ")
+    def TransitiveMatch(self, baseUID, relUIDSubs, targetUID, phraseTypeUIDQ):
+        """ Search recursively whether a targetUID is related to a baseUID
+            in a chain of relations of type relUID.
+        """
+        global exprTable, lhUIDExC, relUIDExC, rhUIDExC, lhNameExC, \
+            relNameExC, rhNameExC, phraseTypeUIDExC
+        global matchTree, matchTreeUIDs
+        
+        match = False
+        end   = True
+        relatedUIDs = []
+        for expr in exprTable:
+            # search for a branch in the base phrase sequence
+            if baseUID == expr[lhUIDExC] and expr[relUIDExC] in relUIDSubs and \
+               phraseTypeUIDQ == expr[phraseTypeUIDExC]: 
+                if expr[rhUIDExC] == targetUID:
+                    branch = [expr[lhUIDExC], expr[lhNameExC], expr[rhUIDExC], expr[rhNameExC]]
+                    branchUID = expr[factUIDExC]
+                    if not branchUID in matchTreeUIDs:
+                        matchTree.append(branch)
+                        matchTreeUIDs.append(branchUID)
+                        match = True
+                        end = True
+                        break
+                else:
+                    relatedUIDs.append(expr[rhUIDExC])
+                    branch = [expr[lhUIDExC], expr[lhNameExC], expr[rhUIDExC], expr[rhNameExC]]
+                    branchUID = expr[factUIDExC]
+                    if not branchUID in matchTreeUIDs:
+                        matchTree.append(branch)
+                        matchTreeUIDs.append(branchUID)
+                        end = False
+            # search for a branch in the inverse phrase sequence
+            elif baseUID == expr[rhUIDExC] and expr[relUIDExC] in relUIDSubs and \
+               phraseTypeUIDQ != expr[phraseTypeUIDExC]: 
+                if expr[lhUIDExC] == targetUID:
+                    branch = [expr[rhUIDExC], expr[rhNameExC], expr[lhUIDExC], expr[lhNameExC]]
+                    branchUID = expr[factUIDExC]
+                    if not branchUID in matchTreeUIDs:
+                        matchTree.append(branch)
+                        matchTreeUIDs.append(branchUID)
+                        match = True
+                        end = True
+                        break
+                else:
+                    relatedUIDs.append(expr[rhUIDExC])
+                    branch = [expr[lhUIDExC], expr[lhNameExC], expr[rhUIDExC], expr[rhNameExC]]
+                    branchUID = expr[factUIDExC]
+                    if not branchUID in matchTreeUIDs:
+                        matchTree.append(branch)
+                        matchTreeUIDs.append(branchUID)
+                        end = False
+        if end == False:
+            for relatedUID in relatedUIDs:
+                match = self.TransitiveMatch(relatedUID, relUIDSubs, targetUID, phraseTypeUIDQ)
+        return match

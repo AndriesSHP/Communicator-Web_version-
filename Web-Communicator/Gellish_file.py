@@ -16,7 +16,7 @@ from Create_output_file import Create_gellish_expression, Open_output_file,\
     Convert_numeric_to_integer, Message
 from Mapping_tables_IB import keys_map, attributes_map, value_key_map, values_map
 from Anything import Anything
-from Query import Query
+# from Query import Query
 
 logger = logging.getLogger(__name__)
 
@@ -515,12 +515,12 @@ class Gellish_file:
                                      serialization)
 
         # If the current file contains a query then create a query object and query_spec
-        if self.content_type == 'queries':
+        # if self.content_type == 'queries':
             # === user_interface is unknown === to be done ===
             # query = Query(self.gel_net, self.user_interface)
             # Create query_spec
-            query.query_spec = self.query_lines
-            query.Interpret_query_spec()
+            # query.query_spec = self.query_lines
+            # query.Interpret_query_spec()
 
     def Interpret_the_first_header_line(self):
         ''' Interpret the (first) header line of a file with Gellish expressions.'''
