@@ -9,10 +9,10 @@
 
 from Expr_Table_Def import intent_name_col, lh_uid_col, lh_name_col, phrase_type_uid_col, \
     rel_type_uid_col, rel_type_name_col, rh_uid_col, rh_name_col, uom_uid_col, uom_name_col, \
-    rh_role_uid_col, rh_role_name_col
+    rh_role_uid_col, rh_role_name_col, idea_uid_col
 # from Anything import Anything, Object, Individual, Kind, Relation, RelationType
 from Bootstrapping import basePhraseUID, by_def_role_of_ind
-from GellishDict import GellishDict
+# from GellishDict import GellishDict
 from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer, \
     Open_output_file
 
@@ -288,7 +288,7 @@ class Query:
                             if len(conceptual_rel_type.base_phrases_in_contexts) > 0:
                                 rel_type_name = conceptual_rel_type.base_phrases_in_contexts[0][2]
                                 for phrase_in_context in \
-                                   conceptual_rel_type.base_phrases_in_contexts:
+                                  conceptual_rel_type.base_phrases_in_contexts:
                                     if phrase_in_context[0] == self.user_interface.GUI_lang_uid:
                                         rel_type_name = phrase_in_context[2]
                                         continue
@@ -501,10 +501,10 @@ class Query:
         # then lh_object shall be a kind or kind of occurrence; idem for rh_object
         elif (self.rolePlayersQTypes == 'hierOfKinds' or
               self.rolePlayersQTypes == 'thingsOfKinds') and \
-           (((lh_integer is False or int_q_lh_uid >= 100) and
-             self.q_lh_category not in list_of_categories) or
-            ((rh_integer is False or int_q_rh_uid >= 100) and
-              self.q_rh_category not in list_of_categories)):
+          (((lh_integer is False or int_q_lh_uid >= 100) and
+            self.q_lh_category not in list_of_categories) or
+           ((rh_integer is False or int_q_rh_uid >= 100) and
+            self.q_rh_category not in list_of_categories)):
             print('Warning: Relation type <{}> relates kinds of things, '
                   'but left {} ({}) or right {} ({}) related things are not kinds. '
                   'Try again.'.
@@ -512,22 +512,22 @@ class Query:
                          self.q_rh_uid, self.q_rh_category))
 
         elif self.rolePlayersQTypes == 'individualAndKind':
-            if ((lh_integer is False or int_q_lh_uid >= 100)
-               and self.q_lh_category in list_of_categories):
+            if ((lh_integer is False or int_q_lh_uid >= 100) and
+              self.q_lh_category in list_of_categories):
                 print('Warning: Relation type <{}> relates an individual thing to a kind, '
                       'but the left hand object {} ({}) is a kind. Try again.'.
                       format(self.q_rel_name, self.q_lh_uid, self.q_lh_category))
 
         elif self.rolePlayersQTypes == 'kindAndIndividual':
-            if ((rh_integer is False or int_q_rh_uid >= 100)
-               and self.q_rh_category in list_of_categories):
+            if ((rh_integer is False or int_q_rh_uid >= 100) and
+              self.q_rh_category in list_of_categories):
                 print('Warning: Relation type <{}> relates a kind to an individual thing, '
                       'but the right hand object {} ({}) is a kind. Try again.'.
                       format(self.q_rel_name, self.q_rh_uid, self.q_rh_category))
 
         elif self.rolePlayersQTypes == 'individualAndMixed':
-            if ((lh_integer is False or int_q_lh_uid >= 100)
-               and self.q_lh_category in list_of_categories):
+            if ((lh_integer is False or int_q_lh_uid >= 100) and
+              self.q_lh_category in list_of_categories):
                 print('Warning: Relation type <{}> relates an individual thing '
                       'to an individual or kind, but the left hand object {} ({}) '
                       'is a kind. Try again.'.
@@ -937,8 +937,8 @@ class Query:
                         self.branches.append(branch)
 
                     # Search for relations in inverse expressions
-                    elif expr[rh_uid_col] == obj.uid \
-                       and expr[phrase_type_uid_col] != phrase_type_uid:
+                    elif expr[rh_uid_col] == obj.uid and \
+                      expr[phrase_type_uid_col] != phrase_type_uid:
                         related_uid = expr[lh_uid_col]
                         if related_uid not in self.net_uids:
                             self.net_uids.append(related_uid)
@@ -1270,8 +1270,8 @@ class Query:
             nameInF = obj.name
             print('Verify model of {} on requirements about {}'.
                   format(nameInF, self.kindName))
-            for obj_rel in obj.relations:
-                expr = obj_rel.expression
+            # for obj_rel in obj.relations:
+                # expr = obj_rel.expression
                 # if expr[rel_type_uid_col] in subtypesOfShall:
                 #    lh = expr[lh_name_col]
                 #    rel = expr[rel_type_name_col]
@@ -1279,7 +1279,7 @@ class Query:
                 #    Debug print('Requirement for {}: {} <{}> {}'.
                 #         format(nameInF,lh,rel,rh))
 # Transform and search for satisfaction in expressions table
-# To be written
+# === To be written ===
 
     def TransitiveMatchChain(self, baseUID, relUIDSubs, targetUID, phraseTypeUIDQ):
         """ Search whether a targetUID is related to a baseUID in a chain of relations of type relUID.
@@ -1287,16 +1287,14 @@ class Query:
             ending in the found leave (targetUID), if any.
             Then following the chain from that leave to the root (baseUID) the chain is found.
         """
-        global matchTree, matchTreeUIDs
-        
-        matchTree = []
-        matchTreeUIDs = []
+        self.matchTree = []
+        self.matchTreeUIDs = []
         match = self.TransitiveMatch(baseUID, relUIDSubs, targetUID, phraseTypeUIDQ)
         chain = []
         chain.append(match)
         previousUID = targetUID
-        if match == True:
-            for branch in reversed(matchTree):       # better: walk in the inverse direction
+        if match is True:
+            for branch in reversed(self.matchTree):       # better: walk in the inverse direction
                 if branch[2] == previousUID:
                     chain.append(branch)
                     previousUID = branch[0]
@@ -1306,55 +1304,56 @@ class Query:
         """ Search recursively whether a targetUID is related to a baseUID
             in a chain of relations of type relUID.
         """
-        global exprTable, lhUIDExC, relUIDExC, rhUIDExC, lhNameExC, \
-            relNameExC, rhNameExC, phraseTypeUIDExC
-        global matchTree, matchTreeUIDs
-        
         match = False
-        end   = True
+        end = True
         relatedUIDs = []
-        for expr in exprTable:
-            # search for a branch in the base phrase sequence
-            if baseUID == expr[lhUIDExC] and expr[relUIDExC] in relUIDSubs and \
-               phraseTypeUIDQ == expr[phraseTypeUIDExC]: 
-                if expr[rhUIDExC] == targetUID:
-                    branch = [expr[lhUIDExC], expr[lhNameExC], expr[rhUIDExC], expr[rhNameExC]]
-                    branchUID = expr[factUIDExC]
-                    if not branchUID in matchTreeUIDs:
-                        matchTree.append(branch)
-                        matchTreeUIDs.append(branchUID)
+        base_obj = self.gel_net.uid_dict[baseUID]
+        for rel_obj in base_obj.relations:
+            expr = rel_obj.expression
+            # Search for a branch in the base phrase sequence
+            if expr[rel_uid_col] in relUIDSubs and \
+              phraseTypeUIDQ == expr[phrase_type_uid_col]:
+                if expr[rh_uid_col] == targetUID:
+                    branch = [expr[lh_uid_col], expr[lh_name_col],
+                              expr[rh_uid_col], expr[rh_name_col]]
+                    branchUID = expr[idea_uid_col]
+                    if branchUID not in self.matchTreeUIDs:
+                        self.matchTree.append(branch)
+                        self.matchTreeUIDs.append(branchUID)
                         match = True
                         end = True
                         break
                 else:
-                    relatedUIDs.append(expr[rhUIDExC])
-                    branch = [expr[lhUIDExC], expr[lhNameExC], expr[rhUIDExC], expr[rhNameExC]]
-                    branchUID = expr[factUIDExC]
-                    if not branchUID in matchTreeUIDs:
-                        matchTree.append(branch)
-                        matchTreeUIDs.append(branchUID)
+                    relatedUIDs.append(expr[rh_uid_col])
+                    branch = [expr[lh_uid_col], expr[lh_name_col],
+                              expr[rh_uid_col], expr[rh_name_col]]
+                    branchUID = expr[idea_uid_col]
+                    if branchUID not in self.matchTreeUIDs:
+                        self.matchTree.append(branch)
+                        self.matchTreeUIDs.append(branchUID)
                         end = False
             # search for a branch in the inverse phrase sequence
-            elif baseUID == expr[rhUIDExC] and expr[relUIDExC] in relUIDSubs and \
-               phraseTypeUIDQ != expr[phraseTypeUIDExC]: 
-                if expr[lhUIDExC] == targetUID:
-                    branch = [expr[rhUIDExC], expr[rhNameExC], expr[lhUIDExC], expr[lhNameExC]]
-                    branchUID = expr[factUIDExC]
-                    if not branchUID in matchTreeUIDs:
-                        matchTree.append(branch)
-                        matchTreeUIDs.append(branchUID)
+            elif baseUID == expr[rh_uid_col] and expr[rel_uid_col] in relUIDSubs and \
+              phraseTypeUIDQ != expr[phrase_type_uid_col]:
+                if expr[lh_uid_col] == targetUID:
+                    branch = [expr[rh_uid_col], expr[rh_name_col],
+                              expr[lh_uid_col], expr[lh_name_col]]
+                    branchUID = expr[idea_uid_col]
+                    if branchUID not in self.matchTreeUIDs:
+                        self.matchTree.append(branch)
+                        self.matchTreeUIDs.append(branchUID)
                         match = True
                         end = True
                         break
                 else:
-                    relatedUIDs.append(expr[rhUIDExC])
-                    branch = [expr[lhUIDExC], expr[lhNameExC], expr[rhUIDExC], expr[rhNameExC]]
-                    branchUID = expr[factUIDExC]
-                    if not branchUID in matchTreeUIDs:
-                        matchTree.append(branch)
-                        matchTreeUIDs.append(branchUID)
+                    relatedUIDs.append(expr[rh_uid_col])
+                    branch = [expr[lh_uid_col], expr[lh_name_col], expr[rh_uid_col], expr[rh_name_col]]
+                    branchUID = expr[idea_uid_col]
+                    if branchUID not in self.matchTreeUIDs:
+                        self.matchTree.append(branch)
+                        self.matchTreeUIDs.append(branchUID)
                         end = False
-        if end == False:
+        if end is False:
             for relatedUID in relatedUIDs:
                 match = self.TransitiveMatch(relatedUID, relUIDSubs, targetUID, phraseTypeUIDQ)
         return match

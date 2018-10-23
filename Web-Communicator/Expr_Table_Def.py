@@ -1,6 +1,6 @@
 # Column name   Col_index, type, ID      Obligatory IDs: [2, 1, 60, 15]
 # IDs of UIDs: [69, 71, 5, 2, 72, 19, 1, 60, 85, 74, 15, 66, 76, 70, 67, 11, 6, 78, 53, 50]
-pres_seq_col = 0  # text,   0     
+pres_seq_col = 0  # text,   0     Presentation sequence without any meaning
 lang_uid_col = 1  # integer,69      UID of the language of a left hand object name
 lang_name_col = 2  # text,   54      Name of the language of a left hand object name
 comm_uid_col = 3  # integer,71      UID of the language community of a left hand object name

@@ -3,7 +3,7 @@ import remi.gui as gui
 from operator import itemgetter
 
 from Bootstrapping import is_called_uid
-from Expr_Table_Def import lh_uid_col, lh_role_uid_col, rel_type_uid_col, \
+from Expr_Table_Def import lh_uid_col, lh_name_col, lh_role_uid_col, rel_type_uid_col, \
     rh_uid_col, rh_name_col, rh_role_uid_col, uom_name_col
 # from Query import Query
 from Anything import Anything
@@ -234,7 +234,8 @@ class Query_view():
 
         self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width=100,
                                              style={'background-color': '#ffffc0',
-                                                    "border-width": "1px","border-style": "solid"})
+                                                    "border-width": "1px",
+                                                    "border-style": "solid"})
         self.q_lh_uid_widget.attributes['title'] = 'A unique identifier of the searched object '\
                                                    '(specified or found'
         self.q_lh_uid_widget.onkeyup.connect(self.Lh_uid_command)
@@ -588,54 +589,55 @@ class Query_view():
         """
 
         # Debug print('Rel Entry:',event.char)
-        if event.keysym not in ['Shift_L', 'Shift_R']:
+        # Tkinter options to be done: if event.keysym not in ['Shift_L', 'Shift_R']:
 
-            # front_end = self.front_end_match_var.get()
-            # case_sens = self.case_sensitive_var.get()
+        # front_end = self.front_end_match_var.get()
+        # case_sens = self.case_sensitive_var.get()
 
-            # Delete previous list of rel_options in tree
-            self.rel_options[:] = []
-            x = self.rel_options_tree.get_children()
-            for item in x:
-                self.rel_options_tree.delete(item)
+        # Delete previous list of rel_options in tree
+        self.rel_options[:] = []
+        x = self.rel_options_tree.get_children()
+        for item in x:
+            self.rel_options_tree.delete(item)
 
-            # Get relation type name (rel_string) from user interface
-            # if event != '': rel_string = rel_string # + event.char
-            if rel_string == 'any':
-                if self.GUI_lang_index == 1:
-                    rel_string = 'binaire relatie'
-                else:
-                    rel_string = 'binary relation'
-            if rel_string == '':
+        # Get relation type name (rel_string) from user interface
+        # if event != '': rel_string = rel_string # + event.char
+        rel_string = self.q_rel_name
+        if rel_string == 'any':
+            if self.GUI_lang_index == 1:
+                rel_string = 'binaire relatie'
+            else:
                 rel_string = 'binary relation'
-            self.string_commonality = 'csfi'
-            self.search_string = rel_string
-            self.foundRel, self.rel_options = self.Solve_unknown()
-            # Debug print('  OptRel:',self.rel_options)
+        if rel_string == '':
+            rel_string = 'binary relation'
+        self.string_commonality = 'csfi'
+        self.search_string = rel_string
+        self.foundRel, self.rel_options = self.Solve_unknown()
+        # Debug print('  OptRel:',self.rel_options)
 
-            # == rel_opions: option_nr,whetherKnown, langUIDres, commUIDres,
-            #                result_string, resultUID, is_called_uid, kindKnown,kind
-            # If rel_options are available, then sort the list and display in rel_options tree
-            if len(self.rel_options) > 0:
-                self.query.q_rel_uid = self.rel_options[0][5]
-                int_q_rel_uid, integer = Convert_numeric_to_integer(self.query.q_rel_uid)
-                if integer is False or int_q_rel_uid > 100:
-                    # obj = self.gel_net.uid_dict[self.query.q_rel_uid]
-                    self.q_rel_uid_str.set(str(self.query.q_rel_uid))
-                if len(self.rel_options) > 1:
-                    # Sort the list of options alphabetically by name
-                    self.rel_options.sort(key=itemgetter(4))
-                for option in self.rel_options:
-                    if option[2] == 0:
-                        lang_name = 'unknown'
-                    else:
-                        lang_name = self.gel_net.lang_uid_dict[option[2]]
-                    if option[3] == 0:
-                        comm_name = 'unknown'
-                    else:
-                        comm_name = self.gel_net.community_dict[option[3]]
-                    opt = [option[5], option[4], option[8], comm_name, lang_name]
-                    self.rel_options_tree.insert('', index='end', values=opt)
+        # == rel_opions: option_nr,whetherKnown, langUIDres, commUIDres,
+        #                result_string, resultUID, is_called_uid, kindKnown,kind
+        # If rel_options are available, then sort the list and display in rel_options tree
+        if len(self.rel_options) > 0:
+            self.query.q_rel_uid = self.rel_options[0][5]
+            int_q_rel_uid, integer = Convert_numeric_to_integer(self.query.q_rel_uid)
+            if integer is False or int_q_rel_uid > 100:
+                # obj = self.gel_net.uid_dict[self.query.q_rel_uid]
+                self.q_rel_uid_str.set(str(self.query.q_rel_uid))
+            if len(self.rel_options) > 1:
+                # Sort the list of options alphabetically by name
+                self.rel_options.sort(key=itemgetter(4))
+            for option in self.rel_options:
+                if option[2] == 0:
+                    lang_name = 'unknown'
+                else:
+                    lang_name = self.gel_net.lang_uid_dict[option[2]]
+                if option[3] == 0:
+                    comm_name = 'unknown'
+                else:
+                    comm_name = self.gel_net.community_dict[option[3]]
+                opt = [option[5], option[4], option[8], comm_name, lang_name]
+                self.rel_options_tree.insert('', index='end', values=opt)
 
     def Rh_search_cmd(self, widget):
         """ Search or Query in Ontology and Model
@@ -650,43 +652,43 @@ class Query_view():
                         result_string, resultUID, is_called_uid, kindKnown,kind
         """
         # Debug print('Rh Entry:',event.char)
-        if event.keysym not in ['Shift_L', 'Shift_R']:
+        # Tkinter options to be done: if event.keysym not in ['Shift_L', 'Shift_R']:
 
-            # Delete previous items in the rh_options in tree
-            self.rh_options[:] = []
-            x = self.rh_options_tree.get_children()
-            for item in x:
-                self.rh_options_tree.delete(item)
+        # Delete previous items in the rh_options in tree
+        self.rh_options[:] = []
+        x = self.rh_options_tree.get_children()
+        for item in x:
+            self.rh_options_tree.delete(item)
 
-            # Get the rh_string and search for options in the dictionary
-            rh_string = self.q_rh_name_widget.get()
-            self.search_string = rh_string
-            self.foundRh, self.rh_options = self.Solve_unknown()
-            # Debug print('  OptRh:',self.rh_options);
+        # Get the rh_string and search for options in the dictionary
+        rh_string = self.q_rh_name_widget.get()
+        self.search_string = rh_string
+        self.foundRh, self.rh_options = self.Solve_unknown()
+        # Debug print('  OptRh:',self.rh_options);
 
-            # == rh_options: option_nr, whetherKnown, langUIDres, commUIDres,
-            #                result_string, resultUID, is_called_uid, kindKnown,kind
-            # If rh_options are available,
-            # then sort the list and display them in the rh_options tree
-            if len(self.rh_options) > 0:
-                self.query.q_rh_uid = self.rh_options[0][5]
-                # obj = self.gel_net.uid_dict[self.query.q_rh_uid]
-                self.q_rh_uid_str.set(str(self.query.q_rh_uid))
-                self.query.q_rh_category = self.rh_options[0][8]
-                if len(self.rh_options) > 1:
-                    # Sort the list of options alphabetically by name
-                    self.rh_options.sort(key=itemgetter(4))
-                for option in self.rh_options:
-                    if option[2] == 0:
-                        lang_name = 'unknown'
-                    else:
-                        lang_name = self.gel_net.lang_uid_dict[option[2]]
-                    if option[3] == 0:
-                        comm_name = 'unknown'
-                    else:
-                        comm_name = self.gel_net.community_dict[option[3]]
-                    opt = [option[5], option[4], option[8], comm_name, lang_name]
-                    self.rh_options_tree.insert('', index='end', values=opt)
+        # == rh_options: option_nr, whetherKnown, langUIDres, commUIDres,
+        #                result_string, resultUID, is_called_uid, kindKnown,kind
+        # If rh_options are available,
+        # then sort the list and display them in the rh_options tree
+        if len(self.rh_options) > 0:
+            self.query.q_rh_uid = self.rh_options[0][5]
+            # obj = self.gel_net.uid_dict[self.query.q_rh_uid]
+            self.q_rh_uid_str.set(str(self.query.q_rh_uid))
+            self.query.q_rh_category = self.rh_options[0][8]
+            if len(self.rh_options) > 1:
+                # Sort the list of options alphabetically by name
+                self.rh_options.sort(key=itemgetter(4))
+            for option in self.rh_options:
+                if option[2] == 0:
+                    lang_name = 'unknown'
+                else:
+                    lang_name = self.gel_net.lang_uid_dict[option[2]]
+                if option[3] == 0:
+                    comm_name = 'unknown'
+                else:
+                    comm_name = self.gel_net.community_dict[option[3]]
+                opt = [option[5], option[4], option[8], comm_name, lang_name]
+                self.rh_options_tree.insert('', index='end', values=opt)
 
     def Determine_selected_aspects(self, widget, row, item):
         ''' Determine one or more selected aspects and their values
@@ -908,7 +910,6 @@ class Query_view():
         # then determine the kinds of relations that relate to that lh_object
         if integer is False or int_q_lh_uid >= 100:
             rel_options = []
-            #opt_nr = 0
             lh_object = self.gel_net.uid_dict[self.query.q_lh_uid]
             # Determine list of subtypes of the lh_object
             sub_types, sub_type_uids = self.gel_net.Determine_subtypes(lh_object)
@@ -1045,20 +1046,20 @@ class Query_view():
                         # Find conceptual quantification (1791) value (on a scale)
                         # Find conceptual compliance criterion/qualif (4902)
                         # or def qualification
-                        if role_uid == expr2[lh_uid_col] \
-                           and (expr2[lh_role_uid_col] in self.gel_net.concComplUIDs
-                                or expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs
-                                or expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs):
+                        if role_uid == expr2[lh_uid_col] and \
+                          (expr2[lh_role_uid_col] in self.gel_net.concComplUIDs or
+                           expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs or
+                           expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs):
                             values = [expr2[rh_uid_col], '', expr2[rel_type_uid_col],
                                       expr[rh_uid_col], expr[rh_name_col],
                                       equality, expr2[rh_name_col], expr2[uom_name_col]]
                         # Find compliancy criterion or constraint (inverse)
                         # Find conceptual quantification (1791) value (inverse)
                         # Find conceptual compliance criterion (inverse)
-                        elif role_uid == expr2[rh_uid_col] \
-                           and (expr2[rh_role_uid_col] in self.gel_net.concComplUIDs
-                                or expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs
-                                or expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs):
+                        elif role_uid == expr2[rh_uid_col] and \
+                          (expr2[rh_role_uid_col] in self.gel_net.concComplUIDs or
+                           expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs or
+                           expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs):
                             values = [expr2[lh_uid_col], '', expr2[rel_type_uid_col],
                                       expr[rh_uid_col], expr[rh_name_col],
                                       equality, expr2[lh_name_col], expr2[uom_name_col]]
@@ -1077,14 +1078,15 @@ class Query_view():
                 rel_type = self.gel_net.uid_dict[expr[rel_type_uid_col]]
                 if rel_type is None:
                     self.user_interface.message_ui(
-                        'The kind of relation {} is not found.'.format(rel_type_uid),
-                        'De soort relatie {} is niet gevonden.'.format(rel_type_uid))
+                        'The kind of relation {} is not found.'.format(expr[rel_type_uid_col]),
+                        'De soort relatie {} is niet gevonden.'.format(expr[rel_type_uid_col]))
                 else:
                     if rel_type not in self.lh_obj_relation_types:
                         self.lh_obj_relation_types.append(rel_type)
 
                         # Determine_subtypes of the relation type
-                        sub_rel_types, sub_rel_type_uids = self.gel_net.Determine_subtypes(rel_type)
+                        sub_rel_types, sub_rel_type_uids = \
+                            self.gel_net.Determine_subtypes(rel_type)
                         for sub_rel_type in sub_rel_types:
                             if sub_rel_type not in self.lh_obj_relation_types:
                                 self.lh_obj_relation_types.append(sub_rel_type)
