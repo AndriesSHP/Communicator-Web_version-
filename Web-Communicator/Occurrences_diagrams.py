@@ -6,7 +6,7 @@
 # TODO: import specific names
 from tkinter import ttk, Toplevel, Canvas, NSEW, E, NS, S, EW, W, \
     VERTICAL, HORIZONTAL, LAST, CENTER
-#from tkinter.ttk import Notebook
+# from tkinter.ttk import Notebook
 
 
 class Occurrences_diagram():
@@ -173,7 +173,7 @@ class Occurrences_diagram():
         # self.sheets = Canvas(drawing, width=self.screen_width,
         #                     height=self.screen_height, background='#ddf')
         self.sheets.append(Canvas(self.drawings[self.sheet_nr], width=self.screen_width - 100,
-                                  height=self.screen_height - 200, background='#ddf')) # Canvas
+                                  height=self.screen_height - 200, background='#ddf'))
         self.sheets[self.sheet_nr].grid(column=0, row=0, columnspan=2, sticky=NSEW)
         self.sheets[self.sheet_nr].bind('<Button-2>', self.RightMouseButton)
         self.sheets[self.sheet_nr].columnconfigure(0, weight=1)
@@ -267,14 +267,14 @@ class Occurrences_diagram():
         self.leftStrScroll.append(ttk.Scrollbar(self.leftStrFrame[self.sheet_nr], orient=VERTICAL,
                                                 command=self.leftStrTree[self.sheet_nr].yview))
         self.leftStrScroll[self.sheet_nr].grid(column=0, row=0, sticky=NS + E)
-        self.leftStrTree[self.sheet_nr].config(yscrollcommand=
-                                               self.leftStrScroll[self.sheet_nr].set)
+        self.leftStrTree[self.sheet_nr].config(
+            yscrollcommand=self.leftStrScroll[self.sheet_nr].set)
 
         self.rightStrScroll.append(ttk.Scrollbar(self.drawings[self.sheet_nr], orient=VERTICAL,
                                                  command=self.rightStrTree[self.sheet_nr].yview))
-        self.rightStrScroll[self.sheet_nr].grid(column=2, row=2, sticky=NS+E)
-        self.rightStrTree[self.sheet_nr].config(yscrollcommand=
-                                                self.rightStrScroll[self.sheet_nr].set)
+        self.rightStrScroll[self.sheet_nr].grid(column=2, row=2, sticky=NS + E)
+        self.rightStrTree[self.sheet_nr].config(
+            yscrollcommand=self.rightStrScroll[self.sheet_nr].set)
 
     def Draw_DrawingOfOneSheet(self, nrOfOccs, occs, parentID):
         ''' - parentID: the ID of the whole occurrence(box)
@@ -299,8 +299,8 @@ class Occurrences_diagram():
         self.boxW2 = boxWidth / 2   # 1/2Width  of boxes
         self.boxH2 = boxHeight / 2   # 1/2Height of boxes
 
-        deltaX = self.screen_width/(nrOfOccs + 1)
-        deltaY = self.screen_height/(nrOfOccs + 1)
+        deltaX = self.screen_width / (nrOfOccs + 1)
+        deltaY = self.screen_height / (nrOfOccs + 1)
         dxC = 8                 # corner rounding
         dyC = 8
         # dx = 8                 # shifted start point for line on box
@@ -310,12 +310,12 @@ class Occurrences_diagram():
         # occCon, occMech, occConUp and 0ccMechUp not yet used, but later exprected
         occIn = []
         occOut = []
-        #occCon = []
-        #occMech = []
+        # occCon = []
+        # occMech = []
         occInUp = []
         occOutUp = []
-        #occConUp = []
-        #occMechUp = []
+        # occConUp = []
+        # occMechUp = []
         # Draw boxes (occurrences), return midpts[i] = N(x,y), S(x,y), E(x,y), W(x,y)
         for boxNr in range(0, nrOfOccs):
             centerX.append(deltaX + boxNr * deltaX)     # X of center of box canvas
@@ -332,12 +332,12 @@ class Occurrences_diagram():
         # Initialize number of I/O/C/M down and upwards for each occurrence on sheet
         occIn = [0 for i in range(0, nrOfOccs)]  # input stream nr of deltas downward
         occOut = [0 for i in range(0, nrOfOccs)]
-        #occCon = [0 for i in range(0, nrOfOccs)]  # control stream nr of deltas right
-        #occMech = [0 for i in range(0, nrOfOccs)]
+        # occCon = [0 for i in range(0, nrOfOccs)]  # control stream nr of deltas right
+        # occMech = [0 for i in range(0, nrOfOccs)]
         occInUp = [0 for i in range(0, nrOfOccs)]  # input stream nr of deltas upward
         occOutUp = [0 for i in range(0, nrOfOccs)]
-        #occConUp = [0 for i in range(0, nrOfOccs)]  # control stream nr of deltas left
-        #occMechUp = [0 for i in range(0, nrOfOccs)]
+        # occConUp = [0 for i in range(0, nrOfOccs)]  # control stream nr of deltas left
+        # occMechUp = [0 for i in range(0, nrOfOccs)]
 
         # Draw lines (streams)
         strNr = 0

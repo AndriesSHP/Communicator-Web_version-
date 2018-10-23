@@ -39,7 +39,7 @@ class User():
                     exit(0)
             else:
                 # Register new users
-                self.pw    = 'pw'  # input("Password: ")
+                self.pw = 'pw'  # input("Password: ")
                 self.email = 'email'  # input("Email address: ")
                 user_db.Register_User(party, self.pw)
                 sesam = True
