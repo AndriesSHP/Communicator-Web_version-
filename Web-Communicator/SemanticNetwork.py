@@ -596,7 +596,7 @@ class Semantic_Network():
             # or one of their subtypes),
             # then add part to collection of parts of the whole object
             elif rel_type_uid in self.subComposUIDs or \
-              rel_type_uid in self.subConcComposUIDs:
+                    rel_type_uid in self.subConcComposUIDs:
                 if phrase_type_uid == basePhraseUID:
                     rh.add_part(lh)
                 else:
