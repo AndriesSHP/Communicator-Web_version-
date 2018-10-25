@@ -487,11 +487,11 @@ class Query:
         # then lh_object may not be a kind or kind of occurrence; idem for rh_object
         int_q_lh_uid, lh_integer = Convert_numeric_to_integer(self.q_lh_uid)
         int_q_rh_uid, rh_integer = Convert_numeric_to_integer(self.q_rh_uid)
-        if self.rolePlayersQTypes == 'individuals' and \
-                (((lh_integer is False or int_q_lh_uid >= 100)
-                  and self.q_lh_category in list_of_categories)
-                 or ((rh_integer is False or int_q_rh_uid >= 100)
-                     and self.q_rh_category in list_of_categories)):
+        if self.rolePlayersQTypes == 'individuals' \
+                and (((lh_integer is False or int_q_lh_uid >= 100)
+                      and self.q_lh_category in list_of_categories)
+                     or ((rh_integer is False or int_q_rh_uid >= 100)
+                         and self.q_rh_category in list_of_categories)):
             print('Warning: Relation type <{}> relates individual things, '
                   'but one or both related things are kinds of things. Try again.'.
                   format(self.q_rel_name, self.q_lh_uid, self.q_lh_category,
@@ -499,12 +499,12 @@ class Query:
 
         # If relation type specifies a relation between kinds and the lh_object is known
         # then lh_object shall be a kind or kind of occurrence; idem for rh_object
-        elif (self.rolePlayersQTypes == 'hierOfKinds' or
-              self.rolePlayersQTypes == 'thingsOfKinds') and \
-              (((lh_integer is False or int_q_lh_uid >= 100) and
-                self.q_lh_category not in list_of_categories) or
-               ((rh_integer is False or int_q_rh_uid >= 100) and
-                self.q_rh_category not in list_of_categories)):
+        elif (self.rolePlayersQTypes == 'hierOfKinds'
+              or self.rolePlayersQTypes == 'thingsOfKinds') \
+                and (((lh_integer is False or int_q_lh_uid >= 100)
+                      and self.q_lh_category not in list_of_categories)
+                     or ((rh_integer is False or int_q_rh_uid >= 100)
+                         and self.q_rh_category not in list_of_categories)):
             print('Warning: Relation type <{}> relates kinds of things, '
                   'but left {} ({}) or right {} ({}) related things are not kinds. '
                   'Try again.'.
@@ -512,22 +512,22 @@ class Query:
                          self.q_rh_uid, self.q_rh_category))
 
         elif self.rolePlayersQTypes == 'individualAndKind':
-            if ((lh_integer is False or int_q_lh_uid >= 100)
-                    and self.q_lh_category in list_of_categories):
+            if (lh_integer is False or int_q_lh_uid >= 100) \
+                    and self.q_lh_category in list_of_categories:
                 print('Warning: Relation type <{}> relates an individual thing to a kind, '
                       'but the left hand object {} ({}) is a kind. Try again.'.
                       format(self.q_rel_name, self.q_lh_uid, self.q_lh_category))
 
         elif self.rolePlayersQTypes == 'kindAndIndividual':
-            if ((rh_integer is False or int_q_rh_uid >= 100)
-                    and self.q_rh_category in list_of_categories):
+            if (rh_integer is False or int_q_rh_uid >= 100) \
+                    and self.q_rh_category in list_of_categories:
                 print('Warning: Relation type <{}> relates a kind to an individual thing, '
                       'but the right hand object {} ({}) is a kind. Try again.'.
                       format(self.q_rel_name, self.q_rh_uid, self.q_rh_category))
 
         elif self.rolePlayersQTypes == 'individualAndMixed':
-            if ((lh_integer is False or int_q_lh_uid >= 100) and
-              self.q_lh_category in list_of_categories):
+            if (lh_integer is False or int_q_lh_uid >= 100) \
+                    and self.q_lh_category in list_of_categories:
                 print('Warning: Relation type <{}> relates an individual thing '
                       'to an individual or kind, but the left hand object {} ({}) '
                       'is a kind. Try again.'.
@@ -929,7 +929,7 @@ class Query:
                     if expr[lh_uid_col] == obj.uid \
                        and expr[phrase_type_uid_col] == phrase_type_uid:
                         related_uid = expr[rh_uid_col]
-                        if related_uid not in self.net_uids:
+                        if related_uid not in self.ne_uids:
                             self.net_uids.append(related_uid)
                             new_direct_related_uids.append(related_uid)
                         branch = [expr[lh_uid_col], expr[lh_name_col],
@@ -937,8 +937,8 @@ class Query:
                         self.branches.append(branch)
 
                     # Search for relations in inverse expressions
-                    elif expr[rh_uid_col] == obj.uid and \
-                      expr[phrase_type_uid_col] != phrase_type_uid:
+                    elif expr[rh_uid_col] == obj.uid \
+                            and expr[phrase_type_uid_col] != phrase_type_uid:
                         related_uid = expr[lh_uid_col]
                         if related_uid not in self.net_uids:
                             self.net_uids.append(related_uid)

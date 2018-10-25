@@ -2652,7 +2652,7 @@ class Display_views():
                             'reltypeName', 'rhUID', 'rhName', 'fullDef', 'uomUID', 'uomName',
                             'remarks', 'status'),
             selectmode='browse', height=20
-            )
+        )
 
         self.expr_tree.heading('seq', text='Seq', anchor=W)
         self.expr_tree.heading('langUID', text='langUID', anchor=W)
