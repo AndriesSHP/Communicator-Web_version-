@@ -288,7 +288,7 @@ class Query:
                             if len(conceptual_rel_type.base_phrases_in_contexts) > 0:
                                 rel_type_name = conceptual_rel_type.base_phrases_in_contexts[0][2]
                                 for phrase_in_context in \
-                                  conceptual_rel_type.base_phrases_in_contexts:
+                                        conceptual_rel_type.base_phrases_in_contexts:
                                     if phrase_in_context[0] == self.user_interface.GUI_lang_uid:
                                         rel_type_name = phrase_in_context[2]
                                         continue
@@ -488,10 +488,10 @@ class Query:
         int_q_lh_uid, lh_integer = Convert_numeric_to_integer(self.q_lh_uid)
         int_q_rh_uid, rh_integer = Convert_numeric_to_integer(self.q_rh_uid)
         if self.rolePlayersQTypes == 'individuals' and \
-           (((lh_integer is False or int_q_lh_uid >= 100) and
-             self.q_lh_category in list_of_categories) or
-            ((rh_integer is False or int_q_rh_uid >= 100) and
-             self.q_rh_category in list_of_categories)):
+                (((lh_integer is False or int_q_lh_uid >= 100) and
+                  self.q_lh_category in list_of_categories) or
+                 ((rh_integer is False or int_q_rh_uid >= 100) and
+                  self.q_rh_category in list_of_categories)):
             print('Warning: Relation type <{}> relates individual things, '
                   'but one or both related things are kinds of things. Try again.'.
                   format(self.q_rel_name, self.q_lh_uid, self.q_lh_category,

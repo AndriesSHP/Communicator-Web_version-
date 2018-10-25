@@ -227,9 +227,9 @@ class Gellish_file:
                                     # rh_uid_name e.g. 550464 , 'breedte'
                                     rh_uid_name = list(attrib_map[1][4:6])
                                     rh_role_uid_name = [str(self.object_uid),
-                                                        rh_uid_name[1] +
-                                                        of_text[self.gel_net.reply_lang_index] +
-                                                        article_identifier]
+                                                        rh_uid_name[1]
+                                                        + of_text[self.gel_net.reply_lang_index]
+                                                        + article_identifier]
                                     uom_uid_name = ['', '']
                                     description = ''
                                     intent_uid_name = ['491285', 'bewering']
@@ -452,7 +452,7 @@ class Gellish_file:
                 for col_id in lang_name_col_id:
                     # Only for rows with a specialization and alias relation
                     if (db_row[rel_type_uid_col] in self.gel_net.specialRelUIDs or
-                       db_row[rel_type_uid_col] in self.gel_net.alias_uids):
+                            db_row[rel_type_uid_col] in self.gel_net.alias_uids):
                         # Check whether column value (name of object) is not blank,
                         # then include name_in_context in the dictionary (if not yet present)
                         if in_row[lang_name_col_id[col_id]] != '':
