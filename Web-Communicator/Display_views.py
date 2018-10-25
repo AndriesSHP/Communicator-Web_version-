@@ -539,8 +539,8 @@ class Display_views():
                         'De uid van de soort frase van idee {} is niet compatibel '
                         'met de uitdrukking.'.format(expr.uid))
             # And for the inverse
-            elif indiv.uid == expr[rh_uid_col] and \
-              expr[rel_type_uid_col] in self.gel_net.subPossAspUIDs:
+            elif indiv.uid == expr[rh_uid_col] \
+                    and expr[rel_type_uid_col] in self.gel_net.subPossAspUIDs:
                 if expr[phrase_type_uid_col] == inversePhraseUID:
                     aspect_uid = expr[lh_uid_col]
                     qualifier = 'quantitative'
@@ -554,13 +554,13 @@ class Display_views():
                 # It is not a possession of (intrinsic) aspect relation,
                 # thus search for possession of a qualitative aspect relations
                 # and for an <is made of> relation
-                if indiv.uid == expr[lh_uid_col] and \
-                  expr[rel_type_uid_col] in ['5843', '5423']:
+                if indiv.uid == expr[lh_uid_col] \
+                        and expr[rel_type_uid_col] in ['5843', '5423']:
                     if expr[phrase_type_uid_col] == basePhraseUID:
                         aspect_uid = expr[rh_uid_col]
                         qualifier = 'qualitative'
-                elif indiv.uid == expr[rh_uid_col] and \
-                  expr[rel_type_uid_col] in ['5843', '5423']:
+                elif indiv.uid == expr[rh_uid_col] \
+                        and expr[rel_type_uid_col] in ['5843', '5423']:
                     if expr[phrase_type_uid_col] == inversePhraseUID:
                         aspect_uid = expr[lh_uid_col]
                         qualifier = 'qualitative'
@@ -1197,16 +1197,16 @@ class Display_views():
                 expr = rel_obj.expression
                 # Find expression with poss_of_aspect relations about the object
                 # (or its supertype)
-                if expr[lh_uid_col] == obj_i.uid and \
-                  (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs and not
-                   expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
+                if expr[lh_uid_col] == obj_i.uid \
+                        and (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs
+                             and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
                     aspect_uid = expr[rh_uid_col]
                     aspect_name = expr[rh_name_col]
                     role_uid = expr[rh_role_uid_col]
-                    role_name = expr[rh_role_name_col]
-                elif expr[rh_uid_col] == obj_i.uid and \
-                  (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs and not
-                   expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
+                    # role_name = expr[rh_role_name_col]
+                elif expr[rh_uid_col] == obj_i.uid \
+                        and (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs
+                             and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
                     aspect_uid = expr[lh_uid_col]
                     aspect_name = expr[lh_name_col]
                     role_uid = expr[lh_role_uid_col]
@@ -1236,14 +1236,14 @@ class Display_views():
                         expr2 = rel_obj2.expression
                         # Find collection of qualitative aspects for intrinsic aspect (=role),
                         # if any.
-                        if role_uid == expr2[lh_uid_col] and \
-                          expr2[rel_type_uid_col] in self.gel_net.qualOptionsUIDs:
+                        if role_uid == expr2[lh_uid_col] \
+                                and expr2[rel_type_uid_col] in self.gel_net.qualOptionsUIDs:
                             value_uid = expr2[rh_uid_col]   # collection of allowed values
                             value_name = expr2[rh_name_col]
                             value_presence = True
                             break
-                        elif role_uid == expr2[rh_uid_col] and \
-                          expr2[rel_type_uid_col] in self.gel_net.qualOptionsUIDs:
+                        elif role_uid == expr2[rh_uid_col] \
+                                and expr2[rel_type_uid_col] in self.gel_net.qualOptionsUIDs:
                             value_uid = expr2[lh_uid_col]   # collection of allowed values
                             value_name = expr2[lh_name_col]
                             value_presence = True
@@ -1251,14 +1251,14 @@ class Display_views():
 
                         # Find conceptual compliancy criterion, (4951)
                         # for intrinsic aspect (=role), if any.
-                        elif role_uid == expr2[lh_uid_col] and \
-                          expr2[lh_role_uid_col] in self.gel_net.concComplUIDs:
+                        elif role_uid == expr2[lh_uid_col] \
+                                and expr2[lh_role_uid_col] in self.gel_net.concComplUIDs:
                             value_uid = expr2[rh_uid_col]   # compliancy criterion or constraint
                             value_name = expr2[rh_name_col]
                             value_presence = True
                             break
-                        elif role_uid == expr2[rh_uid_col] and \
-                          expr2[rh_role_uid_col] in self.gel_net.concComplUIDs:
+                        elif role_uid == expr2[rh_uid_col] \
+                                and expr2[rh_role_uid_col] in self.gel_net.concComplUIDs:
                             value_uid = expr2[lh_uid_col]   # compliancy criterion or constraint
                             value_name = expr2[lh_name_col]
                             value_presence = True
@@ -1266,16 +1266,16 @@ class Display_views():
 
                         # Find conceptual quantification (1791) for intrinsic aspect (=role),
                         # if any.
-                        elif role_uid == expr2[lh_uid_col] and \
-                          expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs:
+                        elif role_uid == expr2[lh_uid_col] \
+                                and expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs:
                             value_uid = expr2[rh_uid_col]   # value (on a scale)
                             value_name = expr2[rh_name_col]
                             uom_uid = expr2[uom_uid_col]
                             uom_name = expr2[uom_name_col]
                             value_presence = True
                             break
-                        elif role_uid == expr2[rh_uid_col] and \
-                          expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs:
+                        elif role_uid == expr2[rh_uid_col] \
+                                and expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs:
                             value_uid = expr2[lh_uid_col]   # value (on a scale)
                             value_name = expr2[lh_name_col]
                             uom_uid = expr2[uom_uid_col]
@@ -1285,15 +1285,15 @@ class Display_views():
 
                         # Find conceptual compliance criterion/qualif (4902)
                         # for intrinsic aspect (=role), if any.
-                        elif role_uid == expr2[lh_uid_col] and \
-                          expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs:
+                        elif role_uid == expr2[lh_uid_col] \
+                                and expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs:
                             # Compliance criterion or def qualification
                             value_uid = expr2[rh_uid_col]
                             value_name = expr2[rh_name_col]
                             value_presence = True
                             break
-                        elif role_uid == expr2[rh_uid_col] and \
-                          expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs:
+                        elif role_uid == expr2[rh_uid_col] \
+                                and expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs:
                             # Compliance criterion or def qualification
                             value_uid = expr2[lh_uid_col]
                             value_name = expr2[lh_name_col]
@@ -1445,24 +1445,24 @@ class Display_views():
                             # If lh_uid is the kind of intr_aspect
                             # and rel_type is <is by definition an intrinsic aspect of a> (5738)
                             # then rh_obj is the kind of part  (and inverse)
-                            if expr_asp[lh_uid_col] == aspect_uid and \
-                              expr_asp[rel_type_uid_col] == '5738':
+                            if expr_asp[lh_uid_col] == aspect_uid \
+                                    and expr_asp[rel_type_uid_col] == '5738':
                                 part_uid = expr_asp[rh_uid_col]
                                 part_name = expr_asp[rh_name_col]
-                            elif expr_asp[rh_uid_col] == aspect_uid and \
-                              expr_asp[rel_type_uid_col] == '5738':
+                            elif expr_asp[rh_uid_col] == aspect_uid \
+                                    and expr_asp[rel_type_uid_col] == '5738':
                                 part_uid = expr_asp[lh_uid_col]
                                 part_name = expr_asp[lh_name_col]
 
                             # If lh_uid is the kind of intr_aspect
                             # and rel_type is <is by definition an intrinsic> (5817)
                             # then rh_obj is the kind of aspect of the kind of part  (and inverse)
-                            if expr_asp[lh_uid_col] == aspect_uid and \
-                              expr_asp[rel_type_uid_col] == '5817':
+                            if expr_asp[lh_uid_col] == aspect_uid \
+                                    and expr_asp[rel_type_uid_col] == '5817':
                                 asp_of_part_uid = expr_asp[rh_uid_col]
                                 asp_of_part_name = expr_asp[rh_name_col]
-                            if expr_asp[rh_uid_col] == aspect_uid and \
-                              expr_asp[rel_type_uid_col] == '5817':
+                            if expr_asp[rh_uid_col] == aspect_uid \
+                                    and expr_asp[rel_type_uid_col] == '5817':
                                 asp_of_part_uid = expr_asp[lh_uid_col]
                                 asp_of_part_name = expr_asp[lh_name_col]
 
@@ -1593,9 +1593,9 @@ class Display_views():
                     part_name = expr[rh_name_col]
                     # role_uid = expr[rh_role_uid_col]
                     # role_name = expr[rh_role_name_col]
-                elif expr[rh_uid_col] == obj.uid and \
-                  expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs and \
-                  expr[phrase_type_uid_col] == '6066':
+                elif expr[rh_uid_col] == obj.uid \
+                        and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs \
+                        and expr[phrase_type_uid_col] == '6066':
                     part_uid = expr[lh_uid_col]
                     part_name = expr[lh_name_col]
                     # role_uid = expr[lh_role_uid_col]
@@ -1831,12 +1831,12 @@ class Display_views():
         # (involver role players)
         for rel_obj in obj.relations:
             expr = rel_obj.expression
-            if (expr[rh_uid_col] == obj.uid and
-              expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+            if (expr[rh_uid_col] == obj.uid
+                    and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
                 occ_uid = expr[lh_uid_col]
                 # occ_name = expr[lh_name_col]
-            elif expr[lh_uid_col] == obj.uid and \
-              expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
+            elif expr[lh_uid_col] == obj.uid \
+                    and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                 occ_uid = expr[rh_uid_col]
                 # occ_name = expr[rh_name_col]
             else:
@@ -1902,15 +1902,15 @@ class Display_views():
                 # Search <is involved in> or <is involving>
                 # or any of its subtypes relations in occ
                 # excluding the object in focus (obj)
-                if expr_occ[rh_uid_col] != obj.uid and \
-                  (expr_occ[lh_uid_col] == occ.uid and
-                   expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+                if expr_occ[rh_uid_col] != obj.uid \
+                        and (expr_occ[lh_uid_col] == occ.uid
+                             and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
                     involved_uid = expr_occ[rh_uid_col]
                     # involved_name = expr_occ[rh_name_col]
                     inv_role_name = expr_occ[rh_role_name_col]
-                elif expr_occ[lh_uid_col] != obj.uid and \
-                  (expr_occ[rh_uid_col] == occ.uid and
-                   expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+                elif expr_occ[lh_uid_col] != obj.uid \
+                        and (expr_occ[rh_uid_col] == occ.uid
+                             and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
                     involved_uid = expr_occ[lh_uid_col]
                     # involved_name = expr_occ[lh_name_col]
                     inv_role_name = expr_occ[lh_role_name_col]
@@ -1987,8 +1987,8 @@ class Display_views():
                 nr_of_sequences += 1
 
             # Search for inputs and outputs (streams) in involv_table
-            elif expr[lh_uid_col] == occ.uid and \
-              expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
+            elif expr[lh_uid_col] == occ.uid \
+                    and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                 involved = self.uid_dict[expr[rh_uid_col]]
                 if len(involved.classifiers) > 0:
                     inv_kind_name = involved.classifiers[0].name
@@ -2001,8 +2001,8 @@ class Display_views():
                 nr_of_ins_and_outs += 1
 
             # Search for inverse relation
-            elif expr[rh_uid_col] == occ.uid and \
-              expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
+            elif expr[rh_uid_col] == occ.uid \
+                    and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                 involved = self.uid_dict[expr[lh_uid_col]]
                 if len(involved.classifiers) > 0:
                     inv_kind_name = involved.classifiers[0].name
@@ -2063,7 +2063,8 @@ class Display_views():
                     self.line_nr += + 1
                     prod_line_8 = [part_occ.uid, kind_part_occ_uid, '', self.line_nr, '',
                                    part_occ.name, '',
-                                   kind_part_occ_name, '', '', '', '', '', status]
+                                   kind_part_occ_name, '', '', '', '', '', status
+                                   ]
                     self.prod_model.append(prod_line_8)
                     self.nr_of_occurrencies += + 1
                     involv_uid = ''
@@ -3287,7 +3288,7 @@ class Display_views():
                                    justify='left', background=back, foreground=fore)
                     fd.grid(row=line_nr, column=column_nr, columnspan=span, rowspan=2, sticky=EW)
                 # Display on line 2 the description label
-                if header_2 is True and column_nr in range(0,3):
+                if header_2 is True and column_nr in range(0, 3):
                     back = '#dfb'
                     fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
                                    justify='left', background=back, foreground=fore)
@@ -3313,10 +3314,10 @@ class Display_views():
                 if body is True:
                     # Set background color
                     # depending on either header, value present or 'unknown'
-                    if (column_nr == 1 and (field_value in self.comp_head or
-                                            field_value in self.occ_head or
-                                            field_value in self.info_head)) or \
-                      (column_nr == 2 and (field_value in self.part_occ_head)):
+                    if (column_nr == 1 and (field_value in self.comp_head
+                                            or field_value in self.occ_head
+                                            or field_value in self.info_head)) \
+                            or (column_nr == 2 and (field_value in self.part_occ_head)):
                         # Header line detected; set background color accordingly
                         head = True
                         back = '#dfb'

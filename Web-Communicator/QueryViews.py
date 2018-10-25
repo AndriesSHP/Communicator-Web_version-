@@ -1046,20 +1046,22 @@ class Query_view():
                         # Find conceptual quantification (1791) value (on a scale)
                         # Find conceptual compliance criterion/qualif (4902)
                         # or def qualification
-                        if role_uid == expr2[lh_uid_col] and \
-                          (expr2[lh_role_uid_col] in self.gel_net.concComplUIDs or
-                           expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs or
-                           expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs):
+                        if role_uid == expr2[lh_uid_col] \
+                                and (expr2[lh_role_uid_col] in self.gel_net.concComplUIDs
+                                     or expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs
+                                     or expr2[rel_type_uid_col]
+                                     in self.gel_net.subConcComplRelUIDs):
                             values = [expr2[rh_uid_col], '', expr2[rel_type_uid_col],
                                       expr[rh_uid_col], expr[rh_name_col],
                                       equality, expr2[rh_name_col], expr2[uom_name_col]]
                         # Find compliancy criterion or constraint (inverse)
                         # Find conceptual quantification (1791) value (inverse)
                         # Find conceptual compliance criterion (inverse)
-                        elif role_uid == expr2[rh_uid_col] and \
-                          (expr2[rh_role_uid_col] in self.gel_net.concComplUIDs or
-                           expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs or
-                           expr2[rel_type_uid_col] in self.gel_net.subConcComplRelUIDs):
+                        elif role_uid == expr2[rh_uid_col] \
+                                and (expr2[rh_role_uid_col] in self.gel_net.concComplUIDs
+                                     or expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs
+                                     or expr2[rel_type_uid_col]
+                                     in self.gel_net.subConcComplRelUIDs):
                             values = [expr2[lh_uid_col], '', expr2[rel_type_uid_col],
                                       expr[rh_uid_col], expr[rh_name_col],
                                       equality, expr2[lh_name_col], expr2[uom_name_col]]

@@ -488,10 +488,10 @@ class Query:
         int_q_lh_uid, lh_integer = Convert_numeric_to_integer(self.q_lh_uid)
         int_q_rh_uid, rh_integer = Convert_numeric_to_integer(self.q_rh_uid)
         if self.rolePlayersQTypes == 'individuals' and \
-                (((lh_integer is False or int_q_lh_uid >= 100) and
-                  self.q_lh_category in list_of_categories) or
-                 ((rh_integer is False or int_q_rh_uid >= 100) and
-                  self.q_rh_category in list_of_categories)):
+                (((lh_integer is False or int_q_lh_uid >= 100)
+                  and self.q_lh_category in list_of_categories)
+                 or ((rh_integer is False or int_q_rh_uid >= 100)
+                     and self.q_rh_category in list_of_categories)):
             print('Warning: Relation type <{}> relates individual things, '
                   'but one or both related things are kinds of things. Try again.'.
                   format(self.q_rel_name, self.q_lh_uid, self.q_lh_category,
@@ -501,10 +501,10 @@ class Query:
         # then lh_object shall be a kind or kind of occurrence; idem for rh_object
         elif (self.rolePlayersQTypes == 'hierOfKinds' or
               self.rolePlayersQTypes == 'thingsOfKinds') and \
-          (((lh_integer is False or int_q_lh_uid >= 100) and
-            self.q_lh_category not in list_of_categories) or
-           ((rh_integer is False or int_q_rh_uid >= 100) and
-            self.q_rh_category not in list_of_categories)):
+              (((lh_integer is False or int_q_lh_uid >= 100) and
+                self.q_lh_category not in list_of_categories) or
+               ((rh_integer is False or int_q_rh_uid >= 100) and
+                self.q_rh_category not in list_of_categories)):
             print('Warning: Relation type <{}> relates kinds of things, '
                   'but left {} ({}) or right {} ({}) related things are not kinds. '
                   'Try again.'.
@@ -512,15 +512,15 @@ class Query:
                          self.q_rh_uid, self.q_rh_category))
 
         elif self.rolePlayersQTypes == 'individualAndKind':
-            if ((lh_integer is False or int_q_lh_uid >= 100) and
-              self.q_lh_category in list_of_categories):
+            if ((lh_integer is False or int_q_lh_uid >= 100)
+                    and self.q_lh_category in list_of_categories):
                 print('Warning: Relation type <{}> relates an individual thing to a kind, '
                       'but the left hand object {} ({}) is a kind. Try again.'.
                       format(self.q_rel_name, self.q_lh_uid, self.q_lh_category))
 
         elif self.rolePlayersQTypes == 'kindAndIndividual':
-            if ((rh_integer is False or int_q_rh_uid >= 100) and
-              self.q_rh_category in list_of_categories):
+            if ((rh_integer is False or int_q_rh_uid >= 100)
+                    and self.q_rh_category in list_of_categories):
                 print('Warning: Relation type <{}> relates a kind to an individual thing, '
                       'but the right hand object {} ({}) is a kind. Try again.'.
                       format(self.q_rel_name, self.q_rh_uid, self.q_rh_category))
@@ -1271,13 +1271,13 @@ class Query:
             print('Verify model of {} on requirements about {}'.
                   format(nameInF, self.kindName))
             # for obj_rel in obj.relations:
-                # expr = obj_rel.expression
-                # if expr[rel_type_uid_col] in subtypesOfShall:
-                #    lh = expr[lh_name_col]
-                #    rel = expr[rel_type_name_col]
-                #    rh = expr[rh_name_col]
-                #    Debug print('Requirement for {}: {} <{}> {}'.
-                #         format(nameInF,lh,rel,rh))
+            #     expr = obj_rel.expression
+            #     if expr[rel_type_uid_col] in subtypesOfShall:
+            #         lh = expr[lh_name_col]
+            #         rel = expr[rel_type_name_col]
+            #         rh = expr[rh_name_col]
+            #         Debug print('Requirement for {}: {} <{}> {}'.
+            #              format(nameInF,lh,rel,rh))
 # Transform and search for satisfaction in expressions table
 # === To be written ===
 
@@ -1311,8 +1311,8 @@ class Query:
         for rel_obj in base_obj.relations:
             expr = rel_obj.expression
             # Search for a branch in the base phrase sequence
-            if expr[rel_uid_col] in relUIDSubs and \
-              phraseTypeUIDQ == expr[phrase_type_uid_col]:
+            if expr[rel_type_uid_col] in relUIDSubs \
+                    and phraseTypeUIDQ == expr[phrase_type_uid_col]:
                 if expr[rh_uid_col] == targetUID:
                     branch = [expr[lh_uid_col], expr[lh_name_col],
                               expr[rh_uid_col], expr[rh_name_col]]
@@ -1333,8 +1333,8 @@ class Query:
                         self.matchTreeUIDs.append(branchUID)
                         end = False
             # search for a branch in the inverse phrase sequence
-            elif baseUID == expr[rh_uid_col] and expr[rel_uid_col] in relUIDSubs and \
-              phraseTypeUIDQ != expr[phrase_type_uid_col]:
+            elif baseUID == expr[rh_uid_col] and expr[rel_type_uid_col] in relUIDSubs \
+                    and phraseTypeUIDQ != expr[phrase_type_uid_col]:
                 if expr[lh_uid_col] == targetUID:
                     branch = [expr[rh_uid_col], expr[rh_name_col],
                               expr[lh_uid_col], expr[lh_name_col]]
@@ -1347,7 +1347,8 @@ class Query:
                         break
                 else:
                     relatedUIDs.append(expr[rh_uid_col])
-                    branch = [expr[lh_uid_col], expr[lh_name_col], expr[rh_uid_col], expr[rh_name_col]]
+                    branch = [expr[lh_uid_col], expr[lh_name_col],
+                              expr[rh_uid_col], expr[rh_name_col]]
                     branchUID = expr[idea_uid_col]
                     if branchUID not in self.matchTreeUIDs:
                         self.matchTree.append(branch)
