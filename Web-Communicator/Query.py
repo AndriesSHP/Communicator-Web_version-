@@ -1281,6 +1281,7 @@ class Query:
 # Transform and search for satisfaction in expressions table
 # === To be written ===
 
+    # TODO argument names should be lower case
     def TransitiveMatchChain(self, baseUID, relUIDSubs, targetUID, phraseTypeUIDQ):
         """ Search whether a targetUID is related to a baseUID in a chain of relations of type relUID.
             This results in a tree of branches (matchTreeUIDs of pairs of 'from-to' UIDs),
@@ -1300,6 +1301,7 @@ class Query:
                     previousUID = branch[0]
         return chain
 
+    # TODO argument names should be lower case
     def TransitiveMatch(self, baseUID, relUIDSubs, targetUID, phraseTypeUIDQ):
         """ Search recursively whether a targetUID is related to a baseUID
             in a chain of relations of type relUID.
