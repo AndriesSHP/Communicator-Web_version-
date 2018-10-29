@@ -1198,15 +1198,15 @@ class Display_views():
                 # Find expression with poss_of_aspect relations about the object
                 # (or its supertype)
                 if expr[lh_uid_col] == obj_i.uid \
-                        and (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs
-                             and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
+                        and expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs \
+                        and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids:
                     aspect_uid = expr[rh_uid_col]
                     aspect_name = expr[rh_name_col]
                     role_uid = expr[rh_role_uid_col]
                     # role_name = expr[rh_role_name_col]
                 elif expr[rh_uid_col] == obj_i.uid \
-                        and (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs
-                             and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
+                        and expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs \
+                        and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids:
                     aspect_uid = expr[lh_uid_col]
                     aspect_name = expr[lh_name_col]
                     role_uid = expr[lh_role_uid_col]
@@ -1831,8 +1831,8 @@ class Display_views():
         # (involver role players)
         for rel_obj in obj.relations:
             expr = rel_obj.expression
-            if (expr[rh_uid_col] == obj.uid
-                    and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+            if expr[rh_uid_col] == obj.uid \
+                    and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                 occ_uid = expr[lh_uid_col]
                 # occ_name = expr[lh_name_col]
             elif expr[lh_uid_col] == obj.uid \
@@ -1903,14 +1903,14 @@ class Display_views():
                 # or any of its subtypes relations in occ
                 # excluding the object in focus (obj)
                 if expr_occ[rh_uid_col] != obj.uid \
-                        and (expr_occ[lh_uid_col] == occ.uid
-                             and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+                        and expr_occ[lh_uid_col] == occ.uid \
+                        and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                     involved_uid = expr_occ[rh_uid_col]
                     # involved_name = expr_occ[rh_name_col]
                     inv_role_name = expr_occ[rh_role_name_col]
                 elif expr_occ[lh_uid_col] != obj.uid \
-                        and (expr_occ[rh_uid_col] == occ.uid
-                             and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+                        and expr_occ[rh_uid_col] == occ.uid \
+                        and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                     involved_uid = expr_occ[lh_uid_col]
                     # involved_name = expr_occ[lh_name_col]
                     inv_role_name = expr_occ[lh_role_name_col]
