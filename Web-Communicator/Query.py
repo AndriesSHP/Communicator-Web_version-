@@ -488,10 +488,10 @@ class Query:
         int_q_lh_uid, lh_integer = Convert_numeric_to_integer(self.q_lh_uid)
         int_q_rh_uid, rh_integer = Convert_numeric_to_integer(self.q_rh_uid)
         if self.rolePlayersQTypes == 'individuals' \
-                and (((lh_integer is False or int_q_lh_uid >= 100)
-                      and self.q_lh_category in list_of_categories)
-                     or ((rh_integer is False or int_q_rh_uid >= 100)
-                         and self.q_rh_category in list_of_categories)):
+                and (((lh_integer is False or int_q_lh_uid >= 100) and
+                     self.q_lh_category in list_of_categories) or
+                     ((rh_integer is False or int_q_rh_uid >= 100) and
+                     self.q_rh_category in list_of_categories)):
             print('Warning: Relation type <{}> relates individual things, '
                   'but one or both related things are kinds of things. Try again.'.
                   format(self.q_rel_name, self.q_lh_uid, self.q_lh_category,
@@ -499,12 +499,12 @@ class Query:
 
         # If relation type specifies a relation between kinds and the lh_object is known
         # then lh_object shall be a kind or kind of occurrence; idem for rh_object
-        elif (self.rolePlayersQTypes == 'hierOfKinds'
-              or self.rolePlayersQTypes == 'thingsOfKinds') \
-                and (((lh_integer is False or int_q_lh_uid >= 100)
-                      and self.q_lh_category not in list_of_categories)
-                     or ((rh_integer is False or int_q_rh_uid >= 100)
-                         and self.q_rh_category not in list_of_categories)):
+        elif (self.rolePlayersQTypes == 'hierOfKinds' or
+                self.rolePlayersQTypes == 'thingsOfKinds') and \
+                (((lh_integer is False or int_q_lh_uid >= 100) and
+                 self.q_lh_category not in list_of_categories) or
+                 ((rh_integer is False or int_q_rh_uid >= 100) and
+                    self.q_rh_category not in list_of_categories)):
             print('Warning: Relation type <{}> relates kinds of things, '
                   'but left {} ({}) or right {} ({}) related things are not kinds. '
                   'Try again.'.
