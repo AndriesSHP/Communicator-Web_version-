@@ -451,8 +451,8 @@ class Gellish_file:
                 # Debug print('Col_ids',lang_name_col_id)
                 for col_id in lang_name_col_id:
                     # Only for rows with a specialization and alias relation
-                    if (db_row[rel_type_uid_col] in self.gel_net.specialRelUIDs
-                            or db_row[rel_type_uid_col] in self.gel_net.alias_uids):
+                    if db_row[rel_type_uid_col] in self.gel_net.specialRelUIDs \
+                            or db_row[rel_type_uid_col] in self.gel_net.alias_uids:
                         # Check whether column value (name of object) is not blank,
                         # then include name_in_context in the dictionary (if not yet present)
                         if in_row[lang_name_col_id[col_id]] != '':
