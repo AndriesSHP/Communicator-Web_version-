@@ -3314,10 +3314,11 @@ class Display_views():
                 if body is True:
                     # Set background color
                     # depending on either header, value present or 'unknown'
-                    if (column_nr == 1 and (field_value in self.comp_head
-                                            or field_value in self.occ_head
-                                            or field_value in self.info_head)) \
-                            or (column_nr == 2 and (field_value in self.part_occ_head)):
+                    if (column_nr == 1 and (
+                            field_value in self.comp_head or
+                            field_value in self.occ_head or
+                            field_value in self.info_head)) \
+                            or column_nr == 2 and field_value in self.part_occ_head:
                         # Header line detected; set background color accordingly
                         head = True
                         back = '#dfb'
