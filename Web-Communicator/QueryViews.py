@@ -1046,6 +1046,7 @@ class Query_view():
                         # Find conceptual quantification (1791) value (on a scale)
                         # Find conceptual compliance criterion/qualif (4902)
                         # or def qualification
+                        # TODO: rewrite overly complex if-and-or statement
                         if role_uid == expr2[lh_uid_col] \
                                 and (expr2[lh_role_uid_col] in self.gel_net.concComplUIDs or
                                      expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs or
