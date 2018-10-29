@@ -30,9 +30,9 @@ class Gellish_file:
     """
 
     def __init__(self, path_and_name, gel_net):
-        ''' Initialize a file that is read from a given location (path)
+        """ Initialize a file that is read from a given location (path)
             The file_name is without path or directory, but with file extension.
-        '''
+        """
         self.path_and_name = path_and_name
         self.gel_net = gel_net
         self.expressions = []
@@ -130,9 +130,9 @@ class Gellish_file:
             self.Import_expressions_from_Gellish_file(f, reader)
 
     def Interpret_non_gellish_JSON_file(self):
-        ''' Read a non-Gellish JSON file and convert it into a Gellish file
+        """ Read a non-Gellish JSON file and convert it into a Gellish file
             Guided by a mapping table
-        '''
+        """
         # Debug print('JSON file: {}'.format(self.json_list))
 
         quantification = [('5737', 'has by definition on scale a value equal to', '6066'),
@@ -286,10 +286,10 @@ class Gellish_file:
                          lang_name, serialization)
 
     def Import_expressions_from_Gellish_file(self, f, reader):
-        ''' Read the expressions from the current file in Gellish expression format
+        """ Read the expressions from the current file in Gellish expression format
             verify its quality
             and add its content to the semantic network
-        '''
+        """
 
         # Initialize expressions table
         self.expressions = []
@@ -523,7 +523,7 @@ class Gellish_file:
             # query.Interpret_query_spec()
 
     def Interpret_the_first_header_line(self):
-        ''' Interpret the (first) header line of a file with Gellish expressions.'''
+        """ Interpret the (first) header line of a file with Gellish expressions."""
 
         # Determine the file type (header[5]) and verify whether base ontology is first provided
         self.base_ontology = False
@@ -636,9 +636,9 @@ class Gellish_file:
                      self.upper_idea_range_uid))
 
     def Determine_highest_uids_in_ranges(self, reader, source_ids, loc_default_row):
-        ''' Determine what the highest uids are within the given ranges
+        """ Determine what the highest uids are within the given ranges
             for the lh and rh objects and for the ideas.
-        '''
+        """
         # Start with the lower value of the ranges
         self.highest_obj_uid = self.lower_obj_range_uid
         self.highest_idea_uid = self.lower_idea_range_uid
@@ -675,7 +675,7 @@ class Gellish_file:
         self.gel_net.new_idea_uid = self.highest_idea_uid + 1
 
     def Clean_whole_number(self, number):
-        ''' Ensure that a whole number is coded as an integer '''
+        """ Ensure that a whole number is coded as an integer """
         integer = True
         dots_removed = number.replace('.', '')
         commas_removed = dots_removed.replace(',', '')
@@ -688,11 +688,11 @@ class Gellish_file:
         return integer, uid
 
     def Rearrange_input_row(self, in_row, source_ids, loc_default_row):
-        ''' Rearrange values in in_row into db_row
+        """ Rearrange values in in_row into db_row
             conform the destination column ids specified in source_id_dict.
             Missing values are loaded with local default values,
             possibly from an in_row with default values.
-        '''
+        """
         # Load default values in row
         db_row = loc_default_row[:]
         # Put input fields from in_row in destination fields in db_row
@@ -723,12 +723,12 @@ class Gellish_file:
         return db_row
 
     def Verify_row(self, db_row):
-        ''' Verify values in db_row and amend where applicable,
+        """ Verify values in db_row and amend where applicable,
             before loading in semantic network.
             Per rel_type and kind first role and kind of second role
             add/verify kind of role players.
             Collect rows in expressions table.
-        '''
+        """
         correct = True
         # Collect used languages that denote language of left hand objects
         # Verify consistency of language names.

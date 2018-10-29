@@ -2609,8 +2609,7 @@ class Display_views():
                 indiv_parents.append(indiv_line[1])
 
     def Define_expressions_sheet(self):
-        ''' Define expressions view sheet for display of expr_table in Notebook tab
-        '''
+        """Define expressions view sheet for display of expr_table in Notebook tab"""
         self.expr_frame = Frame(self.views_noteb)
         self.expr_frame.grid(column=0, row=0, sticky=NSEW, rowspan=4)
         self.expr_frame.columnconfigure(0, weight=1)
@@ -3642,8 +3641,7 @@ class Display_views():
             self.Determine_category_of_object_view(chosen_object_uid, tree_values)
 
     def Determine_network_tree_values(self):
-        ''' Determine the values on a selected focus row in a network treeview
-        '''
+        """Determine the values on a selected focus row in a network treeview"""
         cur_item = self.network_tree.focus()
         tree_values = []
         if cur_item != '':
@@ -3656,8 +3654,7 @@ class Display_views():
         return tree_values
 
     def Determine_category_of_object_view(self, chosen_object_uid, tree_values):
-        ''' Determine kind of chosen object and as a consequence models and views
-        '''
+        """Determine kind of chosen object and as a consequence models and views"""
         description_text = ['description', 'beschrijving']
         obj_descr_title = ['Information about ', 'Informatie over ']
 

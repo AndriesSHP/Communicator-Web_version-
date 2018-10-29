@@ -58,8 +58,8 @@ class Query:
         self.branches = []
 
     def Specify_query_via_command_line(self):
-        ''' Specify and interpret a query (q) about things in a semantic network.
-            Search for terms in the dictionary'''
+        """ Specify and interpret a query (q) about things in a semantic network.
+            Search for terms in the dictionary"""
 
         # Search in the dictionary (using a filter function), which returns values if
         # 0) search_string is equal to the third position of the first(key) field of an item:
@@ -87,12 +87,12 @@ class Query:
                 search_string = 'd'  # input("\nDisplay results (d): ")
 
     def Interpret_query_line(self, search_string):
-        '''A query line via a command line consists either of a single term string
+        """A query line via a command line consists either of a single term string
            or an expression, being lh_string < rel_string > rh_string = uom_string,
            in which < and > mark the beging and end of a relation type phrase.
            Resulting in a list called 'interpreted':
            [lh_uid,lh_name,rel_uid,rel_name,rh_uid,rh_name,uom_uid,uom_name]
-        '''
+        """
         string_commonalities = ['csi', 'cspi', 'csfi', 'cii', 'cipi', 'cifi']
 
         com = input("\nEnter string commonality (csi, cspi, csfi, cii, cipi, cifi): ")
@@ -190,12 +190,12 @@ class Query:
         return known_strings, interpreted  # list of Booleans, list
 
     def Formulate_query_spec_from_individual(self, selected_kind):
-        ''' Determine from a selected individual (to be modified object)
+        """ Determine from a selected individual (to be modified object)
             a query_spec that searches for
             subtypes of its kind (selected_kind)
             that satisfy the aspects of the individual object.
             Thus using the aspects of the individual as criteria for selection of options.
-        '''
+        """
         shall_have_as_aspect_phrase = ['shall have as aspect a',
                                        'moet als aspect hebben een']
         shall_be_phrase = ['shall be', 'moet als kwalitatief aspect hebben']
@@ -350,11 +350,11 @@ class Query:
             self.query_spec.append(query_expr)
 
     def Interpret_query_spec(self):
-        ''' Interpret a query_spec, consisting of one or more lines
+        """ Interpret a query_spec, consisting of one or more lines
             and if a single object is requested, then build product model and view
             or when possibly multiple objects are resulting, then execute the query
             and build the various product models and views.
-        '''
+        """
         self.obj_list[:] = []
         # Debug print('Query_spec:', self.query_spec)
         # If the query interpretation found a single known object
@@ -401,9 +401,9 @@ class Query:
             self.Execute_query()
 
     def Create_query_file(self):
-        ''' Create a file in Gellish Expression format
+        """ Create a file in Gellish Expression format
             on the basis of self.query_spec
-        '''
+        """
         # Debug print('Query_spec example:', self.query_spec)
         # Query_spec example:
         # [['251691', 'three core cable', '4956', 'shall have as aspect a',
@@ -852,10 +852,10 @@ class Query:
             self.Other_views()
 
     def Record_and_verify_candidate_object(self, expr):
-        ''' Identify candidate object and add object to list of candidates,
+        """ Identify candidate object and add object to list of candidates,
             if not yet present
             then verify additional conditions, if present
-        '''
+        """
         candid_uid = expr[lh_uid_col]
         if candid_uid not in self.candid_uid_dict:
             candid = self.gel_net.uid_dict[candid_uid]
@@ -876,10 +876,10 @@ class Query:
                 self.Verify_conditions(candid, expr)
 
     def Find_candidates(self, rhq):
-        ''' Search for relations with object rhq
+        """ Search for relations with object rhq
             that comply with the kind of relation in the query
             and collect the relations in self.candid_expressions
-        '''
+        """
         for obj_rel in rhq.relations:
             expr = obj_rel.expression
             # If relation of q_rh_obj is equal to self.q_rel_uid or one of its subtypes
@@ -1019,12 +1019,12 @@ class Query:
             self.query_spec.append(condition[:])
 
     def Verify_conditions(self, candid_obj, candidate_expr):
-        ''' Conditions found thus
+        """ Conditions found thus
             verify whether the candidate object identified by self.candid_expressions
             satisfies the entered conditions, if any,
             and store the results in the self.answer_expressions
             with the same column definitions as the expressions.
-        '''
+        """
         cond_satisfied = True
         candid_expr = candidate_expr
         # Conditions found thus check candidate expressions on conditions
