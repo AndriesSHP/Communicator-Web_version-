@@ -98,29 +98,29 @@ if __name__ == "__main__":
     # print all items that have "pump" as the third field in the key:
     candidates = d.filter_on_key("pump", 'csi')
     for candidate in candidates:
-        print ("case sensitive identical (pump): ", candidate)
+        print("case sensitive identical (pump): ", candidate)
 
     # print all items that contain "Pu" at the front end of the third field of the key:
     candidates = d.filter_on_key("Pu", 'csfi')
     for candidate in candidates:
-        print ("case sensitive front end identical (Pu): ", candidate)
+        print("case sensitive front end identical (Pu): ", candidate)
 
     # print all items that contain "ump" as a string somewhere in the third field of the key:
     candidates = d.filter_on_key("ump", 'cspi')
     for candidate in candidates:
-        print ("case sensitive partially identical (ump): ", candidate)
+        print("case sensitive partially identical (ump): ", candidate)
 
     # print all items that have "pump" as the third field in the key:
     candidates = d.filter_on_key("pump", 'cii')
     for candidate in candidates:
-        print ("case insensitive identical (pump): ", candidate)
+        print("case insensitive identical (pump): ", candidate)
 
     # print all items that contain "pu" at the front end of the third field of the key:
     candidates = d.filter_on_key("pu", 'cifi')
     for candidate in candidates:
-        print ("case insensitive front end identical (pu): ", candidate)
+        print("case insensitive front end identical (pu): ", candidate)
 
     # print all items that contain "i" as a string somewhere in the third field of the key:
     candidates = d.filter_on_key("i", 'cipi')
     for candidate in candidates:
-        print ("case insensitive partially identical (i): ", candidate)
+        print("case insensitive partially identical (i): ", candidate)
