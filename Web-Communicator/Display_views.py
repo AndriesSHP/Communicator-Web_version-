@@ -22,10 +22,10 @@ from QueryViews import MyTable
 from Anything import Relation
 
 class Display_views():
-    ''' Various models about object(s)
+    """ Various models about object(s)
         are created resulting from a query on a semantic network
-        and the are presented in various treeviews in a notebook.
-    '''
+        and the models are presented in various treeviews in a notebook.
+    """
     def __init__(self, gel_net, user_interface):
         self.gel_net = gel_net
         self.user_interface = user_interface
@@ -96,7 +96,7 @@ class Display_views():
         self.modification = None
 
     def empty_models(self):
-        ''' Make models empty enabling the creation of new models'''
+        """ Make models empty enabling the creation of new models"""
         self.network_model[:] = []
         self.rels_in_network_model[:] = []
         self.kind_model[:] = []
@@ -128,7 +128,7 @@ class Display_views():
         self.indiv_uom_names[:] = ['', '', '', '', '']
 
     def Build_product_views(self, obj_list):
-        ''' Create product model views for one or more objects in obj_list.'''
+        """ Create product model views for one or more objects in obj_list."""
 
         self.empty_models()
 
@@ -151,13 +151,13 @@ class Display_views():
             self.Build_single_product_view(obj)
 
     def Build_single_product_view(self, obj):
-        ''' Create various model views for a single object,
+        """ Create various model views for a single object,
             being either an individual thing or a kind.
             This includes a network_model,
             kind_model, prod_model, expr_table (with Gellish expressions),
             taxon_model (taxonomy view), summ_model (multi-product view),
             possibilities_model and indiv_model.
-        '''
+        """
 
         # Verify whether object is excluded from list of candidates
         if obj in self.user_interface.query.ex_candids:
@@ -318,11 +318,11 @@ class Display_views():
             self.Occurs_and_involvs(obj)
 
     def Add_line_to_network_model(self, rel_obj, expr):
-        ''' Add a row to the network_model for display in a network view.
-            rel_obj is the relation object which lh or rh object is the object in focus.
+        """ Add a row to the network_model for display in a network view.
+            rel_obj is the relation object whereas lh or rh object is the object in focus.
             expr is the full expression.
             Branch is an expression that is added to the network_model.
-        '''
+        """
         # If the left hand object is the object in focus,
         # then find the base phrase or inverse phrase for the relation
         # in the preferred language and language community
@@ -389,14 +389,14 @@ class Display_views():
                     equality, value_name, uom_name, value_uid, uom_uid = \
                         self.Determine_aspect_value(aspect, qualifier)
                     branch += [equality, value_name, uom_name]
-                    print('Branch:', branch)
+                    # Debug print('Branch:', branch)
                 self.network_model.append(branch)
             else:
                 self.network_model.append(branch)
             # Debug print('Branch-3:', rel_obj.phrase_type_uid, branch)
 
     def Create_prod_model_view_header(self, obj):
-        ''' Create prod_model view header '''
+        """ Create prod_model view header """
 
         # Verify if object is classified or has a supertype
         # === should become the status of the classification cr specialization relation ===
@@ -746,9 +746,9 @@ class Display_views():
         return nr_of_aspects
 
     def Determine_aspect_value(self, aspect, qualifier):
-        ''' Determine the equality, value and unit of measure of the aspect object.
+        """ Determine the equality, value and unit of measure of the aspect object.
             And if found, then add expression to expr_table and network_model
-        '''
+        """
         # Verify if the aspect of the individual object is classified
         # (thus no qualitative aspect found)
         if qualifier is 'quantitative':
@@ -843,10 +843,10 @@ class Display_views():
         return equality, value_name, uom_name, value_uid, uom_uid
 
     def Find_information_about_object(self, obj):
-        ''' Search for information and files about the object obj
+        """ Search for information and files about the object obj
             (kind or individual)
             (and its supertypes?) and build info_model
-        '''
+        """
         # obj_head = ['Object', 'Object']
         info_head = ['Document', 'Document']
         dir_head = ['Directory', 'Directory']
@@ -1138,7 +1138,7 @@ class Display_views():
         self.decomp_level += - 1
 
     def Find_kinds_of_aspects(self, obj, role):
-        ''' Search for kinds of aspects that can/shall or are by definition possessed
+        """ Search for kinds of aspects that can/shall or are by definition possessed
             by a kind of thing (obj)
             and search for their qualitative subtypes
             and possible collection of allowed values.
@@ -1148,7 +1148,7 @@ class Display_views():
                            0 = objectInFocus, 1 = part, 2 = part of part, etc.
             obj.category = category of the object in focus,
                 being individual or kind or phys object or occurrence or kind of occurrence
-        '''
+        """
 
         # unknownKind = ['unknown supertype', 'onbekend supertype']
         # noValuesText = ['No specification', 'Geen specificatie']
@@ -1538,9 +1538,9 @@ class Display_views():
         return nr_of_aspects
 
     def Determine_preferred_kind_name(self, obj):
-        ''' Determine the preferred name of the first kind that classified obj
+        """ Determine the preferred name of the first kind that classified obj
             or the name of the first supertype of obj.
-        '''
+        """
         kind = None
         if len(obj.classifiers) > 0:
             kind = obj.classifiers[0]
@@ -1556,7 +1556,7 @@ class Display_views():
         return kind_name, kind_uid
 
     def Determine_supertypes(self, obj):
-        ''' Collect a list of obj and its supertypes, including super_supers, etc. '''
+        """ Collect a list of obj and its supertypes, including super_supers, etc. """
         all_supers = []
         direct_supers = obj.supertypes
         if len(direct_supers) > 0:
@@ -1730,7 +1730,7 @@ class Display_views():
                                   part_uid, part_kind_uid, aspect_uid, nr_of_aspects,
                                   part_name, role, part_kind_name,
                                   aspect_name, equality, value_name, uom_name, status):
-        ''' Create a line_type 3 for product model view '''
+        """ Create a line_type 3 for product model view """
         self.line_nr += 1
         # Decomp_level = 0 means object in focus, 1 means: part (2 = part of part, etc.)
         if self.decomp_level == 1 and nr_of_aspects <= 1:
@@ -1761,9 +1761,9 @@ class Display_views():
             self.kind_model.append(prod_line_3)
 
     def Determine_individuals(self, obj):
-        ''' Determine whether a kind_in_focus (obj) is a classifier for individual things
+        """ Determine whether a kind_in_focus (obj) is a classifier for individual things
             if so, then add individual things to taxonomy (taxon_model) of kinds
-        '''
+        """
         has_as_individuals = ['classifies as individual ',
                               'classificeert als individuele ']
         first_time = True
@@ -2081,7 +2081,7 @@ class Display_views():
                 self.PartOfOccur(part_occ, part_level)
 
     def Display_notebook_views(self):
-        ''' For non-empty models define and display a treeview in a notebook tab.'''
+        """ For non-empty models define and display a treeview in a notebook tab."""
         done = False
         # Define and display Network view sheet
         if len(self.network_model) > 0:
@@ -2160,6 +2160,9 @@ class Display_views():
             self.user_interface.log_frame.append(text_en)
 
     def Define_and_display_network(self):
+        """ Define a network view and
+            display the network of relations about the concept in focus.
+        """
         # Destroy earlier network_frame
         try:
             self.user_interface.views_noteb.remove_child(self.network_tree)
@@ -2171,44 +2174,54 @@ class Display_views():
         self.Display_network_view()
 
     def Define_network_sheet(self):
-        ''' Define a network sheet for display of network_model (a list of network rows)
+        """ Define a network sheet for display of network_model (a list of network rows)
             for display in a tab of Notebook
-        '''
+        """
         network_text = ['Network', 'Netwerk']
+        network_name = network_text[self.GUI_lang_index] + ' of ' + self.object_in_focus.name
         self.network_frame = gui.VBox(width='100%', height='80%',
                                       style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.network_frame,
-                                                network_text[self.GUI_lang_index], self.tab_cb)
+                                                network_name, self.tab_cb)
 
         net_button_text = ['Display network of left-object', 'Toon netwerk van linker object']
         lh_button_text = ['Display details of left object', 'Toon details van linker object']
         rh_button_text = ['Display details of kind', 'Toon details van soort']
         classif_button_text = ['Classify left individual object',
                                'Classificeer linker individueel object']
+        close_button_text = ['Close', 'Sluit']
 
         self.button_row = gui.HBox(height=20, width='100%')
-        self.net_button = gui.Button(net_button_text[self.GUI_lang_index], width=200, height=20)
+        self.net_button = gui.Button(net_button_text[self.GUI_lang_index], width='15%', height=20)
         self.net_button.attributes['title'] = 'Press button after selection of left hand object'
         self.net_button.onclick.connect(self.Prepare_lh_object_network_view)
 
-        self.lh_button = gui.Button(lh_button_text[self.GUI_lang_index], width=200, height=20)
+        self.lh_button = gui.Button(lh_button_text[self.GUI_lang_index], width='15%', height=20)
         self.lh_button.attributes['title'] = 'Press button after selection of left hand object'
         self.lh_button.onclick.connect(self.Prepare_lh_network_object_detail_view)
 
-        self.rh_button = gui.Button(rh_button_text[self.GUI_lang_index], width=200, height=20)
+        self.rh_button = gui.Button(rh_button_text[self.GUI_lang_index], width='15%', height=20)
         self.rh_button.attributes['title'] = 'Press button after selection of right hand object'
         self.rh_button.onclick.connect(self.Prepare_rh_network_object_detail_view)
 
         self.classif_button = gui.Button(classif_button_text[self.GUI_lang_index],
-                                         width=200, height=20)
+                                         width='15%', height=20)
         self.classif_button.attributes['title'] = \
             'Press button after selection of left hand individual object'
         self.classif_button.onclick.connect(self.Prepare_for_classification)
+
+        self.close_button = gui.Button(close_button_text[self.GUI_lang_index],
+                                       width='15%', height=20)
+        self.close_button.attributes['title'] = 'Press button when you want to remave the tag'
+        self.close_button.onclick.connect(self.user_interface.Close_tag,
+                                          self.user_interface.views_noteb,
+                                          network_name)
 
         self.button_row.append(self.net_button)
         self.button_row.append(self.lh_button)
         self.button_row.append(self.rh_button)
         self.button_row.append(self.classif_button)
+        self.button_row.append(self.close_button)
         self.network_frame.append(self.button_row)
 
         # nr_of_cols = 7  # len(self.taxon_column_names)
@@ -2237,9 +2250,9 @@ class Display_views():
         return
 
     def Display_network_view(self):
-        ''' Display a network of all related things
+        """ Display a network of all related things
             that are directly related to the object in focus.
-        '''
+        """
         # Display self.network_model rows in self.network_tree
         parents = []
         # Initialize the list of included names of things
@@ -2289,9 +2302,9 @@ class Display_views():
         self.Display_taxonomy_view()
 
     def Define_taxonomy_sheet(self):
-        ''' Define a taxonomy sheet for display of taxon_model (a list of taxon_rows)
+        """ Define a taxonomy sheet for display of taxon_model (a list of taxon_rows)
             for display in a tab of Notebook
-        '''
+        """
         taxon_text = ['Taxonomy', 'Taxonomie']
         self.taxon_frame = gui.VBox(width='100%', height='100%',
                                     style='background-color:#eeffdd')
@@ -2323,7 +2336,7 @@ class Display_views():
         self.taxon_tree.append_from_list(taxon_uom_heading, fill_title=False)
 
     def Display_taxonomy_view(self):
-        ''' Display a treeview with the taxonomy of the object in focus.'''
+        """ Display a treeview with the taxonomy of the object in focus."""
 
         # Display self.taxon_model rows in self.taxon_tree
         parents = []
@@ -2362,9 +2375,9 @@ class Display_views():
             self.Display_summary_view()
 
     def Define_summary_sheet(self):
-        ''' Define a summary_sheet for display of summ_model(a list of summary_rows)
+        """ Define a summary_sheet for display of summ_model(a list of summary_rows)
             for display in a tab of Notebook
-        '''
+        """
         self.summ_frame = Frame(self.views_noteb)
         self.summ_frame.grid(column=0, row=0, sticky=NSEW)  # pack(fill=BOTH, expand=1)
         self.summ_frame.columnconfigure(0, weight=1)
@@ -2418,7 +2431,7 @@ class Display_views():
         self.summ_tree.bind(sequence='<Double-1>', func=self.Summ_detail_view)
 
     def Display_summary_view(self):
-        ''' Display a summary view that provides a list of items and their aspects.'''
+        """ Display a summary view that provides a list of items and their aspects."""
         # Display the header row with units of measure in summ_tree treeview
         self.summ_tree.insert('', index='end', values=self.summ_uom_names, tags='uom_tag')
         # Display the various summ_model rows in summ_tree treeview
@@ -2461,10 +2474,10 @@ class Display_views():
                 parents.append(possib_line[2])
 
     def Define_possibilities_sheet(self):
-        ''' Define a possibilities_sheet for display of possibilities_model
+        """ Define a possibilities_sheet for display of possibilities_model
             (a list of possib_rows)
             for display in a tab of Notebook
-        '''
+        """
         self.possib_frame = Frame(self.views_noteb)
         self.possib_frame.grid(column=0, row=0, sticky=NSEW, rowspan=2)
         self.possib_frame.columnconfigure(0, weight=1)
@@ -2535,10 +2548,10 @@ class Display_views():
         self.Display_composition_view()
 
     def Define_composition_sheet(self):
-        ''' Define a sheet for display of an individual thing
+        """ Define a sheet for display of an individual thing
             (indiv_model, a list of indiv_rows)
             for display in a tab of Notebook
-        '''
+        """
         self.indiv_frame = Frame(self.views_noteb)
         self.indiv_frame.grid(column=0, row=0, sticky=NSEW)  # pack(fill=BOTH, expand=1)
         self.indiv_frame.columnconfigure(0, weight=1)
@@ -2593,9 +2606,9 @@ class Display_views():
         self.indiv_tree.bind(sequence='<Double-1>', func=self.Indiv_detail_view)
 
     def Display_composition_view(self):
-        ''' Display rows in indiv_model (composition of individual object)
+        """ Display rows in indiv_model (composition of individual object)
             in composition sheet view
-        '''
+        """
         # Display header row with units of measure
         self.indiv_tree.insert('', index='end', values=self.indiv_uom_names, tags='uom_tag')
         # Display self.indiv_model rows in self.indiv_tree
@@ -2609,8 +2622,8 @@ class Display_views():
                 indiv_parents.append(indiv_line[1])
 
     def Define_expressions_sheet(self):
-        ''' Define expressions view sheet for display of expr_table in Notebook tab
-        '''
+        """ Define expressions view sheet for display of expr_table in Notebook tab
+        """
         self.expr_frame = Frame(self.views_noteb)
         self.expr_frame.grid(column=0, row=0, sticky=NSEW, rowspan=4)
         self.expr_frame.columnconfigure(0, weight=1)
@@ -2816,7 +2829,7 @@ class Display_views():
         self.Display_kind_model_view()
 
     def Define_kind_model_sheet(self):
-        ''' Kind_model View tab sheet for a kind in Notebook'''
+        """ Kind_model View tab sheet for a kind in Notebook"""
         self.kind_frame = Frame(self.views_noteb)
         self.kind_frame.grid(column=0, row=0, sticky=NSEW)  # pack(fill=BOTH, expand=1)
         self.kind_frame.columnconfigure(0, weight=1)
@@ -2895,10 +2908,10 @@ class Display_views():
         self.kind_tree.bind(sequence='<Button-3>', func=self.Kind_detail_view_right)
 
     def Display_kind_model_view(self):
-        ''' Kind_model Model view of a kind: Display prod_model in self.kind_tree:
+        """ Kind_model Model view of a kind: Display prod_model in self.kind_tree:
             self.kind_tree.insert('',index=0,iid='UIDInFocus',values=[nameInFocus,kindDat],
             tags='focus_tag',open=True)
-        '''
+        """
         unknownVal = ['unknown value', 'onbekende waarde']
         # unknownKind = ['unknown kind', 'onbekende soort']
         level0Part = ''
@@ -2985,9 +2998,9 @@ class Display_views():
         self.Display_product_model_view()
 
     def Define_product_model_sheet(self):
-        ''' Product_model view tab sheet in Notebook
+        """ Product_model view tab sheet in Notebook
             Preceded by a frame with a number of buttons corresponding with binds
-        '''
+        """
         self.prod_frame = Frame(self.views_noteb)
         self.prod_frame.grid(column=0, row=0, sticky=NSEW, columnspan=6, rowspan=4)
         self.prod_frame.columnconfigure(0, weight=1)
@@ -3063,10 +3076,10 @@ class Display_views():
         self.prod_tree.bind(sequence='c', func=self.Prod_detail_view_middle)
 
     def Display_product_model_view(self):
-        ''' Product Model view: Display prod_model in self.prod_tree:
+        """ Product Model view: Display prod_model in self.prod_tree:
             self.prod_tree.insert('',index=0,iid='UIDInFocus',values=[nameInFocus,kindDat],
             tags='focus_tag',open=True)
-        '''
+        """
         unknownVal = ['unknown value', 'onbekende waarde']
         # unknownKind = ['unknown kind', 'onbekende soort']
         further_part = ['Further part', 'Verder deel']
@@ -3226,7 +3239,7 @@ class Display_views():
         data_canvas.config(yscrollcommand=data_scroll.set)
 
     def Display_data_sheet_view(self):
-        ''' Produce a view of a product model in the form of a datasheet'''
+        """ Produce a view of a product model in the form of a datasheet"""
         unknownVal = ['unknown value', 'onbekende waarde']
         unknownKind = ['unknown kind', 'onbekende soort', 'anything', 'iets']
 
@@ -3404,9 +3417,9 @@ class Display_views():
         self.act_tree.config(yscrollcommand=actScroll.set)
 
     def Display_occ_model_view(self):
-        ''' Display activities and occurrences in self.act_tree
+        """ Display activities and occurrences in self.act_tree
             Followed by a display of IDEF0 diagram(s)
-        '''
+        """
 
         self.act_tree.tag_configure('head_tag', option=None, background='#dfd')
         if len(self.occ_model) > 0:
@@ -3458,7 +3471,7 @@ class Display_views():
         self.occ_level = 1
 
     def Define_and_display_documents(self):
-        ''' Define documents view and display documents in view.'''
+        """ Define documents view and display documents in view."""
         # Destroy earlier documents sheet
         try:
             self.doc_frame.destroy()
@@ -3498,7 +3511,7 @@ class Display_views():
         # self.doc_tree.on_table_row_click_right.connect(self.Doc_detail_view)
 
     def Display_documents_sheet(self):
-        ''' Display documents and files for selection for display.'''
+        """ Display documents and files for selection for display."""
         color = '#eeffdd'
         for info_line in self.info_model:
             name = info_line[1]
@@ -3531,10 +3544,10 @@ class Display_views():
             self.Define_and_display_individual_detail_view(selected_obj)
 
     def Prepare_lh_object_network_view(self):
-        ''' Set the uid of the left hand object in a selected treeview row
+        """ Set the uid of the left hand object in a selected treeview row
             as the chosen object
             for display of a new network view and other views.
-        '''
+        """
         tree_values = self.Determine_network_tree_values()
         if len(tree_values) > 0:
             chosen_object_uid = str(tree_values[0])
@@ -3547,10 +3560,10 @@ class Display_views():
             self.Display_notebook_views()
 
     def Prepare_lh_network_object_detail_view(self, widget):
-        ''' Set the uid of the left hand object
+        """ Set the uid of the left hand object
             in a selected network treeview row
             as the chosen object for display of details
-        '''
+        """
         tree_values = self.Determine_network_tree_values()
         if len(tree_values) > 0:
             chosen_object_uid = tree_values[0]
@@ -3558,10 +3571,10 @@ class Display_views():
             self.Determine_category_of_object_view(chosen_object_uid, tree_values)
 
     def Prepare_rh_network_object_detail_view(self, widget):
-        ''' Set the uid of the right hand object
+        """ Set the uid of the right hand object
             in a selected network treeview row
             as the chosen object for display of details
-        '''
+        """
         tree_values = self.Determine_network_tree_values()
         if len(tree_values) > 4:
             chosen_object_uid = tree_values[4]
@@ -3596,10 +3609,10 @@ class Display_views():
                 'om het object te classificeren')
 
     def Classification_of_individual_thing(self, to_be_classified_object_uid, kind_uid):
-        ''' Start a classification process for a to be classified object
+        """ Start a classification process for a to be classified object
             by a subtype of a current classifying kind.
             When completed, a classification relation is added to the classified object.
-        '''
+        """
         self.modification = 'classification started'
         kind = self.uid_dict[kind_uid]
         self.modified_object = self.uid_dict[to_be_classified_object_uid]
@@ -3641,8 +3654,7 @@ class Display_views():
             self.Determine_category_of_object_view(chosen_object_uid, tree_values)
 
     def Determine_network_tree_values(self):
-        ''' Determine the values on a selected focus row in a network treeview
-        '''
+        """ Determine the values on a selected focus row in a network treeview"""
         cur_item = self.network_tree.focus()
         tree_values = []
         if cur_item != '':
@@ -3655,8 +3667,8 @@ class Display_views():
         return tree_values
 
     def Determine_category_of_object_view(self, chosen_object_uid, tree_values):
-        ''' Determine kind of chosen object and as a consequence models and views
-        '''
+        """ Determine kind of chosen object and as a consequence models and views
+        """
         description_text = ['description', 'beschrijving']
         obj_descr_title = ['Information about ', 'Informatie over ']
 
@@ -3974,10 +3986,10 @@ class Display_views():
                     format(self.modified_object.name, selected_obj.name))
 
     def Add_classification_relation(self, modified_object, selected_object):
-        ''' Append the (selected) kind as a classifier to the modified_object,
+        """ Append the (selected) kind as a classifier to the modified_object,
             and then add a classification relation to the classified individual thing
             as well as to the classifying kind.
-        '''
+        """
 
         statement = ['statement', 'bewering']
         modified_object.classifiers.append(selected_object)
