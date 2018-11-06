@@ -26,8 +26,8 @@ class MyTabBox(gui.TabBox):
                 holder.get_parent().remove_child(holder)
                 self._tab_cbs.pop(holder.identifier)
                 identifier = holder.identifier
-            if identifier is not None:
-                self._tabs.pop(holder.identifier)
+        if identifier is not None:
+            self._tabs.pop(holder.identifier)
 
 
 class Communicator(App):
@@ -59,6 +59,7 @@ class Communicator(App):
                                      'Francais': '910039'}
         self.comm_pref_uids = ['492014', 'any']  # Default: 492014 = 'Gellish'
         self.file_path_names = []
+        self.q_view = None
 
         super(Communicator, self).__init__(*args)
 
@@ -178,17 +179,17 @@ class Communicator(App):
         self.Define_log_sheet()
 
     def Define_log_sheet(self):
-        ''' Define a tab and frame for errors and warnings'''
+        ''' Define a frame for errors and warnings'''
         log_head = ['Messages and warnings', 'Berichten en foutmeldingen']
         self.mess_frame = gui.VBox(width='100%', height='20%')
         self.mess_frame.attributes['title'] = 'Display area for messages and warnings'
         self.main_frame.append(self.mess_frame)
         self.log_head = gui.HBox(width='100%', height=20)
         self.log_label = gui.Label(log_head[self.GUI_lang_index], width='100%', height=20,
-                                   style='background-color:#eeffdd')
+                                   style='background-color:#bbffff')
         self.log_head.append(self.log_label)
         self.log_frame = gui.ListView(width='100%', height='100%',
-                                      style='background-color:#ffdddd')
+                                      style='background-color:#ddffff')
         self.mess_frame.append(self.log_head)
         self.mess_frame.append(self.log_frame)
 
@@ -362,7 +363,7 @@ class Communicator(App):
         self.set_root_widget(self.container)
 
     def message_ui(self, mess_text_EN, mess_text_NL):
-        ''' Display a message in the log_frake in any of the languages'''
+        ''' Display a message in the log_frame in any of the languages'''
         if self.GUI_lang_index == 1:
             self.log_frame.append(mess_text_NL)
         else:
@@ -408,10 +409,13 @@ class Communicator(App):
             # Create a query object
             self.query = Query(self.gel_net, self)
 
-            # Enter and Interpret a query
-            q_view = Query_view(self.gel_net, self)
-            # Specify a query via GUI
-            q_view.Define_query_window()
+            if self.q_view is None:
+                # Create a query view object
+                self.q_view = Query_view(self.gel_net, self)
+                # Specify a query window and enable spefiying a query via GUI
+                self.q_view.Define_query_window()
+            else:
+                self.views_noteb.select_by_name('Search')
 
     def Set_reply_language(self, reply_lang_name):
         ''' Set the reply language (name, uid, reply_lang_pref_uids)
@@ -541,6 +545,8 @@ class Communicator(App):
         ''' Close the tabbox in widget with the specified tab_name'''
         # tabbox.select_by_name(ref_widget_tab_name)
         tabbox.remove_tab_by_name(ref_widget_tab_name)
+        if ref_widget_tab_name == 'Search':
+            self.q_view = None
 
 class Semantic_network():
     ''' Dummy class for testing only.'''
