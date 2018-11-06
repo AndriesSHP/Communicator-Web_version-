@@ -411,7 +411,7 @@ class Communicator(App):
             # Enter and Interpret a query
             q_view = Query_view(self.gel_net, self)
             # Specify a query via GUI
-            q_view.Query_window()
+            q_view.Define_query_window()
 
     def Set_reply_language(self, reply_lang_name):
         ''' Set the reply language (name, uid, reply_lang_pref_uids)
@@ -537,6 +537,10 @@ class Communicator(App):
 
         return lang_name, comm_name, obj_name, full_def
 
+    def Close_tag(self, widget, tabbox, ref_widget_tab_name):
+        ''' Close the tabbox in widget with the specified tab_name'''
+        # tabbox.select_by_name(ref_widget_tab_name)
+        tabbox.remove_tab_by_name(ref_widget_tab_name)
 
 class Semantic_network():
     ''' Dummy class for testing only.'''

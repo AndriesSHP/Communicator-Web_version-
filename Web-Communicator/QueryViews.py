@@ -80,7 +80,7 @@ class Query_view():
         self.aliases_widget = False
         self.aspects_widget = False
 
-    def Query_window(self):
+    def Define_query_window(self):
         """ Specify a Search term or UID
             or a Query expression with unknowns and possible multiline conditions.
             Display options for found objects that satisfy the search or query.
@@ -150,9 +150,9 @@ class Query_view():
 
         close_button = gui.Button(close[self.GUI_lang_index], width=100, height=20)
         close_button.attributes['title'] = 'Close the search window'
-        close_button.onclick.connect(self.Close_query,
+        close_button.onclick.connect(self.user_interface.Close_tag,
                                      self.user_interface.views_noteb,
-                                     self.query_widget)
+                                     query_text[self.GUI_lang_index])  # self.query_widget,
 
         # Widget locations in grid
         self.first_line_widget.append(case_sensitive_box)
@@ -1206,7 +1206,7 @@ class Query_view():
         self.query.q_lh_name = self.q_lh_name_widget.get_text()
         self.query.query_expr = [self.query.q_lh_uid, self.query.q_lh_name]
 
-        # Delete earlier definition text in query_window.
+        # Delete earlier definition text in query view.
         self.full_def_widget.set_text('')
 
         # If lh_object is known then determine and display its full definition
@@ -1336,9 +1336,3 @@ class Query_view():
         self.query.Interpret_query_spec()
         # Display query results in notebook sheets
         self.views.Display_notebook_views()
-
-    def Close_query(self, widget, tabbox, refWidgetTab):
-        ''' Close the tab about the Search'''
-        query_text = ["Search", "Zoek"]
-        tabbox.select_by_widget(refWidgetTab)
-        tabbox.remove_tab_by_name(query_text[self.GUI_lang_index])
