@@ -2182,7 +2182,7 @@ class Display_views():
         self.network_frame = gui.VBox(width='100%', height='80%',
                                       style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.network_frame,
-                                                network_name, self.tab_cb)
+                                                network_name, self.tab_cb(network_name))
 
         net_button_text = ['Display network of left-object', 'Toon netwerk van linker object']
         lh_button_text = ['Display details of left object', 'Toon details van linker object']
@@ -2212,7 +2212,7 @@ class Display_views():
 
         self.close_button = gui.Button(close_button_text[self.GUI_lang_index],
                                        width='15%', height=20)
-        self.close_button.attributes['title'] = 'Press button when you want to remave the tag'
+        self.close_button.attributes['title'] = 'Press button when you want to remove this tag'
         self.close_button.onclick.connect(self.user_interface.Close_tag,
                                           self.user_interface.views_noteb,
                                           network_name)
@@ -2246,7 +2246,8 @@ class Display_views():
         # self.network_tree.on_table_row_i_key_click.connect(self.Network_object_detail_view)
         # self.network_tree.on_table_row_right_click.connect(self.Network_object_detail_view)
 
-    def tab_cb(self):
+    def tab_cb(self, tab_name):
+        self.user_interface.views_noteb.select_by_name(tab_name)
         return
 
     def Display_network_view(self):
@@ -2306,10 +2307,11 @@ class Display_views():
             for display in a tab of Notebook
         """
         taxon_text = ['Taxonomy', 'Taxonomie']
+        taxon_name = taxon_text[self.GUI_lang_index] + ' of ' + self.object_in_focus.name
         self.taxon_frame = gui.VBox(width='100%', height='100%',
                                     style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.taxon_frame,
-                                                taxon_text[self.GUI_lang_index], self.tab_cb)
+                                                taxon_name, self.tab_cb(taxon_name))
 
         headings = ['UID', 'Name', 'Kind', 'Community',
                     'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4',
@@ -3483,10 +3485,11 @@ class Display_views():
 
     def Define_documents_sheet(self):
         doc_text = ['Documents', 'Documenten']
+        doc_name = doc_text[self.GUI_lang_index] + ' about ' + self.object_in_focus.name
         self.doc_frame = gui.VBox(width='100%', height='100%',
                                   style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.doc_frame,
-                                                doc_text[self.GUI_lang_index], self.tab_cb)
+                                                doc_name, self.tab_cb(doc_name))
         headings = ['info', 'obj', 'carrier', 'directory', 'Info', 'Kind of info', 'Directory',
                     'Name of object', 'File name', 'Kind of file']
         display_cols = list(headings[4:])
