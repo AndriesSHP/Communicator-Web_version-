@@ -100,15 +100,15 @@ class Query_view():
                                                 query_text[self.GUI_lang_index],
                                                 self.user_interface.tab_cb)
 
-        self.first_line_widget = gui.HBox(height=20, width=730, margin='5px',
-                                          style='position: relative; background-color: #eeffdd')
+        self.first_line_widget = gui.HBox(height=20, width=750, margin='4px',
+                                          style='position: static; background-color: #eeffdd')
 
-        # Define reply language with language selector
+        # Define a reply language with the language selector
         lang_text = ['Reply language:', 'Antwoordtaal:']
         reply_text = ['Select the language used for display of search results',
                       'Kies de taal waarin zoekresultaten weergegeven worden']
         self.reply_lang_label = gui.Label(lang_text[self.GUI_lang_index], width=100, height=20,
-                                          style={'margin-left': '110px'})
+                                          style={'margin-left': '10px'})
         self.reply_lang_label.attributes['title'] = reply_text[self.GUI_lang_index]
 
         # Set default language: reply_lang_names[0] = English, [1] = Nederlands
@@ -130,18 +130,18 @@ class Query_view():
         case_sensitive_box = gui.CheckBox(checked=True, width=10, height=20)
         case_sensitive_box.attributes['title'] = 'Tick when search string is case sensitive'
         case_sensitive_box.onchange.connect(self.set_case)
-        case_sensitive_text = gui.Label(case_text[self.GUI_lang_index], width=150, height=20)
+        case_sensitive_text = gui.Label(case_text[self.GUI_lang_index], width=110, height=20)
         case_sensitive_text.attributes['title'] = 'Tick when search string is case sensitive'
 
         front_end_box = gui.CheckBox(checked=True, width=10, height=20)
         front_end_box.attributes['title'] = \
             'Tick when search string shall match with first character(s) of found string'
         front_end_box.onchange.connect(self.set_front_end)
-        front_end_text = gui.Label(front_end[self.GUI_lang_index], width=150, height=20)
+        front_end_text = gui.Label(front_end[self.GUI_lang_index], width=110, height=20)
         front_end_text.attributes['title'] = \
             'Tick when search string shall match with first character(s) of found string'
 
-        # Buttons definition
+        # Define buttons for confimation of the selection and for closing the tag
         confirm = ['Confirm', 'Bevestig']
         close = ['Close', 'Sluit']
         confirm_button = gui.Button(confirm[self.GUI_lang_index], width=100, height=20)
@@ -157,17 +157,13 @@ class Query_view():
         # Widget locations in grid
         self.first_line_widget.append(case_sensitive_box)
         self.first_line_widget.append(case_sensitive_text)
+        self.first_line_widget.append(front_end_box)
+        self.first_line_widget.append(front_end_text)
         self.first_line_widget.append(self.reply_lang_label)
         self.first_line_widget.append(self.reply_lang_box)
         self.first_line_widget.append(confirm_button)
         self.first_line_widget.append(close_button)
         self.query_widget.append(self.first_line_widget)
-
-        self.second_line_widget = gui.HBox(height=20, width=190, margin='5px',
-                                           style='background-color:#eeffdd')
-        self.second_line_widget.append(front_end_box)
-        self.second_line_widget.append(front_end_text)
-        self.query_widget.append(self.second_line_widget)
 
         # Define English and Dutch example values (initial options) for query
         lhTermListEN = ['?', 'Paris', 'Eiffel tower', 'France']
@@ -289,46 +285,21 @@ class Query_view():
         self.fourth_line_widget.append(self.full_def_widget)
 
         # Aliases, options and aspects boxes on sixth line
-        self.sixth_line_box = gui.HBox(height=600, width='100%',
+        self.sixth_line_box = gui.HBox(height=240, width='100%',
                                        style={'background-color': '#eeffdd'})
         self.sixth_line_box.style['justify-content'] = 'flex-start'
 
         self.query_widget.append(self.sixth_line_box)
 
-        # Aliases and options in sixth_line_left_box
+        # Options and aliases in sixth_line_left_box
         self.sixth_line_left_box = gui.VBox(height='99%', width='60%',
-                                            style={'background-color': '#eeffdd',
+                                            style={'overflow': 'scroll',
+                                                   'background-color': '#eeffdd',
                                                    "border-width": "3px",
                                                    "border-style": "solid"})
         self.sixth_line_left_box.style['justify-content'] = 'flex-start'
         self.sixth_line_left_box.style['align-items'] = 'flex-start'
         # self.sixth_line_box.append(self.sixth_line_left_box)
-
-        # Aliases display label
-        aliasText = ['Aliases for the name of the selected object:',
-                     'Aliases voor de naam van het geselecteerde object:']
-        self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width='100%')
-        self.alias_label.attributes['title'] = 'A table with synonyms, abbreviations and ' \
-                                               'translations of the name of the selected object'
-        # self.sixth_line_left_box.append(self.alias_label)
-
-        lang_text = ('Language', 'Taal')
-        term_text = ('Term', 'Term')
-        alias_text = ('Alias type', 'Aliastype')
-
-        self.aliases_table_widget = gui.Table(width='100%',
-                                              style={"overflow": "auto",
-                                                     "background-color": "#eeffdd",
-                                                     "border-width": "2px",
-                                                     "border-style": "solid",
-                                                     "font-size": "12px",
-                                                     'table-layout': 'auto'})
-        self.aliases_table_head = [(lang_text[self.GUI_lang_index],
-                                    term_text[self.GUI_lang_index],
-                                    alias_text[self.GUI_lang_index])]
-        self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
-        # self.sixth_line_left_box.append(self.aliases_table_widget)
-        self.aliases_widget = False
 
         # Options for selection widgets definition
         select_term = ["Select one of the following options:",
@@ -345,24 +316,50 @@ class Query_view():
         # right_col = ['Right UID', 'Rechter UID']
 
         self.options_table = MyTable(width='100%',
-                                     style={"overflow": "auto", "background-color": "#eeffdd",
-                                            "border-width": "2px", "border-style": "solid",
-                                            "font-size": "12px", 'table-layout': 'auto'})
+                                     style={'overflow': 'scroll', 'background-color': '#eeffdd',
+                                            'border-width': '2px', 'border-style': 'solid',
+                                            'font-size': '12px', 'table-layout': 'auto'})
         self.options_table_head = [(uid_col[self.GUI_lang_index],
                                     name_col[self.GUI_lang_index],
                                     kind_col[self.GUI_lang_index],
                                     comm_col[self.GUI_lang_index],
                                     lang_col[self.GUI_lang_index])]
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
-
         self.options_table.on_table_row_click.connect(self.Set_selected_q_lh_term)
         # self.sixth_line_left_box.append(self.options_table)
         self.options_widget = False
 
+        # Aliases display label
+        aliasText = ['Aliases for the name of the selected object:',
+                     'Aliases voor de naam van het geselecteerde object:']
+        self.alias_label = gui.Label(aliasText[self.GUI_lang_index], height=20, width='100%')
+        self.alias_label.attributes['title'] = 'A table with synonyms, abbreviations and ' \
+                                               'translations of the name of the selected object'
+        # self.sixth_line_left_box.append(self.alias_label)
+
+        lang_text = ('Language', 'Taal')
+        term_text = ('Term', 'Term')
+        alias_text = ('Alias type', 'Aliastype')
+
+        self.aliases_table_widget = gui.Table(width='100%',
+                                              style={'overflow': 'scroll',
+                                                     'background-color': '#eeffdd',
+                                                     'border-width': '2px',
+                                                     'border-style': 'solid',
+                                                     'font-size': '12px',
+                                                     'table-layout': 'auto'})
+        self.aliases_table_head = [(lang_text[self.GUI_lang_index],
+                                    term_text[self.GUI_lang_index],
+                                    alias_text[self.GUI_lang_index])]
+        self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
+        # self.sixth_line_left_box.append(self.aliases_table_widget)
+        self.aliases_widget = False
+
         # Aspect frame widget
         self.aspects_frame = gui.VBox(height='99%', width='39%',
-                                      style={'background-color': '#eeffdd',
-                                             "border-width": "2px", "border-style": "solid"})
+                                      style={'overflow': 'scroll',
+                                             'background-color': '#eeffdd',
+                                             'border-width': '2px', 'border-style': 'solid'})
         self.aspects_frame.style['justify-content'] = 'flex-start'
         self.aspects_frame.style['align-items'] = 'flex-start'
         # Aspects label widget
@@ -381,9 +378,9 @@ class Query_view():
         uom_col = ['UoM', 'Eenheid']
 
         self.aspects_table = MyTable(width='100%',
-                                     style={"overflow": "auto", "background-color": "#eeffdd",
-                                            "border-width": "2px", "border-style": "solid",
-                                            "font-size": "12px", 'table-layout': 'auto'})
+                                     style={'overflow': 'auto', 'background-color': '#eeffdd',
+                                            'border-width': '2px', 'border-style': 'solid',
+                                            'font-size': '12px', 'table-layout': 'auto'})
         self.aspects_table_head = [(aspect_col[self.GUI_lang_index],
                                     eq_col[self.GUI_lang_index],
                                     value_col[self.GUI_lang_index],
@@ -417,10 +414,11 @@ class Query_view():
         self.lh_options[:] = []
         # Remove possible earlier options by making the options_table empty
         if self.options_widget is False:
-            self.sixth_line_box.append(self.sixth_line_left_box)
             self.sixth_line_left_box.append(self.options_heading)
             self.sixth_line_left_box.append(self.options_table)
+            self.sixth_line_left_box.style.update({'overflow-y': 'scroll'})  # Does not work
             self.options_widget = True
+            self.sixth_line_box.append(self.sixth_line_left_box)
 
         self.options_table.empty()
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
@@ -507,10 +505,10 @@ class Query_view():
         self.lh_options[:] = []
         # If no options_table yet, then add options_table to sixth_line_left_box
         if self.options_widget is False:
-            self.sixth_line_box.append(self.sixth_line_left_box)
             self.sixth_line_left_box.append(self.options_heading)
             self.sixth_line_left_box.append(self.options_table)
             self.options_widget = True
+            self.sixth_line_box.append(self.sixth_line_left_box)
         # Remove possible earlier options by making the options_table empty
         self.options_table.empty()
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
