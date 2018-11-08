@@ -179,11 +179,11 @@ class Communicator(App):
         self.Define_log_sheet()
 
     def Define_log_sheet(self):
-        ''' Define a frame for errors and warnings'''
+        ''' Define a mess_frame for errors and warnings'''
         log_head = ['Messages and warnings', 'Berichten en foutmeldingen']
         self.mess_frame = gui.VBox(width='100%', height='20%')
         self.mess_frame.attributes['title'] = 'Display area for messages and warnings'
-        self.main_frame.append(self.mess_frame)
+
         self.log_head = gui.HBox(width='100%', height=20)
         self.log_label = gui.Label(log_head[self.GUI_lang_index], width='100%', height=20,
                                    style='background-color:#bbffff')
@@ -192,6 +192,8 @@ class Communicator(App):
                                       style='background-color:#ddffff')
         self.mess_frame.append(self.log_head)
         self.mess_frame.append(self.log_frame)
+        
+        self.main_frame.append(self.mess_frame)
 
     def tab_cb(self):
         return
@@ -542,7 +544,7 @@ class Communicator(App):
         return lang_name, comm_name, obj_name, full_def
 
     def Close_tag(self, widget, tabbox, ref_widget_tab_name):
-        ''' Close the tabbox in widget with the specified tab_name'''
+        ''' Close the tab in tabbox in widget with the specified tab_name'''
         # tabbox.select_by_name(ref_widget_tab_name)
         tabbox.remove_tab_by_name(ref_widget_tab_name)
         if ref_widget_tab_name == 'Search':
