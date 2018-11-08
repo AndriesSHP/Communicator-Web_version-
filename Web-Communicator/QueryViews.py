@@ -12,9 +12,9 @@ from Create_output_file import Convert_numeric_to_integer
 
 
 class MyTable(gui.Table):
-    ''' A subclass of gui.Table that has the feature
+    """ A subclass of gui.Table that has the feature
         that the last selected row is highlighted.
-    '''
+    """
     @gui.decorate_event
     def on_table_row_click(self, row, item):
         if hasattr(self, "last_clicked_row"):
@@ -25,11 +25,11 @@ class MyTable(gui.Table):
 
 
 class Query_view():
-    ''' Defines a query window
+    """ Defines a query window
         for specification of searched/queries in the semantic network
         of dictionary, knowledge and information,
         including the display of a textual definition, synonyms and translations.
-    '''
+    """
     def __init__(self, gel_net, user_interface):
         self.gel_net = gel_net
         self.user_interface = user_interface
@@ -398,7 +398,7 @@ class Query_view():
             'De antwoordtaal is {}'.format(self.user_interface.reply_lang_name))
 
     def Determine_reply_language(self, widget):
-        ''' Get the user specified reply language and report it.'''
+        """ Get the user specified reply language and report it."""
         reply_lang_name = self.reply_lang_box.get()
         self.user_interface.Set_reply_language(reply_lang_name)
         self.views.Display_message(
@@ -465,7 +465,7 @@ class Query_view():
             pass
 
     def set_case(self, widget, new_value):
-        ''' Depending on user input determine whether the search string is case sensitive'''
+        """ Depending on user input determine whether the search string is case sensitive"""
         case_sens = new_value  # self.case_sensitive_var.get()
         if case_sens:
             self.cs = 'cs'   # case sensitive
@@ -473,8 +473,8 @@ class Query_view():
             self.cs = 'ci'   # case insensitive
 
     def set_front_end(self, widget, new_value):
-        ''' Depending on user input determine whether the front end part of the found name
-            should comply with the front end part of the search string.'''
+        """ Depending on user input determine whether the front end part of the found name
+            should comply with the front end part of the search string."""
         front_end = self.front_end_match_var.get()
         if front_end:
             self.fe = 'fi'   # front end identical
@@ -689,11 +689,11 @@ class Query_view():
                 self.rh_options_tree.insert('', index='end', values=opt)
 
     def Determine_selected_aspects(self, widget, row, item):
-        ''' Determine one or more selected aspects and their values
+        """ Determine one or more selected aspects and their values
             and add them to the query.
             Note: values for the same aspects are alternative options (or)
                   values for different aspects are additional requirements (and).
-        '''
+        """
         aspect_value = []
         self.query.aspect_values = []
         for val in row.children.values():
@@ -1014,10 +1014,10 @@ class Query_view():
                         self.aliases_table_widget.append(row_widget, alias_row[1])
 
     def Determine_aspect_and_value_options(self, lh_obj_sub):
-        ''' Determine in a search the characteristics of lh_object and its subtypes
+        """ Determine in a search the characteristics of lh_object and its subtypes
             and determine the available values for those characteristics.
             These are options for conditions that reduce the selection in a query.
-        '''
+        """
         equality = '='
         for rel_obj in lh_obj_sub.relations:
             expr = rel_obj.expression
@@ -1044,10 +1044,11 @@ class Query_view():
                         # Find conceptual quantification (1791) value (on a scale)
                         # Find conceptual compliance criterion/qualif (4902)
                         # or def qualification
+                        # TODO: rewrite overly complex if-and-or statement
                         if role_uid == expr2[lh_uid_col] \
-                                and (expr2[lh_role_uid_col] in self.gel_net.concComplUIDs
-                                     or expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs
-                                     or expr2[rel_type_uid_col]
+                                and (expr2[lh_role_uid_col] in self.gel_net.concComplUIDs or
+                                     expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs or
+                                     expr2[rel_type_uid_col]
                                      in self.gel_net.subConcComplRelUIDs):
                             values = [expr2[rh_uid_col], '', expr2[rel_type_uid_col],
                                       expr[rh_uid_col], expr[rh_name_col],
@@ -1056,9 +1057,9 @@ class Query_view():
                         # Find conceptual quantification (1791) value (inverse)
                         # Find conceptual compliance criterion (inverse)
                         elif role_uid == expr2[rh_uid_col] \
-                                and (expr2[rh_role_uid_col] in self.gel_net.concComplUIDs
-                                     or expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs
-                                     or expr2[rel_type_uid_col]
+                                and (expr2[rh_role_uid_col] in self.gel_net.concComplUIDs or
+                                     expr2[rel_type_uid_col] in self.gel_net.concQuantUIDs or
+                                     expr2[rel_type_uid_col]
                                      in self.gel_net.subConcComplRelUIDs):
                             values = [expr2[lh_uid_col], '', expr2[rel_type_uid_col],
                                       expr[rh_uid_col], expr[rh_name_col],
@@ -1069,9 +1070,9 @@ class Query_view():
                                 # Debug print('Values:', values)
 
     def Determine_rel_types_for_lh_object(self, lh_object):
-        ''' With given selected lh_object determine which kinds of relations are known
+        """ With given selected lh_object determine which kinds of relations are known
             and store results in self.lh_obj_relation_types
-        '''
+        """
         self.lh_obj_relation_types = []
         for lh_obj_rel in lh_object.relations:
                 expr = lh_obj_rel.expression
@@ -1092,11 +1093,11 @@ class Query_view():
                                 self.lh_obj_relation_types.append(sub_rel_type)
 
     def Determine_aliases(self, obj):
-        ''' Collect the names and translation that are known for obj
+        """ Collect the names and translation that are known for obj
             in the alias_table for display in alias_tree treeview.
             name_in_context = (lang_uid, comm_uid, name, naming_uid, description)
             alias_row = (language, term, alias_type)
-        '''
+        """
         alias_table = []
         languages = []
         for name_in_context in obj.names_in_contexts:
@@ -1334,3 +1335,12 @@ class Query_view():
         self.query.Interpret_query_spec()
         # Display query results in notebook sheets
         self.views.Display_notebook_views()
+<<<<<<< HEAD
+=======
+
+    def Close_query(self, widget, tabbox, refWidgetTab):
+        """ Close the tab about the Search"""
+        query_text = ["Search", "Zoek"]
+        tabbox.select_by_widget(refWidgetTab)
+        tabbox.remove_tab_by_name(query_text[self.GUI_lang_index])
+>>>>>>> d24bbe7cfe7beab8806e02ab12c2677062fe1ec9

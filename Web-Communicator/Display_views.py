@@ -1198,15 +1198,15 @@ class Display_views():
                 # Find expression with poss_of_aspect relations about the object
                 # (or its supertype)
                 if expr[lh_uid_col] == obj_i.uid \
-                        and (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs
-                             and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
+                        and expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs \
+                        and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids:
                     aspect_uid = expr[rh_uid_col]
                     aspect_name = expr[rh_name_col]
                     role_uid = expr[rh_role_uid_col]
                     # role_name = expr[rh_role_name_col]
                 elif expr[rh_uid_col] == obj_i.uid \
-                        and (expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs
-                             and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids):
+                        and expr[rel_type_uid_col] in self.gel_net.subConcPossAspUIDs \
+                        and not expr[rel_type_uid_col] in self.gel_net.conc_playing_uids:
                     aspect_uid = expr[lh_uid_col]
                     aspect_name = expr[lh_name_col]
                     role_uid = expr[lh_role_uid_col]
@@ -1831,8 +1831,8 @@ class Display_views():
         # (involver role players)
         for rel_obj in obj.relations:
             expr = rel_obj.expression
-            if (expr[rh_uid_col] == obj.uid
-                    and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+            if expr[rh_uid_col] == obj.uid \
+                    and expr[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                 occ_uid = expr[lh_uid_col]
                 # occ_name = expr[lh_name_col]
             elif expr[lh_uid_col] == obj.uid \
@@ -1903,14 +1903,14 @@ class Display_views():
                 # or any of its subtypes relations in occ
                 # excluding the object in focus (obj)
                 if expr_occ[rh_uid_col] != obj.uid \
-                        and (expr_occ[lh_uid_col] == occ.uid
-                             and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+                        and expr_occ[lh_uid_col] == occ.uid \
+                        and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                     involved_uid = expr_occ[rh_uid_col]
                     # involved_name = expr_occ[rh_name_col]
                     inv_role_name = expr_occ[rh_role_name_col]
                 elif expr_occ[lh_uid_col] != obj.uid \
-                        and (expr_occ[rh_uid_col] == occ.uid
-                             and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs):
+                        and expr_occ[rh_uid_col] == occ.uid \
+                        and expr_occ[rel_type_uid_col] in self.gel_net.subInvolvUIDs:
                     involved_uid = expr_occ[lh_uid_col]
                     # involved_name = expr_occ[lh_name_col]
                     inv_role_name = expr_occ[lh_role_name_col]
@@ -2698,8 +2698,12 @@ class Display_views():
                 indiv_parents.append(indiv_line[1])
 
     def Define_expressions_sheet(self):
+<<<<<<< HEAD
         """ Define expressions view sheet for display of expr_table in Notebook tab
         """
+=======
+        """Define expressions view sheet for display of expr_table in Notebook tab"""
+>>>>>>> d24bbe7cfe7beab8806e02ab12c2677062fe1ec9
         self.expr_frame = Frame(self.views_noteb)
         self.expr_frame.grid(column=0, row=0, sticky=NSEW, rowspan=4)
         self.expr_frame.columnconfigure(0, weight=1)
@@ -3403,10 +3407,11 @@ class Display_views():
                 if body is True:
                     # Set background color
                     # depending on either header, value present or 'unknown'
-                    if (column_nr == 1 and (field_value in self.comp_head
-                                            or field_value in self.occ_head
-                                            or field_value in self.info_head)) \
-                            or (column_nr == 2 and (field_value in self.part_occ_head)):
+                    if (column_nr == 1 and (
+                            field_value in self.comp_head or
+                            field_value in self.occ_head or
+                            field_value in self.info_head)) \
+                            or column_nr == 2 and field_value in self.part_occ_head:
                         # Header line detected; set background color accordingly
                         head = True
                         back = '#dfb'
@@ -3751,7 +3756,11 @@ class Display_views():
         self.Determine_category_of_object_view(widget.uid, tree_values)
 
     def Determine_network_tree_values(self):
+<<<<<<< HEAD
         """ Determine the values on a selected focus row in a network treeview"""
+=======
+        """Determine the values on a selected focus row in a network treeview"""
+>>>>>>> d24bbe7cfe7beab8806e02ab12c2677062fe1ec9
         cur_item = self.network_tree.focus()
         tree_values = []
         if cur_item != '':
@@ -3764,8 +3773,12 @@ class Display_views():
         return tree_values
 
     def Determine_category_of_object_view(self, chosen_object_uid, tree_values):
+<<<<<<< HEAD
         """ Determine kind of chosen object and as a consequence models and views
         """
+=======
+        """Determine kind of chosen object and as a consequence models and views"""
+>>>>>>> d24bbe7cfe7beab8806e02ab12c2677062fe1ec9
         description_text = ['description', 'beschrijving']
         obj_descr_title = ['Information about ', 'Informatie over ']
 
