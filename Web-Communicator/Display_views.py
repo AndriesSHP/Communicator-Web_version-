@@ -2178,20 +2178,21 @@ class Display_views():
             for display in a tab of Notebook
         """
         network_text = ['Network', 'Netwerk']
-        network_name = network_text[self.GUI_lang_index] + ' of ' + self.object_in_focus.name
+        self.network_name = network_text[self.GUI_lang_index] + ' of ' + self.object_in_focus.name
         self.network_frame = gui.VBox(width='100%', height='80%',
                                       style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.network_frame,
-                                                network_name, self.tab_cb(network_name))
+                                                self.network_name, self.tab_cb(self.network_name))
 
-        net_button_text = ['Display network of left-object', 'Toon netwerk van linker object']
+        net_button_text = ['Display network of left object', 'Toon netwerk van linker object']
         lh_button_text = ['Display details of left object', 'Toon details van linker object']
         rh_button_text = ['Display details of kind', 'Toon details van soort']
         classif_button_text = ['Classify left individual object',
                                'Classificeer linker individueel object']
-        close_button_text = ['Close', 'Sluit']
+        self.close_button_text = ['Close', 'Sluit']
 
-        self.button_row = gui.HBox(height=20, width='100%')
+        self.network_button_row = gui.HBox(height=20, width='100%')
+        
         self.net_button = gui.Button(net_button_text[self.GUI_lang_index], width='15%', height=20)
         self.net_button.attributes['title'] = 'Press button after selection of left hand object'
         self.net_button.onclick.connect(self.Prepare_lh_object_network_view)
@@ -2210,26 +2211,33 @@ class Display_views():
             'Press button after selection of left hand individual object'
         self.classif_button.onclick.connect(self.Prepare_for_classification)
 
-        self.close_button = gui.Button(close_button_text[self.GUI_lang_index],
-                                       width='15%', height=20)
-        self.close_button.attributes['title'] = 'Press button when you want to remove this tag'
-        self.close_button.onclick.connect(self.user_interface.Close_tag,
-                                          self.user_interface.views_noteb,
-                                          network_name)
+        self.close_network = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                        width='15%', height=20)
+        self.close_network.attributes['title'] = 'Press button when you want to remove this tag'
+        self.close_network.onclick.connect(
+            self.user_interface.Close_tag,
+            self.user_interface.views_noteb,
+            self.network_name)  # self.user_interface.main_frame,
 
-        self.button_row.append(self.net_button)
-        self.button_row.append(self.lh_button)
-        self.button_row.append(self.rh_button)
-        self.button_row.append(self.classif_button)
-        self.button_row.append(self.close_button)
-        self.network_frame.append(self.button_row)
+        self.network_button_row.append(self.net_button)
+        self.network_button_row.append(self.lh_button)
+        self.network_button_row.append(self.rh_button)
+        self.network_button_row.append(self.classif_button)
+        self.network_button_row.append(self.close_network)
+        self.network_frame.append(self.network_button_row)
 
         # nr_of_cols = 7  # len(self.taxon_column_names)
-        self.network_tree = MyTable(width='100%',
-                                    style={"overflow": "auto", "background-color": "#eeffaa",
-                                           "border-width": "2px", "border-style": "solid",
-                                           "font-size": "12px", 'table-layout': 'auto',
-                                           'text-align': 'left'})
+##        self.network_tree = MyTable(width='100%',
+##                                    style={"overflow": "auto", "background-color": "#eeffaa",
+##                                           "border-width": "2px", "border-style": "solid",
+##                                           "font-size": "12px", 'table-layout': 'auto',
+##                                           'text-align': 'left'})
+        self.network_tree = gui.TreeView(
+            width='100%',
+            style={"overflow": "auto", "background-color": "#eeffaa",
+                   "border-width": "2px", "border-style": "solid",
+                   "font-size": "12px", 'table-layout': 'auto',
+                   'text-align': 'left'})
         eqal_head = ['>=<', '>=<']
         valu_head = ['Value', 'Waarde']
         unit_head = ['Unit', 'Eenheid']
@@ -2239,10 +2247,11 @@ class Display_views():
                     eqal_head[self.GUI_lang_index],
                     valu_head[self.GUI_lang_index],
                     unit_head[self.GUI_lang_index])]
-        self.network_tree.append_from_list(content, fill_title=True)
+##        self.network_tree.append_from_list(content, fill_title=True)
         self.network_frame.append(self.network_tree)
 
-        self.network_tree.on_table_row_click.connect(self.Network_object_detail_view)
+        # Select a row for viewing details of leftmost object
+##        self.network_tree.on_table_row_click.connect(self.Network_object_detail_view)
         # self.network_tree.on_table_row_i_key_click.connect(self.Network_object_detail_view)
         # self.network_tree.on_table_row_right_click.connect(self.Network_object_detail_view)
 
@@ -2250,28 +2259,72 @@ class Display_views():
         self.user_interface.views_noteb.select_by_name(tab_name)
         return
 
+##    def Display_network_view(self):
+##        """ Display a network of all related things
+##            that are directly related to the object in focus in a gui.Table.
+##        """
+##        # Display self.network_model rows in self.network_tree (Table) view
+##        parents = []
+##        # Initialize the list of included names of things
+##        included = []
+##        for network_line in self.network_model:
+##            # Verify whether network_line[7], being the parent (typically an intermediate relation),
+##            # is blank or is in the list of parents.
+##            # Determine whether hierarchy of sub_sub concepts shall be open or not
+##            # openness = False
+##            parent_name = network_line[7]
+##            if parent_name == '' or parent_name in parents:
+##                # Skip duplicate line
+##                # row_duplicate = False
+##                name = network_line[6]
+##                # Include only lines that are not already included yet
+##                if network_line not in included:
+##                    included.append(network_line)
+##                    # if parent_name == '':
+##                    #     openness = True
+##                    relation = False
+##                    color = '#ffff99'
+##                    term = name.partition(' ')
+##                    if term[0] in ['has', 'heeft', 'classifies', 'classificeert',
+##                                   'is', 'can', 'kan', 'shall', 'moet']:
+##                        relation = True
+##                        color = '#eeffdd'
+##                    row_widget = gui.TableRow()
+##                    for index, field in enumerate(network_line[5:]):
+##                        row_item = gui.TableItem(text=field,
+##                                                 style={'text-align': 'left',
+##                                                        'background-color': color})
+##                        if relation is False or index < 2:
+##                            row_widget.append(row_item, field)
+##                    self.network_tree.append(row_widget, name)
+##                    if name not in parents:
+##                        parents.append(name)
+
     def Display_network_view(self):
         """ Display a network of all related things
-            that are directly related to the object in focus.
+            that are directly related to the object in focus in a gui.TreeView.
         """
-        # Display self.network_model rows in self.network_tree
+        # Display self.network_model rows in self.network_tree TreeView
         parents = []
+        widget_dict = {}  # key, value = name, widget
         # Initialize the list of included names of things
         included = []
         for network_line in self.network_model:
-            # Verify whether network_line[7], being the parent (typically intermediate),
-            # is blank or is in the list of parents
-            # openness = False
-            upper_concept = network_line[7]
-            if upper_concept == '' or upper_concept in parents:
+            # Verify whether network_line[7], being the parent (typically an intermediate relation),
+            # is blank or is in the list of parents.
+            # Determine whether hierarchy of sub_sub concepts shall be open or not
+            openness = 'false'
+            name = network_line[6]
+            parent_name = network_line[7]
+            # Debug print('net:', name, parent_name)
+            if parent_name == '' or parent_name in parents:
                 # Skip duplicate line
                 # row_duplicate = False
-                name = network_line[6]
                 # Include only lines that are not already included yet
                 if network_line not in included:
                     included.append(network_line)
-                    # if upper_concept == '':
-                    #     openness = True
+                    if parent_name == '':
+                        openness = 'true'
                     relation = False
                     color = '#ffff99'
                     term = name.partition(' ')
@@ -2279,15 +2332,26 @@ class Display_views():
                                    'is', 'can', 'kan', 'shall', 'moet']:
                         relation = True
                         color = '#eeffdd'
-                    row_widget = gui.TableRow()
-                    for index, field in enumerate(network_line[5:]):
-                        row_item = gui.TableItem(text=field,
-                                                 style={'text-align': 'left',
-                                                        'background-color': color})
-                        if relation is False or index < 2:
-                            row_widget.append(row_item, field)
-                    self.network_tree.append(row_widget, name)
-                    # Set color of line in table (rel_tag) === to be done ===
+                        openness = 'true'
+##                    row_widget = gui.TableRow()
+                    row_widget = gui.TreeItem(name, style={'text-align': 'left',
+                                                           'font-size': '14px',
+                                                           'background-color': color})
+                    row_widget.attributes['treeopen'] = openness
+                    if relation is not True and parent_name != '':
+                        row_widget.onclick.connect(self.Network_object_detail_view)
+                        row_widget.uid = network_line[0]
+                    widget_dict[name] = row_widget
+##                    for index, field in enumerate(network_line[5:]):
+##                        row_item = gui.TableItem(text=field,
+##                                                 style={'text-align': 'left',
+##                                                        'background-color': color})
+##                        if relation is False or index < 2:
+##                            row_widget.append(row_item, field)
+                    if parent_name == '':
+                        self.network_tree.append(row_widget, name)
+                    else:
+                        widget_dict[parent_name].append(row_widget, name)
                     if name not in parents:
                         parents.append(name)
 
@@ -2307,11 +2371,21 @@ class Display_views():
             for display in a tab of Notebook
         """
         taxon_text = ['Taxonomy', 'Taxonomie']
-        taxon_name = taxon_text[self.GUI_lang_index] + ' of ' + self.object_in_focus.name
+        self.taxon_name = taxon_text[self.GUI_lang_index] + ' of ' + self.object_in_focus.name
         self.taxon_frame = gui.VBox(width='100%', height='100%',
                                     style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.taxon_frame,
-                                                taxon_name, self.tab_cb(taxon_name))
+                                                self.taxon_name, self.tab_cb(self.taxon_name))
+        self.taxon_button_row = gui.HBox(height=20, width='100%')
+
+        self.close_taxon = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                      width='15%', height=20)
+        self.close_taxon.attributes['title'] = 'Press button when you want to remove this tag'
+        self.close_taxon.onclick.connect(self.user_interface.Close_tag,
+                                         self.user_interface.views_noteb,
+                                         self.taxon_name)
+        self.taxon_button_row.append(self.close_taxon)
+        self.taxon_frame.append(self.taxon_button_row)
 
         headings = ['UID', 'Name', 'Kind', 'Community',
                     'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4',
@@ -3485,11 +3559,21 @@ class Display_views():
 
     def Define_documents_sheet(self):
         doc_text = ['Documents', 'Documenten']
-        doc_name = doc_text[self.GUI_lang_index] + ' about ' + self.object_in_focus.name
+        self.doc_name = doc_text[self.GUI_lang_index] + ' about ' + self.object_in_focus.name
         self.doc_frame = gui.VBox(width='100%', height='100%',
                                   style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.doc_frame,
-                                                doc_name, self.tab_cb(doc_name))
+                                                self.doc_name, self.tab_cb(self.doc_name))
+        self.doc_button_row = gui.HBox(height=20, width='100%')
+        self.doc_frame.append(self.doc_button_row)
+        self.close_doc = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                    width='15%', height=20)
+        self.close_doc.attributes['title'] = 'Press button when you want to remove this tag'
+        self.close_doc.onclick.connect(self.user_interface.Close_tag,
+                                       self.user_interface.views_noteb,
+                                       self.doc_name)
+        self.doc_button_row.append(self.close_doc)
+
         headings = ['info', 'obj', 'carrier', 'directory', 'Info', 'Kind of info', 'Directory',
                     'Name of object', 'File name', 'Kind of file']
         display_cols = list(headings[4:])
@@ -3643,18 +3727,28 @@ class Display_views():
         if len(self.info_model) > 0:
             self.Define_and_display_documents()
 
-    def Network_object_detail_view(self, window, row, item):
+##    def Network_object_detail_view(self, widget, row, item):
+##        """ Find the selected left hand object from a user selection with left button
+##            in the network_model that is displayed in the network_tree view.
+##        """
+##        tree_values = self.Determine_network_tree_values()
+##        Debug print('Network object detail view:', cur_item, tree_values)
+##        if len(tree_values) > 0:
+##            # if sel.num == 1:
+##            chosen_object_uid = tree_values[0]
+##            # else:
+##            #     chosen_object_uid = tree_values[4]
+##            self.Determine_category_of_object_view(chosen_object_uid, tree_values)
+
+    def Network_object_detail_view(self, widget):  # , row, item):
         """ Find the selected left hand object from a user selection with left button
             in the network_model that is displayed in the network_tree view.
         """
-        tree_values = self.Determine_network_tree_values()
-        # Debug print('Network object detail view:', cur_item, tree_values)
-        if len(tree_values) > 0:
-            # if sel.num == 1:
-            chosen_object_uid = tree_values[0]
-            # else:
-            #     chosen_object_uid = tree_values[4]
-            self.Determine_category_of_object_view(chosen_object_uid, tree_values)
+        widget_name = widget.get_text()
+        print('Selected:', widget_name, widget.uid)
+        # selected_object = self.gel_net.uid_dict[widget.uid]
+        tree_values = [widget.uid, widget_name]
+        self.Determine_category_of_object_view(widget.uid, tree_values)
 
     def Determine_network_tree_values(self):
         """ Determine the values on a selected focus row in a network treeview"""
