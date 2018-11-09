@@ -2234,9 +2234,9 @@ class Display_views():
                    "border-width": "2px", "border-style": "solid",
                    "font-size": "12px", 'table-layout': 'auto',
                    'text-align': 'left'})
-        eqal_head = ['>=<', '>=<']
-        valu_head = ['Value', 'Waarde']
-        unit_head = ['Unit', 'Eenheid']
+##        eqal_head = ['>=<', '>=<']
+##        valu_head = ['Value', 'Waarde']
+##        unit_head = ['Unit', 'Eenheid']
 ##        # When Remi Table is used (via MyTable) instead of TreeView, then the following is O.K.
 ##        content = [('UID', self.name_head[self.GUI_lang_index],
 ##                    self.parent_head[self.GUI_lang_index],
