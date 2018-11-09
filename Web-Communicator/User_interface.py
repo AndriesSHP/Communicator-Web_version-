@@ -192,7 +192,7 @@ class Communicator(App):
                                       style='background-color:#ddffff')
         self.mess_frame.append(self.log_head)
         self.mess_frame.append(self.log_frame)
-        
+
         self.main_frame.append(self.mess_frame)
 
     def tab_cb(self):
