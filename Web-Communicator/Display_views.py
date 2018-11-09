@@ -2267,7 +2267,8 @@ class Display_views():
 ##        # Initialize the list of included names of things
 ##        included = []
 ##        for network_line in self.network_model:
-##            # Verify whether network_line[7], being the parent (typically an intermediate relation),
+##            # Verify whether network_line[7],
+##            # being the parent (typically an intermediate relation),
 ##            # is blank or is in the list of parents.
 ##            # Determine whether hierarchy of sub_sub concepts shall be open or not
 ##            # openness = False
