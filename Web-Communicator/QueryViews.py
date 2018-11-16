@@ -148,9 +148,9 @@ class Query_view():
         confirm_button.attributes['title'] = 'Confirm that selected option is searched for'
         confirm_button.onclick.connect(self.Formulate_query_spec)
 
-        close_button = gui.Button(close[self.GUI_lang_index], width=100, height=20)
-        close_button.attributes['title'] = 'Close the search window'
-        close_button.onclick.connect(self.user_interface.Close_tag,
+        search_close = gui.Button(close[self.GUI_lang_index], width=100, height=20)
+        search_close.attributes['title'] = 'Close the search window'
+        search_close.onclick.connect(self.user_interface.Close_tag,
                                      self.user_interface.views_noteb,
                                      query_text[self.GUI_lang_index])  # self.query_widget,
 
@@ -162,7 +162,7 @@ class Query_view():
         self.first_line_widget.append(self.reply_lang_label)
         self.first_line_widget.append(self.reply_lang_box)
         self.first_line_widget.append(confirm_button)
-        self.first_line_widget.append(close_button)
+        self.first_line_widget.append(search_close)
         self.query_widget.append(self.first_line_widget)
 
         # Define English and Dutch example values (initial options) for query
