@@ -42,7 +42,9 @@ class Semantic_Network():
               base_phrases being bootstrapping base phrases for binary relations
               and inverse_phrases being bootstrapping inverse phrases.
     '''
-    def __init__(self, net_name):
+    def __init__(self, GUI_lang_index, net_name):
+        ''' Initialize a semantic network based on import of Gellish files.'''
+        self.GUI_lang_index = GUI_lang_index
         self.name = net_name
         self.semantic_file_name = "Gellish_net_db"
 
@@ -60,7 +62,6 @@ class Semantic_Network():
         # A dictionary for names in a context that refers to the denoted concepts
         self.dictionary = GellishDict('Dictionary of Gellish formal languages')
 
-        self.GUI_lang_index = 0
         self.lang_uid_dict = {}
         self.community_dict = {}
         self.lang_dict_EN = {'910036': "English",
@@ -108,18 +109,18 @@ class Semantic_Network():
         self.non_object = Anything('', '')
 
     def reset_network(self, net_name):
-        ''' Reset the network properties to their initial values '''
+        ''' Reset the network properties to their initial values.'''
         self.__init__(net_name)
 
     def reset_and_build_network(self):
-        ''' Reset the network and build a new content '''
+        ''' Reset the network and build a new content.'''
         self.reset_network('Gellish semantic network')
         self.build_network
 
     def build_network(self):
         ''' Build a new semantic network
             by bootstrapping kinds of relations
-            and read and process the language definition files
+            and read and process the language definition files.
         '''
         # Create a base dictionary of kinds of relations
         # from the list in the bootstrapping module
