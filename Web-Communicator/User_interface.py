@@ -29,6 +29,17 @@ class MyTabBox(gui.TabBox):
         if identifier is not None:
             self._tabs.pop(holder.identifier)
 
+    def _fix_tab_widths(self):
+        tab_w = 100.0 / len(self._tabs)
+        for a, li, holder in self._tabs.values():
+            li.style['float'] = "left"
+            # Here you can change the size percentage
+            li.style['width'] = "%.0f%%" % (tab_w - 1)
+
+            # Here we can change text height
+            a.style['height'] = "20px"
+            a.style['line-height'] = "10px"
+
 
 class Communicator(App):
     ''' The opening window of the Communicator program
@@ -41,12 +52,13 @@ class Communicator(App):
         self.pickle_file_name = "Gellish_net_db"
 
         self.gel_net = None
+        self.net_built = False
         self.user = None
-        self.user_interface = None
 
         self.GUI_lang_name_dict = {"English": '910036',
                                    "Nederlands": '910037'}
         self.GUI_lang_names = ['English', 'Nederlands']
+        self.GUI_lang_index = 0
 
         self.extended_query = False
         self.obj_without_name_in_context = []
@@ -77,15 +89,14 @@ class Communicator(App):
         manual = ['User manual', 'Handleiding']
         wiki = ['Gellish wiki', 'Gellish wiki']
 
-        # Initialize user_db and start up
+        # Initialize user_db
         user_db = SU.UserDb()
         self.start_up(user_db)
-        self.start_net()
 
         # Set GUI language default = English: GUI_lang_names[0]
         self.Set_GUI_language(self.GUI_lang_names[0])
 
-        # Define main GUI window
+        # Define main GUI window conform the REMI gui
         self.container = gui.Widget(margin='2px', style='background-color:#eeffdd')
         self.container.set_size('100%', '100%')
         self.container.attributes['title'] = 'Communicator'
@@ -122,12 +133,12 @@ class Communicator(App):
 
         self.save_as_tag = gui.MenuItem(save_as[self.GUI_lang_index], width=100, height=20)
         self.save_as_tag.attributes['title'] = 'Save semantic network on binary file'
-        self.save_as_tag.onclick.connect(self.gel_net.save_pickle_db)
+        
         self.admin_tag.append(self.save_as_tag)
 
         self.new_net_tag = gui.MenuItem(new_net[self.GUI_lang_index], width=100, height=20)
         self.new_net_tag.attributes['title'] = 'Delete old and create new semantic network'
-        self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network)
+        
         self.admin_tag.append(self.new_net_tag)
 
         # Define language selector
@@ -157,14 +168,24 @@ class Communicator(App):
 
         self.query = None
         self.unknown = ['unknown', 'onbekend']
-        self.unknown_quid = 0   # start UID for unknowns in queries
-
-        # Create display views object
-        self.views = Display_views(self.gel_net, self)
+        self.unknown_quid = 0   # initial value of UID for unknowns in queries
 
         # Define a notebook in window
         self.Define_notebook()
 
+        # Start up semantic network
+        self.start_net()
+        # Create display views object
+        self.views = Display_views(self.gel_net, self)
+        self.save_as_tag.onclick.connect(self.gel_net.save_pickle_db)
+        self.new_net_tag.onclick.connect(self.gel_net.reset_and_build_network)
+        # If new network is only initialized and not built from files yet,
+        # then build a semantic network from Gellish files.
+        if self.net_built is False:
+            self.gel_net.build_network()
+            self.net_built = True
+
+        # The REMI gui requires the return of the container in main
         return self.container
 
     def Define_notebook(self):
@@ -208,8 +229,7 @@ class Communicator(App):
             sys.exit(0)
 
     def start_net(self):
-        ''' Start user interaction and
-            Import gel_net semantic network from Pickle
+        ''' Import gel_net semantic network from Pickle
             or create new network from files
         '''
         # Load the semantic network from pickle, if available
@@ -217,9 +237,9 @@ class Communicator(App):
         if self.gel_net is None:
             # Create a Semantic Network with a given name
             # from bootstrapping and from files
-            self.gel_net = Semantic_Network(self.net_name)
-            # Build the semantic network
-            self.gel_net.build_network()
+            self.gel_net = Semantic_Network(self.GUI_lang_index, self.net_name)
+        else:
+            self.net_built = True
 
     def load_net(self):
         ''' Load semantic network from pickle binary file.'''
@@ -550,10 +570,11 @@ class Communicator(App):
         if ref_widget_tab_name == 'Search':
             self.q_view = None
 
+
 class Semantic_network():
     ''' Dummy class for testing only.'''
-    def __init__(self):
-        self.GUI_lang_index = 0
+    def __init__(self, GUI_lang_index, net_name):
+        self.GUI_lang_index = GUI_lang_index
         self.GUI_lang_name = 'English'
         self.uid_dict = {}  # key = uid; value = obj (an instance of Anything)
 
@@ -567,7 +588,9 @@ class Semantic_network():
 class Network():
     ''' Dummy class for testing only.'''
     def __init__(self):
-        self.gel_net = Semantic_network()
+        GUI_lang_index = 0
+        net_name = 'Sementic Newtork'
+        self.gel_net = Semantic_network(GUI_lang_index, net_name)
 
     def build_network(self):
         print('Build network')
