@@ -93,6 +93,8 @@ class Display_views():
         self.nr_of_occurrencies = 0
         self.max_nr_of_rows = 500   # in treeviews
 
+        self.selected_obj = None
+        self.modified_object = None
         self.modification = None
 
     def empty_models(self):
@@ -423,18 +425,16 @@ class Display_views():
         prod_line_1 = ['', '', '', 2, '', descr_text[self.GUI_lang_index], description,
                        '', '', '', '', '', '', '']
 
-        prod_head_NL2I = ['', '', '', 3, '', '', '', '', 'Aspect', 'Soort aspect',
-                          '>=<', 'Waarde', 'Eenheid', 'Status']
-        prod_head_NL2K = ['', '', '', 3, '', '', '', '', 'Soort aspect', '',
-                          '>=<', 'Waarde', 'Eenheid', 'Status']
-
-        prod_head_EN2I = ['', '', '', 3, '', '', '', '', 'Aspect', 'Aspect type',
-                          '>=<', 'Value', 'UoM', 'Status']
-        prod_head_EN2K = ['', '', '', 3, '', '', '', '', 'Kind of aspect', '',
-                          '>=<', 'Value', 'UoM', 'Status']
+        prod_head_indiv = [['', '', '', 3, '', '', '', '', 'Aspect', 'Kind of aspect',
+                            '>=<', 'Value', 'UoM', 'Status'],
+                           ['', '', '', 3, '', '', '', '', 'Aspect', 'Soort aspect',
+                            '>=<', 'Waarde', 'Eenheid', 'Status']]
+        prod_head_kind = [['', '', '', 3, '', '', '', '', 'Kind of aspect', '',
+                           '>=<', 'Value', 'UoM', 'Status'],
+                          ['', '', '', 3, '', '', '', '', 'Soort aspect', '',
+                           '>=<', 'Waarde', 'Eenheid', 'Status']]
 
         self.line_nr = 3
-
         # prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr, part,
         #                '', '', kindOfPart, aspect.name, kindOfAspect, value, UoM, status]
         # prod_line_4 = [part_of_part.uid, part_kind_uid, aspect_uid, self.line_nr, '',
@@ -457,10 +457,7 @@ class Display_views():
                     self.kind_model.append([obj.uid, super_type.uid, '', 1,
                                             '', '', '', '', '', supert_type_name])
             self.kind_model.append(prod_line_1)
-            if self.user_interface.GUI_lang_name == 'Nederlands':
-                self.kind_model.append(prod_head_NL2K)
-            else:
-                self.kind_model.append(prod_head_EN2K)
+            self.kind_model.append(prod_head_kind[self.GUI_lang_index])
         else:
             # Category is individual
             self.prod_model.append(prod_line_0)
@@ -472,10 +469,7 @@ class Display_views():
                     self.prod_model.append([obj.uid, classifier.uid, '', 1,
                                             '', '', '', '', '', classifier_name])
             self.prod_model.append(prod_line_1)
-            if self.user_interface.GUI_lang_name == 'Nederlands':
-                self.prod_model.append(prod_head_NL2I)
-            else:
-                self.prod_model.append(prod_head_EN2I)
+            self.prod_model.append(prod_head_indiv[self.GUI_lang_index])
 
     def Find_aspects(self, indiv, role):
         """ Search for aspects of an individual thing (indiv)
@@ -1008,7 +1002,6 @@ class Display_views():
             Store results in prod_model or occ_model.
         """
         unknownClassifierText = ['unknown kind', 'onbekende soort']
-        compHead = ['Part hierarchy', 'Compositie']
         partHead = ['Part of part', 'Deel van deel']
         par3Head = ['Further part', 'Verder deel']
         kindHead = ['Kind', 'Soort']
@@ -1056,7 +1049,8 @@ class Display_views():
                     # the first time only
                     if self.part_head_req is True:
                         self.line_nr += 1
-                        prod_head_4 = ['', '', '', self.line_nr, compHead[self.GUI_lang_index],
+                        prod_head_4 = ['', '', '', self.line_nr,
+                                       self.comp_head[self.GUI_lang_index],
                                        partHead[self.GUI_lang_index],
                                        par3Head[self.GUI_lang_index],
                                        kindHead[self.GUI_lang_index], '', '', '', '', '']
@@ -1571,7 +1565,6 @@ class Display_views():
         """ Search for explicit kinds of parts
             and combine them with implied kinds of parts.
         """
-        compHead = ['Part hierarchy', 'Compositie']
         partHead = ['Part of part', 'Deel van deel']
         par3Head = ['Further part', 'Verder deel']
         kindHead = ['Kind', 'Soort']
@@ -1605,7 +1598,8 @@ class Display_views():
                 if self.part_head_req is True:
                     self.line_nr += 1
                     prod_head_4 = ['', '', '',
-                                   self.line_nr, compHead[self.GUI_lang_index],
+                                   self.line_nr,
+                                   self.comp_head[self.GUI_lang_index],
                                    partHead[self.GUI_lang_index],
                                    par3Head[self.GUI_lang_index],
                                    kindHead[self.GUI_lang_index], '', '', '', '', '']
@@ -1690,7 +1684,8 @@ class Display_views():
             if self.part_head_req is True:
                 self.line_nr += 1
                 prod_head_4 = ['', '', '',
-                               self.line_nr, compHead[self.GUI_lang_index],
+                               self.line_nr,
+                               self.comp_head[self.GUI_lang_index],
                                partHead[self.GUI_lang_index],
                                par3Head[self.GUI_lang_index],
                                kindHead[self.GUI_lang_index], '', '', '', '', '']
@@ -2113,9 +2108,7 @@ class Display_views():
 
         # Define and display product_model_sheet view
         if len(self.prod_model) > 0:
-            # === Temporary skipped
-            if done:
-                self.Define_and_display_product_sheet()
+            self.Define_and_display_product_sheet()
 
         # Define and display data_sheet view
         if len(self.prod_model) > 0:
@@ -2176,7 +2169,8 @@ class Display_views():
         network_text = ['Network', 'Netwerk']
         self.network_name = network_text[self.GUI_lang_index] + ' of ' + self.object_in_focus.name
         self.network_frame = gui.VBox(width='100%', height='80%',
-                                      style='background-color:#eeffdd')
+                                      style={'overflow': 'auto',
+                                             'background-color': '#eeffdd'})
         self.user_interface.views_noteb.add_tab(self.network_frame,
                                                 self.network_name, self.tab_cb(self.network_name))
 
@@ -2189,7 +2183,7 @@ class Display_views():
 
         self.network_button_row = gui.HBox(height=20, width='100%')
 
-        self.net_button = gui.Button(net_button_text[self.GUI_lang_index], width='15%', height=20)
+        self.net_button = gui.Button(net_button_text[self.GUI_lang_index], width='20%', height=20)
         self.net_button.attributes['title'] = 'Press button after selection of left hand object'
         self.net_button.onclick.connect(self.Prepare_lh_object_network_view)
 
@@ -2202,7 +2196,7 @@ class Display_views():
         self.rh_button.onclick.connect(self.Prepare_rh_network_object_detail_view)
 
         self.classif_button = gui.Button(classif_button_text[self.GUI_lang_index],
-                                         width='15%', height=20)
+                                         width='20%', height=20)
         self.classif_button.attributes['title'] = \
             'Press button after selection of left hand individual object'
         self.classif_button.onclick.connect(self.Prepare_for_classification)
@@ -2230,7 +2224,7 @@ class Display_views():
 ##                                           'text-align': 'left'})
         self.network_tree = gui.TreeView(
             width='100%',
-            style={"overflow": "auto", "background-color": "#eeffaa",
+            style={"overflow": "scroll", "background-color": "#eeffaa",
                    "border-width": "2px", "border-style": "solid",
                    "font-size": "12px", 'table-layout': 'auto',
                    'text-align': 'left'})
@@ -2380,13 +2374,28 @@ class Display_views():
                                                 self.taxon_name, self.tab_cb(self.taxon_name))
         self.taxon_button_row = gui.HBox(height=20, width='100%')
 
-        self.close_taxon = gui.Button(self.close_button_text[self.GUI_lang_index],
+        self.taxon_detail = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                       width='15%', height=20)
+        self.taxon_detail.attributes['title'] = 'Show details of selected left hand item'
+        self.taxon_detail.onclick.connect(self.Taxon_detail_view)
+
+        # Request for classification of the earlier selected individual thing
+        classify_button_text = ['Classify', 'Classificeer']
+        self.taxon_classify = gui.Button(classify_button_text[self.GUI_lang_index],
+                                         width='15%', height=20)
+        self.taxon_classify.attributes['title'] = 'Classify earlier selected individual ' \
+                                                  'by the selected kind'
+        self.taxon_classify.onclick.connect(self.Classify_individual)
+        
+        self.taxon_close = gui.Button(self.close_button_text[self.GUI_lang_index],
                                       width='15%', height=20)
-        self.close_taxon.attributes['title'] = 'Press button when you want to remove this tag'
-        self.close_taxon.onclick.connect(self.user_interface.Close_tag,
+        self.taxon_close.attributes['title'] = 'Press button when you want to remove this tag'
+        self.taxon_close.onclick.connect(self.user_interface.Close_tag,
                                          self.user_interface.views_noteb,
                                          self.taxon_name)
-        self.taxon_button_row.append(self.close_taxon)
+        
+        self.taxon_button_row.append(self.taxon_classify)
+        self.taxon_button_row.append(self.taxon_close)
         self.taxon_frame.append(self.taxon_button_row)
 
         headings = ['UID', 'Name', 'Kind', 'Community',
@@ -2403,9 +2412,9 @@ class Display_views():
                                          'text-align': 'left'})
         self.taxon_tree.append_from_list(display_cols, fill_title=True)
         self.taxon_frame.append(self.taxon_tree)
-        self.taxon_tree.on_table_row_click.connect(self.Taxon_detail_view)
-        # Request for classification of the earlier selected individual thing
-        # self.taxon_tree.on_table_row_click_right.connect(self.Taxon_detail_view)
+##        self.taxon_tree.on_table_row_click.connect(self.Taxon_detail_view)
+##        # Request for classification of the earlier selected individual thing
+##        self.taxon_tree.on_table_row_click_right.connect(self.Taxon_detail_view)
 
         # Display header row with units of measure
         # Color = uomtag = '#ccf'
@@ -2974,11 +2983,11 @@ class Display_views():
         kind_scroll.grid(column=0, row=1, sticky=NS + E)
         self.kind_tree.config(yscrollcommand=kind_scroll.set)
 
-        self.kind_tree.tag_configure('focus_tag', background='#9f9')  # hell green
-        self.kind_tree.tag_configure('head_tag', background='#bfb')
-        self.kind_tree.tag_configure('val_tag', background='#dfd')  # light green
-        self.kind_tree.tag_configure('available', background='yellow')
-        self.kind_tree.tag_configure('missing', background='#fcc')  # red
+##        self.kind_tree.tag_configure('focus_tag', background='#9f9')  # hell green
+##        self.kind_tree.tag_configure('head_tag', background='#bfb')
+##        self.kind_tree.tag_configure('val_tag', background='#dfd')  # light green
+##        self.kind_tree.tag_configure('available', background='yellow')
+##        self.kind_tree.tag_configure('missing', background='#fcc')  # red
 
         self.kind_tree.bind(sequence='<Double-1>', func=self.Kind_detail_view_left)
         self.kind_tree.bind(sequence='<Button-2>', func=self.Kind_detail_view_middle)
@@ -3078,87 +3087,81 @@ class Display_views():
         """ Product_model view tab sheet in Notebook
             Preceded by a frame with a number of buttons corresponding with binds.
         """
-        self.prod_frame = Frame(self.views_noteb)
-        self.prod_frame.grid(column=0, row=0, sticky=NSEW, columnspan=6, rowspan=4)
-        self.prod_frame.columnconfigure(0, weight=1)
-        self.prod_frame.rowconfigure(0, weight=0)
-        self.prod_frame.rowconfigure(1, weight=0)
-
+        self.prod_frame = gui.VBox(width='100%', height='80%',
+                                   style={'overflow': 'auto',
+                                          'background-color': '#eeffdd'})
         prod_text = ['Product model', 'Productmodel']
-        self.views_noteb.add(self.prod_frame, text=prod_text[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end", self.prod_frame, sticky=NSEW)
+        self.prod_name = prod_text[self.GUI_lang_index] + ' of ' + self.object_in_focus.name
+        self.user_interface.views_noteb.add_tab(self.prod_frame, self.prod_name,
+                                                self.tab_cb(self.prod_name))
+        self.prod_button_row = gui.HBox(height=20, width='100%')
 
-        heads = ['uid_1', 'uid_2', 'uid-3', 'inFocus', 'Level1', 'Level2', 'Level3', 'kind',
-                 'aspect', 'kAspect', '>=<', 'value', 'UoM', 'status']
-        display_heads = heads[5:]
-        self.prod_tree = Treeview(self.prod_frame, columns=(heads), displaycolumns=display_heads,
-                                  selectmode='browse', height=30, padding=2)
+        lh_button_text = ['Display details',
+                          'Toon details']
+        self.lh_button = gui.Button(lh_button_text[self.GUI_lang_index], width='15%', height=20)
+        self.lh_button.attributes['title'] = 'Select a row, ' \
+                                             'then display details of left hand object'
+        self.lh_button.onclick.connect(self.Prod_detail_view)
 
-        self.prod_tree.grid(column=0, row=1, columnspan=6, sticky=NSEW)
+        tax_button_text = ['Taxonomy of kind',
+                           'Taxonomie van soort']
+        self.tax_button = gui.Button(tax_button_text[self.GUI_lang_index], width='15%', height=20)
+        self.tax_button.attributes['title'] = 'Select a row, then display taxonomy of classifier'
+        self.tax_button.onclick.connect(self.Prod_taxonomy)
 
-        self.prod_treeHead = [('', '', 'Kind', 'Aspect', 'Kind of aspect',
-                               '>=<', 'Value', 'UoM', 'Status'),
-                              ('', '', 'Soort', 'Aspect', 'Soort aspect',
-                               '>=<', 'Waarde', 'Eenheid', 'Status')]
-        self.prod_tree.heading('#0', text='Object', anchor=W)
-        col = -1
-        for head_field in display_heads:
-            col += + 1
-            self.prod_tree.heading(head_field, text=self.prod_treeHead[self.GUI_lang_index][col],
-                                   anchor=W)
+        asp_button_text = ['Details of aspect',
+                           'Details van aspect']
+        self.asp_button = gui.Button(asp_button_text[self.GUI_lang_index],
+                                         width='20%', height=20)
+        self.asp_button.attributes['title'] = 'Select a row, ' \
+                                              'then display details of aspect'
+        self.asp_button.onclick.connect(self.Prod_aspect)
 
-        self.prod_tree.column('#0', minwidth=40, width=100)
-        # self.prod_tree.column('inFocus', minwidth=10, width=10)
-        self.prod_tree.column('Level1', minwidth=20, width=100)
-        self.prod_tree.column('Level2', minwidth=20, width=50)
-        self.prod_tree.column('Level3', minwidth=20, width=50)
-        self.prod_tree.column('kind', minwidth=20, width=100)
-        self.prod_tree.column('aspect', minwidth=20, width=100)
-        self.prod_tree.column('kAspect', minwidth=20, width=100)
-        self.prod_tree.column('>=<', minwidth=20, width=20)
-        self.prod_tree.column('value', minwidth=20, width=100)
-        self.prod_tree.column('UoM', minwidth=20, width=50)
-        self.prod_tree.column('status', minwidth=20, width=80)
+        classif_button_text = ['Classify',
+                               'Classificeer']
+        self.classif_button = gui.Button(classif_button_text[self.GUI_lang_index],
+                                         width='20%', height=20)
+        self.classif_button.attributes['title'] = 'Select a row, ' \
+                                                  'then Clcssify the left hand object'
+        self.classif_button.onclick.connect(self.Prod_classification)
 
-        self.prod_tree.columnconfigure(0, weight=1)
-        self.prod_tree.columnconfigure(1, weight=1)
-        self.prod_tree.columnconfigure(2, weight=1)
-        self.prod_tree.columnconfigure(3, weight=1)
-        self.prod_tree.columnconfigure(4, weight=1)
-        self.prod_tree.columnconfigure(5, weight=1)
-        self.prod_tree.columnconfigure(6, weight=1)
-        self.prod_tree.columnconfigure(7, weight=1)
-        self.prod_tree.columnconfigure(8, weight=1)
-        self.prod_tree.columnconfigure(9, weight=1)
-        self.prod_tree.columnconfigure(10, weight=1)
-        self.prod_tree.columnconfigure(11, weight=1)
+        self.close_prod = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                     width='15%', height=20)
+        self.close_prod.attributes['title'] = 'Press button when you want to remove this tag'
+        self.close_prod.onclick.connect(self.user_interface.Close_tag,
+                                        self.user_interface.views_noteb,
+                                        self.prod_name)
+        self.prod_button_row.append(self.close_prod)
 
-        self.prod_tree.columnconfigure(0, weight=1)
-        self.prod_tree.rowconfigure(0, weight=1)
-        self.prod_tree.rowconfigure(1, weight=1)
+        self.prod_button_row.append(self.lh_button)
+        self.prod_button_row.append(self.tax_button)
+        self.prod_button_row.append(self.asp_button)
+        self.prod_button_row.append(self.classif_button)
+        self.prod_button_row.append(self.close_prod)
+        self.prod_frame.append(self.prod_button_row)
 
-        prod_scroll = Scrollbar(self.prod_frame, orient=VERTICAL, command=self.prod_tree.yview)
-        prod_scroll.grid(column=5, row=1, sticky=NS + E)
-        self.prod_tree.config(yscrollcommand=prod_scroll.set)
+        self.prod_tree = MyTable(width='100%',
+                                 style={"overflow": "auto", "background-color": "#eeffaa",
+                                        "border-width": "2px", "border-style": "solid",
+                                        "font-size": "12px", 'table-layout': 'auto',
+                                        'text-align': 'left'})
+        prod_treeHead = [[('', '', '', 'Kind', 'Aspect', 'Kind of aspect',
+                          '>=<', 'Value', 'UoM', 'Status')],
+                         [('', '', '', 'Soort', 'Aspect', 'Soort aspect',
+                          '>=<', 'Waarde', 'Eenheid', 'Status')]]
+        self.prod_tree.append_from_list(prod_treeHead[self.GUI_lang_index], fill_title=True)
+        self.prod_frame.append(self.prod_tree)
 
-        self.prod_tree.tag_configure('focus_tag', background='#9f9')  # hell green
-        self.prod_tree.tag_configure('head_tag', background='#bfb')
-        self.prod_tree.tag_configure('val_tag', background='#dfd')  # light green
-        self.prod_tree.tag_configure('available', background='yellow')
-        self.prod_tree.tag_configure('missing', background='#fcc')  # red
-
-        self.prod_tree.bind(sequence='<Double-1>', func=self.Prod_detail_view_left)
-        self.prod_tree.bind(sequence='<Button-2>', func=self.Prod_detail_view_middle)
-        self.prod_tree.bind(sequence='<Button-3>', func=self.Prod_detail_view_right)
-        self.prod_tree.bind(sequence='c', func=self.Prod_detail_view_middle)
+        self.focus_color = '#9f9'  # hell green
+        self.head_color = '#bfb'  # dark green
+        self.val_color = '#dfd'  # light green
+        self.available = 'yellow'
+        self.missing = '#fcc'  # red
 
     def Display_product_model_view(self):
-        """ Product Model view: Display prod_model in self.prod_tree:
-            self.prod_tree.insert('',index=0,iid='UIDInFocus',values=[nameInFocus,kindDat],
-            tags='focus_tag',open=True).
-        """
+        """ Display prod_model in self.prod_tree."""
         unknownVal = ['unknown value', 'onbekende waarde']
-        # unknownKind = ['unknown kind', 'onbekende soort']
+        unknownKind = ['unknown kind', 'onbekende soort']
         further_part = ['Further part', 'Verder deel']
         kind_of_part = ['Kind of part', 'Soort deel']
         possible_roles = False  # No roles expected
@@ -3170,42 +3173,63 @@ class Display_views():
             prod_line = prod_line_0[:]
             head = False
             head_line = []
+            line_type = prod_line[3]
+            name = prod_line[5]
             # Debug print('Prod_line:',prod_line)
-            # If line_type (prod_line[3]) == 1
+            # If line_type == 1
             # then prepare header line from prod_line for level 0 object
             # Note: line_type == 2 and 3 are skipped in this view
-            if prod_line[3] == 1:
+            if line_type == 1:
                 head_line = prod_line[0:4]
-                head_line.append(prod_line[5])
+                head_line.append(name)
                 head_line.append('')
                 head_line.append('')
                 head_line.append(prod_line[9])
-                nameInFocus = head_line[4]
-                # Debug print('Head_line:',head_line)
-                level0Part = self.prod_tree.insert('', index='end', values=head_line,
-                                                   text=nameInFocus, tags='focus_tag', open=True)
+##                nameInFocus = head_line[4]
+                # Debug print('Head_line:', head_line)
+##                level0Part = self.prod_tree.insert('', index='end', values=head_line,
+##                                                   text=nameInFocus, tags='focus_tag', open=True)
+                prod_row_widget = gui.TableRow(style={'text-align': 'left',
+                                                      'background-color': self.val_color})
+                for index, field in enumerate(head_line[4:]):
+                    prod_row_item = gui.TableItem(text=field,
+                                                  style={'text-align': 'left',
+                                                         'background-color': self.available})
+                    prod_row_widget.append(prod_row_item, field)
+                level0Part = self.prod_tree.append(prod_row_widget, name)
                 previusPart = level0Part
-            # If line_type (prod_line[3]) == 4
+            # If line_type == 4
             # then prepare header line from prod_line for level 0 object
             # Note: line_type == 1, 2 and 3 are skipped in this view
-            if prod_line[3] == 4:
-                # nameInFocus = prod_line[5]
+            if line_type == 4:
+##                nameInFocus = prod_line[5]
                 prod_name = prod_line[4]
-                level0Part = self.prod_tree.insert('', index='end', values=prod_line,
-                                                   text=prod_name, tags='focus_tag', open=True)
+##                level0Part = self.prod_tree.insert('', index='end', values=prod_line,
+##                                                   text=prod_name, tags='focus_tag', open=True)
+                prod_row_widget = gui.TableRow()
+                for index, field in enumerate(prod_line[4:]):
+                    prod_row_item = gui.TableItem(text=field,
+                                                  style={'text-align': 'left',
+                                                          'background-color': self.head_color})
+                    prod_row_widget.append(prod_row_item, field)
+                level0Part = self.prod_tree.append(prod_row_widget, prod_name)
                 previusPart = level0Part
 
-            # In prod_tree view line_type 2 to 3 (indicated in prod_line[3]) are not displayed.
-            elif prod_line[3] > 4:
-                # Set value_tags at 'val_tag' or 'head_tag' for each field
-                value_tags = 11 * ['val_tag']
+            # In prod_tree view line_type 2 and 3 are not displayed.
+            elif line_type > 4:
+                # Set color at default 'val_color' for each field in a line
+                value_colors = []
+                for col in range(0, 14):
+                    value_colors.append(self.val_color)
 
-                # If the line is a header line, then set value_tag to 'head_tag'
+                # If the line is a header line
                 if prod_line[4] in self.comp_head or prod_line[4] in self.occ_head or \
                    prod_line[4] in self.info_head or prod_line[8] in self.aspect_head or \
                    prod_line[5] in self.part_occ_head or prod_line[4] in self.subs_head:
                     head = True
-                    value_tags = 11 * ['head_tag']
+                    # Set color to 'head_color' for each field in the header line
+                    for col in range(0, 14):
+                        value_colors[col] = self.head_color
                     prod_name = prod_line[4]
                     # Determine whether roles may appear in prod_line[4]
                     # in lines following the header line
@@ -3234,21 +3258,29 @@ class Display_views():
                     prod_name = prod_line[6]
 
                 # Set tag background color depending on value
-                # If value is missing then bachgroumd color is yellow
-                if prod_line[9] == '' or prod_line[9] in unknownVal:
-                    value_tags[9] = 'missing'
-                else:
-                    value_tags[9] = 'available'
-                if prod_line[7] in unknownVal:
-                    value_tags[7] = 'missing'
+                # If value is missing then backgroumd color is yellow
+                if prod_line[11] in unknownVal:
+                    value_colors[11] = self.missing
+                elif prod_line[11] != '':
+                    value_colors[11] = self.available
+                if prod_line[9] in unknownKind:
+                    value_colors[9] = self.missing
 
                 if possible_roles is True and prod_line[4] == '':
                     prod_name = ''
 
                 # Insert line
                 # Debug print('Values:', prod_line[1], type(prod_line[1]))
-                id = self.prod_tree.insert(previusPart, index='end', values=prod_line,
-                                           text=prod_name, tags=value_tags, open=True)
+##                id = self.prod_tree.insert(previusPart, index='end', values=prod_line,
+##                                           text=prod_name, tags=value_tags, open=True)
+                prod_row_widget = gui.TableRow(style={'text-align': 'left'})
+                for index, field in enumerate(prod_line[4:]):
+                    color = value_colors[index + 4]
+                    prod_row_item = gui.TableItem(text=field,
+                                                  style={'text-align': 'left',
+                                                         'background-color': color})
+                    prod_row_widget.append(prod_row_item, field)
+                id = self.prod_tree.append(prod_row_widget, prod_name)
 
                 # If the line is a header line, then continue to next line
                 if head is True:
@@ -3619,17 +3651,17 @@ class Display_views():
         item_dict = self.expr_tree.item(cur_item)
         values = list(item_dict['values'])
 
-        selected_obj = self.uid_dict[str(values[lh_uid_col])]
+        self.selected_obj = self.uid_dict[str(values[lh_uid_col])]
         self.Display_message(
-            'Display product details of: {}'.format(selected_obj.name),
-            'Weergave van productdetails van: {}'.format(selected_obj.name))
+            'Display product details of: {}'.format(self.selected_obj.name),
+            'Weergave van productdetails van: {}'.format(self.selected_obj.name))
 
-        if selected_obj.category in ['kind', 'kind of physical object',
-                                     'kind of occurrence', 'kind of aspect',
-                                     'kind of role', 'kind of relation']:
-            self.Define_and_display_kind_detail_view(selected_obj)
+        if self.selected_obj.category in ['kind', 'kind of physical object',
+                                          'kind of occurrence', 'kind of aspect',
+                                          'kind of role', 'kind of relation']:
+            self.Define_and_display_kind_detail_view(self.selected_obj)
         else:
-            self.Define_and_display_individual_detail_view(selected_obj)
+            self.Define_and_display_individual_detail_view(self.selected_obj)
 
     def Prepare_lh_object_network_view(self):
         """ Set the uid of the left hand object in a selected treeview row
@@ -3678,7 +3710,7 @@ class Display_views():
             subtypes in the hierarchy.
             The taxonomy of the selected kind is displayed for selection of the classifier.
         """
-        # similar to def Prod_detail_view_middle(self, sel):
+        # similar to def Prod_taxonomy(self, sel):
         tree_values = self.Determine_network_tree_values()
 
         if len(tree_values) > 0:
@@ -3697,7 +3729,7 @@ class Display_views():
                 'om het object te classificeren')
 
     def Classification_of_individual_thing(self, to_be_classified_object_uid, kind_uid):
-        """ Start a classification process for a to be classified object
+        """ Start a classification process for a modified_object = to be classified
             by a subtype of a current classifying kind.
             When completed, a classification relation is added to the classified object.
         """
@@ -3734,7 +3766,7 @@ class Display_views():
         """
         widget_name = widget.get_text()
         print('Selected:', widget_name, widget.uid)
-        # selected_object = self.gel_net.uid_dict[widget.uid]
+        # self.selected_obj = self.gel_net.uid_dict[widget.uid]
         tree_values = [widget.uid, widget_name]
         self.Determine_category_of_object_view(widget.uid, tree_values)
 
@@ -3757,20 +3789,20 @@ class Display_views():
         obj_descr_title = ['Information about ', 'Informatie over ']
 
         if chosen_object_uid != '':
-            selected_obj = self.uid_dict[str(chosen_object_uid)]
+            self.selected_obj = self.uid_dict[str(chosen_object_uid)]
 
             # If info_kind is a description then display the destription in messagebox
             if len(tree_values) > 8 and tree_values[8] in description_text:
-                messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name,
-                                    selected_obj.description)
+                messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + self.selected_obj.name,
+                                    self.selected_obj.description)
             else:
                 self.Display_message(
-                    'Display object details of: {}'.format(selected_obj.name),
-                    'Weergave van objectdetails van: {}'.format(selected_obj.name))
-                if selected_obj.category in self.gel_net.categories_of_kinds:
-                    self.Define_and_display_kind_detail_view(selected_obj)
+                    'Display object details of: {}'.format(self.selected_obj.name),
+                    'Weergave van objectdetails van: {}'.format(self.selected_obj.name))
+                if self.selected_obj.category in self.gel_net.categories_of_kinds:
+                    self.Define_and_display_kind_detail_view(self.selected_obj)
                 else:
-                    self.Define_and_display_individual_detail_view(selected_obj)
+                    self.Define_and_display_individual_detail_view(self.selected_obj)
 
             if len(self.info_model) > 0:
                 self.Define_and_display_documents()
@@ -3785,15 +3817,15 @@ class Display_views():
         item_dict = self.kind_tree.item(cur_item)
         tree_values = list(item_dict['values'])
         # Debug print('Kind_detail_left:', cur_item, tree_values)
-        selected_obj = self.uid_dict[str(tree_values[0])]
+        self.selected_obj = self.uid_dict[str(tree_values[0])]
 
         # If info_kind is a description then display the destription in messagebox
         if tree_values[7] in description_text:
-            messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name,
-                                selected_obj.description)
+            messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + self.selected_obj.name,
+                                self.selected_obj.description)
         else:
-            print('Display kind details of: {}'.format(selected_obj.name))
-            self.Define_and_display_kind_detail_view(selected_obj)
+            print('Display kind details of: {}'.format(self.selected_obj.name))
+            self.Define_and_display_kind_detail_view(self.selected_obj)
             if len(self.info_model) > 0:
                 self.Define_and_display_documents()
 
@@ -3809,16 +3841,16 @@ class Display_views():
 
         if len(tree_values) > 0:
             if tree_values[1] > 0:
-                selected_obj = self.uid_dict[str(tree_values[1])]
+                self.selected_obj = self.uid_dict[str(tree_values[1])]
 
                 # Save sel.type being either 'ButtonPress' or 'KeyPress' with sel.keysym = 'c'
                 self.sel_type = sel.type
 
                 self.Display_message(
-                    'Display the taxonomy of: {}'.format(selected_obj.name),
-                    'Weergave van de taxonomie van: {}'.format(selected_obj.name))
+                    'Display the taxonomy of: {}'.format(self.selected_obj.name),
+                    'Weergave van de taxonomie van: {}'.format(self.selected_obj.name))
                 obj_list = []
-                obj_list.append(selected_obj)
+                obj_list.append(self.selected_obj)
                 self.Build_product_views(obj_list)
                 # Display taxonomy of selected kind
                 self.Define_and_display_taxonomy_of_kinds()
@@ -3864,10 +3896,10 @@ class Display_views():
                     'De naam <{}> bevat geen file extensie, hoewel dat wel verwacht wordt. '
                     'Die naam is nu geïnterpreteerd als een soort aspect.'.
                     format(tree_values[8]))
-                selected_obj = tree_values[2]
+                self.selected_obj = tree_values[2]
                 self.Display_message(
-                    'Display the aspect details of: {}'.format(selected_obj.name),
-                    'Weergave van de aspectdetails van: {}'.format(selected_obj.name))
+                    'Display the aspect details of: {}'.format(self.selected_obj.name),
+                    'Weergave van de aspectdetails van: {}'.format(self.selected_obj.name))
                 # Display taxonomy of selected kind
                 self.Define_and_display_taxonomy_of_kinds()
             else:
@@ -3881,13 +3913,9 @@ class Display_views():
                 'There is no right hand object found to be displayed.',
                 'Er is geen rechter object gevonden om weergegeven te worden.')
 
-    def Prod_detail_view_left(self, sel):
-        self.Prod_detail_view_left_button()
-
-    def Prod_detail_view_left_button(self):
-        """ Find the selected left hand individual object
-            from a user selection with left button
-            in the prod_table that is displayed in the prod_tree view.
+    def Prod_detail_view(self, widget, row, item):
+        """ Identify the selected individual object at the left hand of the row
+            in the prod_table and display its details in a prod_tree view.
         """
         description_text = ['description', 'beschrijving']
         obj_descr_title = ['Information about ', 'Informatie over ']
@@ -3897,29 +3925,70 @@ class Display_views():
         # Debug print('Prod_detail_left:', cur_item, tree_values)
         if len(tree_values) > 0:
             if tree_values[0] != '':
-                selected_obj = self.uid_dict[str(tree_values[0])]
+                self.selected_obj = self.uid_dict[str(tree_values[0])]
 
                 # If info_kind is a description
                 # then display the destription in messagebox
                 if tree_values[7] in description_text:
-                    messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + selected_obj.name,
-                                        selected_obj.description)
+                    messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + self.selected_obj.name,
+                                        self.selected_obj.description)
                 else:
                     self.Display_message(
-                        'Display of product details of: {}'.format(selected_obj.name),
-                        'Weergave van de productdetails van: {}'.format(selected_obj.name))
-                    self.Define_and_display_individual_detail_view(selected_obj)
+                        'Display of product details of: {}'.format(self.selected_obj.name),
+                        'Weergave van de productdetails van: {}'.format(self.selected_obj.name))
+                    self.Define_and_display_individual_detail_view(self.selected_obj)
 
                 if len(self.info_model) > 0:
                     self.Define_and_display_documents()
 
-    def Prod_detail_view_middle(self, sel):
-        """ Find the selected left classifier object from a user selection
+    def Prod_taxonomy(self, sel):
+        """ Identify the classifier of the left hand object from a user selection
             in the prod_table that is displayed in the prod_tree view.
-            When the middle mouse button was used
-            the taxonomy of the selected kind is displayed.
-            When the 'c' key was used a search for a second classifier in the taxonomy
-            (the subtype hierarchy of the selected kind) is started.
+            Display the taxonomy of the selected kind.
+        """
+        cur_item = self.prod_tree.focus()
+        item_dict = self.prod_tree.item(cur_item)
+        tree_values = list(item_dict['values'])
+        # Debug print('Prod_detail_middle:', sel.type, sel.keysym,
+        #             cur_item, tree_values, type(tree_values[1]))
+
+        if len(tree_values) > 0:
+            kind_uid = str(tree_values[1])
+            individual_object_uid = str(tree_values[0])
+            if kind_uid != '':
+                self.selected_obj = self.uid_dict[individual_object_uid]
+                # Build views for selected kind and display views
+                self.Display_message(
+                    'Display taxonomy and possibilities of kind: {}'.
+                    format(self.selected_obj.name),
+                    'Weergave van de taxonomie en mogelijkheden van soort: {}'.
+                    format(self.selected_obj.name))
+                obj_list = []
+                obj_list.append(self.selected_obj)
+                self.Build_product_views(obj_list)
+                # Display taxonomy in taxon view
+                self.Define_and_display_taxonomy_of_kinds()
+                # Display possibilities of kind in possibilities view
+                self.Define_and_display_possibilities_of_kind()
+
+                if len(self.info_model) > 0:
+                    self.Define_and_display_documents()
+            else:
+                self.Display_message(
+                    'The kind of object is unknown.',
+                    'De soort object is onbekend.')
+        else:
+            self.Display_message(
+                "Select an item, then click the taxonomy button "
+                "for display of the taxonomy of the classifier.",
+                "Selecteer een regel, click dan de taxonomieknop "
+                "voor het weergeven van de taxonomie van de classificeerder.")
+
+    def Prod_classification(self, sel):
+        """ Identify the selected classifier of the left hand object from a user selection
+            in the prod_table that is displayed in the prod_tree view.
+            Start a search for a second classifier in the taxonomy
+            (the subtype hierarchy of the selected kind).
             The aspects of the individual object are used to create selection criteria
             for the subtypes in the hierarchy.
             The taxonomy of the selected kind is displayed for selection of the classifier.
@@ -3934,32 +4003,10 @@ class Display_views():
             kind_uid = str(tree_values[1])
             individual_object_uid = str(tree_values[0])
             if kind_uid != '':
-                selected_obj = self.uid_dict[individual_object_uid]
-                # Verify sel.type being either 'Button-2 Press' for display of taxonomy
-                # or 'KeyPress' with sel.keysym = 'c'
-                # (for display for classification by selection of subtype)
-                # Debug print('sel.type', sel.type, sel.keysym, sel.char)
-                if sel.keysym == 'c':
-                    # Perform a classification process by display the taxonomy of kind
-                    # and selection of one of its subtypes
-                    self.Classification_of_individual_thing(individual_object_uid, kind_uid)
-                else:
-                    # Mouse Button-2 Press: Build views for selected kind and display views
-                    self.Display_message(
-                        'Display taxonomy and possibilities of kind: {}'.
-                        format(selected_obj.name),
-                        'Weergave van de taxonomie en mogelijkheden van soort: {}'.
-                        format(selected_obj.name))
-                    obj_list = []
-                    obj_list.append(selected_obj)
-                    self.Build_product_views(obj_list)
-                    # Display taxonomy in taxon view
-                    self.Define_and_display_taxonomy_of_kinds()
-                    # Display possibilities of kind in possibilities view
-                    self.Define_and_display_possibilities_of_kind()
-
-                    if len(self.info_model) > 0:
-                        self.Define_and_display_documents()
+                self.selected_obj = self.uid_dict[individual_object_uid]
+                # Perform a classification process by display the taxonomy of kind
+                # and selection of one of its subtypes
+                self.Classification_of_individual_thing(individual_object_uid, kind_uid)
             else:
                 self.Display_message(
                     'The kind of object is unknown.',
@@ -3967,15 +4014,13 @@ class Display_views():
         else:
             self.Display_message(
                 "Select an item, then click the classification button "
-                "or the second mouse button or press 'c' key "
                 "for classying the object.",
                 "Selecteer een regel, click dan de classifikatieknop "
-                "of click met de tweede muisknop of kies de 'c' toets "
                 "voor het classificeren van het object.")
 
-    def Prod_detail_view_right(self, sel):
-        """ Find the selected aspect or file from a user selection with right button
-            in the prod_table that is displayed in the prod_tree view.
+    def Prod_aspect(self, sel):
+        """ Identify the selected aspect or file from a user selection with right button
+            in the prod_table abd display its details in the prod_tree view.
         """
         cur_item = self.prod_tree.focus()
         if cur_item == '':
@@ -4008,11 +4053,11 @@ class Display_views():
                         'De naam van het rechter object <{}> bevat geen file extensie. '
                         'Het is geïnterpreteerd als een aspect.'.
                         format(tree_values[8]))
-                    selected_obj = self.uid_dict[str(tree_values[2])]
+                    self.selected_obj = self.uid_dict[str(tree_values[2])]
                     self.Display_message(
-                        'Display aspect details of: {}'.format(selected_obj.name),
-                        'Weergave van aspectdetails van: {}'.format(selected_obj.name))
-                    self.Define_and_display_individual_detail_view(selected_obj)
+                        'Display aspect details of: {}'.format(self.selected_obj.name),
+                        'Weergave van aspectdetails van: {}'.format(self.selected_obj.name))
+                    self.Define_and_display_individual_detail_view(self.selected_obj)
             else:
                 # Open the file in the file format that is defined by its file extension
                 # from directory+file_name
@@ -4024,58 +4069,77 @@ class Display_views():
                 'There is no right hand object found to be displayed.',
                 'Er is geen rechter object gevonden om weergegeven te worden.')
 
-    def Taxon_detail_view(self, sel):
+    def Taxon_detail_view(self, widget):
         """ Find the selected object from a user selection that is made
             in the taxon_model that is displayed in the taxon_tree view.
+            Then create a detail view of the selected item
         """
-        classifier = ['classifies', 'classificeert']
-        cur_item = self.taxon_tree.focus()
-        item_dict = self.taxon_tree.item(cur_item)
-        tree_values = list(item_dict['values'])
-        # Debug print('Taxon values, sel.', tree_values)
-        selected_obj = self.uid_dict[str(tree_values[0])]
+##        classifier = ['classifies', 'classificeert']
+##        cur_item = self.taxon_tree.focus()
+##        item_dict = self.taxon_tree.item(cur_item)
+##        tree_values = list(item_dict['values'])
+        taxon_values = widget.get_text()
+        print('Taxon selected kind:', taxon_values)
+        kind_uid = widget.uid
+        self.selected_obj = self.uid_dict[kind_uid]
 
-        if sel.num == 1:
-            # If mousebutton-1 is used, then Create a detail view
-            # Verify whether object is an individual thing due to being classified
-            parts = str(tree_values[2]).partition(' ')
-            if parts[0] in classifier:
-                # Debug print('Display details of individual:', tree_values[0], selected_obj.name)
-                self.Define_and_display_individual_detail_view(selected_obj)
-            else:
-                # Debug print('Display details of kind:',tree_values[0], selected_obj.name)
-                self.Define_and_display_kind_detail_view(selected_obj)
-        elif self.modification == 'classification started':
-            # if sel.type = 'KeyPress' with sel.keysym = 'c' then
-            # Append selected classifier to modified_object, and add classification relation
-            if sel.keysym == 'c':
-                self.Add_classification_relation(self.modified_object, selected_obj)
+        # Button 'Detail view is used, thus Create a detail view
+##        # Verify whether object is an individual thing due to being classified
+##        parts = str(taxon_values[2]).partition(' ')
+##        if parts[0] in classifier:
+##            # Debug print('Display details of individual:', taxon_values[0], self.selected_obj.name)
+##            self.Define_and_display_individual_detail_view(self.selected_obj)
+##        else:
+##            # Debug print('Display details of kind:',taxon_values[0], self.selected_obj.name)
+        self.Define_and_display_kind_detail_view(self.selected_obj)
 
-                # Display modified product view
-                self.modification = 'classification completed'
-                self.Define_and_display_individual_detail_view(self.modified_object)
+    def Classify_individual(self, widget):
+        ''' Classify an earlier selected individual thing (candidate that is not yet classified)
+            by the kind that is selected in the taxonomy view through
+            adding a classification relation to the individual thing
+            as well as to the kind in the semantic network.
+        '''
+        if self.modification == 'classification started':
+            print('Taxon selected kind:', self.modified_object.name, self.selected_obj.name)
+            # Append selected classifier to an individual modified_object,
+            # by adding a classification relation to that object
+            self.Add_classification_relation()
+            self.modification = 'classification completed'
+            
+            # Display modified product view
+            self.Define_and_display_individual_detail_view(self.modified_object)
+            self.Display_message(
+                'A classification of <{}> by classifier <{}> is added '
+                'to the semantic network'.
+                format(self.modified_object.name, self.selected_obj.name),
+                'Een classifikatie van <{}> door classificeerder <{}> is toegevoegd '
+                'aan het semantische netwerk.'.
+                format(self.modified_object.name, self.selected_obj.name))
+        else:
+            if self.modified_object is None:
                 self.Display_message(
-                    'A classification of <{}> by classifier <{}> is added '
-                    'to the semantic network'.
-                    format(self.modified_object.name, selected_obj.name),
-                    'Een classifikatie van <{}> door classificeerder <{}> is toegevoegd '
-                    'aan het semantische netwerk.'.
-                    format(self.modified_object.name, selected_obj.name))
-            else:
-                self.modification = 'classification completed'
+                    'First select an individual thing before classifying it',
+                    'Selecteer eerst een individueel iets voor het te classificeren')
+            if self.selected_obj is None:
+                self.Display_message(
+                    'First select a kind and then classify '
+                    'an earlier selected individual thing by that kind',
+                    'Selecteer eerst een soort en classificeerd dan '
+                    'een eerder geselecteerd individueel iets door die soort')
+            if self.modified_object is not None and self.selected_obj is not None:
                 self.Display_message(
                     'The classification of {} by classifier {} is NOT performed.'.
-                    format(self.modified_object.name, selected_obj.name),
+                    format(self.modified_object.name, self.selected_obj.name),
                     'De classifikatie van <{}> door classificeerder <{}> is NIET uitgevoerd.'.
-                    format(self.modified_object.name, selected_obj.name))
+                    format(self.modified_object.name, self.selected_obj.name))
 
-    def Add_classification_relation(self, modified_object, selected_object):
+    def Add_classification_relation(self):
         """ Append the (selected) kind as a classifier to the modified_object,
             and then add a classification relation to the classified individual thing
             as well as to the classifying kind.
         """
         statement = ['statement', 'bewering']
-        modified_object.classifiers.append(selected_object)
+        self.modified_object.classifiers.append(self.selected_obj)
 
         # Add a classification expression to the list of expressions
         # of the classified object
@@ -4094,15 +4158,15 @@ class Display_views():
                 'Er is geen uid voor het idee beschikbaar in de range {} tot {}.'.
                 format(self.num_idea_uid, 212000000))
 
-        lang_uid = modified_object.names_in_contexts[0][0]
+        lang_uid = self.modified_object.names_in_contexts[0][0]
         lang_name = self.lang_uid_dict[lang_uid]
-        comm_uid = modified_object.names_in_contexts[0][1]
+        comm_uid = self.modified_object.names_in_contexts[0][1]
         comm_name = self.gel_net.community_dict[comm_uid]
         lang_comm = [lang_uid, lang_name, comm_uid, comm_name]
-        lh_uid_name = [modified_object.uid, modified_object.name]
+        lh_uid_name = [self.modified_object.uid, self.modified_object.name]
         rel_uid_phrase_type = ['1225', self.classification[self.GUI_lang_index], basePhraseUID]
         rh_role_uid_name = ['', '']
-        rh_uid_name = [selected_object.uid, selected_object.name]  # e.g. 43769, 'roofwindow'
+        rh_uid_name = [self.self.selected_obj.uid, self.self.selected_obj.name]  # e.g. 43769, 'roofwindow'
         uom_uid_name = ['', '']
         description = ''
         intent_uid_name = ['491285', statement[self.GUI_lang_index]]
@@ -4111,10 +4175,10 @@ class Display_views():
                                                  lh_uid_name, rel_uid_phrase_type,
                                                  rh_role_uid_name, rh_uid_name,
                                                  uom_uid_name, description)
-        relation = Relation(modified_object, rel_type, selected_object,
+        relation = Relation(self.modified_object, rel_type, self.self.selected_obj,
                             basePhraseUID, '', gellish_expr)
-        modified_object.add_relation(relation)
-        selected_object.add_relation(relation)
+        self.modified_object.add_relation(relation)
+        self.self.selected_obj.add_relation(relation)
 
     def Summ_detail_view(self, sel):
         """ Find the selected object from a user selection that is made
@@ -4126,10 +4190,10 @@ class Display_views():
         # Debug print('Detail view item:', item_dict['values'])
         tree_values = list(item_dict['values'])
 
-        selected_obj = self.uid_dict[str(tree_values[0])]
-        # Debug print('Display of product details of:',tree_values[0], selected_obj.name)
+        self.selected_obj = self.uid_dict[str(tree_values[0])]
+        # Debug print('Display of product details of:',tree_values[0], self.selected_obj.name)
         # Create a detail view
-        self.Define_and_display_individual_detail_view(selected_obj)
+        self.Define_and_display_individual_detail_view(self.selected_obj)
 
     def Possibilities_detail_view(self, sel):
         """ Find the selected object from a user selection that is made
@@ -4141,10 +4205,10 @@ class Display_views():
         # Debug print('Detail view item:', item_dict['values'])
         tree_values = list(item_dict['values'])
 
-        selected_obj = self.uid_dict[str(tree_values[0])]
-        # Debug print('Display product details of:',tree_values[0], selected_obj.name)
+        self.selected_obj = self.uid_dict[str(tree_values[0])]
+        # Debug print('Display product details of:',tree_values[0], self.selected_obj.name)
         # Create a detail view
-        self.Define_and_display_kind_detail_view(selected_obj)
+        self.Define_and_display_kind_detail_view(self.selected_obj)
 
     def Indiv_detail_view(self, sel):
         """ Find the selected object from a user selection that is made
@@ -4156,18 +4220,18 @@ class Display_views():
         # Debug print('Detail view item:', item_dict['values'])
         tree_values = list(item_dict['values'])
 
-        selected_obj = self.uid_dict[str(tree_values[0])]
-        # Debug print('Display product details of:',tree_values[0], selected_obj.name)
+        self.selected_obj = self.uid_dict[str(tree_values[0])]
+        # Debug print('Display product details of:',tree_values[0], self.selected_obj.name)
         # Create a detail view
-        self.Define_and_display_individual_detail_view(selected_obj)
+        self.Define_and_display_individual_detail_view(self.selected_obj)
 
-    def Define_and_display_kind_detail_view(self, selected_obj):
+    def Define_and_display_kind_detail_view(self, kind_obj):
         """ Create a detail view of a kind from a user selection
             and display the view in the kind_model view.
         """
         self.kind_model[:] = []
         self.expr_table[:] = []
-        self.Build_single_product_view(selected_obj)
+        self.Build_single_product_view(kind_obj)
 
         try:
             self.kind_frame.destroy()
@@ -4189,13 +4253,13 @@ class Display_views():
         for expr_line in self.expr_table:
             self.expr_tree.insert('', index='end', values=expr_line, tags='val_tag')
 
-    def Define_and_display_individual_detail_view(self, selected_obj):
-        """ Create a detail view of a product from a user selection
+    def Define_and_display_individual_detail_view(self, individual_obj):
+        """ Create a detail view of an individual object
             and display the view in the prod_model view.
         """
         self.prod_model[:] = []
         self.expr_table[:] = []
-        self.Build_single_product_view(selected_obj)
+        self.Build_single_product_view(individual_obj)
 
         try:
             self.prod_frame.destroy()
@@ -4222,17 +4286,22 @@ class Display_views():
         for expr_line in self.expr_table:
             self.expr_tree.insert('', index='end', values=expr_line, tags='val_tag')
 
-    def Doc_detail_view(self, sel):
+    def Doc_detail_view(self, window, row, item):
         """ Find the selected object from a user selection
             in the info_model that is displayed in the doc_tree view.
             - info_row('values') = [info.uid, obj.uid, carrier.uid, directory_name,
                                     info.name, super_info_name, obj.name,
                                     carrier.name, carrier_kind_name].
         """
-        cur_item = self.doc_tree.focus()
-        item_dict = self.doc_tree.item(cur_item)
-        info_row = list(item_dict['values'])
-        # Debug print('Doc_detail_view:', cur_item, info_row)
+        # Determine UID and Name of selected option
+        info_row = list(row.children.values())
+        self.info = info_row[0].get_text()
+        print('Selected info:', self.info)
+        
+##        cur_item = self.doc_tree.focus()
+##        item_dict = self.doc_tree.item(cur_item)
+##        info_row = list(item_dict['values'])
+##        # Debug print('Doc_detail_view:', cur_item, info_row)
 
         # If right hand mouse button is pressed (sel.num == 3),
         # then determine and display a product view of the object
@@ -4240,9 +4309,9 @@ class Display_views():
         if sel.num == 3:
             if len(info_row) > 1:
                 if info_row[1] != '':
-                    selected_obj = self.uid_dict[str(info_row[1])]
-                    # Debug print('Display product details of: {}'.format(selected_obj.name))
-                    self.Define_and_display_kind_detail_view(selected_obj)
+                    self.selected_obj = self.uid_dict[str(info_row[1])]
+                    # Debug print('Display product details of: {}'.format(self.selected_obj.name))
+                    self.Define_and_display_kind_detail_view(self.selected_obj)
 
                     if len(self.info_model) > 0:
                         self.Define_and_display_documents()
