@@ -1,4 +1,5 @@
 import os
+import operator
 
 import remi.gui as gui
 # from operator import itemgetter
@@ -175,9 +176,10 @@ class Display_views():
 
         self.Create_prod_model_view_header(obj)
 
+        self.kinds = ['kind', 'kind of physical object', 'kind of occurrence',
+                      'kind of aspect', 'kind of role', 'kind of relation', 'number']
         # If object_in_focus is a kind, then collect its supertypes
-        if obj.category in ['kind', 'kind of physical object', 'kind of occurrence',
-                            'kind of aspect', 'kind of role', 'kind of relation', 'number']:
+        if obj.category in self.kinds:
             # Search for the first supertype relation
             # that generalizes the obj (= self.object_in_focus)
             if len(obj.supertypes) == 0:
@@ -285,6 +287,7 @@ class Display_views():
         elif obj.category in ['individual', 'physical object', 'occurrence']:
 
             community_name = self.gel_net.community_dict[obj.names_in_contexts[0][1]]
+            # Summ_model table = obj.uid, obj.name, kind_name, community_name, aspects
             self.summary_row[0] = obj.uid
             self.summary_row[1] = obj.name
             self.summary_row[2] = kind_name
@@ -297,7 +300,7 @@ class Display_views():
             self.indiv_row[4] = community_name
 
             # Find aspects of individual object_in_focus
-            # nr_of_aspects = self.Find_aspects(obj, role)
+            nr_of_aspects = self.Find_aspects(obj, role)
 
             # Find parts and their aspects
             self.part_head_req = True
@@ -473,8 +476,9 @@ class Display_views():
 
     def Find_aspects(self, indiv, role):
         """ Search for aspects of an individual thing (indiv)
-            and their qualifications or quantifications
-            and store results in lines in prod_model
+            and their qualifications or quantifications.
+            Store expressions in expr_table and relations in network model
+            Store search results in lines in prod_model and summ_model and indiv_model
             indiv = the individual thing
             kind.name = the name of the kind of individual thing
             (for messages only)
@@ -482,8 +486,8 @@ class Display_views():
               0 = objectInFocus, 1 = part, 2 = part of part, etc.
             categoryInFocus = category of the object in focus,
               being individual or phys object or occurrence
-            The prod_model lineType is 3A: aspects of a product
-            - conform the header line for aspects (line type 3).
+            The prod_model line_type is 3A: aspects of a product
+              conform the header line for aspects (line type 3).
         """
         # Search for aspects and their values
         nr_of_aspects = 0  # nr of found aspects for this indiv object
@@ -557,7 +561,7 @@ class Display_views():
                 else:
                     continue
 
-            # Aspect is found or qualitative aspect is found
+            # An aspect is found or a qualitative aspect is found
             status = expr[status_col]
             nr_of_aspects += 1
 
@@ -601,9 +605,14 @@ class Display_views():
                     self.expr_table.append(expr)
                     self.Add_line_to_network_model(rel_obj, expr)
 
-            # Summary_table
+            # Summary table (summ_model)
+            #   A summary is a table for multiple individual things (not parts)
+            #   with for each object (or product) one row of aspect values.
+            #   The table has two header rows
+            #   one with the kinds of aspects and another with the units of measure.
+
             # If the object is the object_in_focus and not one of its parts,
-            # then collect the aspect in a summary_table
+            # then collect the aspect in a summary_table.
             if self.decomp_level == 0:
                 # Build summary_view table header
                 # with list of kinds of aspects (summ_column_names)
@@ -612,15 +621,19 @@ class Display_views():
                     self.summ_aspect_uids.append(aspect.kind_uid)
                     self.summ_column_names.append(aspect.kind_name)
                     self.summ_uom_names.append(uom_name)
+                # Search in header row which column suits the aspect.kind_uid
+                # Values start at position 4.
                 self.summ_ind = 3
                 for kind_uid in self.summ_aspect_uids[4:]:
                     self.summ_ind += + 1
                     # Build list of values conform list of aspects.
-                    # Note: sumRow[0] = component
-                    if aspect.kind_uid == kind_uid:
+                    # Note: summary_row[0] = uid of indiv
+                    if kind_uid == aspect.kind_uid:
                         # Debug print('Aspects of phys:', indiv.name, len(self.summ_aspect_uids),
                         #      aspect_name, aspect.kind_name, self.summ_ind, value_name)
+                        # Add value_name to proper field in summary_row (in summ_model)
                         self.summary_row[self.summ_ind] = value_name
+                        # Verify whether units of measure are identical
                         if uom_name != self.summ_uom_names[self.summ_ind]:
                             self.Display_message(
                                 'The unit of measure {} ({}) of the value of {} differs '
@@ -632,77 +645,82 @@ class Display_views():
                                 format(uom_name, uom_uid, aspect_name,
                                        self.summ_uom_names[self.summ_ind]))
 
-            # Indiv_table
-            # If the object is the object_in_focus and not one of its subtypes,
-            # then collect the aspect in an indiv_table
-            if self.subtype_level == 0:
-                # Build individual_view table header with list of aspects
-                # (indiv_column_names)
-                # Debug print('Aspect kind', aspect.uid, aspect_name)
-                if aspect.kind_name not in self.indiv_column_names \
-                   and len(self.indiv_column_names) <= 15:
-                    self.indiv_aspect_uids.append(aspect.kind_uid)
-                    self.indiv_column_names.append(aspect.kind_name)
-                    self.indiv_uom_names.append(uom_name)
-                self.indiv_ind = 4
-                for kind_uid in self.indiv_aspect_uids[5:]:
-                    self.indiv_ind += + 1
-                    # Build list of values conform list of aspects.
-                    # Note: sumRow[0] = component
-                    if aspect.kind_uid == kind_uid:
-                        # Debug print('Aspects of phys:', indiv.name, len(self.indiv_aspect_uids),
-                        #      aspect_name, aspect.kind_name, self.indiv_ind, value_name)
-                        self.indiv_row[self.indiv_ind] = value_name
-                        if uom_name != self.indiv_uom_names[self.indiv_ind]:
-                            if uom_name == '':
-                                self.Display_message(
-                                    'The unit of measure of the value of {} is missing.'.
-                                    format(aspect_name),
-                                    'De meeteenheid van de waarde van {} ontbreekt.'.
-                                    format(aspect_name))
-                            else:
-                                self.Display_message(
-                                    'The unit of measure {} ({}) of the value of {} differs '
-                                    'from the table header UoM {}.'.
-                                    format(uom_name, uom_uid, aspect_name,
-                                           self.indiv_uom_names[self.indiv_ind]),
-                                    'De meeteenheid {} ({}) van de waarde van {} verschilt '
-                                    'van de eenheid {} in de kop van de tabel.'.
-                                    format(uom_name, uom_uid, aspect_name,
-                                           self.indiv_uom_names[self.indiv_ind]))
+            # If the object in focus is not a kind, then add aspect row to prod_model. 
+            if self.object_in_focus.category not in self.kinds:
+                # Indiv_table
+                # If the object is the object_in_focus and not one of its subtypes,
+                # then collect the aspect in an indiv_row for insertion in a prod_model.
+                if self.subtype_level == 0:
+                    # Build individual_view table header with list of aspects
+                    # (indiv_column_names)
+                    # Debug print('Aspect kind', aspect.uid, aspect_name)
+                    if aspect.kind_name not in self.indiv_column_names \
+                       and len(self.indiv_column_names) <= 15:
+                        self.indiv_aspect_uids.append(aspect.kind_uid)
+                        self.indiv_column_names.append(aspect.kind_name)
+                        self.indiv_uom_names.append(uom_name)
+                    self.indiv_ind = 4
+                    for kind_uid in self.indiv_aspect_uids[5:]:
+                        self.indiv_ind += + 1
+                        # Build list of values conform list of aspects.
+                        # Note: summary_row[0] = uid of indiv
+                        if aspect.kind_uid == kind_uid:
+                            # Debug print('Aspects of phys:',
+                            #      indiv.name, len(self.indiv_aspect_uids),
+                            #      aspect_name, aspect.kind_name, self.indiv_ind, value_name)
+                            # Add value_name to proper field in indiv_row
+                            self.indiv_row[self.indiv_ind] = value_name
+                            if uom_name != self.indiv_uom_names[self.indiv_ind]:
+                                if uom_name == '':
+                                    self.Display_message(
+                                        'The unit of measure of the value of {} is missing.'.
+                                        format(aspect_name),
+                                        'De meeteenheid van de waarde van {} ontbreekt.'.
+                                        format(aspect_name))
+                                else:
+                                    self.Display_message(
+                                        'The unit of measure {} ({}) of the value of {} differs '
+                                        'from the table header UoM {}.'.
+                                        format(uom_name, uom_uid, aspect_name,
+                                               self.indiv_uom_names[self.indiv_ind]),
+                                        'De meeteenheid {} ({}) van de waarde van {} verschilt '
+                                        'van de eenheid {} in de kop van de tabel.'.
+                                        format(uom_name, uom_uid, aspect_name,
+                                               self.indiv_uom_names[self.indiv_ind]))
 
-            # Prod_model
-            # Create prod_model text line for output view
-            self.line_nr += 1
-            # Debug print('Aspect of obj.:', self.decomp_level, nr_of_aspects,
-            #             indiv.name, aspect_name)
-            if self.decomp_level == 0 and nr_of_aspects == 1:
-                prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
-                               self.line_nr, indiv.name, role, '', indiv.kind_name,
-                               aspect_name, aspect.kind_name, equality,
-                               value_name, uom_name, status]
-            elif self.decomp_level == 1 and nr_of_aspects == 1:
-                prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
-                               self.line_nr, indiv.name, role, '', indiv.kind_name,
-                               aspect_name, aspect.kind_name, equality,
-                               value_name, uom_name, status]
-            elif self.decomp_level == 2 and nr_of_aspects == 1:
-                prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
-                               self.line_nr, role, indiv.name, '', indiv.kind_name,
-                               aspect_name, aspect.kind_name, equality,
-                               value_name, uom_name, status]
-            elif self.decomp_level == 3 and nr_of_aspects == 1:
-                prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
-                               self.line_nr, '', role, indiv.name, indiv.kind_name,
-                               aspect_name, aspect.kind_name, equality,
-                               value_name, uom_name, status]
-            else:
-                prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
-                               self.line_nr, '', '', '', '',
-                               aspect_name, aspect.kind_name, equality,
-                               value_name, uom_name, status]
-            if len(self.prod_model) < self.max_nr_of_rows:
-                self.prod_model.append(prod_line_3)
+                # Prod_model
+                # Create prod_model text line for output view
+                self.line_nr += 1
+                # Debug print('Aspect of obj.:', self.decomp_level, nr_of_aspects,
+                #             indiv.name, aspect_name)
+                if self.decomp_level == 0 and nr_of_aspects == 1:
+                    prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
+                                   self.line_nr, indiv.name, role, '', indiv.kind_name,
+                                   aspect_name, aspect.kind_name, equality,
+                                   value_name, uom_name, status]
+                elif self.decomp_level == 1 and nr_of_aspects == 1:
+                    prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
+                                   self.line_nr, indiv.name, role, '', indiv.kind_name,
+                                   aspect_name, aspect.kind_name, equality,
+                                   value_name, uom_name, status]
+                elif self.decomp_level == 2 and nr_of_aspects == 1:
+                    prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
+                                   self.line_nr, role, indiv.name, '', indiv.kind_name,
+                                   aspect_name, aspect.kind_name, equality,
+                                   value_name, uom_name, status]
+                elif self.decomp_level == 3 and nr_of_aspects == 1:
+                    prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
+                                   self.line_nr, '', role, indiv.name, indiv.kind_name,
+                                   aspect_name, aspect.kind_name, equality,
+                                   value_name, uom_name, status]
+                else:
+                    prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
+                                   self.line_nr, '', '', '', '',
+                                   aspect_name, aspect.kind_name, equality,
+                                   value_name, uom_name, status]
+                if len(self.prod_model) < self.max_nr_of_rows:
+                    # Debug print('Prod_line 3:', prod_line_3)
+                    self.prod_model.append(prod_line_3)
 
         # If aspect is possessed by object_in_focus (thus not possessed by a part)
         # then add row to summ_model
@@ -720,8 +738,9 @@ class Display_views():
 
             self.summary_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
 
-        # For whole and for parts of whole create a row in indiv_model (not for occurences)
-        if self.occ_in_focus != 'occurrence' \
+        # For whole and for parts of whole create a row in indiv_model (composition model)
+        # Although not for an occurences and not when object in focus is a kind.
+        if self.occ_in_focus != 'occurrence' and self.object_in_focus not in self.kinds\
            and len(self.indiv_model) < self.max_nr_of_rows:
             if indiv not in self.indiv_objects:
                 self.indiv_objects.append(indiv)
@@ -1473,12 +1492,12 @@ class Display_views():
         #                self.occ_uoms   [nrOfAspOccKinds] = uom_name
         #                self.taxon_ind = 3
         #                for kind_name in self.occ_kinds[4:]:
-        #                    self.taxon_ind += + 1
+        #                    self.taxon_ind += 1
         #                    # Build list of values conform list of aspects.
         #                    # Note: sumRow[0] = component
         #                    if aspect.kind == kind_name:
-        #                        # Debug print('Aspects of occ :',nrOfAspOccKinds,aspect_name,
-        #                               aspect.kind,self.taxon_ind,value_name)
+        #                        # Debug print('Aspects of occ :', nrOfAspOccKinds, aspect_name,
+        #                               aspect.kind, self.taxon_ind, value_name)
         #                        occRow[self.taxon_ind] = value_name
         #                        if uom_name != self.occ_uoms[self.taxon_ind]:
         #        # If not a kind of occurrence, then build header for summaryTable
@@ -1752,8 +1771,11 @@ class Display_views():
             self.kind_model.append(prod_line_3)
 
     def Determine_individuals(self, obj):
-        """ Determine whether a kind_in_focus (obj) is a classifier for individual things
-            if so, then add individual things to taxonomy (taxon_model) of kinds.
+        """ Determine whether a kind_in_focus (obj) or one of its subtypes
+            is a classifier for individual things.
+            If so, then add the individual things to taxonomy (taxon_model) of kinds.
+            Also search for aspects of the individual thing and,
+            if found, add them as a row to summ_model.
         """
         has_as_individuals = ['classifies as individual ',
                               'classificeert als individuele ']
@@ -1779,7 +1801,20 @@ class Display_views():
                 # Individual thing uid is found via classification relation
                 indiv = self.uid_dict[indiv_uid]
 
-                # Insert an inter_row header for classified individual things
+                # Find aspects of the individual thing, if any
+                # and add them to summary table.
+                # Do not create add aspects to a prod_model because
+                # the object in focus is a kind.
+                community_name = self.gel_net.community_dict[indiv.names_in_contexts[0][1]]
+                self.summary_row[0] = indiv.uid
+                self.summary_row[1] = indiv.name
+                self.summary_row[2] = indiv.classifiers[0].name
+                self.summary_row[3] = community_name
+
+                role = ''
+                nr_of_aspects = self.Find_aspects(indiv, role)
+
+                # Insert an intermediate inter_row header for classified individual things
                 # in the taxonomy; the first time only
                 if first_time is True:
                     header_text = has_as_individuals[self.GUI_lang_index] + obj.name
@@ -2096,9 +2131,7 @@ class Display_views():
 
         # Define and display summary_view sheet for individual products
         if len(self.summ_model) > 0:
-            # === Temporary skipped
-            if done:
-                self.Define_and_display_summary_sheet()
+            self.Define_and_display_summary_sheet()
 
         # Define and display individual_view sheet
         if len(self.indiv_model) > 0:
@@ -2144,9 +2177,9 @@ class Display_views():
 
     def Display_message(self, text_en, text_nl):
         if self.GUI_lang_index == 1:
-            self.user_interface.log_frame.append(text_nl)
+            self.user_interface.log_messages.append(text_nl)
         else:
-            self.user_interface.log_frame.append(text_en)
+            self.user_interface.log_messages.append(text_en)
 
     def Define_and_display_network(self):
         """ Define a network view and
@@ -2464,75 +2497,86 @@ class Display_views():
     def Define_summary_sheet(self):
         """ Define a summary_sheet for display of summ_model(a list of summary_rows)
             for display in a tab of Notebook.
+            Summ_model table = obj.uid, obj.name, kind_name, community_name, aspects.
         """
-        self.summ_frame = Frame(self.views_noteb)
-        self.summ_frame.grid(column=0, row=0, sticky=NSEW)  # pack(fill=BOTH, expand=1)
-        self.summ_frame.columnconfigure(0, weight=1)
-        self.summ_frame.rowconfigure(0, weight=1)
-        # self.summ_frame.rowconfigure(1, weight=1)
+        summ_text = ['List of ', 'Lijst van ']
+        plurality = ['s', 'en']
+        self.summ_name = summ_text[self.GUI_lang_index] + self.object_in_focus.name \
+                         + plurality[self.GUI_lang_index]
+        self.summ_frame = gui.VBox(width='100%', height='100%',
+                                   style='background-color:#eeffdd')
+        self.user_interface.views_noteb.add_tab(self.summ_frame,
+                                                self.summ_name, self.tab_cb(self.summ_name))
+        summ_head_text = ['Aspects per object of a particular kind',
+                          'Aspecten per object van een bepaalde soort']
+        self.summ_frame.attributes['title'] = summ_head_text[self.GUI_lang_index]
 
-        summary = ['Summary', 'Overzicht']
-        self.views_noteb.add(self.summ_frame, text=summary[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end", self.summ_frame, sticky=NSEW)
+        self.summ_button_row = gui.HBox(height=20, width='100%')
 
-        summHead = ['Aspects per object of a particular kind',
-                    'Aspecten per object van een bepaalde soort']
-        summ_lbl = Label(self.summ_frame, text=summHead[self.GUI_lang_index])
+        self.summ_detail = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                     width='15%', height=20)
+        self.summ_detail.attributes['title'] = 'First select a row, ' \
+                                               'then display details of selected item'
+        self.summ_detail.onclick.connect(self.Summ_detail_view)
+        self.summ_button_row.append(self.summ_detail)
+        
+        self.close_summ = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                     width='15%', height=20)
+        self.close_summ.attributes['title'] = 'Press button when you want to remove this tag'
+        self.close_summ.onclick.connect(self.user_interface.Close_tag,
+                                        self.user_interface.views_noteb,
+                                        self.summ_name)
+        self.summ_button_row.append(self.close_summ)
 
-        headings = ['UID', 'Name', 'Kind', 'Community', 'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4',
-                    'Aspect5', 'Aspect6', 'Aspect7', 'Aspect8', 'Aspect9', 'Aspect10']
-        nr_of_cols = len(self.summ_column_names)
-        display_cols = headings[3: nr_of_cols]
+        self.summ_frame.append(self.summ_button_row)
 
-        self.summ_tree = Treeview(self.summ_frame, columns=(headings[0: nr_of_cols]),
-                                  displaycolumns=display_cols, selectmode='browse', height=30)
+        self.summ_tree = MyTable(width='100%',
+                                 style={"overflow": "auto", "background-color": "#eeffaa",
+                                        "border-width": "2px", "border-style": "solid",
+                                        "font-size": "12px", 'table-layout': 'auto',
+                                        'text-align': 'left'})
+        # Summary table: UID, Name, Kind, Community, Aspect{1,n)
+        self.summ_column_names[0:4] = ['UID', 'Name', 'Kind', 'Community']
+        summ_heading = []
+        summ_heading.append(tuple(self.summ_column_names[1:]))
+        self.summ_tree.append_from_list(summ_heading, fill_title=True)
+        self.summ_frame.append(self.summ_tree)
 
-        self.summ_tree.heading('#0', text='Object', anchor=W)
-        self.summ_tree.heading('UID', text='UID', anchor=W)
-        self.summ_tree.heading('Name', text=self.name_head[self.GUI_lang_index], anchor=W)
-        self.summ_tree.heading('Kind', text=self.kind_head[self.GUI_lang_index], anchor=W)
-        self.summ_tree.heading('Community', text=self.comm_head[self.GUI_lang_index], anchor=W)
-
-        self.summ_tree.column('#0', minwidth=100, width=200)
-        self.summ_tree.column('Community', minwidth=20, width=50)
-        asp = 0
-        for column in self.summ_column_names[4:]:
-            asp += 1
-            Asp_name = 'Aspect' + str(asp)
-            self.summ_tree.heading(Asp_name, text=self.summ_column_names[asp + 3], anchor=W)
-            self.summ_tree.column(Asp_name, minwidth=20, width=50)
-
-        self.summ_tree.columnconfigure(0, weight=1)
-        self.summ_tree.rowconfigure(0, weight=1)
-
-        # self.summ_tree.tag_configure('col_tag', option=None, background='#9f9')
-        self.summ_tree.tag_configure('uom_tag', option=None, background='#ccf')
-        self.summ_tree.tag_configure('sum_tag', option=None, background='#cfc')
-
-        summScroll = Scrollbar(self.summ_frame, orient=VERTICAL, command=self.summ_tree.yview)
-        summ_lbl.grid(column=0, row=0, sticky=EW)
-        self.summ_tree.grid(column=0, row=1, sticky=NSEW)
-        summScroll.grid(column=0, row=1, sticky=NS + E)
-        self.summ_tree.config(yscrollcommand=summScroll.set)
-
-        self.summ_tree.bind(sequence='<Double-1>', func=self.Summ_detail_view)
+        self.uom_tag = '#ccf'
+        self.sum_tag = '#cfc'
 
     def Display_summary_view(self):
         """ Display a summary view that provides a list of items and their aspects."""
         # Display the header row with units of measure in summ_tree treeview
-        self.summ_tree.insert('', index='end', values=self.summ_uom_names, tags='uom_tag')
+        summ_uom_widget = gui.TableRow(style={'text-align': 'left'})
+        for index, field in enumerate(self.summ_uom_names[1:]):
+            color = self.uom_tag
+            summ_uom_item = gui.TableItem(text=field,
+                                          style={'text-align': 'left',
+                                                 'background-color': color})
+            summ_uom_widget.append(summ_uom_item, field)
+        self.summ_tree.append(summ_uom_widget, 'UoM')
+        
         # Display the various summ_model rows in summ_tree treeview
-        parents = []
-        for summ_line in self.summ_model:
-            if summ_line[2] == '' or summ_line[2] in parents:
-                if self.summ_tree.exists(summ_line[1]):
-                    continue
-                else:
-                    # Summ_line[2] is the supertype
-                    self.summ_tree.insert(summ_line[2], index='end', values=summ_line,
-                                          tags='sum_tag', iid=summ_line[1],
-                                          text=summ_line[1], open=True)
-                    parents.append(summ_line[1])
+        # Select displayed columns
+        nr_of_cols = len(self.summ_column_names)
+        # Sort the table by product name
+        self.summ_model_sorted = []
+        for row in self.sort_table(self.summ_model, 1):
+            self.summ_model_sorted.append(row)
+        # Display the summary table
+        for summ_line in self.summ_model_sorted:
+            summ_row_widget = gui.TableRow(style={'text-align': 'left'})
+            for index, field in enumerate(summ_line[1:nr_of_cols]):
+                color = self.sum_tag
+                summ_row_item = gui.TableItem(text=field,
+                                              style={'text-align': 'left',
+                                                     'background-color': color})
+                summ_row_widget.append(summ_row_item, field)
+            self.summ_tree.append(summ_row_widget, summ_line[1])
+
+    def sort_table(self, table, col=0):
+        return sorted(table, key=operator.itemgetter(col))
 
     def Define_and_display_possibilities_of_kind(self):
         # Destroy earlier possib_frame
@@ -2915,7 +2959,7 @@ class Display_views():
         self.Display_kind_model_view()
 
     def Define_kind_model_sheet(self):
-        """ Kind_model View tab sheet for a kind in Notebook."""
+        """ Define a kind model view tab sheet for a kind in Notebook."""
         self.kind_frame = Frame(self.views_noteb)
         self.kind_frame.grid(column=0, row=0, sticky=NSEW)  # pack(fill=BOTH, expand=1)
         self.kind_frame.columnconfigure(0, weight=1)
@@ -2994,7 +3038,7 @@ class Display_views():
         self.kind_tree.bind(sequence='<Button-3>', func=self.Kind_detail_view_right)
 
     def Display_kind_model_view(self):
-        """ Kind_model Model view of a kind: Display prod_model in self.kind_tree:
+        """ Display a model view of a kind: Display kind_model in self.kind_tree:
             self.kind_tree.insert('',index=0,iid='UIDInFocus',values=[nameInFocus,kindDat],
             tags='focus_tag',open=True).
         """
@@ -3087,11 +3131,11 @@ class Display_views():
         """ Product_model view tab sheet in Notebook
             Preceded by a frame with a number of buttons corresponding with binds.
         """
-        self.prod_frame = gui.VBox(width='100%', height='80%',
+        self.prod_frame = gui.VBox(width='100%', height='100%',
                                    style={'overflow': 'auto',
                                           'background-color': '#eeffdd'})
-        prod_text = ['Product model', 'Productmodel']
-        self.prod_name = prod_text[self.GUI_lang_index] + ' of ' + self.object_in_focus.name
+        prod_text = ['Product model of ', 'Productmodel van ']
+        self.prod_name = prod_text[self.GUI_lang_index] + self.object_in_focus.name
         self.user_interface.views_noteb.add_tab(self.prod_frame, self.prod_name,
                                                 self.tab_cb(self.prod_name))
         self.prod_button_row = gui.HBox(height=20, width='100%')
@@ -3174,21 +3218,19 @@ class Display_views():
             head = False
             head_line = []
             line_type = prod_line[3]
-            name = prod_line[5]
-            # Debug print('Prod_line:',prod_line)
+            str_line = str(line_type)
+            # Debug print('Prod_line:', prod_line)
             # If line_type == 1
             # then prepare header line from prod_line for level 0 object
             # Note: line_type == 2 and 3 are skipped in this view
             if line_type == 1:
+                name = prod_line[5]
                 head_line = prod_line[0:4]
                 head_line.append(name)
                 head_line.append('')
                 head_line.append('')
                 head_line.append(prod_line[9])
-##                nameInFocus = head_line[4]
-                # Debug print('Head_line:', head_line)
-##                level0Part = self.prod_tree.insert('', index='end', values=head_line,
-##                                                   text=nameInFocus, tags='focus_tag', open=True)
+                print('Head_line:', name, head_line)
                 prod_row_widget = gui.TableRow(style={'text-align': 'left',
                                                       'background-color': self.val_color})
                 for index, field in enumerate(head_line[4:]):
@@ -3198,14 +3240,9 @@ class Display_views():
                     prod_row_widget.append(prod_row_item, field)
                 level0Part = self.prod_tree.append(prod_row_widget, name)
                 previusPart = level0Part
-            # If line_type == 4
-            # then prepare header line from prod_line for level 0 object
-            # Note: line_type == 1, 2 and 3 are skipped in this view
-            if line_type == 4:
-##                nameInFocus = prod_line[5]
-                prod_name = prod_line[4]
-##                level0Part = self.prod_tree.insert('', index='end', values=prod_line,
-##                                                   text=prod_name, tags='focus_tag', open=True)
+            # Note: line_type == 2 and 3 are skipped in this view
+            elif line_type == 4:
+                prod_name = prod_line[4] + str_line
                 prod_row_widget = gui.TableRow()
                 for index, field in enumerate(prod_line[4:]):
                     prod_row_item = gui.TableItem(text=field,
@@ -3230,7 +3267,7 @@ class Display_views():
                     # Set color to 'head_color' for each field in the header line
                     for col in range(0, 14):
                         value_colors[col] = self.head_color
-                    prod_name = prod_line[4]
+                    prod_name = prod_line[4] + str_line
                     # Determine whether roles may appear in prod_line[4]
                     # in lines following the header line
                     # to avoid that they are included in the indented hierarchy
@@ -3249,13 +3286,15 @@ class Display_views():
                 # then remember the part as a previous part
                 elif prod_line[4] != '':
                     previusPart = level0Part
-                    prod_name = prod_line[4]
+                    prod_name = prod_line[4] + str_line
                 elif prod_line[5] != '':
                     previusPart = level1Part
-                    prod_name = prod_line[5]
+                    prod_name = prod_line[5] + str_line
                 elif prod_line[6] != '':
                     previusPart = level2Part
-                    prod_name = prod_line[6]
+                    prod_name = prod_line[6] + str_line
+                else:
+                    prod_name = prod_name + str_line
 
                 # Set tag background color depending on value
                 # If value is missing then backgroumd color is yellow
@@ -3267,12 +3306,10 @@ class Display_views():
                     value_colors[9] = self.missing
 
                 if possible_roles is True and prod_line[4] == '':
-                    prod_name = ''
+                    prod_name = '' + str_line
 
-                # Insert line
+                # Insert line in prod_tree
                 # Debug print('Values:', prod_line[1], type(prod_line[1]))
-##                id = self.prod_tree.insert(previusPart, index='end', values=prod_line,
-##                                           text=prod_name, tags=value_tags, open=True)
                 prod_row_widget = gui.TableRow(style={'text-align': 'left'})
                 for index, field in enumerate(prod_line[4:]):
                     color = value_colors[index + 4]
@@ -3285,7 +3322,7 @@ class Display_views():
                 # If the line is a header line, then continue to next line
                 if head is True:
                     continue
-                # If the line is a value line and the there is a name of a part
+                # If the line is a value line and there is a name of a part
                 #   then remember the part as a previous part
                 elif prod_line[4] != '':
                     level1Part = id
