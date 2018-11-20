@@ -90,7 +90,8 @@ class Query_view():
         """
         query_text = ["Search", "Zoek"]
         self.query_widget = gui.Widget(height='100%', width='100%',
-                                       style={'display': 'block', 'background-color': '#eeffdd'})
+                                       style={'display': 'block',
+                                              'background-color': '#eeffdd'})
         search_title = ['A table for searching and selecting objects '
                         'from the semantic network (dictionary)',
                         'Een tabel voor het zoeken en selecteren van objecten '
@@ -101,8 +102,8 @@ class Query_view():
                                                 self.user_interface.tab_cb)
 
         self.first_line_widget = gui.HBox(height=20, width=750, margin='4px',
-                                          style='position: static; background-color: #eeffdd')
-
+                                          style={'position': 'static',
+                                                 'background-color': '#eeffdd'})
         # Define a reply language with the language selector
         lang_text = ['Reply language:', 'Antwoordtaal:']
         reply_text = ['Select the language used for display of search results',
@@ -454,7 +455,7 @@ class Query_view():
                     row_item = gui.TableItem(text=field,
                                              style={'text-align': 'left'})
                     row_widget.append(row_item, field)
-                    self.options_table.append(row_widget, opt[1])
+                self.options_table.append(row_widget, opt[1])
 
                 # Display lh_object uid
                 self.query.q_lh_uid = lh_uid
