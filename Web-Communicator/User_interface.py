@@ -33,10 +33,10 @@ class MyTabBox(gui.TabBox):
         tab_w = 100.0 / len(self._tabs)
         for a, li, holder in self._tabs.values():
             li.style['float'] = "left"
-            # Here you can change the size percentage
+            # Specify the size percentage
             li.style['width'] = "%.0f%%" % (tab_w - 1)
 
-            # Here we can change text height
+            # Specify the text height
             a.style['height'] = "20px"
             a.style['line-height'] = "10px"
 
@@ -98,7 +98,7 @@ class Communicator(App):
 
         # Define main GUI window conform the REMI gui
         self.container = gui.Widget(margin='2px', style='background-color:#eeffdd')
-        self.container.set_size('100%', '100%')
+        # self.container.set_size('100%', '100%')
         self.container.attributes['title'] = 'Communicator'
 
         # Menu bar
@@ -172,6 +172,7 @@ class Communicator(App):
 
         # Define a notebook in window
         self.Define_notebook()
+        self.Define_log_sheet()
 
         # Start up semantic network
         self.start_net()
@@ -189,30 +190,28 @@ class Communicator(App):
         return self.container
 
     def Define_notebook(self):
-        ''' Defines a Notebook with various view layouts and displays view contents.
-            Starting in grid on row 1.
-        '''
+        ''' Defines a Notebook with various view layouts and displays view contents.'''
         # Define the overall views_notebook
-        self.views_noteb = MyTabBox(width='100%', height='80%',
+        self.views_noteb = MyTabBox(width='100%', height='100%',
                                     style='background-color:#eeffdd')
         self.main_frame.append(self.views_noteb)
 
-        self.Define_log_sheet()
-
     def Define_log_sheet(self):
         ''' Define a mess_frame for errors and warnings'''
-        log_head = ['Messages and warnings', 'Berichten en foutmeldingen']
-        self.mess_frame = gui.VBox(width='100%', height='20%')
+        log_head_text = ['Messages and warnings', 'Berichten en foutmeldingen']
+        self.mess_frame = gui.VBox(width='100%', height=120,
+                                   style={'overflow': 'auto'})
         self.mess_frame.attributes['title'] = 'Display area for messages and warnings'
 
-        self.log_head = gui.HBox(width='100%', height=20)
-        self.log_label = gui.Label(log_head[self.GUI_lang_index], width='100%', height=20,
+##        self.log_head = gui.HBox(width='100%', height=20)
+        self.log_label = gui.Label(log_head_text[self.GUI_lang_index],
+                                   width='100%', height=20,
                                    style='background-color:#bbffff')
-        self.log_head.append(self.log_label)
-        self.log_frame = gui.ListView(width='100%', height='100%',
-                                      style='background-color:#ddffff')
-        self.mess_frame.append(self.log_head)
-        self.mess_frame.append(self.log_frame)
+##        self.log_head.append(self.log_label)
+        self.log_messages = gui.ListView(width='100%', height='100%',
+                                         style='background-color:#ddffff')
+        self.mess_frame.append(self.log_label)
+        self.mess_frame.append(self.log_messages)
 
         self.main_frame.append(self.mess_frame)
 
@@ -385,11 +384,11 @@ class Communicator(App):
         self.set_root_widget(self.container)
 
     def message_ui(self, mess_text_EN, mess_text_NL):
-        ''' Display a message in the log_frame in any of the languages'''
+        ''' Display a message in the log_messages in any of the languages'''
         if self.GUI_lang_index == 1:
-            self.log_frame.append(mess_text_NL)
+            self.log_messages.append(mess_text_NL)
         else:
-            self.log_frame.append(mess_text_EN)
+            self.log_messages.append(mess_text_EN)
 
     def user_manual(self, widget):
         ''' Open the user manual wiki. '''
