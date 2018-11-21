@@ -300,7 +300,7 @@ class Display_views():
             self.indiv_row[4] = community_name
 
             # Find aspects of individual object_in_focus
-            nr_of_aspects = self.Find_aspects(obj, role)
+            self.Find_aspects(obj, role)
 
             # Find parts and their aspects
             self.part_head_req = True
@@ -490,7 +490,7 @@ class Display_views():
               conform the header line for aspects (line type 3).
         """
         # Search for aspects and their values
-        nr_of_aspects = 0  # nr of found aspects for this indiv object
+        self.nr_of_aspects = 0  # nr of found aspects for this indiv object
         aspect_uid = ''
         aspect_name = ''
         equality = ''
@@ -563,7 +563,7 @@ class Display_views():
 
             # An aspect is found or a qualitative aspect is found
             status = expr[status_col]
-            nr_of_aspects += 1
+            self.nr_of_aspects += 1
 
             # Find the aspect object from its uid
             # being the aspect in the <has as aspect> relation
@@ -645,7 +645,7 @@ class Display_views():
                                 format(uom_name, uom_uid, aspect_name,
                                        self.summ_uom_names[self.summ_ind]))
 
-            # If the object in focus is not a kind, then add aspect row to prod_model. 
+            # If the object in focus is not a kind, then add aspect row to prod_model.
             if self.object_in_focus.category not in self.kinds:
                 # Indiv_table
                 # If the object is the object_in_focus and not one of its subtypes,
@@ -691,24 +691,24 @@ class Display_views():
                 # Prod_model
                 # Create prod_model text line for output view
                 self.line_nr += 1
-                # Debug print('Aspect of obj.:', self.decomp_level, nr_of_aspects,
+                # Debug print('Aspect of obj.:', self.decomp_level, self.nr_of_aspects,
                 #             indiv.name, aspect_name)
-                if self.decomp_level == 0 and nr_of_aspects == 1:
+                if self.decomp_level == 0 and self.nr_of_aspects == 1:
                     prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
                                    self.line_nr, indiv.name, role, '', indiv.kind_name,
                                    aspect_name, aspect.kind_name, equality,
                                    value_name, uom_name, status]
-                elif self.decomp_level == 1 and nr_of_aspects == 1:
+                elif self.decomp_level == 1 and self.nr_of_aspects == 1:
                     prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
                                    self.line_nr, indiv.name, role, '', indiv.kind_name,
                                    aspect_name, aspect.kind_name, equality,
                                    value_name, uom_name, status]
-                elif self.decomp_level == 2 and nr_of_aspects == 1:
+                elif self.decomp_level == 2 and self.nr_of_aspects == 1:
                     prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
                                    self.line_nr, role, indiv.name, '', indiv.kind_name,
                                    aspect_name, aspect.kind_name, equality,
                                    value_name, uom_name, status]
-                elif self.decomp_level == 3 and nr_of_aspects == 1:
+                elif self.decomp_level == 3 and self.nr_of_aspects == 1:
                     prod_line_3 = [indiv.uid, indiv.kind_uid, aspect_uid,
                                    self.line_nr, '', role, indiv.name, indiv.kind_name,
                                    aspect_name, aspect.kind_name, equality,
@@ -752,7 +752,7 @@ class Display_views():
                 self.indiv_model.append(self.indiv_row[:])
 
         self.indiv_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
-        return nr_of_aspects
+        return
 
     def Determine_aspect_value(self, aspect, qualifier):
         """ Determine the equality, value and unit of measure of the aspect object.
@@ -1120,10 +1120,10 @@ class Display_views():
 
                     # Search for aspects of part
                     role = ''
-                    nr_of_aspects = self.Find_aspects(part, role)
+                    self.Find_aspects(part, role)
 
                     # if no aspects of part found, record part only (in prod_model)
-                    if nr_of_aspects == 0:
+                    if self.nr_of_aspects == 0:
                         self.line_nr += + 1
                         if self.decomp_level == 1:
                             prod_line_4 = [part.uid, part_kind_uid, '',
@@ -1177,7 +1177,7 @@ class Display_views():
         # with the obj.uid (or its supertypes) at left or at right.
 
         # Initialize number of kinds of aspects that are possessed by this kind of object
-        nr_of_aspects = 0
+        self.nr_of_aspects = 0
         value_name = ''
         aspect_uid = ''
         aspect_name = ''
@@ -1223,7 +1223,7 @@ class Display_views():
                     continue
 
                 # There is a kind of aspect found
-                nr_of_aspects += 1
+                self.nr_of_aspects += 1
                 status = expr[status_col]
                 equality = '='
                 value_uid = ''
@@ -1341,7 +1341,7 @@ class Display_views():
                 if self.subtype_level == 0:
                     # Create and insert header for possible characteristics of part
                     # (only preceding the first aspect)
-                    if nr_of_aspects == 1:
+                    if self.nr_of_aspects == 1:
                         self.poss_asp_of_obj_text = \
                             possible_aspect_text[self.GUI_lang_index] + obj_name
                         self.possibility_row[0] = obj.uid
@@ -1375,7 +1375,7 @@ class Display_views():
                         self.possibility_row = \
                             ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
 
-                # Debug print('obj_i', value_presence, obj_i.name, nr_of_aspects, aspect_name,
+                # Debug print('obj_i', value_presence, obj_i.name, self.nr_of_aspects, aspect_name,
                 #      value_name, len(self.taxon_aspect_uids))
 
                 if value_presence is True:
@@ -1429,7 +1429,7 @@ class Display_views():
                         supertype_name = self.unknown[self.GUI_lang_index]
                     self.Add_prod_model_line_type3(self.subtype_level,
                                                    obj_i.uid, supertype_uid, aspect_uid,
-                                                   nr_of_aspects, obj.name, role,
+                                                   obj.name, role,
                                                    supertype_name, aspect_name, equality,
                                                    value_name, uom_name, status)
 
@@ -1543,7 +1543,7 @@ class Display_views():
                         #      self.taxon_row[0:4])
 
             self.taxon_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
-        return nr_of_aspects
+        return
 
     def Determine_preferred_kind_name(self, obj):
         """ Determine the preferred name of the first kind that classified obj
@@ -1671,12 +1671,12 @@ class Display_views():
                     self.possibilities_model.append(self.possibility_row[:])
 
                 # Search for aspects of the kind of part
-                nr_of_aspects = self.Find_kinds_of_aspects(part, role)
-                if nr_of_aspects > 0:
+                self.Find_kinds_of_aspects(part, role)
+                if self.nr_of_aspects > 0:
                     # Verify consistency between aspect values and implied aspect values.
                     # === to be completed ===
 
-                    # Debug print('*** Nr of aspects to be verified', nr_of_aspects)
+                    # Debug print('*** Nr of aspects to be verified', self.nr_of_aspects)
                     # Verify whether there are implied parts with aspect values
                     if len(self.implied_parts_dict) > 0:
                         for key, implied_tuple in self.implied_parts_dict:
@@ -1715,7 +1715,7 @@ class Display_views():
             # Create kind_model lines of part
             for key, implied_tuple in self.implied_parts_dict.items():
                 self.decomp_level = 1
-                nr_of_aspects = 1
+                self.nr_of_aspects = 1
                 part_name = implied_tuple[0]
                 if len(self.uid_dict[key[0]].supertypes) > 0:
                     part_kind_uid = self.uid_dict[key[0]].supertypes[0].uid
@@ -1732,33 +1732,33 @@ class Display_views():
 
                 self.Add_prod_model_line_type3(subtype_of_part_level,
                                                key[0], part_kind_uid, implied_tuple[1],
-                                               nr_of_aspects, part_name, role,
+                                               part_name, role,
                                                part_kind_name, aspect_name, equality,
                                                value_name, uom_name, status)
 
     def Add_prod_model_line_type3(self, subtype_level,
-                                  part_uid, part_kind_uid, aspect_uid, nr_of_aspects,
+                                  part_uid, part_kind_uid, aspect_uid,
                                   part_name, role, part_kind_name,
                                   aspect_name, equality, value_name, uom_name, status):
         """ Create a line_type 3 for product model view."""
         self.line_nr += 1
         # Decomp_level = 0 means object in focus, 1 means: part (2 = part of part, etc.)
-        if self.decomp_level == 1 and nr_of_aspects <= 1:
+        if self.decomp_level == 1 and self.nr_of_aspects <= 1:
             prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr,
                            part_name, role, '', part_kind_name, aspect_name, '', equality,
                            value_name, uom_name, status]
         # Decomp_level = 2 means: part of part
-        elif self.decomp_level == 2 and nr_of_aspects == 1:
+        elif self.decomp_level == 2 and self.nr_of_aspects == 1:
             prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr,
                            role, part_name, '', part_kind_name, aspect_name, '', equality,
                            value_name, uom_name, status]
-        elif self.decomp_level == 3 and nr_of_aspects == 1:
+        elif self.decomp_level == 3 and self.nr_of_aspects == 1:
             prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr,
                            '', role, part_name, part_kind_name, aspect_name, '', equality,
                            value_name, uom_name, status]
 
         # Subtype_level = 1 means: first decomp_level subtype
-        elif subtype_level > 0 and nr_of_aspects == 1:
+        elif subtype_level > 0 and self.nr_of_aspects == 1:
             prod_line_3 = [part_uid, part_kind_uid, aspect_uid, self.line_nr,
                            part_name, role, '', part_kind_name, aspect_name, '', equality,
                            value_name, uom_name, status]
@@ -1812,7 +1812,7 @@ class Display_views():
                 self.summary_row[3] = community_name
 
                 role = ''
-                nr_of_aspects = self.Find_aspects(indiv, role)
+                self.Find_aspects(indiv, role)
 
                 # Insert an intermediate inter_row header for classified individual things
                 # in the taxonomy; the first time only
@@ -1909,11 +1909,11 @@ class Display_views():
             occ_role = ''
             self.occ_in_focus = 'occurrence'
             # Find possession of aspect relations for aspects of occurrence
-            nr_of_aspects = self.Find_aspects(occ, occ_role)
+            self.Find_aspects(occ, occ_role)
 
             # If no aspects found then line without aspects
             # (otherwise line is included in Find_aspects
-            if nr_of_aspects == 0:
+            if self.nr_of_aspects == 0:
                 self.line_nr += + 1
                 prod_line_5 = [occ.uid, occ_kind.uid, '',
                                self.line_nr, occ_name, '', '',
@@ -1966,10 +1966,10 @@ class Display_views():
 
                 # Search for aspects of objects that are involved in occurrence
                 # Find possession of aspect relations of involved object
-                nr_of_aspects = self.Find_aspects(involved, inv_role_name)
+                self.Find_aspects(involved, inv_role_name)
 
                 # if no aspects of part found, then record part only
-                if nr_of_aspects == 0:
+                if self.nr_of_aspects == 0:
                     self.line_nr += + 1
                     prod_line_6 = [involved.uid, involved_kind.uid, '',
                                    self.line_nr, '', inv_role_name, involved.name,
@@ -2419,14 +2419,14 @@ class Display_views():
         self.taxon_classify.attributes['title'] = 'Classify earlier selected individual ' \
                                                   'by the selected kind'
         self.taxon_classify.onclick.connect(self.Classify_individual)
-        
+
         self.taxon_close = gui.Button(self.close_button_text[self.GUI_lang_index],
                                       width='15%', height=20)
         self.taxon_close.attributes['title'] = 'Press button when you want to remove this tag'
         self.taxon_close.onclick.connect(self.user_interface.Close_tag,
                                          self.user_interface.views_noteb,
                                          self.taxon_name)
-        
+
         self.taxon_button_row.append(self.taxon_classify)
         self.taxon_button_row.append(self.taxon_close)
         self.taxon_frame.append(self.taxon_button_row)
@@ -2496,13 +2496,20 @@ class Display_views():
 
     def Define_summary_sheet(self):
         """ Define a summary_sheet for display of summ_model(a list of summary_rows)
-            for display in a tab of Notebook.
+            for a list of individual things for display in a tab of Notebook.
             Summ_model table = obj.uid, obj.name, kind_name, community_name, aspects.
         """
+        # Determine tab text
         summ_text = ['List of ', 'Lijst van ']
+        indiv_text = ['individual things', 'individuele dingen']
         plurality = ['s', 'en']
-        self.summ_name = summ_text[self.GUI_lang_index] + self.object_in_focus.name \
-                         + plurality[self.GUI_lang_index]
+        if self.object_in_focus.category in self.kinds:
+            self.summ_name = summ_text[self.GUI_lang_index] + self.object_in_focus.name \
+                             + plurality[self.GUI_lang_index]
+        else:
+            self.summ_name = summ_text[self.GUI_lang_index] + indiv_text[self.GUI_lang_index] \
+                             + '(' + self.object_in_focus.name + ')'
+
         self.summ_frame = gui.VBox(width='100%', height='100%',
                                    style='background-color:#eeffdd')
         self.user_interface.views_noteb.add_tab(self.summ_frame,
@@ -2514,12 +2521,12 @@ class Display_views():
         self.summ_button_row = gui.HBox(height=20, width='100%')
 
         self.summ_detail = gui.Button(self.close_button_text[self.GUI_lang_index],
-                                     width='15%', height=20)
+                                      width='15%', height=20)
         self.summ_detail.attributes['title'] = 'First select a row, ' \
                                                'then display details of selected item'
         self.summ_detail.onclick.connect(self.Summ_detail_view)
         self.summ_button_row.append(self.summ_detail)
-        
+
         self.close_summ = gui.Button(self.close_button_text[self.GUI_lang_index],
                                      width='15%', height=20)
         self.close_summ.attributes['title'] = 'Press button when you want to remove this tag'
@@ -2556,7 +2563,7 @@ class Display_views():
                                                  'background-color': color})
             summ_uom_widget.append(summ_uom_item, field)
         self.summ_tree.append(summ_uom_widget, 'UoM')
-        
+
         # Display the various summ_model rows in summ_tree treeview
         # Select displayed columns
         nr_of_cols = len(self.summ_column_names)
@@ -3079,12 +3086,12 @@ class Display_views():
                 # If the line is a value line (thus not a header line)
                 # and there is a name of a part
                 # then remember the part as a previous part
-                elif kindLine[4] != '':
-                    previusPart = level0Part
-                elif kindLine[5] != '':
-                    previusPart = level1Part
-                elif kindLine[6] != '':
-                    previusPart = level2Part
+                # elif kindLine[4] != '':
+                #     previusPart = level0Part
+                # elif kindLine[5] != '':
+                #     previusPart = level1Part
+                # elif kindLine[6] != '':
+                #     previusPart = level2Part
 
                 # Set tag background color depending on value
                 # If value is missing then bachgroumd color is yellow
@@ -3156,7 +3163,7 @@ class Display_views():
         asp_button_text = ['Details of aspect',
                            'Details van aspect']
         self.asp_button = gui.Button(asp_button_text[self.GUI_lang_index],
-                                         width='20%', height=20)
+                                     width='20%', height=20)
         self.asp_button.attributes['title'] = 'Select a row, ' \
                                               'then display details of aspect'
         self.asp_button.onclick.connect(self.Prod_aspect)
@@ -3209,13 +3216,9 @@ class Display_views():
         further_part = ['Further part', 'Verder deel']
         kind_of_part = ['Kind of part', 'Soort deel']
         possible_roles = False  # No roles expected
-        level0Part = ''
-        level1Part = ''
-        level2Part = ''
 
         for prod_line_0 in self.prod_model:
             prod_line = prod_line_0[:]
-            head = False
             head_line = []
             line_type = prod_line[3]
             str_line = str(line_type)
@@ -3230,7 +3233,6 @@ class Display_views():
                 head_line.append('')
                 head_line.append('')
                 head_line.append(prod_line[9])
-                print('Head_line:', name, head_line)
                 prod_row_widget = gui.TableRow(style={'text-align': 'left',
                                                       'background-color': self.val_color})
                 for index, field in enumerate(head_line[4:]):
@@ -3238,8 +3240,7 @@ class Display_views():
                                                   style={'text-align': 'left',
                                                          'background-color': self.available})
                     prod_row_widget.append(prod_row_item, field)
-                level0Part = self.prod_tree.append(prod_row_widget, name)
-                previusPart = level0Part
+                self.prod_tree.append(prod_row_widget, name)
             # Note: line_type == 2 and 3 are skipped in this view
             elif line_type == 4:
                 prod_name = prod_line[4] + str_line
@@ -3247,10 +3248,9 @@ class Display_views():
                 for index, field in enumerate(prod_line[4:]):
                     prod_row_item = gui.TableItem(text=field,
                                                   style={'text-align': 'left',
-                                                          'background-color': self.head_color})
+                                                         'background-color': self.head_color})
                     prod_row_widget.append(prod_row_item, field)
-                level0Part = self.prod_tree.append(prod_row_widget, prod_name)
-                previusPart = level0Part
+                self.prod_tree.append(prod_row_widget, prod_name)
 
             # In prod_tree view line_type 2 and 3 are not displayed.
             elif line_type > 4:
@@ -3263,7 +3263,6 @@ class Display_views():
                 if prod_line[4] in self.comp_head or prod_line[4] in self.occ_head or \
                    prod_line[4] in self.info_head or prod_line[8] in self.aspect_head or \
                    prod_line[5] in self.part_occ_head or prod_line[4] in self.subs_head:
-                    head = True
                     # Set color to 'head_color' for each field in the header line
                     for col in range(0, 14):
                         value_colors[col] = self.head_color
@@ -3285,13 +3284,10 @@ class Display_views():
                 # and there is a name of a part
                 # then remember the part as a previous part
                 elif prod_line[4] != '':
-                    previusPart = level0Part
                     prod_name = prod_line[4] + str_line
                 elif prod_line[5] != '':
-                    previusPart = level1Part
                     prod_name = prod_line[5] + str_line
                 elif prod_line[6] != '':
-                    previusPart = level2Part
                     prod_name = prod_line[6] + str_line
                 else:
                     prod_name = prod_name + str_line
@@ -3317,21 +3313,7 @@ class Display_views():
                                                   style={'text-align': 'left',
                                                          'background-color': color})
                     prod_row_widget.append(prod_row_item, field)
-                id = self.prod_tree.append(prod_row_widget, prod_name)
-
-                # If the line is a header line, then continue to next line
-                if head is True:
-                    continue
-                # If the line is a value line and there is a name of a part
-                #   then remember the part as a previous part
-                elif prod_line[4] != '':
-                    level1Part = id
-                    previusPart = level0Part
-                elif prod_line[5] != '':
-                    level2Part = id
-                    previusPart = level1Part
-                elif prod_line[6] != '':
-                    previusPart = level2Part
+                self.prod_tree.append(prod_row_widget, prod_name)
 
     def Define_and_display_data_sheet(self):
         # Destroy earlier data sheet
@@ -3967,7 +3949,8 @@ class Display_views():
                 # If info_kind is a description
                 # then display the destription in messagebox
                 if tree_values[7] in description_text:
-                    messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + self.selected_obj.name,
+                    messagebox.showinfo(obj_descr_title[self.GUI_lang_index]
+                                        + self.selected_obj.name,
                                         self.selected_obj.description)
                 else:
                     self.Display_message(
@@ -4124,7 +4107,8 @@ class Display_views():
 ##        # Verify whether object is an individual thing due to being classified
 ##        parts = str(taxon_values[2]).partition(' ')
 ##        if parts[0] in classifier:
-##            # Debug print('Display details of individual:', taxon_values[0], self.selected_obj.name)
+##            # Debug print('Display details of individual:', taxon_values[0],
+##                          self.selected_obj.name)
 ##            self.Define_and_display_individual_detail_view(self.selected_obj)
 ##        else:
 ##            # Debug print('Display details of kind:',taxon_values[0], self.selected_obj.name)
@@ -4142,7 +4126,7 @@ class Display_views():
             # by adding a classification relation to that object
             self.Add_classification_relation()
             self.modification = 'classification completed'
-            
+
             # Display modified product view
             self.Define_and_display_individual_detail_view(self.modified_object)
             self.Display_message(
@@ -4203,7 +4187,8 @@ class Display_views():
         lh_uid_name = [self.modified_object.uid, self.modified_object.name]
         rel_uid_phrase_type = ['1225', self.classification[self.GUI_lang_index], basePhraseUID]
         rh_role_uid_name = ['', '']
-        rh_uid_name = [self.self.selected_obj.uid, self.self.selected_obj.name]  # e.g. 43769, 'roofwindow'
+        # e.g. 43769, 'roofwindow'
+        rh_uid_name = [self.self.selected_obj.uid, self.self.selected_obj.name]
         uom_uid_name = ['', '']
         description = ''
         intent_uid_name = ['491285', statement[self.GUI_lang_index]]
@@ -4334,7 +4319,7 @@ class Display_views():
         info_row = list(row.children.values())
         self.info = info_row[0].get_text()
         print('Selected info:', self.info)
-        
+
 ##        cur_item = self.doc_tree.focus()
 ##        item_dict = self.doc_tree.item(cur_item)
 ##        info_row = list(item_dict['values'])
@@ -4343,7 +4328,8 @@ class Display_views():
         # If right hand mouse button is pressed (sel.num == 3),
         # then determine and display a product view of the object
         # about which the document provides info
-        if sel.num == 3:
+        right = True
+        if right is True:
             if len(info_row) > 1:
                 if info_row[1] != '':
                     self.selected_obj = self.uid_dict[str(info_row[1])]
