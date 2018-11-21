@@ -133,12 +133,12 @@ class Communicator(App):
 
         self.save_as_tag = gui.MenuItem(save_as[self.GUI_lang_index], width=100, height=20)
         self.save_as_tag.attributes['title'] = 'Save semantic network on binary file'
-        
+
         self.admin_tag.append(self.save_as_tag)
 
         self.new_net_tag = gui.MenuItem(new_net[self.GUI_lang_index], width=100, height=20)
         self.new_net_tag.attributes['title'] = 'Delete old and create new semantic network'
-        
+
         self.admin_tag.append(self.new_net_tag)
 
         # Define language selector
