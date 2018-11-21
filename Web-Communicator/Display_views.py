@@ -2505,10 +2505,10 @@ class Display_views():
         plurality = ['s', 'en']
         if self.object_in_focus.category in self.kinds:
             self.summ_name = summ_text[self.GUI_lang_index] + self.object_in_focus.name \
-                             + plurality[self.GUI_lang_index]
+                + plurality[self.GUI_lang_index]
         else:
             self.summ_name = summ_text[self.GUI_lang_index] + indiv_text[self.GUI_lang_index] \
-                             + '(' + self.object_in_focus.name + ')'
+                + '(' + self.object_in_focus.name + ')'
 
         self.summ_frame = gui.VBox(width='100%', height='100%',
                                    style='background-color:#eeffdd')
