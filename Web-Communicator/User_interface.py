@@ -12,6 +12,7 @@ from Query import Query
 from QueryViews import Query_view
 from Display_views import Display_views
 from Create_output_file import Convert_numeric_to_integer
+from Bootstrapping import is_called_uid
 
 
 class MyTabBox(gui.TabBox):
@@ -186,7 +187,7 @@ class Communicator(App):
             self.gel_net.build_network()
             self.net_built = True
 
-        # The REMI gui requires the return of the container in main
+        # The REMI gui requires the return of the container root widget in main
         return self.container
 
     def Define_notebook(self):
@@ -503,7 +504,7 @@ class Communicator(App):
                 for lang_uid in self.reply_lang_pref_uids:
                     for name_in_context in obj.names_in_contexts:
                         if name_in_context[0] == lang_uid \
-                           and name_in_context[3] == '5117':
+                           and name_in_context[3] == is_called_uid:
                             part_def = name_in_context[4]
                             break
                     if part_def:
@@ -542,21 +543,33 @@ class Communicator(App):
             comm_name = self.unknown[self.GUI_lang_index]
             part_def = ''
 
-        # Determine full_def by determining supertype name in the preferred language
-        # and concatenate with part_def
+        # Determine full_def by determining supertype or classifier name
+        # in the preferred language and concatenate with part_def
         super_name = None
         if len(obj.supertypes) > 0 and len(obj.supertypes[0].names_in_contexts) > 0:
             for lang_uid in self.reply_lang_pref_uids:
                 for name_in_context in obj.supertypes[0].names_in_contexts:
                     # Verify if language uid corresponds with required reply language uid
                     if name_in_context[0] == lang_uid \
-                       and name_in_context[3] == '5117':
+                       and name_in_context[3] == is_called_uid:  # '5117'
                         super_name = name_in_context[2]
                         break
                 if super_name:
                     break
+        elif len(obj.classifiers) > 0 and len(obj.classifiers[0].names_in_contexts) > 0:
+            for lang_uid in self.reply_lang_pref_uids:
+                for name_in_context in obj.classifiers[0].names_in_contexts:
+                    # Verify if language uid corresponds with required reply language uid
+                    if name_in_context[0] == lang_uid \
+                       and name_in_context[3] == is_called_uid:  # '5117'
+                        super_name = name_in_context[2]
+                        break
+                if super_name:
+                    break
+                                              
         if super_name:
-            full_def = super_name + ' ' + part_def
+            is_a = ['is a ', 'is een ']
+            full_def = is_a[self.GUI_lang_index] + super_name + ' ' + part_def
         else:
             full_def = part_def
 
