@@ -1512,7 +1512,8 @@ class Display_views():
             Taxon_model: uid, name, preferred name of super, comm, aspect values
                      or: uid, 'has as subtypes', name, blank.
         '''
-        print('Tax aspects:', self.hierarchy[obj], self.subtype_level, obj.name, self.taxon_row)
+        # Debug print('Tax aspects:', self.hierarchy[obj], self.subtype_level,
+        #             obj.name, self.taxon_row)
         if len(obj.supertypes) > 0:
             # Create a row in the taxonomy per direct supertype
             for supertype in obj.supertypes:
@@ -2503,7 +2504,7 @@ class Display_views():
             uid = taxon_line[0]
             obj = self.uid_dict[uid]
             target_level = self.hierarchy[obj] + 1
-            print('Taxon_model:', sub_level, target_level, taxon_line)
+            # Debug print('Taxon_model:', sub_level, target_level, taxon_line)
             name_of_super = taxon_line[2]
             # Debug print('Taxon_line', taxon_line)
             # If the supertype name (taxon_line[2]) is blank or in the list of parents,
