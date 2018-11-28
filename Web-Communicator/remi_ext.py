@@ -1,5 +1,59 @@
 import remi.gui as gui
 
+class SingleRowSelectionTable(gui.Table):
+    ''' A subclass of gui.Table that has the feature
+        that the last selected row is highlighted.
+    '''
+    @gui.decorate_event
+    def on_table_row_click(self, row, item):
+        ''' Highlight selected row.'''
+        if hasattr(self, "last_clicked_row"):
+            del self.last_clicked_row.style['outline']
+        self.last_clicked_row = row
+        self.last_clicked_row.style['outline'] = "2px dotted blue"
+        return (row, item)
+
+
+class MultiRowSelectionTable(gui.Table):
+    ''' A subclass of gui.Table that has the feature
+        that the last selected row is highlighted
+        and that allows for multi_row selection.
+    '''
+    def __init__(self, *arg, **kwargs):
+        super(MultiRowSelectionTable, self).__init__(*arg, **kwargs)
+        self.attributes['tabindex'] = '1'
+        self.onkeydown.connect(self.keydown)
+        self.onkeyup.connect(self.keyup)
+        self.multi_selection_enabled = False
+        self.selected_row_list = []
+
+    def keydown(self, emitter, key, ctrl, shift, alt):
+        # print("key:%d ctrl:%d shift:%d alt:%d", (key, ctrl, shift, alt))
+        if ctrl.lower()=='true':
+            self.multi_selection_enabled = True
+
+    def keyup(self, emitter, key, ctrl, shift, alt):
+        self.multi_selection_enabled = False
+
+    def remove_selection(self):
+        for r in self.selected_row_list:
+            del r.style['outline']
+        self.selected_row_list = []
+
+    @gui.decorate_event
+    def on_table_row_click(self, row, item):
+        ''' Highlight selected row(s)
+            and put the result of a muti_row selection
+            in the list "self.selected_row_list".
+        '''
+        if not self.multi_selection_enabled:
+            self.remove_selection()
+        if not row in self.selected_row_list:
+            self.selected_row_list.append(row)
+            row.style['outline'] = "2px dotted blue"
+        return (row, item)
+
+
 class FoldButton(gui.Button):
     def __init__(self, *args, **kwargs):
         super(FoldButton, self).__init__('-', *args, **kwargs)
