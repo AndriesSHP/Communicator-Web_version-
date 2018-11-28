@@ -1,5 +1,6 @@
 # import os
 import remi.gui as gui
+from remi_ext import SingleRowSelectionTable, MultiRowSelectionTable
 from operator import itemgetter
 
 from Bootstrapping import is_called_uid
@@ -9,20 +10,6 @@ from Expr_Table_Def import lh_uid_col, lh_name_col, lh_role_uid_col, rel_type_ui
 from Anything import Anything
 from Create_output_file import Convert_numeric_to_integer
 #   Create_gellish_expression, Open_output_file
-
-
-class MyTable(gui.Table):
-    ''' A subclass of gui.Table that has the feature
-        that the last selected row is highlighted.
-    '''
-    @gui.decorate_event
-    def on_table_row_click(self, row, item):
-        if hasattr(self, "last_clicked_row"):
-            del self.last_clicked_row.style['outline']
-        self.last_clicked_row = row
-        self.last_clicked_row.style['outline'] = "2px dotted blue"
-        return (row, item)
-
 
 class Query_view():
     ''' Defines a query window
@@ -79,6 +66,11 @@ class Query_view():
         self.options_widget = False
         self.aliases_widget = False
         self.aspects_widget = False
+
+    def on_table_row_click(self, emitter, row, item):
+        self.views.Display_message(
+            "Selected item: {}".format(item.get_text()),
+            "Geselecteerd object: {}".format(item.get_text()))
 
     def Define_query_window(self):
         """ Specify a Search term or UID
@@ -318,10 +310,11 @@ class Query_view():
         # rela_col = ['Relation UID', 'Relatie UID']
         # right_col = ['Right UID', 'Rechter UID']
 
-        self.options_table = MyTable(width='100%',
-                                     style={'background-color': '#eeffdd',
-                                            'border-width': '1px', 'border-style': 'solid',
-                                            'font-size': '12px', 'table-layout': 'auto'})
+        self.options_table = SingleRowSelectionTable(
+            width='100%',
+            style={'background-color': '#eeffdd',
+                   'border-width': '1px', 'border-style': 'solid',
+                   'font-size': '12px', 'table-layout': 'auto'})
         self.options_table_head = [(uid_col[self.GUI_lang_index],
                                     name_col[self.GUI_lang_index],
                                     kind_col[self.GUI_lang_index],
@@ -379,10 +372,11 @@ class Query_view():
         value_col = ['Value', 'Waarde']
         uom_col = ['UoM', 'Eenheid']
 
-        self.aspects_table = MyTable(width='100%',
-                                     style={'overflow': 'scroll', 'background-color': '#eeffdd',
-                                            'border-width': '1px', 'border-style': 'solid',
-                                            'font-size': '12px', 'table-layout': 'auto'})
+        self.aspects_table = MultiRowSelectionTable(
+            width='100%',
+            style={'overflow': 'scroll', 'background-color': '#eeffdd',
+                   'border-width': '1px', 'border-style': 'solid',
+                   'font-size': '12px', 'table-layout': 'auto'})
         self.aspects_table_head = [(aspect_col[self.GUI_lang_index],
                                     eq_col[self.GUI_lang_index],
                                     value_col[self.GUI_lang_index],
@@ -698,11 +692,12 @@ class Query_view():
         '''
         aspect_value = []
         self.query.aspect_values = []
-        for val in row.children.values():
-            # Debug print('Aspect value:', val.get_text())
-            aspect_value.append(val.get_text())
-        # Debug print('Query aspects:', aspect_value)
-        self.query.aspect_values.append(aspect_value)
+        for aspect_row in self.aspects_table.selected_row_list:
+            for val in aspect_row.children.values():
+                # Debug print('Aspect value:', val.get_text())
+                aspect_value.append(val.get_text())
+            print('Query aspects:', aspect_value)
+            self.query.aspect_values.append(aspect_value)
 
     def Solve_unknown(self):
         """ Determine the available options (UIDs and names) in the dictionary
@@ -985,12 +980,13 @@ class Query_view():
             rel_options.sort()
             self.gel_net.rel_terms = rel_options
 
-            # Delete previous aliases in alias_tree
+            # If alias_box not yet filled, the fill it
             if self.aliases_widget is False:
                 self.alias_box.append(self.alias_label)
                 self.alias_box.append(self.aliases_table_widget)
                 self.aliases_widget = True
                 self.sixth_line_left_box.append(self.alias_box)
+            # Delete previous aliases in aliases_table and add title row
             self.aliases_table_widget.empty()
             self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
 
@@ -1096,7 +1092,7 @@ class Query_view():
 
     def Determine_aliases(self, obj):
         ''' Collect the names and translation that are known for obj
-            in the alias_table for display in alias_tree treeview.
+            in the alias_table for display aliases view.
             name_in_context = (lang_uid, comm_uid, name, naming_uid, description)
             alias_row = (language, term, alias_type)
         '''
