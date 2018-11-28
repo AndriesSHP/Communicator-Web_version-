@@ -2,7 +2,8 @@ import os
 import operator
 
 import remi.gui as gui
-# from operator import itemgetter
+from remi_ext import TreeTable, FoldButton
+
 from tkinter import ttk, Frame, Scrollbar, Button, Canvas, NSEW, E, NS, S, EW, W, N, \
     VERTICAL, HORIZONTAL, filedialog, messagebox, Tk
 #   Toplevel, LAST, CENTER
@@ -14,12 +15,12 @@ from Expr_Table_Def import lh_name_col, rel_type_name_col, rh_name_col, status_c
     uom_uid_col, uom_name_col, full_def_col, \
     lh_role_uid_col, lh_role_name_col, rh_role_uid_col, rh_role_name_col, \
     expr_col_ids, header3
-# from Query import Query
+
 from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer, \
     Open_output_file
 from Occurrences_diagrams import Occurrences_diagram
 from utils import open_file
-from QueryViews import MyTable
+from QueryViews import SingleRowSelectionTable
 from Anything import Relation
 
 class Display_views():
@@ -51,6 +52,7 @@ class Display_views():
         self.involv_table = []
         self.seq_table = []
         self.part_whole_occs = []
+        self.hierarchy = {}
 
         self.taxon_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
         self.summary_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
@@ -119,6 +121,7 @@ class Display_views():
         self.involv_table[:] = []
         self.seq_table[:] = []
         self.part_whole_occs[:] = []
+        self.hierarchy.clear()
 
         self.summ_aspect_uids[:] = ['', '', '', '']
         self.summ_column_names[:] = ['', '', '', '']
@@ -150,6 +153,7 @@ class Display_views():
                     'Uitgesloten kandidaat-1: {}'.format(obj.name))
                 continue
             self.subtype_level = 0
+            self.hierarchy[obj] = 0
             self.Build_single_product_view(obj)
 
     def Build_single_product_view(self, obj):
@@ -178,14 +182,21 @@ class Display_views():
 
         self.kinds = ['kind', 'kind of physical object', 'kind of occurrence',
                       'kind of aspect', 'kind of role', 'kind of relation', 'number']
+        self.specialization_uids = ['1146', '1726', '5396', '1823']
+
         # If object_in_focus is a kind, then collect its supertypes
         if obj.category in self.kinds:
+            # Find preferred name of object in required language and community
+            lang_name, comm_name, obj_name, descr = \
+                self.user_interface.Determine_name_in_context(obj)
+            obj.name = obj_name
+
             # Search for the first supertype relation
             # that generalizes the obj (= self.object_in_focus)
             if len(obj.supertypes) == 0:
                 # No supertypes found for kind: report omission
-                kind_uid = 0
-                kind_name = 'Not found'
+                super_uid = 0
+                super_name = 'Not found'
                 descrOfKind = ''
                 self.Display_message(
                     'No supertype of {} found.'.format(obj.name),
@@ -194,12 +205,52 @@ class Display_views():
                 # There is one or more supertype of the kind in focus:
                 # collect all generalization relations in the expr_table and the network
                 for supertype in obj.supertypes:
-                    for rel_obj in obj.relations:
+                    for rel_obj in supertype.relations:
                         expr = rel_obj.expression
-                        if expr[rel_type_uid_col] in ['1146', '1726', '5396', '1823']:
-                            if len(self.expr_table) < self.max_nr_of_rows:
+                        if rel_obj.rel_type.uid in self.specialization_uids:
+                            if (rel_obj.lh_obj == obj or rel_obj.rh_obj == obj) \
+                               and len(self.expr_table) < self.max_nr_of_rows:
                                 self.expr_table.append(expr)
                                 self.Add_line_to_network_model(rel_obj, expr)
+
+            self.taxon_row[0] = obj.uid
+            self.taxon_row[1] = obj.name
+            self.taxon_row[3] = comm_name
+
+            if len(obj.supertypes) > 0:
+                lang_name, comm_name_supertype, supertype_name, descr_of_super = \
+                    self.user_interface.Determine_name_in_context(obj.supertypes[0])
+            else:
+                supertype_name = self.unknown[self.GUI_lang_index]
+            self.taxon_row[2] = supertype_name   # name of the first supertype
+
+            # Add object_in_focus to possibilities_model with comm_name of obj (not of supertype)
+            # Second (extended) obj_name enables duplicate branches in display tree
+            possib_row = [obj.uid, obj_name, obj_name, '', supertype_name, comm_name]
+            if possib_row not in self.possibilities_model:
+                self.possibilities_model.append(possib_row)
+
+            # Find kinds of aspects and their values for kind_in_focus (and implied parts)
+            self.Find_kinds_of_aspects(obj, role)
+            self.Create_row_in_taxonomy(obj)
+
+            # Find kinds of parts of kind in focus and their conceptual or qualitative aspects
+            self.Find_kinds_of_parts_and_their_aspects(obj)
+
+            # Find (qualitative) information about the kind in focus and build info_model
+            self.Find_information_about_object(obj)
+
+            # Determine whether the kind is a classifier for individual things
+            # and collect individual things that are classified by the kind in focus
+            self.Determine_individuals(obj)
+
+            # Determine subtypes of kind_in_focus and build product models of those subtypes
+            self.subtype_level += 1
+            for sub in obj.subtypes:
+                if sub not in self.all_subtypes:
+                    self.hierarchy[sub] = self.hierarchy[obj] + 1
+                    self.all_subtypes.append(sub)
+                    self.Build_single_product_view(sub)
 
         # Individual thing: Object category is not a kind, thus indicates an indiv.
         # Verify whether the individual thing is classified (has one or more classifiers)
@@ -210,14 +261,14 @@ class Display_views():
                 'Voor object {} is geen supertype noch een classificeerder gevonden.'.
                 format(obj.name))
         else:
-            # The object_in_focus is classified (once or more times)
-            # thus it is an individual, such as an individual physical object or occurrence:
+            # An individual, such as an individual physical object or occurrence,
+            # because the object_in_focus is classified (once or more times)
             # Search for the first classifying kind and classification relation
             # that classifies the object_in_focus
             classifier = obj.classifiers[0]
             # kind_uid is the kind that classifies the object_in_focus
             kind_uid = classifier.uid
-            # Determine name etc. of the kind of the object_in_focus
+            # Determine name etc. of the kind that classifies the object_in_focus
             lang_name, comm_name, kind_name, descrOfKind = \
                 self.user_interface.Determine_name_in_context(classifier)
 
@@ -235,58 +286,12 @@ class Display_views():
             self.occ_model.append([obj.uid, '', '', '', '',
                                    obj.name, '', '', kind_name, ''])
 
-        # Search for aspects of the whole object_in_focus and their values and UoMs
-
-        # Find kinds of aspects and their values of kind_in_focus (and implied parts)
-        if obj.category in ['kind', 'kind of physical object', 'kind of occurrence',
-                            'kind of aspect', 'kind of role', 'kind of relation', 'number']:
-            # Find preferred name of object in required language and community
-            lang_name, comm_name, obj_name, descr = \
-                self.user_interface.Determine_name_in_context(obj)
-            obj.name = obj_name
-
-            self.taxon_row[0] = obj.uid
-            self.taxon_row[1] = obj.name
-            # self.taxon_row[2] = supertype_name   # name of the first supertype
-            self.taxon_row[3] = comm_name
-
-            if len(obj.supertypes) > 0:
-                lang_name, comm_name_supertype, supertype_name, descr_of_super = \
-                    self.user_interface.Determine_name_in_context(obj.supertypes[0])
-            else:
-                supertype_name = self.unknown[self.GUI_lang_index]
-
-            # Add object_in_focus to possibilities_model with comm_name of obj (not of supertype)
-            # Second (extended) obj_name enables duplicate branches in display tree
-            possib_row = [obj.uid, obj_name, obj_name, '', supertype_name, comm_name]
-            if possib_row not in self.possibilities_model:
-                self.possibilities_model.append(possib_row)
-
-            # Find kinds of aspects for kind in focus
-            self.Find_kinds_of_aspects(obj, role)
-
-            # Find kinds of parts of kind in focus and their conceptual or qualitative aspects
-            self.Find_kinds_of_parts_and_their_aspects(obj)
-
-            # Find (qualitative) information about the kind in focus and build info_model
-            self.Find_information_about_object(obj)
-
-            # Determine whether the kind is a classifier for individual things
-            # and collect individual things that are classified by the kind in focus
-            self.Determine_individuals(obj)
-
-            # Determine subtypes of kind_in_focus and build product models of those subtypes
-            self.subtype_level += 1
-            for sub in obj.subtypes:
-                if sub not in self.all_subtypes:
-                    self.all_subtypes.append(sub)
-                    self.Build_single_product_view(sub)
-
         # Individual object_in_focus:
-        # Find aspects, their classification and their values of the individual object_in_focus
-        elif obj.category in ['individual', 'physical object', 'occurrence']:
-
-            community_name = self.gel_net.community_dict[obj.names_in_contexts[0][1]]
+        # Find aspects, their classification and their values and UoMs
+        # of the individual object_in_focus
+        if obj.category in ['individual', 'physical object', 'occurrence']:
+            lang_name, community_name, kind_name, descrOfKind = \
+                self.user_interface.Determine_name_in_context(obj)
             # Summ_model table = obj.uid, obj.name, kind_name, community_name, aspects
             self.summary_row[0] = obj.uid
             self.summary_row[1] = obj.name
@@ -305,13 +310,6 @@ class Display_views():
             # Find parts and their aspects
             self.part_head_req = True
             self.Find_parts_and_their_aspects(obj)
-
-        else:
-            self.Display_message(
-                "Object category '{}' is not programmed for searching for aspects.".
-                format(obj.category),
-                "Object categorie '{}' is niet geprogrammeerd voor het zoeken naar aspecten.".
-                format(obj.category))
 
         # self.parts_of_occ_table= []       # parts of occurrence in focus
         if obj.category != 'occurrence':
@@ -383,7 +381,8 @@ class Display_views():
             # then link the child to the intermediate instead of to its parent
             if branch[1] == self.object_in_focus.uid:
                 branch[7] = is_related_to
-                # If kind of relation is a possession of characteristic or one of its subtypes
+                # If kind of relation is a possession of characteristic
+                # or one of its subtypes
                 # then determine that value of the characteristic.
                 if rel_obj.rel_type.uid in self.gel_net.subPossAspUIDs:
                     # Determine the value of the aspect
@@ -855,6 +854,10 @@ class Display_views():
         """ Search for information and files about the object obj
             (kind or individual)
             (and its supertypes?) and build info_model.
+            - info_row('values') =
+                [info.uid, obj.uid, carrier.uid, directory_name,
+                 info.name, super_info_name, obj.name,
+                 carrier.name, carrier_kind_name].
         """
         # obj_head = ['Object', 'Object']
         info_head = ['Document', 'Document']
@@ -996,8 +999,9 @@ class Display_views():
                         'Een kwalificatierelatie voor informatie {} ontbreekt.'.
                         format(info.name))
 
+                # If info is not presented on a carrier then store text
                 if presented is False:
-                    # Store info about object in info_model
+                    # Store info (text) about object in info_model
                     info_row = [info.uid, obj.uid, info.description, '',
                                 info.name, super_info_name, '', obj.name, '',
                                 descr_avail_text[self.GUI_lang_index], '', '']
@@ -1198,7 +1202,7 @@ class Display_views():
         all_supers = self.Determine_supertypes(obj)
 
         # For each object in the hierarchy find aspects and inherited aspect values
-        # but exclude the roles
+        # that are inherited from its supertype objects but exclude the roles
         for obj_i in all_supers:
             value_presence = False
             for rel_obj in obj_i.relations:
@@ -1376,7 +1380,7 @@ class Display_views():
                             ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
 
                 # Debug print('obj_i', value_presence, obj_i.name, self.nr_of_aspects, aspect_name,
-                #      value_name, len(self.taxon_aspect_uids))
+                #       value_name, len(self.taxon_aspect_uids))
 
                 if value_presence is True:
                     # Debug print('Value present:', obj_i.name, aspect_name, value_name)
@@ -1402,7 +1406,7 @@ class Display_views():
                             # Build list of values conform list of aspects.
                             if kind_uid == aspect_uid:
                                 # Debug print('Aspects of phys:',len(self.taxon_aspect_uids),
-                                #      aspect_name, self.taxon_ind, value_name)
+                                #       aspect_name, self.taxon_ind, value_name)
                                 self.taxon_row[self.taxon_ind] = value_name
                                 # Check whether there the uom corresponds with the table uom
                                 # (when there is a value)
@@ -1419,8 +1423,7 @@ class Display_views():
                                                self.taxon_uom_names[self.taxon_ind]))
 
                     # Add a line of Line_type 3 to prod_model
-                    self.subtype_level = 0  # not a subtype of object in focus
-                    # self.line_nr += 1
+                    #self.subtype_level = 0  # not a subtype of object in focus
                     if len(obj.supertypes) > 0:
                         supertype_uid = obj.supertypes[0].uid
                         supertype_name = obj.supertypes[0].name
@@ -1503,50 +1506,67 @@ class Display_views():
         #        # If not a kind of occurrence, then build header for summaryTable
         #        elif self.decomp_level == 0:
 
-        # If obj is object_in_focus (thus not a part)
-        # then create one or more rows in taxon_model
-        if self.decomp_level == 0:
-            if len(obj.supertypes) > 0:
-                # Create a row in the taxonomy per direct supertype
-                for supertype in obj.supertypes:
-                    lang_name, comm_name_super, preferred_name, descr = \
-                        self.user_interface.Determine_name_in_context(supertype)
-                    self.taxon_row[2] = preferred_name  # of the supertype
-                    if len(self.taxon_model) < self.max_nr_of_rows:
-                        # If summary row is about object in focus,
-                        # then make supertype of object in focus empty
-                        # Because treeview parent (taxon_row[2] should be supertype or blank.
-                        # Debug print('Subtype_level-1:', self.subtype_level,
-                        #      self.object_in_focus.uid,
-                        #      self.object_in_focus.name, obj.uid, obj.name, self.taxon_row[0:4])
-                        if self.taxon_row[0] == self.object_in_focus.uid:
-                            self.taxon_row[2] = ''
+    def Create_row_in_taxonomy(self, obj):
+        ''' For an obj (object_in_focus) (thus not a part)
+            create a row in taxon_model
+            Taxon_model: uid, name, preferred name of super, comm, aspect values
+                     or: uid, 'has as subtypes', name, blank.
+        '''
+        print('Tax aspects:', self.hierarchy[obj], self.subtype_level, obj.name, self.taxon_row)
+        if len(obj.supertypes) > 0:
+            # Create a row in the taxonomy per direct supertype
+            for supertype in obj.supertypes:
+                lang_name, comm_name_super, preferred_name, descr = \
+                    self.user_interface.Determine_name_in_context(supertype)
+                self.taxon_row[2] = preferred_name  # of the supertype
+                if len(self.taxon_model) < self.max_nr_of_rows:
+                    # If taxon row is about object in focus,
+                    # then make supertype of object in focus empty
+                    # Because treeview parent (taxon_row[2] should be supertype or blank.
+                    # Debug print('Subtype_level-1:', self.subtype_level,
+                    #      self.object_in_focus.uid,
+                    #      self.object_in_focus.name, obj.uid, obj.name, self.taxon_row[0:4])
+                    if self.taxon_row[0] == self.object_in_focus.uid:
+                        self.taxon_row[2] = ''
+                        self.taxon_model.append(self.taxon_row[:])
+                    # Debug print('Super-1:', self.hierarchy[obj], self.subtype_level, supertype.name,
+                    #       self.object_in_focus.name, self.taxon_row[0:6])
+
+                    # If the object is not a subtype of the object_in_focus,
+                    # then insert an inter_row header line for the subtypes
+                    if self.hierarchy[obj] == 0:
+                        has_as_subs_uid = '1146'
+                        rel_obj = self.uid_dict[has_as_subs_uid]
+                        self.hierarchy[rel_obj] = 1
+                        inter_row = [has_as_subs_uid,
+                                     self.has_as_subtypes[self.GUI_lang_index],
+                                     obj.name, '']
+                        self.taxon_model.append(inter_row)
+
+                    # If taxon_row[2] (the 'supertype name') is the object_in_focus.name,
+                    # then make the object a sub of the inter_row
+                    else:
+                        if self.taxon_row[2] == self.object_in_focus.name:
+                            self.taxon_row[2] = self.has_as_subtypes[self.GUI_lang_index]
                             self.taxon_model.append(self.taxon_row[:])
-
-                        # If the object not a subtype of the object_in_focus,
-                        # then insert an inter_row header line for the subtypes
-                        if self.subtype_level == 0:
-                            inter_row = [obj.uid,
-                                         self.has_as_subtypes[self.GUI_lang_index],
-                                         obj.name, '']
-                            self.taxon_model.append(inter_row)
-
-                        # If the supertype is the object_in_focus,
-                        # then make the object a sub of the inter_row
                         else:
-                            if self.taxon_row[2] == self.object_in_focus.name:
-                                self.taxon_row[2] = self.has_as_subtypes[self.GUI_lang_index]
-                                self.taxon_model.append(self.taxon_row[:])
-                            else:
-                                self.taxon_model.append(self.taxon_row[:])
-                        # Debug print('Subtype_level-2:', self.subtype_level, obj.name,
-                        #      self.taxon_row[0:4])
+                            self.taxon_model.append(self.taxon_row[:])
+        else:
+            # The obj (object in focus) has no defined supertype(s)
+            self.taxon_row[2] = ''  # self.unknown[self.GUI_lang_index]
+            self.taxon_model.append(self.taxon_row[:])
+            # If the object is not a subtype of the object_in_focus,
+            # then insert an inter_row header line for the subtypes
+            if self.subtype_level == 0:
+                inter_row = [obj.uid,
+                             self.has_as_subtypes[self.GUI_lang_index],
+                             obj.name, '']
+                self.taxon_model.append(inter_row)
 
-            self.taxon_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
-        return
+        self.taxon_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
 
     def Determine_preferred_kind_name(self, obj):
-        """ Determine the preferred name of the first kind that classified obj
+        """ Determine the preferred name of the first kind that classifies obj
             or the name of the first supertype of obj.
         """
         kind = None
@@ -1799,7 +1819,9 @@ class Display_views():
                     self.Add_line_to_network_model(rel_obj, expr)
 
                 # Individual thing uid is found via classification relation
+                # Set level in the hierarchy two higher because of classif relation
                 indiv = self.uid_dict[indiv_uid]
+                self.hierarchy[indiv] = self.hierarchy[obj] + 2
 
                 # Find aspects of the individual thing, if any
                 # and add them to summary table.
@@ -1817,9 +1839,12 @@ class Display_views():
                 # Insert an intermediate inter_row header for classified individual things
                 # in the taxonomy; the first time only
                 if first_time is True:
+                    has_as_ind_uid = '1225'
+                    classif = self.uid_dict[has_as_ind_uid]
                     header_text = has_as_individuals[self.GUI_lang_index] + obj.name
-                    inter_row = [obj.uid, header_text, obj.name, '']
+                    inter_row = [has_as_ind_uid, header_text, obj.name, '']
                     self.taxon_model.append(inter_row)
+                    self.hierarchy[classif] = self.hierarchy[obj] + 1
                     first_time = False
 
                 # Create a row in the taxonomy for an individual thing
@@ -2107,7 +2132,7 @@ class Display_views():
                 self.PartOfOccur(part_occ, part_level)
 
     def Display_notebook_views(self):
-        """ For non-empty models define and display a treeview in a notebook tab."""
+        """ For each non-empty model define and display a view in a notebook tab."""
         done = False
         # Define and display Network view sheet
         if len(self.network_model) > 0:
@@ -2133,7 +2158,7 @@ class Display_views():
         if len(self.summ_model) > 0:
             self.Define_and_display_summary_sheet()
 
-        # Define and display individual_view sheet
+        # Define and display individual_view sheet for composition based view
         if len(self.indiv_model) > 0:
             # === Temporary skipped
             if done:
@@ -2220,7 +2245,7 @@ class Display_views():
         self.net_button.attributes['title'] = 'Press button after selection of left hand object'
         self.net_button.onclick.connect(self.Prepare_lh_object_network_view)
 
-        self.lh_button = gui.Button(lh_button_text[self.GUI_lang_index], width='15%', height=20)
+        self.lh_button = gui.Button(lh_button_text[self.GUI_lang_index], width='20%', height=20)
         self.lh_button.attributes['title'] = 'Press button after selection of left hand object'
         self.lh_button.onclick.connect(self.Prepare_lh_network_object_detail_view)
 
@@ -2249,12 +2274,14 @@ class Display_views():
         self.network_button_row.append(self.close_network)
         self.network_frame.append(self.network_button_row)
 
-##        # When Remi Table is used (via MyTable) instead of TreeView, then the following is O.K.
-##        self.network_tree = MyTable(width='100%',
-##                                    style={"overflow": "auto", "background-color": "#eeffaa",
-##                                           "border-width": "2px", "border-style": "solid",
-##                                           "font-size": "12px", 'table-layout': 'auto',
-##                                           'text-align': 'left'})
+##        # When Remi Table is used (via SingleRowSelectionTable)
+##        # instead of TreeView, then the following is O.K.
+##        self.network_tree = SingleRowSelectionTable(
+##            width='100%',
+##            style={"overflow": "auto", "background-color": "#eeffaa",
+##                   "border-width": "2px", "border-style": "solid",
+##                   "font-size": "12px", 'table-layout': 'auto',
+##                   'text-align': 'left'})
         self.network_tree = gui.TreeView(
             width='100%',
             style={"overflow": "scroll", "background-color": "#eeffaa",
@@ -2264,7 +2291,8 @@ class Display_views():
 ##        eqal_head = ['>=<', '>=<']
 ##        valu_head = ['Value', 'Waarde']
 ##        unit_head = ['Unit', 'Eenheid']
-##        # When Remi Table is used (via MyTable) instead of TreeView, then the following is O.K.
+##        # When Remi Table is used (via SingleRowSelectionTable)
+##        # instead of TreeView, then the following is O.K.
 ##        content = [('UID', self.name_head[self.GUI_lang_index],
 ##                    self.parent_head[self.GUI_lang_index],
 ##                    self.kind_head[self.GUI_lang_index],
@@ -2367,7 +2395,7 @@ class Display_views():
                                                            'background-color': color})
                     row_widget.attributes['treeopen'] = openness
                     if relation is not True and parent_name != '':
-                        row_widget.onclick.connect(self.Network_object_detail_view)
+                        # row_widget.onclick.connect(self.Network_object_detail_view)
                         row_widget.uid = network_line[0]
                     widget_dict[name] = row_widget
 ##                    For Remi using either Table or TreeView
@@ -2407,7 +2435,8 @@ class Display_views():
                                                 self.taxon_name, self.tab_cb(self.taxon_name))
         self.taxon_button_row = gui.HBox(height=20, width='100%')
 
-        self.taxon_detail = gui.Button(self.close_button_text[self.GUI_lang_index],
+        detail_text = ['Object details', 'Objectdetails']
+        self.taxon_detail = gui.Button(detail_text[self.GUI_lang_index],
                                        width='15%', height=20)
         self.taxon_detail.attributes['title'] = 'Show details of selected left hand item'
         self.taxon_detail.onclick.connect(self.Taxon_detail_view)
@@ -2427,63 +2456,114 @@ class Display_views():
                                          self.user_interface.views_noteb,
                                          self.taxon_name)
 
+        self.taxon_button_row.append(self.taxon_detail)
         self.taxon_button_row.append(self.taxon_classify)
         self.taxon_button_row.append(self.taxon_close)
         self.taxon_frame.append(self.taxon_button_row)
 
-        headings = ['UID', 'Name', 'Kind', 'Community',
-                    'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4',
-                    'Aspect5', 'Aspect6', 'Aspect7', 'Aspect8', 'Aspect9', 'Aspect10']
-        nr_of_cols = len(self.taxon_column_names)
-        display_cols = []
-        display_cols.append(tuple(headings[3:nr_of_cols]))
-
-        self.taxon_tree = MyTable(width='100%',
-                                  style={"overflow": "auto", "background-color": "#eeffaa",
-                                         "border-width": "2px", "border-style": "solid",
-                                         "font-size": "12px", 'table-layout': 'auto',
-                                         'text-align': 'left'})
-        self.taxon_tree.append_from_list(display_cols, fill_title=True)
+        self.taxon_tree = TreeTable(10,
+            width='100%',
+            style={'overflow': 'auto', 'background-color': '#ddffaa',
+                   'border-width': '2px', 'border-style': 'solid',
+                   'font-size': '12px', 'table-layout': 'auto',
+                   'text-align': 'left'})
+        taxon_headings = [['Name', 'Kind', 'Community'],
+                          ['Naam', 'Soort', 'Gemeenschap']]
+        # nr_of_cols = len(self.taxon_column_names)
+        self.taxon_column_names[1:4] = taxon_headings[self.GUI_lang_index]
+        taxon_heads = []
+        taxon_heads.append(tuple(self.taxon_column_names[1:]))
+        self.taxon_tree.append_from_list(taxon_heads, fill_title=True)
         self.taxon_frame.append(self.taxon_tree)
-##        self.taxon_tree.on_table_row_click.connect(self.Taxon_detail_view)
-##        # Request for classification of the earlier selected individual thing
-##        self.taxon_tree.on_table_row_click_right.connect(self.Taxon_detail_view)
 
         # Display header row with units of measure
-        # Color = uomtag = '#ccf'
-        taxon_uom_heading = []
-        taxon_uom_heading.append(tuple(self.taxon_uom_names))
-        self.taxon_tree.append_from_list(taxon_uom_heading, fill_title=False)
+        uom_color = '#ccf'
+        name = 'uom'
+        taxon_row_widget = gui.TableRow()
+        for index, field in enumerate(self.taxon_uom_names[1:]):
+            taxon_row_item = gui.TableItem(text=field,
+                                           style={'text-align': 'left',
+                                                  'background-color': uom_color})
+            taxon_row_widget.append(taxon_row_item, field)
+        self.taxon_tree.append(taxon_row_widget, name)
 
     def Display_taxonomy_view(self):
-        """ Display a treeview with the taxonomy of the object in focus."""
-
+        """ Display a treeview with the taxonomy of the kind in focus
+            including also aspect values of the kind and its subtypes.
+            Taxon_model: uid, name, name_of_super, comm, aspect values
+                     or: uid, 'has as subtypes', name_of_super, blank 
+        """
         # Display self.taxon_model rows in self.taxon_tree
         parents = []
+        parent = ''
+        sub_level = 0
+        nr_of_cols = len(self.taxon_column_names)
+        super_texts = ['has', 'heeft', 'classifies', 'classificeert']
         for taxon_line in self.taxon_model:
+            uid = taxon_line[0]
+            obj = self.uid_dict[uid]
+            target_level = self.hierarchy[obj] + 1
+            print('Taxon_model:', sub_level, target_level, taxon_line)
+            name_of_super = taxon_line[2]
             # Debug print('Taxon_line', taxon_line)
-            # Verify whether taxon_line[2], being the supertype,
-            # is blank or in the list of parents
-            if taxon_line[2] == '' or taxon_line[2] in parents:
+            # If the supertype name (taxon_line[2]) is blank or in the list of parents,
+            # then display the line
+            if name_of_super == '' or name_of_super in parents:
                 # Skip duplicates
                 # if self.taxon_tree.exists(taxon_line[1]):
                 #     continue
                 # else:
                 name = taxon_line[1]
                 relation = False
-                color = '#eeffdd'
-                term = taxon_line[1].partition(' ')
-                if term[0] in ['has', 'heeft', 'classifies', 'classificeert']:
+                color = '#ddffdd'  # light green
+                term = name.partition(' ')
+                # Debug print('Tax:', sub_level, name, name_of_super, parents)
+                # Indentation:
+                # If name denotes a 'has as subtypes' or 'classifies' or equivalent
+                # then store parent name and indent
+                if term[0] in super_texts:
                     relation = True
-                    color = '#aaffaa'
-                taxon_row_widget = gui.TableRow(style={'text-align': 'left',
-                                                       'background-color': color})
-                for index, field in enumerate(taxon_line[1:]):
-                    taxon_row_item = gui.TableItem(text=field)
-                    if relation is False or index < 2:
+                    parent = name_of_super
+                    color = '#aaffaa'  # medium green
+                    self.taxon_tree.begin_fold()
+                    sub_level += 1
+                elif sub_level > 0 and target_level > sub_level:
+                    self.taxon_tree.begin_fold()
+                    sub_level += 1
+                elif target_level < sub_level:
+                    while target_level < sub_level:
+                        sub_level += -1
+                        self.taxon_tree.end_fold()
+
+                taxon_row_widget = gui.TableRow()
+                # Determine color of individual 'classified' things
+                parts_super = name_of_super.partition(' ') 
+                if parts_super[0] in super_texts[2:]:
+                    color_ind = '#ffdddd'
+                else:
+                    color_ind = color
+                for index, field in enumerate(taxon_line[1:nr_of_cols]):
+                    taxon_row_item = gui.TableItem(
+                        text=field,
+                        style={'text-align': 'left',
+                               'background-color': color_ind})
+                    if relation is False:
+                        # If row (taxon_line[1]) is not a 'has as subtypes' etc.
+                        # and super_name is a 'has as subtypes'
+                        # then replace super_name by parent (=object_in_focus.name)
+                        parts = field.partition(' ')
+                        if parts[0] in super_texts:
+                            taxon_row_item = gui.TableItem(
+                                text=parent,
+                                style={'text-align': 'left',
+                                       'background-color': color_ind})
+                        taxon_row_widget.append(taxon_row_item, field)
+                    elif index < 1:
+                        # Relation ('has as subtypes' etc.),
+                        # thus display only the first field
                         taxon_row_widget.append(taxon_row_item, field)
                 self.taxon_tree.append(taxon_row_widget, name)
-                parents.append(taxon_line[1])
+                parents.append(name)
 
     def Define_and_display_summary_sheet(self):
             # Destroy earlier summary_frame
@@ -2520,7 +2600,8 @@ class Display_views():
 
         self.summ_button_row = gui.HBox(height=20, width='100%')
 
-        self.summ_detail = gui.Button(self.close_button_text[self.GUI_lang_index],
+        self.summ_detail_text = ['Display details', 'Toon details']
+        self.summ_detail = gui.Button(self.summ_detail_text[self.GUI_lang_index],
                                       width='15%', height=20)
         self.summ_detail.attributes['title'] = 'First select a row, ' \
                                                'then display details of selected item'
@@ -2537,11 +2618,12 @@ class Display_views():
 
         self.summ_frame.append(self.summ_button_row)
 
-        self.summ_tree = MyTable(width='100%',
-                                 style={"overflow": "auto", "background-color": "#eeffaa",
-                                        "border-width": "2px", "border-style": "solid",
-                                        "font-size": "12px", 'table-layout': 'auto',
-                                        'text-align': 'left'})
+        self.summ_tree = MultiRowSelectionTable(
+            width='100%',
+            style={"overflow": "auto", "background-color": "#eeffaa",
+                   "border-width": "2px", "border-style": "solid",
+                   "font-size": "12px", 'table-layout': 'auto',
+                   'text-align': 'left'})
         # Summary table: UID, Name, Kind, Community, Aspect{1,n)
         self.summ_column_names[0:4] = ['UID', 'Name', 'Kind', 'Community']
         summ_heading = []
@@ -2686,7 +2768,7 @@ class Display_views():
         self.Display_composition_view()
 
     def Define_composition_sheet(self):
-        """ Define a sheet for display of an individual thing
+        """ Define a sheet for display of an individual thing and its composition
             (indiv_model, a list of indiv_rows)
             for display in a tab of Notebook.
         """
@@ -3191,11 +3273,12 @@ class Display_views():
         self.prod_button_row.append(self.close_prod)
         self.prod_frame.append(self.prod_button_row)
 
-        self.prod_tree = MyTable(width='100%',
-                                 style={"overflow": "auto", "background-color": "#eeffaa",
-                                        "border-width": "2px", "border-style": "solid",
-                                        "font-size": "12px", 'table-layout': 'auto',
-                                        'text-align': 'left'})
+        self.prod_tree = SingleRowSelectionTable(
+            width='100%',
+            style={"overflow": "auto", "background-color": "#eeffaa",
+                   "border-width": "2px", "border-style": "solid",
+                   "font-size": "12px", 'table-layout': 'auto',
+                   'text-align': 'left'})
         prod_treeHead = [[('', '', '', 'Kind', 'Aspect', 'Kind of aspect',
                           '>=<', 'Value', 'UoM', 'Status')],
                          [('', '', '', 'Soort', 'Aspect', 'Soort aspect',
@@ -3329,42 +3412,31 @@ class Display_views():
     def Define_data_sheet(self):
         # Define ProductView tab in Notebook = = = = = = = = = = = = = = = = = = =
         # Product_sheet is canvas for scrollbar
-        self.data_sheet = Frame(self.views_noteb)
-        self.data_sheet.grid(column=0, row=0, sticky=NSEW)  # pack(fill=BOTH, expand=1)
-        self.data_sheet.columnconfigure(0, weight=1)
-        self.data_sheet.rowconfigure(0, weight=0)
-        # self.data_sheet.rowconfigure(1, weight=0)
-        prodText = ['Data sheet', 'Data sheet']
-        self.views_noteb.add(self.data_sheet, text=prodText[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end", self.data_sheet, sticky=NSEW)
+        self.data_sheet_frame = gui.VBox(width='100%', height='100%',
+                                         style={'overflow': 'auto',
+                                                'background-color': '#eeffdd'})
+        data_text = ['Data sheet of ', 'Productformulier van ']
+        self.data_name = data_text[self.GUI_lang_index] + self.object_in_focus.name
+        self.user_interface.views_noteb.add_tab(self.data_sheet_frame, self.data_name,
+                                                self.tab_cb(self.data_name))
+        self.data_button_row = gui.HBox(height=20, width='100%')
 
-        data_canvas = Canvas(self.data_sheet, background='#ddf')
-        # data_canvas.pack()
-        data_canvas.grid(column=0, row=0, sticky=NSEW)
-        # data_canvas.bind('<Button-2>', RightMouseButton)
-        data_canvas.columnconfigure(0, weight=1)
-        data_canvas.rowconfigure(0, weight=0)
+        self.close_data = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                     width='15%', height=20)
+        self.close_data.attributes['title'] = 'Press button when you want to remove this tag'
+        self.close_data.onclick.connect(self.user_interface.Close_tag,
+                                        self.user_interface.views_noteb,
+                                        self.data_name)
+        self.data_button_row.append(self.close_data)
+        self.data_sheet_frame.append(self.data_button_row)
 
-        self.data_frame = Frame(data_canvas)
-        self.data_frame.grid(column=0, row=0, sticky=NSEW)
-
-        self.data_frame.columnconfigure(0, weight=1)
-        self.data_frame.columnconfigure(1, weight=1)
-        self.data_frame.columnconfigure(2, weight=1)
-        self.data_frame.columnconfigure(3, weight=1)
-        self.data_frame.columnconfigure(4, weight=1)
-        self.data_frame.columnconfigure(5, weight=1)
-        self.data_frame.columnconfigure(6, weight=1)
-        self.data_frame.columnconfigure(7, weight=1)
-        self.data_frame.columnconfigure(8, weight=1)
-        self.data_frame.columnconfigure(9, weight=1)
-        self.data_frame.columnconfigure(10, weight=1)
-        self.data_frame.rowconfigure(0, weight=0)
-        self.data_frame.rowconfigure(1, weight=0)
-
-        data_scroll = Scrollbar(self.data_sheet, orient=VERTICAL, command=data_canvas.yview)
-        data_scroll.grid(column=0, row=0, sticky=NS + E)
-        data_canvas.config(yscrollcommand=data_scroll.set)
+        self.data_table = SingleRowSelectionTable(
+            width='100%',
+            style={'overflow': 'auto', 'background-color': '#eeffaa',
+                   'border-width': '2px', 'border-style': 'solid',
+                   'font-size': '12px', 'table-layout': 'auto',
+                   'text-align': 'left'})
+        self.data_sheet_frame.append(self.data_table)
 
     def Display_data_sheet_view(self):
         """ Produce a view of a product model in the form of a datasheet."""
@@ -3385,6 +3457,7 @@ class Display_views():
             body = False
             back = 'white'
             fore = 'black'
+            data_row_widget = gui.TableRow(style={'text-align': 'left'})
             for field_value in line:
                 column_nr += + 1
                 # fieldStr = StringVar()
@@ -3404,17 +3477,17 @@ class Display_views():
                 # Display on line 1 the line nr, 'Product form' label and the 'kind' label
                 if header_1 is True and column_nr in [0, 1, 5]:
                     back = '#dfb'  # light green
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   justify='left', background=back, foreground=fore)
-                    fd.grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
+                    fd = gui.Label(field_value, width=column_width, height=20,
+                                   style={'background-color': back})
+                    data_row_widget.append(fd, field_value)
 
                 # Display on line 1 the product_name and kind_name (with another background color)
                 if header_1 is True and column_nr in [2, 6]:
                     back = 'white'
                     fore = 'black'
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   background=back, foreground=fore, borderwidth=0)
-                    fd.grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
+                    fd = gui.Label(field_value, width=column_width, height=20,
+                                   style={'background-color': back})
+                    data_row_widget.append(fd, field_value)
 
                 # Detect start of header line 2: Value 2 in column 0 means line_type2 and header_2
                 if column_nr == 0 and field_value == 2:
@@ -3425,15 +3498,15 @@ class Display_views():
                     span = 8
                     back = 'white'
                     fore = 'black'
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   justify='left', background=back, foreground=fore)
-                    fd.grid(row=line_nr, column=column_nr, columnspan=span, rowspan=2, sticky=EW)
+                    fd = gui.Label(field_value, width=column_width, height=20,
+                                   style={'background-color': back})
+                    data_row_widget.append(fd, field_value)
                 # Display on line 2 the description label
                 if header_2 is True and column_nr in range(0, 3):
                     back = '#dfb'
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   justify='left', background=back, foreground=fore)
-                    fd.grid(row=line_nr, column=column_nr, columnspan=span, rowspan=2, sticky=EW)
+                    fd = gui.Label(field_value, width=column_width, height=20,
+                                   style={'background-color': back})
+                    data_row_widget.append(fd, field_value)
 
                 # Detect start of header line 3:
                 # Value 3 in column 0 means line_type3 and header_3
@@ -3444,9 +3517,9 @@ class Display_views():
                 # Display the line 3 subsequent values
                 if header_3 is True:
                     back = '#dfb'
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   justify="center", background=back, foreground=fore)
-                    fd.grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
+                    fd = gui.Label(field_value, width=column_width, height=20,
+                                   style={'background-color': back})
+                    data_row_widget.append(fd, field_value)
 
                 # Detect start of body values: Value >3 in column 0 means body of values
                 if column_nr == 0 and field_value > 3:
@@ -3473,10 +3546,9 @@ class Display_views():
                         field_value = unknownKind[self.GUI_lang_index]
                         back = '#fcc'
                     # Display subsequent body values
-                    fd = ttk.Label(self.data_frame, text=field_value, width=column_width,
-                                   background=back, foreground=fore,
-                                   wraplength=200, borderwidth=0, relief='ridge')
-                    fd.grid(row=line_nr, column=column_nr, columnspan=span, sticky=EW)
+                    fd = gui.Label(field_value, width=column_width, height=20,
+                                   style={'background-color': back})
+                    data_row_widget.append(fd, field_value)
 
     def Define_and_display_activity_sheet(self):
         # Destroy earlier activity sheet
@@ -3618,6 +3690,25 @@ class Display_views():
                                                 self.doc_name, self.tab_cb(self.doc_name))
         self.doc_button_row = gui.HBox(height=20, width='100%')
         self.doc_frame.append(self.doc_button_row)
+
+        # If info_kind is a description then display the destription
+        #   else open the file in the file format that is defined by its file extension
+        self.info_button_text = ['Display information', 'Toon informatie']
+        self.info_doc = gui.Button(self.info_button_text[self.GUI_lang_index],
+                                   width='20%', height=20)
+        self.info_doc.attributes['title'] = 'Display the selected text or file content'
+        self.info_doc.onclick.connect(self.Doc_detail_view)
+        self.doc_button_row.append(self.info_doc)
+
+        # Determine and display a product view of the object
+        # about which the document provides info
+        self.object_button_text = ['Object model', 'Objectmodel']
+        self.object_doc = gui.Button(self.object_button_text[self.GUI_lang_index],
+                                     width='20%', height=20)
+        self.object_doc.attributes['title'] = 'Display the selected text or file content'
+        self.object_doc.onclick.connect(self.Object_detail_view)
+        self.doc_button_row.append(self.object_doc)
+        
         self.close_doc = gui.Button(self.close_button_text[self.GUI_lang_index],
                                     width='15%', height=20)
         self.close_doc.attributes['title'] = 'Press button when you want to remove this tag'
@@ -3631,36 +3722,39 @@ class Display_views():
         display_cols = list(headings[4:])
         doc_heading = []
         doc_heading.append(tuple(display_cols))
-        self.doc_tree = MyTable(width='100%',
-                                style={"overflow": "auto", "background-color": "#eeffaa",
-                                       "border-width": "2px", "border-style": "solid",
-                                       "font-size": "12px", 'table-layout': 'auto',
-                                       'text-align': 'left'})
-        self.doc_tree.append_from_list(doc_heading, fill_title=True)
-        self.doc_frame.append(self.doc_tree)
-
-        # If left hand mouse button is pressed, then
-        #   if info_kind is a description then display the destription
-        #   else open the file in the file format that is defined by its file extension
-        self.doc_tree.on_table_row_click.connect(self.Doc_detail_view)
-        # If right hand mouse button is pressed,
-        # then determine and display a product view of the object
-        # about which the document provides info
-        # === TODO ===
-        # self.doc_tree.on_table_row_click_right.connect(self.Doc_detail_view)
+        self.doc_table = SingleRowSelectionTable(
+            width='100%',
+            style={"overflow": "auto", "background-color": "#eeffaa",
+                   "border-width": "2px", "border-style": "solid",
+                   "font-size": "12px", 'table-layout': 'auto',
+                   'text-align': 'left'})
+        self.doc_table.on_table_row_click.connect(self.Select_info)
+        self.doc_table.append_from_list(doc_heading, fill_title=True)
+        self.doc_frame.append(self.doc_table)
 
     def Display_documents_sheet(self):
-        """ Display documents and files for selection for display."""
+        """ Display information about texts and documents file for selection
+            for display of textual information, document content or object model.
+            - info_row('values') =
+                [info.uid, obj.uid, carrier.uid, directory_name,
+                 info.name, super_info_name, obj.name,
+                 carrier.name, carrier_kind_name].
+        """
         color = '#eeffdd'
         for info_line in self.info_model:
-            name = info_line[1]
+            name = info_line[4]
             info_row_widget = gui.TableRow()
             for index, field in enumerate(info_line[4:]):
                 info_row_item = gui.TableItem(text=field,
                                               style={'text-align': 'left',
                                                      'background-color': color})
+                if index == 0:
+                    info_row_item.uid = info_line[0]
+                    info_row_item.description = info_line[2]
+                elif index == 3:
+                    info_row_item.uid = info_line[2]
                 info_row_widget.append(info_row_item, field)
-            self.doc_tree.append(info_row_widget, name)
+            self.doc_table.append(info_row_widget, name)
 
     def Expr_detail_view(self, sel):
         """ Find the selected object from a user selection
@@ -3682,7 +3776,7 @@ class Display_views():
         else:
             self.Define_and_display_individual_detail_view(self.selected_obj)
 
-    def Prepare_lh_object_network_view(self):
+    def Prepare_lh_object_network_view(self, widget):
         """ Set the uid of the left hand object in a selected treeview row
             as the chosen object
             for display of a new network view and other views.
@@ -3783,8 +3877,8 @@ class Display_views():
         """ Find the selected left hand object from a user selection with left button
             in the network_model that is displayed in the network_tree view.
         """
-        widget_name = widget.get_text()
-        print('Selected:', widget_name, widget.uid)
+        widget_name = widget.get_value()
+        print('Selected for detail network:', widget_name, widget.uid)
         # self.selected_obj = self.gel_net.uid_dict[widget.uid]
         tree_values = [widget.uid, widget_name]
         self.Determine_category_of_object_view(widget.uid, tree_values)
@@ -4094,24 +4188,12 @@ class Display_views():
             in the taxon_model that is displayed in the taxon_tree view.
             Then create a detail view of the selected item
         """
-##        classifier = ['classifies', 'classificeert']
-##        cur_item = self.taxon_tree.focus()
-##        item_dict = self.taxon_tree.item(cur_item)
-##        tree_values = list(item_dict['values'])
         taxon_values = widget.get_text()
         print('Taxon selected kind:', taxon_values)
         kind_uid = widget.uid
         self.selected_obj = self.uid_dict[kind_uid]
 
         # Button 'Detail view is used, thus Create a detail view
-##        # Verify whether object is an individual thing due to being classified
-##        parts = str(taxon_values[2]).partition(' ')
-##        if parts[0] in classifier:
-##            # Debug print('Display details of individual:', taxon_values[0],
-##                          self.selected_obj.name)
-##            self.Define_and_display_individual_detail_view(self.selected_obj)
-##        else:
-##            # Debug print('Display details of kind:',taxon_values[0], self.selected_obj.name)
         self.Define_and_display_kind_detail_view(self.selected_obj)
 
     def Classify_individual(self, widget):
@@ -4253,6 +4335,7 @@ class Display_views():
         """
         self.kind_model[:] = []
         self.expr_table[:] = []
+        self.object_in_focus = kind_obj
         self.Build_single_product_view(kind_obj)
 
         try:
@@ -4281,6 +4364,7 @@ class Display_views():
         """
         self.prod_model[:] = []
         self.expr_table[:] = []
+        self.object_in_focus = individual_obj
         self.Build_single_product_view(individual_obj)
 
         try:
@@ -4308,59 +4392,49 @@ class Display_views():
         for expr_line in self.expr_table:
             self.expr_tree.insert('', index='end', values=expr_line, tags='val_tag')
 
-    def Doc_detail_view(self, window, row, item):
-        """ Find the selected object from a user selection
-            in the info_model that is displayed in the doc_tree view.
-            - info_row('values') = [info.uid, obj.uid, carrier.uid, directory_name,
-                                    info.name, super_info_name, obj.name,
-                                    carrier.name, carrier_kind_name].
-        """
-        # Determine UID and Name of selected option
+    def Select_info(self, emitter, row, item):
+        ''' Determine the row values that are selected in the indo_view table.'''
+                # Determine UID and Name of selected option
         info_row = list(row.children.values())
         self.info = info_row[0].get_text()
-        print('Selected info:', self.info)
+        self.kind_of_info = info_row[1].get_text()
+        self.info_uid = info_row[0].uid
+        self.info_text = info_row[0].description
+        self.directory = info_row[2].get_text()
+        self.object_uid = info_row[3].uid
+        self.object_name = info_row[3].get_text()
+        self.file_name = info_row[4].get_text()
+        print('Display info:', self.info_uid, self.info, self.kind_of_info, self.directory)
 
-##        cur_item = self.doc_tree.focus()
-##        item_dict = self.doc_tree.item(cur_item)
-##        info_row = list(item_dict['values'])
-##        # Debug print('Doc_detail_view:', cur_item, info_row)
-
-        # If right hand mouse button is pressed (sel.num == 3),
-        # then determine and display a product view of the object
-        # about which the document provides info
-        right = True
-        if right is True:
-            if len(info_row) > 1:
-                if info_row[1] != '':
-                    self.selected_obj = self.uid_dict[str(info_row[1])]
-                    # Debug print('Display product details of: {}'.format(self.selected_obj.name))
-                    self.Define_and_display_kind_detail_view(self.selected_obj)
-
-                    if len(self.info_model) > 0:
-                        self.Define_and_display_documents()
-        else:
-            # Left hand mouse button is pressed
-            # If info_kind is a description then display the destription
-            description_text = ['description', 'beschrijving']
+    def Doc_detail_view(self, widget):
+        """ Find the selected object from a user selection
+            in the info_model that is displayed in the doc_table view.
+            Determine and display a description text
+            or launch an application to display the content of the selected file.
+            - info_row('values') = [info.name, super_info_name, directory_name, obj.name,
+                                    carrier.name, carrier_kind_name].
+        """
+        # If info_kind is a description then display the description
+        description_text = ['description', 'beschrijving']
+        if self.kind_of_info in description_text:
+            # Debug print('Information {} is not presented on a carrier '
+            #             'but is as follows:\n   {}'.
+            #      format(info_row[4], info_row[2]))
             description_title = ['Information about ', 'Informatie over ']
-            if info_row[5] in description_text:
-                # Debug print('Information {} is not presented on a carrier '
-                #             'but is as follows:\n   {}'.
-                #      format(info_row[4], info_row[2]))
-                messagebox.showinfo(description_title[self.GUI_lang_index] + info_row[6],
-                                    info_row[2])
-
-            # Verify whether file name (info_row[7]) is presented on a file
+            self.messagebox(description_title[self.GUI_lang_index] + self.object_name,
+                            self.info_text)
+        else:
+            # Verify whether file name (info_row[3]) is presented on a file
             # And verify whether the file name has a file extension (indicated by a dot(.))
-            parts = info_row[8].rsplit('.', maxsplit=1)
+            parts = info_row[4].rsplit('.', maxsplit=1)
             if len(parts) == 1:
                 self.Display_message(
-                    'File name {} does not have a file extension'.format(info_row[7]),
-                    'Filenaam {} bevat geen file extensie'.format(info_row[7]))
+                    'File name {} does not have a file extension'.format(info_row[3]),
+                    'Filenaam {} bevat geen file extensie'.format(info_row[3]))
             else:
                 # Open the file in the file format that is defined by its file extension
-                directory_name = info_row[3]
-                file_name = info_row[8]
+                directory_name = info_row[2]
+                file_name = info_row[4]
                 if directory_name != '':
                     if not directory_name.startswith(os.sep):
                         # By default, we look in the app root dir.
@@ -4369,6 +4443,26 @@ class Display_views():
                     file_path = os.path.join(directory_name, file_name)
                     normalized_path = os.path.normpath(file_path)
                     open_file(normalized_path)
+
+    def messagebox(self, title, text):
+        return
+
+    def Object_detail_view(self, widget):
+        """ Find the selected object from a user selection
+            in the info_model that is displayed in the doc_table view.
+            Determine and display a product view of the object
+            about which the document provides info.
+            - info_row('values') = [info.name, super_info_name, directory_name, obj.name,
+                                    carrier.name, carrier_kind_name].
+        """
+        if len(info_row) > 1:
+            if info_row[1] != '':
+                self.selected_obj = self.uid_dict[str(info_row[1])]
+                # Debug print('Display product details of: {}'.format(self.selected_obj.name))
+                self.Define_and_display_kind_detail_view(self.selected_obj)
+
+                if len(self.info_model) > 0:
+                    self.Define_and_display_documents()
 
     def Contextual_facts(self):
         print('Contextual_facts')
