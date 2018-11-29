@@ -2,7 +2,7 @@ import os
 import operator
 
 import remi.gui as gui
-from remi_ext import TreeTable, SingleRowSelectionTable, MultiRowSelectionTable
+from remi_ext import TreeTable, SingleRowSelectionTable  # MultiRowSelectionTable
 
 from tkinter import Frame, Scrollbar, Button, NSEW, E, NS, S, EW, W, N, \
     VERTICAL, HORIZONTAL, filedialog, messagebox, Tk
@@ -4459,6 +4459,8 @@ class Display_views():
             - info_row('values') = [info.name, super_info_name, directory_name, obj.name,
                                     carrier.name, carrier_kind_name].
         """
+        info_row = widget.get_text()
+        print('Selected info_row for object:', info_row)
         if len(info_row) > 1:
             if info_row[1] != '':
                 self.selected_obj = self.uid_dict[str(info_row[1])]
