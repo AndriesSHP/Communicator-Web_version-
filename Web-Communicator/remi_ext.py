@@ -29,7 +29,7 @@ class MultiRowSelectionTable(gui.Table):
 
     def keydown(self, emitter, key, ctrl, shift, alt):
         # print("key:%d ctrl:%d shift:%d alt:%d", (key, ctrl, shift, alt))
-        if ctrl.lower()=='true':
+        if ctrl.lower() == 'true':
             self.multi_selection_enabled = True
 
     def keyup(self, emitter, key, ctrl, shift, alt):
@@ -48,7 +48,7 @@ class MultiRowSelectionTable(gui.Table):
         '''
         if not self.multi_selection_enabled:
             self.remove_selection()
-        if not row in self.selected_row_list:
+        if row not in self.selected_row_list:
             self.selected_row_list.append(row)
             row.style['outline'] = "2px dotted blue"
         return (row, item)
@@ -67,10 +67,10 @@ class FoldButton(gui.Button):
     def clicked(self, emitter):
         r = None
         for r in self.nested_rows:
-            r.style['display'] = 'none' if r.style['display']=='table-row' else 'table-row'
+            r.style['display'] = 'none' if r.style['display'] == 'table-row' else 'table-row'
             if 'fold' in r.children['fold_cell_0'].children.keys():
                 r.children['fold_cell_0'].children['fold'].clicked(None)
-        self.set_text('-' if r.style['display']=='table-row' else '+')
+        self.set_text('-' if r.style['display'] == 'table-row' else '+')
 
 
 class TreeTable(gui.Table):
@@ -85,19 +85,20 @@ class TreeTable(gui.Table):
         self.current_fold_button = {}
 
     def append_row(self, value, key=''):
-        modified_row = gui.TableRow(style={'display':'table-row'})
-        fold_items = ['']*(self.fold_level+1)
+        modified_row = gui.TableRow(style={'display': 'table-row'})
+        fold_items = [''] * (self.fold_level + 1)
         for i in range(0, len(fold_items)):
             ti = gui.TableItem(fold_items[i])
             ti.style['min-width'] = '10px'
-            modified_row.append(ti, "fold_cell_%s"%i)
-        
+            modified_row.append(ti, "fold_cell_%s" % i)
+
         for k in value._render_children_list:
             modified_row.append(value.children[k], k)
 
-        modified_row.children[modified_row._render_children_list[self.fold_level+1]].attributes['colspan'] = str(self.max_fold_levels - self.fold_level)
+        modified_row.children[modified_row._render_children_list[self.fold_level + 1]]. \
+            attributes['colspan'] = str(self.max_fold_levels - self.fold_level)
 
-        if self.fold_level>0:
+        if self.fold_level > 0:
             self.current_fold_button[str(self.fold_level)].add_nested_row(modified_row)
         self.current_row = modified_row
         return super(gui.Table, self).append(modified_row, key)
@@ -113,10 +114,12 @@ class TreeTable(gui.Table):
 
     def begin_fold(self):
         self.fold_level = min(self.fold_level + 1, self.max_fold_levels)
-        self.current_fold_button[str(self.fold_level)] = FoldButton(width = 15, height = 15)
-        self.current_row.children['fold_cell_0'].append(self.current_fold_button[str(self.fold_level)], 'fold')
+        self.current_fold_button[str(self.fold_level)] = FoldButton(width=15, height=15)
+        self.current_row.children['fold_cell_0']. \
+            append(self.current_fold_button[str(self.fold_level)], 'fold')
         txt = self.current_row.children['fold_cell_0'].get_text()
-        self.current_row.children['fold_cell_0'].remove_child(self.current_row.children['fold_cell_0'].children['text'])
+        self.current_row.children['fold_cell_0']. \
+            remove_child(self.current_row.children['fold_cell_0'].children['text'])
         self.current_row.children['fold_cell_0'].set_text(txt)
 
     def end_fold(self):

@@ -2,11 +2,11 @@ import os
 import operator
 
 import remi.gui as gui
-from remi_ext import TreeTable, FoldButton
+from remi_ext import TreeTable, SingleRowSelectionTable, MultiRowSelectionTable
 
-from tkinter import ttk, Frame, Scrollbar, Button, Canvas, NSEW, E, NS, S, EW, W, N, \
+from tkinter import Frame, Scrollbar, Button, NSEW, E, NS, S, EW, W, N, \
     VERTICAL, HORIZONTAL, filedialog, messagebox, Tk
-#   Toplevel, LAST, CENTER
+#   Toplevel, LAST, CENTER, Canvas
 from tkinter.ttk import Label, Treeview
 
 from Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
@@ -20,7 +20,6 @@ from Create_output_file import Create_gellish_expression, Convert_numeric_to_int
     Open_output_file
 from Occurrences_diagrams import Occurrences_diagram
 from utils import open_file
-from QueryViews import SingleRowSelectionTable
 from Anything import Relation
 
 class Display_views():
@@ -195,8 +194,8 @@ class Display_views():
             # that generalizes the obj (= self.object_in_focus)
             if len(obj.supertypes) == 0:
                 # No supertypes found for kind: report omission
-                super_uid = 0
-                super_name = 'Not found'
+                # super_uid = 0
+                # super_name = 'Not found'
                 descrOfKind = ''
                 self.Display_message(
                     'No supertype of {} found.'.format(obj.name),
@@ -723,7 +722,7 @@ class Display_views():
 
         # If aspect is possessed by object_in_focus (thus not possessed by a part)
         # then add row to summ_model
-        # Debug print('Indiv', self.decomp_level, indiv.uid, self.summary_row)
+        # Debug print('Indiv', self.decomp_level, indiv.name, self.summary_row)
         if self.decomp_level == 0:
             if len(self.summ_model) < self.max_nr_of_rows:
                 if indiv not in self.summ_objects:
@@ -1031,9 +1030,9 @@ class Display_views():
 
         # self.coll_of_subtype_uids = []
         self.nr_of_parts = 0
-        self.decomp_level += + 1
+        self.decomp_level += 1
         if self.decomp_level > 3:
-            self.decomp_level += - 1
+            self.decomp_level += -1
             return
         # Debug print('Indentation_level of parts of:', self.decomp_level, name,obj.uid)
 
@@ -1148,7 +1147,7 @@ class Display_views():
                     # Search for parts of part and their aspects
                     self.Find_parts_and_their_aspects(part)
 
-        self.decomp_level += - 1
+        self.decomp_level += -1
 
     def Find_kinds_of_aspects(self, obj, role):
         """ Search for kinds of aspects that can/shall or are by definition possessed
@@ -1157,7 +1156,7 @@ class Display_views():
             and possible collection of allowed values.
             obj = the kind in focus
             role = the role played by an involved object that is involved in an occurrence
-            decomp_level = indentation level:
+            decomp_level = decomposition level:
                            0 = objectInFocus, 1 = part, 2 = part of part, etc.
             obj.category = category of the object in focus,
                 being individual or kind or phys object or occurrence or kind of occurrence.
@@ -1389,7 +1388,7 @@ class Display_views():
                         self.Add_line_to_network_model(rel_obj2, expr2)
 
                     if self.decomp_level == 0:
-                        # Build summary_view header add a column for aspects if not yet included
+                        # Build taxon view header add a column for aspects if not yet included
                         if value_presence is True \
                            and aspect_name not in self.taxon_column_names \
                            and len(self.taxon_column_names) <= 14:
@@ -1414,16 +1413,16 @@ class Display_views():
                                    and uom_name != self.taxon_uom_names[self.taxon_ind]:
                                     self.Display_message(
                                         'Unit of measure {} ({}) of the value of {} differs'
-                                        'from summary table header UoM {}'.
+                                        'from taxon table header UoM {}'.
                                         format(uom_name, uom_uid, aspect_name,
                                                self.taxon_uom_names[self.taxon_ind]),
                                         'Meeteenheid {} ({}) van de waarde van {} verschilt'
-                                        'van de overzichtstabel kop_eenheid {}'.
+                                        'van de taxonomietabel kop_eenheid {}'.
                                         format(uom_name, uom_uid, aspect_name,
                                                self.taxon_uom_names[self.taxon_ind]))
 
                     # Add a line of Line_type 3 to prod_model
-                    #self.subtype_level = 0  # not a subtype of object in focus
+                    # self.subtype_level = 0  # not a subtype of object in focus
                     if len(obj.supertypes) > 0:
                         supertype_uid = obj.supertypes[0].uid
                         supertype_name = obj.supertypes[0].name
@@ -1487,7 +1486,7 @@ class Display_views():
                                                         equality, value_name, uom_name, status)
 
         #        if obj.category == 'kind of occurrence':
-        #            # Build list of kinds of aspects (taxon_column_names) for SummaryView
+        #            # Build list of kinds of aspects (occ_column_names) for OccView
         #            if aspect.kind not in self.occ_kinds:
         #                nrOfAspOccKinds = nrOfAspOccKinds + 1
         #                self.occ_aspects[nrOfAspOccKinds] = aspect_name
@@ -1530,8 +1529,8 @@ class Display_views():
                     if self.taxon_row[0] == self.object_in_focus.uid:
                         self.taxon_row[2] = ''
                         self.taxon_model.append(self.taxon_row[:])
-                    # Debug print('Super-1:', self.hierarchy[obj], self.subtype_level, supertype.name,
-                    #       self.object_in_focus.name, self.taxon_row[0:6])
+                    # Debug print('Super-1:', self.hierarchy[obj], self.subtype_level,
+                    #       supertype.name, self.object_in_focus.name, self.taxon_row[0:6])
 
                     # If the object is not a subtype of the object_in_focus,
                     # then insert an inter_row header line for the subtypes
@@ -1733,9 +1732,9 @@ class Display_views():
                     self.kind_model.append(prod_head_4)  # Header of part list
                 self.part_head_req = False
 
-            # Create kind_model lines of part
+            # Create kind_model line(s) for part(s)
+            self.decomp_level += 1
             for key, implied_tuple in self.implied_parts_dict.items():
-                self.decomp_level = 1
                 self.nr_of_aspects = 1
                 part_name = implied_tuple[0]
                 if len(self.uid_dict[key[0]].supertypes) > 0:
@@ -1756,6 +1755,7 @@ class Display_views():
                                                part_name, role,
                                                part_kind_name, aspect_name, equality,
                                                value_name, uom_name, status)
+            self.decomp_level += -1
 
     def Add_prod_model_line_type3(self, subtype_level,
                                   part_uid, part_kind_uid, aspect_uid,
@@ -1826,7 +1826,7 @@ class Display_views():
 
                 # Find aspects of the individual thing, if any
                 # and add them to summary table.
-                # Do not create add aspects to a prod_model because
+                # Do not add aspects to a prod_model because
                 # the object in focus is a kind.
                 community_name = self.gel_net.community_dict[indiv.names_in_contexts[0][1]]
                 self.summary_row[0] = indiv.uid
@@ -1879,8 +1879,8 @@ class Display_views():
         self.occ_in_focus = 'no'
         self.line_nr += + 1
 
-        # Search for UID and <involved> role or its subtypes to find occurrences
-        # (involver role players)
+        # Search for occurences (involver role players)
+        # via UID and <involved> role or its subtypes
         for rel_obj in obj.relations:
             expr = rel_obj.expression
             if (expr[rh_uid_col] == obj.uid
@@ -1895,10 +1895,10 @@ class Display_views():
                 continue
 
             # An occurrence is found
-            nr_of_occur += + 1
+            nr_of_occur += 1
             occ = self.uid_dict[occ_uid]
             occ_name = occ.name
-            self.decomp_level = 1
+            self.decomp_level = 1  # An occurence has the same level effect as a part
             # Debug print('Occ     :',obj.name, occ_uid, occ_name, 'roles:',
             #      expr[rel_type_name_col], expr[lh_role_name_col], expr[rh_role_name_col])
 
@@ -2009,6 +2009,7 @@ class Display_views():
             # Search for parts of found occurrence and parts of parts, etc.
             occ_part_level = 1
             self.PartOfOccur(occ, occ_part_level)
+        self.decomp_level = 0
 
     def Determine_sequences_of_occurrences(self, occ):
         """ Build occurrences (activities or processes or events)
@@ -2462,7 +2463,7 @@ class Display_views():
         self.taxon_button_row.append(self.taxon_close)
         self.taxon_frame.append(self.taxon_button_row)
 
-        self.taxon_tree = TreeTable(10,
+        self.taxon_tree = TreeTable(
             width='100%',
             style={'overflow': 'auto', 'background-color': '#ddffaa',
                    'border-width': '2px', 'border-style': 'solid',
@@ -2492,7 +2493,7 @@ class Display_views():
         """ Display a treeview with the taxonomy of the kind in focus
             including also aspect values of the kind and its subtypes.
             Taxon_model: uid, name, name_of_super, comm, aspect values
-                     or: uid, 'has as subtypes', name_of_super, blank 
+                     or: uid, 'has as subtypes', name_of_super, blank.
         """
         # Display self.taxon_model rows in self.taxon_tree
         parents = []
@@ -2538,7 +2539,7 @@ class Display_views():
 
                 taxon_row_widget = gui.TableRow()
                 # Determine color of individual 'classified' things
-                parts_super = name_of_super.partition(' ') 
+                parts_super = name_of_super.partition(' ')
                 if parts_super[0] in super_texts[2:]:
                     color_ind = '#ffdddd'
                 else:
@@ -2619,7 +2620,7 @@ class Display_views():
 
         self.summ_frame.append(self.summ_button_row)
 
-        self.summ_tree = MultiRowSelectionTable(
+        self.summ_tree = SingleRowSelectionTable(
             width='100%',
             style={"overflow": "auto", "background-color": "#eeffaa",
                    "border-width": "2px", "border-style": "solid",
@@ -3457,23 +3458,23 @@ class Display_views():
             header_3 = False
             body = False
             back = 'white'
-            fore = 'black'
+            # fore = 'black'
             data_row_widget = gui.TableRow(style={'text-align': 'left'})
             for field_value in line:
                 column_nr += + 1
                 # fieldStr = StringVar()
-                span = 1
+                # span = 1
                 column_width = col_width[column_nr]
 
                 # Detect start of header line 1:
                 # Field_value 1 in column 0 means line_type_1 and header_1
                 if column_nr == 0 and field_value == 1:
                     header_1 = True
-                if header_1 is True:
-                    if column_nr == 2:
-                        span = 3
-                    elif column_nr == 6:
-                        span = 5
+##                if header_1 is True:
+##                    if column_nr == 2:
+##                        span = 3
+##                    elif column_nr == 6:
+##                        span = 5
 
                 # Display on line 1 the line nr, 'Product form' label and the 'kind' label
                 if header_1 is True and column_nr in [0, 1, 5]:
@@ -3485,7 +3486,7 @@ class Display_views():
                 # Display on line 1 the product_name and kind_name (with another background color)
                 if header_1 is True and column_nr in [2, 6]:
                     back = 'white'
-                    fore = 'black'
+                    # fore = 'black'
                     fd = gui.Label(field_value, width=column_width, height=20,
                                    style={'background-color': back})
                     data_row_widget.append(fd, field_value)
@@ -3496,9 +3497,9 @@ class Display_views():
 
                 # Display on line 2 the description text
                 if header_2 is True and column_nr == 3:
-                    span = 8
+                    # span = 8
                     back = 'white'
-                    fore = 'black'
+                    # fore = 'black'
                     fd = gui.Label(field_value, width=column_width, height=20,
                                    style={'background-color': back})
                     data_row_widget.append(fd, field_value)
@@ -3709,7 +3710,7 @@ class Display_views():
         self.object_doc.attributes['title'] = 'Display the selected text or file content'
         self.object_doc.onclick.connect(self.Object_detail_view)
         self.doc_button_row.append(self.object_doc)
-        
+
         self.close_doc = gui.Button(self.close_button_text[self.GUI_lang_index],
                                     width='15%', height=20)
         self.close_doc.attributes['title'] = 'Press button when you want to remove this tag'
@@ -4395,7 +4396,7 @@ class Display_views():
 
     def Select_info(self, emitter, row, item):
         ''' Determine the row values that are selected in the indo_view table.'''
-                # Determine UID and Name of selected option
+        # Determine UID and Name of selected option
         info_row = list(row.children.values())
         self.info = info_row[0].get_text()
         self.kind_of_info = info_row[1].get_text()
@@ -4415,6 +4416,8 @@ class Display_views():
             - info_row('values') = [info.name, super_info_name, directory_name, obj.name,
                                     carrier.name, carrier_kind_name].
         """
+        info_row = widget.get_text()
+        print('Selected info_row:', info_row)
         # If info_kind is a description then display the description
         description_text = ['description', 'beschrijving']
         if self.kind_of_info in description_text:

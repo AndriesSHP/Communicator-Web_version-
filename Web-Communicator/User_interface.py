@@ -566,7 +566,6 @@ class Communicator(App):
                         break
                 if super_name:
                     break
-                                              
         if super_name:
             is_a = ['is a ', 'is een ']
             full_def = is_a[self.GUI_lang_index] + super_name + ' ' + part_def
