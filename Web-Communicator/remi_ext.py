@@ -4,6 +4,9 @@ class SingleRowSelectionTable(gui.Table):
     ''' A subclass of gui.Table that has the feature
         that the last selected row is highlighted.
     '''
+    def __init__(self, *arg, **kwargs):
+        super(SingleRowSelectionTable, self).__init__(*arg, **kwargs)
+        
     @gui.decorate_event
     def on_table_row_click(self, row, item):
         ''' Highlight selected row.'''
@@ -73,8 +76,8 @@ class FoldButton(gui.Button):
         self.set_text('-' if r.style['display'] == 'table-row' else '+')
 
 
-class TreeTable(gui.Table):
-    def __init__(self, max_fold_levels=10, *args, **kwargs):
+class TreeTable(SingleRowSelectionTable):
+    def __init__(self, max_fold_levels=20, *args, **kwargs):
         """
         Args:
             kwargs: See Widget.__init__()
