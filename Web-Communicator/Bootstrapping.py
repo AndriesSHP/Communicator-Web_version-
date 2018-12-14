@@ -41,7 +41,8 @@ model_file_names = [
 # Product & Processes Models file paths
 prod_dirs = ["../GellishData"]
 prod_file_names = [
-    # "Semantic model of a road network - UTF-8.csv",
+    # "Electric cables-UTF-8.csv",
+    # "Semantic model of a road network with house-UTF-8.csv"
     # "Semantisch model van een Wegennet met Huis - v5.2-UTF-8.csv"
 ]
 
