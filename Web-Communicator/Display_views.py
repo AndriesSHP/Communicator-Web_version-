@@ -11,7 +11,7 @@ from tkinter.ttk import Label, Treeview
 
 from Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
 from Expr_Table_Def import lh_name_col, rel_type_name_col, rh_name_col, status_col, \
-    lh_uid_col, rel_type_uid_col, rh_uid_col, phrase_type_uid_col, \
+    lh_uid_col, rel_type_uid_col, rh_uid_col, idea_uid_col, phrase_type_uid_col, \
     uom_uid_col, uom_name_col, full_def_col, \
     lh_role_uid_col, lh_role_name_col, rh_role_uid_col, rh_role_name_col, \
     expr_col_ids, header3
@@ -33,6 +33,7 @@ class Display_views():
         self.root = user_interface.root
         self.GUI_lang_index = user_interface.GUI_lang_index
         self.uid_dict = gel_net.uid_dict
+        self.container = user_interface.container
 
         self.network_model = []
         self.rels_in_network_model = []
@@ -51,7 +52,10 @@ class Display_views():
         self.involv_table = []
         self.seq_table = []
         self.part_whole_occs = []
-        self.hierarchy = {}
+        self.taxon_hierarchy = {}
+        self.net_hierarchy = {}
+        self.net_parents = []
+        self.net_ideas = []
 
         self.taxon_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
         self.summary_row = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
@@ -81,7 +85,7 @@ class Display_views():
         self.part_occ_head = ['Part occurrence', 'Deelgebeurtenis']
         self.info_head = ['Document', 'Document']
         self.name_head = ['Name', 'Naam']
-        self.parent_head = ['Upper concept', 'Hoger concept']
+        self.parent_head = ['Parent concept', 'Hoger concept']
         self.comm_head = ['Community', 'Taalgemeenschap']
         self.unknown = ['unknown', 'onbekend']
         self.unknown_kind = ['unknown kind', 'onbekende soort']
@@ -120,7 +124,10 @@ class Display_views():
         self.involv_table[:] = []
         self.seq_table[:] = []
         self.part_whole_occs[:] = []
-        self.hierarchy.clear()
+        self.taxon_hierarchy.clear()
+        self.net_hierarchy.clear()  # levels of objects in network hierarchy
+        self.net_parents[:] = []  # included parent objects in network model
+        self.net_ideas[:] = []
 
         self.summ_aspect_uids[:] = ['', '', '', '']
         self.summ_column_names[:] = ['', '', '', '']
@@ -152,14 +159,15 @@ class Display_views():
                     'Uitgesloten kandidaat-1: {}'.format(obj.name))
                 continue
             self.subtype_level = 0
-            self.hierarchy[obj] = 0
+            self.taxon_hierarchy[obj] = 0
+            self.net_hierarchy[obj] = 0
             self.Build_single_product_view(obj)
 
     def Build_single_product_view(self, obj):
-        """ Create various model views for a single object,
+        """ Create various model views for a single object (obj),
             being either an individual thing or a kind.
-            This includes a network_model,
-            kind_model, prod_model, expr_table (with Gellish expressions),
+            This includes at least the following models (views):
+            network model, kind_model, prod_model, expr_table (with Gellish expressions),
             taxon_model (taxonomy view), summ_model (multi-product view),
             possibilities_model and indiv_model.
         """
@@ -191,7 +199,7 @@ class Display_views():
             obj.name = obj_name
 
             # Search for the first supertype relation
-            # that generalizes the obj (= self.object_in_focus)
+            # that generalizes the obj
             if len(obj.supertypes) == 0:
                 # No supertypes found for kind: report omission
                 # super_uid = 0
@@ -201,16 +209,24 @@ class Display_views():
                     'No supertype of {} found.'.format(obj.name),
                     'Geen supertype van {} gevonden.'.format(obj.name))
             else:
-                # There is one or more supertype of the kind in focus:
+                # There is one or more supertype of the kind:
                 # collect all generalization relations in the expr_table and the network
                 for supertype in obj.supertypes:
-                    for rel_obj in supertype.relations:
-                        expr = rel_obj.expression
-                        if rel_obj.rel_type.uid in self.specialization_uids:
-                            if (rel_obj.lh_obj == obj or rel_obj.rh_obj == obj) \
-                               and len(self.expr_table) < self.max_nr_of_rows:
-                                self.expr_table.append(expr)
-                                self.Add_line_to_network_model(rel_obj, expr)
+                    if supertype not in self.net_parents:
+                        for rel_obj in supertype.relations:
+                            expr = rel_obj.expression
+                            if rel_obj.rel_type.uid in self.specialization_uids:
+                                # Verify if the obj is a subtype in the specialization relation
+                                if (rel_obj.lh_obj == obj
+                                        and expr[phrase_type_uid_col] == basePhraseUID) \
+                                        or (rel_obj.rh_obj == obj
+                                            and expr[phrase_type_uid_col] == inversePhraseUID):
+                                    # Debug print('Super of sub:', supertype.name,
+                                    #       expr[lh_name_col:rh_name_col+1])
+                                    if len(self.expr_table) < self.max_nr_of_rows \
+                                            and expr not in self.expr_table:
+                                        self.expr_table.append(expr)
+                                        self.Add_line_to_network_model(obj, rel_obj, expr)
 
             self.taxon_row[0] = obj.uid
             self.taxon_row[1] = obj.name
@@ -246,10 +262,34 @@ class Display_views():
             # Determine subtypes of kind_in_focus and build product models of those subtypes
             self.subtype_level += 1
             for sub in obj.subtypes:
+                # Debug print('Sub_name, Obj_name:', sub.name, obj.name)
                 if sub not in self.all_subtypes:
-                    self.hierarchy[sub] = self.hierarchy[obj] + 1
+                    self.taxon_hierarchy[sub] = self.taxon_hierarchy[obj] + 1
                     self.all_subtypes.append(sub)
+                    # Find the relation with the supertype and add it to the product model
+                    for supertype in sub.supertypes:
+                        for super_rel_obj in supertype.relations:
+                            super_expr = super_rel_obj.expression
+                            if super_rel_obj.rel_type.uid in self.specialization_uids:
+                                # Verify whether the obj
+                                # is the supertype in the specialization relation 
+                                if (super_rel_obj.lh_obj == sub
+                                        and super_expr[phrase_type_uid_col] == basePhraseUID) \
+                                        or (super_rel_obj.rh_obj == sub
+                                            and super_expr[phrase_type_uid_col] == inversePhraseUID):
+                                    if len(self.expr_table) < self.max_nr_of_rows \
+                                            and super_expr not in self.expr_table:
+                                        self.expr_table.append(super_expr)
+                                    # Debug print('Additions:', sub.name,
+                                    #       obj.name, super_expr[phrase_type_uid_col])
+                                    self.Add_line_to_network_model(obj, super_rel_obj, super_expr)
                     self.Build_single_product_view(sub)
+                else:
+                    self.Display_message(
+                        'Object {} is also a subtype of {}.'.
+                        format(sub.name, obj.name),
+                        'Object {} is ook een sybtype van {}.'.
+                        format(sub.name, obj.name))
 
         # Individual thing: Object category is not a kind, thus indicates an indiv.
         # Verify whether the individual thing is classified (has one or more classifiers)
@@ -297,6 +337,7 @@ class Display_views():
             self.summary_row[2] = kind_name
             self.summary_row[3] = community_name
 
+            # indiv_model = obj.uid, obj.name, '', kind_name, community_name
             self.indiv_row[0] = obj.uid
             self.indiv_row[1] = obj.name
             self.indiv_row[2] = ''
@@ -317,84 +358,135 @@ class Display_views():
             self.decomp_level = 0
             self.Occurs_and_involvs(obj)
 
-    def Add_line_to_network_model(self, rel_obj, expr):
+    def Add_line_to_network_model(self, obj, rel_obj, expr):
         """ Add a row to the network_model for display in a network view.
             rel_obj is the relation object whereas lh or rh object is the object in focus.
             expr is the full expression.
+            network_model = related_uid, focus_uid, focus_name, phrase, related_name,
+                            kind_uid, related_name, focus_name, kind_name
             Branch is an expression that is added to the network_model.
         """
-        # If the left hand object is the object in focus,
-        # then find the base phrase or inverse phrase for the relation
-        # in the preferred language and language community
-        if rel_obj.lh_obj == self.object_in_focus:
-            # lh_obj is the object_in_focus
-            # Determine the preferred name of the related object
-            kind_name, kind_uid = self.Determine_preferred_kind_name(rel_obj.rh_obj)
-            # Determine the preferred phrase for the kind of relation
-            # Debug print('Base phrases:', expr[rel_type_name_col], rel_obj.rel_type.base_phrases)
-            if expr[rel_type_name_col] in rel_obj.rel_type.base_phrases:
-                lang_name, comm_name, rel_type_phrase, full_def = \
-                    self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'base')
+        if expr[idea_uid_col] not in self.net_ideas:
+            self.net_ideas.append(expr[idea_uid_col])
+        
+            # If the left hand object is the current_focus,
+            # then find the base phrase or inverse phrase for the relation
+            # in the preferred language and language community
+            # Debug print('Focus:', obj.name)
+            if rel_obj.lh_obj == obj:
+                # lh_obj is the current_focus
+                # Determine the preferred name of the related object
+                kind_name, kind_uid = self.Determine_preferred_kind_name(rel_obj.rh_obj)
+                # Determine the preferred phrase for the kind of relation
+                # Debug print('Base phrases:', expr[rel_type_name_col], rel_obj.rel_type.base_phrases)
+                if expr[rel_type_name_col] in rel_obj.rel_type.base_phrases:
+                    lang_name, comm_name, rel_type_phrase, full_def = \
+                        self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'base')
+                else:
+                    # Rel_type_name is an inverse phrase
+                    lang_name, comm_name, rel_type_phrase, full_def = \
+                        self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'inverse')
+                branch = [rel_obj.rh_obj.uid, rel_obj.lh_obj.uid, rel_obj.rel_type.uid,
+                          rel_type_phrase, rel_obj.rh_obj.name, kind_uid,
+                          expr[rh_name_col], expr[lh_name_col], kind_name]
+                # Debug print('Expr-l  :', expr[lh_name_col:rh_name_col+1])
+                # Debug print('Branch-l:', self.net_hierarchy[obj],
+                #       rel_obj.phrase_type_uid, branch)
+            elif rel_obj.rh_obj == obj:
+                # rh_obj is the current_focus
+                kind_name, kind_uid = self.Determine_preferred_kind_name(rel_obj.lh_obj)
+                if expr[rel_type_name_col] in rel_obj.rel_type.base_phrases:
+                    lang_name, comm_name, rel_type_phrase, full_def = \
+                        self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'inverse')
+                else:
+                    lang_name, comm_name, rel_type_phrase, full_def = \
+                        self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'base')
+                branch = [rel_obj.lh_obj.uid, rel_obj.rh_obj.uid, rel_obj.rel_type.uid,
+                          rel_type_phrase, rel_obj.lh_obj.name, kind_uid,
+                          expr[lh_name_col], expr[rh_name_col], kind_name]
+                # Debug print('Expr-r  :', expr[lh_name_col:rh_name_col+1])
+                # Debug print('Branch-r:', self.net_hierarchy[obj],
+                #             rel_obj.phrase_type_uid, branch)
             else:
-                # Rel_type_name is an inverse phrase
-                lang_name, comm_name, rel_type_phrase, full_def = \
-                    self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'inverse')
-            branch = [rel_obj.rh_obj.uid, rel_obj.lh_obj.uid, expr[lh_name_col],
-                      rel_type_phrase, expr[rh_name_col], kind_uid,
-                      rel_obj.rh_obj.name, rel_obj.lh_obj.name, kind_name]
-        else:
-            # rh_obj is the object_in_focus
-            kind_name, kind_uid = self.Determine_preferred_kind_name(rel_obj.lh_obj)
-            if expr[rel_type_name_col] in rel_obj.rel_type.base_phrases:
-                lang_name, comm_name, rel_type_phrase, full_def = \
-                    self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'inverse')
-            else:
-                lang_name, comm_name, rel_type_phrase, full_def = \
-                    self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'base')
-            branch = [rel_obj.lh_obj.uid, rel_obj.rh_obj.uid, expr[rh_name_col],
-                      rel_type_phrase, expr[lh_name_col], kind_uid,
-                      rel_obj.lh_obj.name, rel_obj.rh_obj.name, kind_name]
+                # Debug print('Object {} does not appear in idea {} '.
+                #       format(obj.name, expr[lh_name_col:rh_name_col+1]))
+                return
 
-        # Debug print('Branch-1:', rel_obj.phrase_type_uid, branch)
-        # Add the branch to the network_model, if not yet present
-        if branch not in self.network_model:
-            is_related_to = branch[3]  # rel_type_phrase
-            # If the branch is about the object in focus, then make parent empty (= root)
-            # and insert an intermediate line with the expressed kind of relation
-            if branch[1] == self.object_in_focus.uid and \
-               is_related_to not in self.rels_in_network_model:
+            # Add the branch to the network_model, if not yet present
+            # if branch not in self.network_model:
+            parent_uid = branch[1]
+            rel_type_uid = branch[2]
+            # Allocate level in the network hierarchy (add 2 because of inserted relation phrase
+            if rel_obj.lh_obj == obj:
+                if obj == self.object_in_focus:
+                    self.net_hierarchy[rel_obj.rh_obj] = self.net_hierarchy[obj] + 2
+                else:
+                    self.net_hierarchy[rel_obj.rh_obj] = self.net_hierarchy[obj] + 1
+            elif rel_obj.rh_obj == obj:
+                if obj == self.object_in_focus:
+                    self.net_hierarchy[rel_obj.lh_obj] = self.net_hierarchy[obj] + 2
+                else:
+                    self.net_hierarchy[rel_obj.lh_obj] = self.net_hierarchy[obj] + 1
+
+            # If the branch is about the object in focus,
+            # then insert an intermediate line with the expressed kind of relation
+            if parent_uid == self.object_in_focus.uid and \
+                    rel_type_uid not in self.rels_in_network_model:
                 if len(self.rels_in_network_model) == 0:
+                    # Append the root line to the network
                     kind_name, kind_uid = self.Determine_preferred_kind_name(self.object_in_focus)
-                    root = [self.object_in_focus.uid,
-                            '', '', '', '', kind_uid,
+                    root = [self.object_in_focus.uid, '', '',
+                            '', '', kind_uid,
                             self.object_in_focus.name, '', kind_name]
+                    # Debug print('Root branch:', root)
                     self.network_model.append(root)
+                    self.net_hierarchy[self.object_in_focus] = 0
+                    self.net_parents.append(self.object_in_focus)
 
-                intermediate = [rel_obj.rel_type.uid, '', '', '', '', '',
-                                is_related_to, branch[7]]
+                # Determine the relation type object from the rel_type_uid
+                rel_obj = self.uid_dict[rel_type_uid]
+                self.net_hierarchy[rel_obj] = 1
+                # Append the intermediate line with the phrase of the kind of relation
+                phrase = branch[3]
+                focus_name = branch[7]
+                intermediate = [rel_type_uid, parent_uid, '', '', '', '',
+                                phrase, focus_name]
+                # Debug print('Intermediate branch:', intermediate)
                 self.network_model.append(intermediate)
-                self.rels_in_network_model.append(is_related_to)
-                # Debug print('Branch-2:', rel_obj.phrase_type_uid, intermediate)
+                self.rels_in_network_model.append(rel_type_uid)
+
+            # Determine the level in the network hierarchy
+            child = self.uid_dict[branch[0]]
+            if child not in self.net_parents:
+                self.net_parents.append(child)
+            parent = self.uid_dict[branch[1]]
+            # Debug print('Parent-child', parent.name, branch[1],
+            #       rel_type_phrase, child.name, branch[0])
+            if parent not in self.net_parents:
+                # Debug print('Add parent', parent.name, branch[1],
+                #       rel_type_phrase, child.name, branch[0])
+                self.net_hierarchy[parent] = 0
+                self.net_parents.append(parent)
 
             # If the branch is a direct child of the object in focus,
-            # then link the child to the intermediate instead of to its parent
-            if branch[1] == self.object_in_focus.uid:
-                branch[7] = is_related_to
-                # If kind of relation is a possession of characteristic
-                # or one of its subtypes
-                # then determine that value of the characteristic.
-                if rel_obj.rel_type.uid in self.gel_net.subPossAspUIDs:
+            # and if the kind of relation is a possession of characteristic
+            # or one of its subtypes
+            # then determine that value of the characteristic and add it to the branch.
+            if parent_uid == self.object_in_focus.uid:
+                branch[1] = rel_type_uid
+                branch[7] = rel_type_phrase
+                if rel_type_uid in self.gel_net.subPossAspUIDs:
                     # Determine the value of the aspect
                     qualifier = 'quantitative'
                     aspect = self.uid_dict[branch[0]]
                     equality, value_name, uom_name, value_uid, uom_uid = \
                         self.Determine_aspect_value(aspect, qualifier)
                     branch += [equality, value_name, uom_name]
-                    # Debug print('Branch:', branch)
-                self.network_model.append(branch)
-            else:
-                self.network_model.append(branch)
-            # Debug print('Branch-3:', rel_obj.phrase_type_uid, branch)
+                    # Debug print('Branch with values:', branch)
+            self.network_model.append(branch)
+            # Debug print('Branch-3:', rel_type_uid, branch)
+            # else:
+            # Debug print('Idea {} already included in network'.format(expr[idea_uid_col]))
 
     def Create_prod_model_view_header(self, obj):
         """ Create prod_model view header."""
@@ -509,14 +601,11 @@ class Display_views():
         for rel_obj in indiv.relations:
             expr = rel_obj.expression
             qualifier = None
-            # Add each expression to the expr_table with each idea
-            # about the object in focus
+            # Add each expression with an idea about the object in focus
+            # to the expr_table
             if len(self.expr_table) < self.max_nr_of_rows \
                and expr not in self.expr_table:
                 self.expr_table.append(expr)
-                # Debug print('Rel_obj', rel_obj.lh_obj.uid, rel_obj.lh_obj.name,
-                #      rel_obj.rel_type.base_phrases[0], rel_obj.rh_obj.name)
-                self.Add_line_to_network_model(rel_obj, expr)
 
             # Find possession of aspect relations (or its subtypes)
             if indiv.uid == expr[lh_uid_col] \
@@ -562,6 +651,9 @@ class Display_views():
             # An aspect is found or a qualitative aspect is found
             status = expr[status_col]
             self.nr_of_aspects += 1
+            # Add a line to the network_model (derived from the expression)
+            if indiv == self.object_in_focus:
+                self.Add_line_to_network_model(indiv, rel_obj, expr)
 
             # Find the aspect object from its uid
             # being the aspect in the <has as aspect> relation
@@ -596,12 +688,14 @@ class Display_views():
             # Store result in various models (display views)
             # Network_model and expr_table
             # If quantitative sspect value is found
-            # then add expression to network_model and expr_table
-            if qualifier == 'quantitative' and value_name != 'unknown':
+            # then add expression to and expr_table
+            if (qualifier == 'quantitative' or qualifier == 'quantitative') \
+                    and value_name != 'unknown':
                 if len(self.expr_table) < self.max_nr_of_rows \
                    and expr not in self.expr_table:
                     self.expr_table.append(expr)
-                    self.Add_line_to_network_model(rel_obj, expr)
+                # Add aspect values to network model line (ToBeDone)
+                # self.Add_line_to_network_model(indiv, rel_obj, expr)
 
             # Summary table (summ_model)
             #   A summary is a table for multiple individual things (not parts)
@@ -791,7 +885,6 @@ class Display_views():
                 if len(self.expr_table) < self.max_nr_of_rows \
                    and expr not in self.expr_table:
                     self.expr_table.append(expr)
-                    self.Add_line_to_network_model(rel_obj, expr)
 
                 # Search for the first expression that qualifies or quantifies the aspect
                 # by searching for the kinds of qualifying relations or their subtypes
@@ -867,7 +960,6 @@ class Display_views():
         status_head = ['Status', 'Status']
         descr_avail_text = ['Description available',
                             'Omschrijving beschikbaar']
-
         info_header = True
 
         for rel_obj in obj.relations:
@@ -902,9 +994,13 @@ class Display_views():
                         self.prod_model.append(prod_head_8)
                     info_header = False
 
+                # Add line about info to expr_table and to netwerk_model
+                self.expr_table.append(expr)
+                if obj == self.object_in_focus:
+                    self.Add_line_to_network_model(obj, rel_obj, expr)
                 # Determine the name of the supertype of info
                 # and verify if info is presented on a carrier.
-                # And store full description
+                # And store full description of the info
                 qualified = False
                 presented = False
                 super_info_uid = ''
@@ -920,7 +1016,6 @@ class Display_views():
                         info.description = info_expr[full_def_col]
                         qualified = True
                         self.expr_table.append(info_expr)
-                        self.Add_line_to_network_model(rel_info, info_expr)
 
                     # Verify whether info <is presented on> (4996) physical object
                     # (typically an electronic data file)
@@ -937,7 +1032,7 @@ class Display_views():
                         # Info is presented on a carrier
                         presented = True
                         self.expr_table.append(info_expr)
-                        self.Add_line_to_network_model(rel_info, info_expr)
+                        # self.Add_line_to_network_model(info, rel_info, info_expr)
 
                         carrier = self.uid_dict[carrier_uid]
                         if len(carrier.classifiers) > 0:
@@ -960,7 +1055,7 @@ class Display_views():
                                 # Directory for carrier is found
                                 directory = self.uid_dict[directory_uid]
                                 self.expr_table.append(car_expr)
-                                self.Add_line_to_network_model(rel_carrier, car_expr)
+                                # self.Add_line_to_network_model(carrier, rel_carrier, car_expr)
                                 directory_name = directory.name
 
                         if directory_name == '':
@@ -1041,11 +1136,12 @@ class Display_views():
         for rel_obj in obj.relations:
             expr = rel_obj.expression
             if expr[rel_type_uid_col] in self.gel_net.subComposUIDs:
-                if expr not in self.expr_table and expr not in self.expr_table:
+                if expr not in self.expr_table:
                     self.expr_table.append(expr)
                     # Debug print('Rel_obj-parts', rel_obj.lh_obj.uid, rel_obj.lh_obj.name,
                     #      rel_obj.rel_type.base_phrases[0], rel_obj.rh_obj.name)
-                    self.Add_line_to_network_model(rel_obj, expr)
+                    if obj == self.object_in_focus:
+                        self.Add_line_to_network_model(obj, rel_obj, expr)
 
                 # If base phrase <is a part of> and right hand is the object in focus
                 # then lh is a part
@@ -1114,6 +1210,7 @@ class Display_views():
                             'Deel {} heeft geen gedefinieerde naam van zijn taalgemeenschap.'.
                             format(part.name))
 
+                    # indiv_model = obj.uid, obj.name, whole_name, kind_name, community_name
                     self.indiv_row[0] = part.uid
                     self.indiv_row[1] = part_name
                     self.indiv_row[2] = obj.name
@@ -1173,7 +1270,6 @@ class Display_views():
                 expr = rel_obj.expression
                 if len(self.expr_table) < self.max_nr_of_rows and expr not in self.expr_table:
                     self.expr_table.append(expr)
-                    self.Add_line_to_network_model(rel_obj, expr)
 
         # Search for expressions that are <can have as aspect a> kind of relation
         # or subtypes of that kind of relation
@@ -1225,8 +1321,11 @@ class Display_views():
                 else:
                     continue
 
-                # There is a kind of aspect found
+                # There is a kind of aspect found. Add a line to the network model
+                if obj_i == self.object_in_focus:
+                    self.Add_line_to_network_model(obj_i, rel_obj, expr)
                 self.nr_of_aspects += 1
+                
                 status = expr[status_col]
                 equality = '='
                 value_uid = ''
@@ -1235,7 +1334,7 @@ class Display_views():
                 uom_name = ''
                 value_presence = False
 
-                # Searching for values/criteria for the kind of aspect
+                # Search for values/constraints for the kind of aspect
                 # Therefore, find a rh_role object (intrinsic aspect)
                 # of the <can have as aspect a> relation.
                 if role_uid != '':
@@ -1338,7 +1437,7 @@ class Display_views():
                 else:
                     value_name = ''
 
-                # If the item is not a subtype (subtype_level == 0)
+                # If the obj is object in focus (thus subtype_level == 0)
                 # then create a row in the possibilities_model
                 #   for any decomp_level
                 if self.subtype_level == 0:
@@ -1385,7 +1484,9 @@ class Display_views():
                     # Debug print('Value present:', obj_i.name, aspect_name, value_name)
                     if len(self.expr_table) < self.max_nr_of_rows:
                         self.expr_table.append(expr2)
-                        self.Add_line_to_network_model(rel_obj2, expr2)
+                        # The value and uom are added to the aspect line in the network_model
+                        # self.Add_line_to_network_model(asp, rel_obj2, expr2)
+                        # *** ToBeDone
 
                     if self.decomp_level == 0:
                         # Build taxon view header add a column for aspects if not yet included
@@ -1511,7 +1612,7 @@ class Display_views():
             Taxon_model: uid, name, preferred name of super, comm, aspect values
                      or: uid, 'has as subtypes', name, blank.
         '''
-        # Debug print('Tax aspects:', self.hierarchy[obj], self.subtype_level,
+        # Debug print('Tax aspects:', self.taxon_hierarchy[obj], self.subtype_level,
         #             obj.name, self.taxon_row)
         if len(obj.supertypes) > 0:
             # Create a row in the taxonomy per direct supertype
@@ -1529,15 +1630,15 @@ class Display_views():
                     if self.taxon_row[0] == self.object_in_focus.uid:
                         self.taxon_row[2] = ''
                         self.taxon_model.append(self.taxon_row[:])
-                    # Debug print('Super-1:', self.hierarchy[obj], self.subtype_level,
+                    # Debug print('Super-1:', self.taxon_hierarchy[obj], self.subtype_level,
                     #       supertype.name, self.object_in_focus.name, self.taxon_row[0:6])
 
                     # If the object is not a subtype of the object_in_focus,
                     # then insert an inter_row header line for the subtypes
-                    if self.hierarchy[obj] == 0:
+                    if self.taxon_hierarchy[obj] == 0:
                         has_as_subs_uid = '1146'
                         rel_obj = self.uid_dict[has_as_subs_uid]
-                        self.hierarchy[rel_obj] = 1
+                        self.taxon_hierarchy[rel_obj] = 1
                         inter_row = [has_as_subs_uid,
                                      self.has_as_subtypes[self.GUI_lang_index],
                                      obj.name, '']
@@ -1548,9 +1649,7 @@ class Display_views():
                     else:
                         if self.taxon_row[2] == self.object_in_focus.name:
                             self.taxon_row[2] = self.has_as_subtypes[self.GUI_lang_index]
-                            self.taxon_model.append(self.taxon_row[:])
-                        else:
-                            self.taxon_model.append(self.taxon_row[:])
+                        self.taxon_model.append(self.taxon_row[:])
         else:
             # The obj (object in focus) has no defined supertype(s)
             self.taxon_row[2] = ''  # self.unknown[self.GUI_lang_index]
@@ -1647,10 +1746,11 @@ class Display_views():
                         self.kind_model.append(prod_head_4)
                     self.part_head_req = False
 
-                # Add the expression to the expr_table output table
+                # Add the compostion expression to the expr_table table and network_model
                 if len(self.expr_table) < self.max_nr_of_rows:
                     self.expr_table.append(expr)
-                    self.Add_line_to_network_model(rel_obj, expr)
+                    if obj == self.object_in_focus:
+                        self.Add_line_to_network_model(obj, rel_obj, expr)
 
                 # Determine preferred name of object (= kind)
                 if len(obj.names_in_contexts) > 0:
@@ -1678,7 +1778,7 @@ class Display_views():
                 else:
                     part_kind_name = self.unknown[self.GUI_lang_index]
 
-                # Create row about possible aspect of kind in possibilities_model
+                # Create row about possible aspect of kind of part in possibilities_model
                 self.possibility_row[0] = part.uid
                 self.possibility_row[1] = part_name
                 self.possibility_row[2] = \
@@ -1814,15 +1914,17 @@ class Display_views():
                     indiv_uid = expr[lh_uid_col]
                 else:
                     continue
+
+                # Individual thing uid is found via classification relation.
                 # Store the expression in the expr_table for display and possible export
+                # and add a line to the network_model
                 if len(self.expr_table) < self.max_nr_of_rows:
                     self.expr_table.append(expr)
-                    self.Add_line_to_network_model(rel_obj, expr)
+                    # self.Add_line_to_network_model(obj, rel_obj, expr)
 
-                # Individual thing uid is found via classification relation
                 # Set level in the hierarchy two higher because of classif relation
                 indiv = self.uid_dict[indiv_uid]
-                self.hierarchy[indiv] = self.hierarchy[obj] + 2
+                self.taxon_hierarchy[indiv] = self.taxon_hierarchy[obj] + 1
 
                 # Find aspects of the individual thing, if any
                 # and add them to summary table.
@@ -1845,7 +1947,7 @@ class Display_views():
                     header_text = has_as_individuals[self.GUI_lang_index] + obj.name
                     inter_row = [has_as_ind_uid, header_text, obj.name, '']
                     self.taxon_model.append(inter_row)
-                    self.hierarchy[classif] = self.hierarchy[obj] + 1
+                    self.taxon_hierarchy[classif] = self.taxon_hierarchy[obj] + 1
                     first_time = False
 
                 # Create a row in the taxonomy for an individual thing
@@ -1910,9 +2012,11 @@ class Display_views():
                                '', '', '', '', '']
                 self.prod_model.append(prod_head_5)
 
+            # Add occurence that involves object to expr_table and network model
             if len(self.expr_table) < self.max_nr_of_rows:
                 self.expr_table.append(expr)
-                self.Add_line_to_network_model(rel_obj, expr)
+                if obj == self.object_in_focus:
+                    self.Add_line_to_network_model(obj, rel_obj, expr)
 
             # Record the role playing occurrence in occ_model
             # Find classifying kind of occurrence
@@ -1975,7 +2079,7 @@ class Display_views():
                 #      'roles:',expr_occ[lh_role_uid_col],expr_occ[rh_role_uid_col])
 
                 self.expr_table.append(expr_occ)
-                self.Add_line_to_network_model(rel_occ, expr_occ)
+                # self.Add_line_to_network_model(occ, rel_occ, expr_occ)
                 status = expr_occ[status_col]
 
                 # Determine the kind of the involved individual object
@@ -2083,6 +2187,7 @@ class Display_views():
             expr = rel_occ.expression
             if expr[lh_uid_col] == occ.uid \
                and expr[rel_type_uid_col] in self.gel_net.subComposUIDs:
+                # A part occurrence is found
                 # Create header line, only after finding a part the first time
                 if parts is False:
                     self.line_nr += + 1
@@ -2096,7 +2201,7 @@ class Display_views():
                 status = expr[status_col]
 
                 self.expr_table.append(expr)
-                self.Add_line_to_network_model(rel_occ, expr)
+                # self.Add_line_to_network_model(occ, rel_occ, expr)
 
                 if len(part_occ.classifiers) > 0:
                     kind_part_occ = part_occ.classifiers[0]
@@ -2150,11 +2255,9 @@ class Display_views():
             if done:
                 self.Define_and_display_possibilities_of_kind()
 
-        # Define and display model of a Kind
+        # Define and display model of kind
         if len(self.kind_model) > 0:
-            # === Temporary skipped
-            if done:
-                self.Define_and_display_kind_view()
+            self.Define_and_display_kind_view()
 
         # Define and display summary_view sheet for individual products
         if len(self.summ_model) > 0:
@@ -2162,19 +2265,15 @@ class Display_views():
 
         # Define and display individual_view sheet for composition based view
         if len(self.indiv_model) > 0:
-            # === Temporary skipped
-            if done:
-                self.Define_and_display_individual_model()
+            self.Define_and_display_individual_model()
 
         # Define and display product_model_sheet view
         if len(self.prod_model) > 0:
-            self.Define_and_display_product_sheet()
+            self.Define_and_display_product_model_view()
 
         # Define and display data_sheet view
         if len(self.prod_model) > 0:
-            # === Temporary skipped
-            if done:
-                self.Define_and_display_data_sheet()
+            self.Define_and_display_data_sheet()
 
         # Activities view
         if len(self.occ_model) > 0:
@@ -2218,11 +2317,11 @@ class Display_views():
         except AttributeError:
             pass
 
-        self.Define_network_sheet()
+        self.Define_network_view()
 
         self.Display_network_view()
 
-    def Define_network_sheet(self):
+    def Define_network_view(self):
         """ Define a network sheet for display of network_model (a list of network rows)
             for display in a tab of Notebook.
         """
@@ -2276,143 +2375,116 @@ class Display_views():
         self.network_button_row.append(self.close_network)
         self.network_frame.append(self.network_button_row)
 
-##        # When Remi Table is used (via SingleRowSelectionTable)
-##        # instead of TreeView, then the following is O.K.
-##        self.network_tree = SingleRowSelectionTable(
-##            width='100%',
-##            style={"overflow": "auto", "background-color": "#eeffaa",
-##                   "border-width": "2px", "border-style": "solid",
-##                   "font-size": "12px", 'table-layout': 'auto',
-##                   'text-align': 'left'})
-        self.network_tree = gui.TreeView(
+        self.network_tree = TreeTable(
             width='100%',
-            style={"overflow": "scroll", "background-color": "#eeffaa",
-                   "border-width": "2px", "border-style": "solid",
-                   "font-size": "12px", 'table-layout': 'auto',
+            style={'overflow': 'scroll', 'background-color': '#eeffaa',
+                   'border-width': '2px', 'border-style': 'solid',
+                   'font-size': '12px', 'table-layout': 'auto',
                    'text-align': 'left'})
-##        eqal_head = ['>=<', '>=<']
-##        valu_head = ['Value', 'Waarde']
-##        unit_head = ['Unit', 'Eenheid']
-##        # When Remi Table is used (via SingleRowSelectionTable)
-##        # instead of TreeView, then the following is O.K.
-##        content = [('UID', self.name_head[self.GUI_lang_index],
-##                    self.parent_head[self.GUI_lang_index],
-##                    self.kind_head[self.GUI_lang_index],
-##                    eqal_head[self.GUI_lang_index],
-##                    valu_head[self.GUI_lang_index],
-##                    unit_head[self.GUI_lang_index])]
-##        self.network_tree.append_from_list(content, fill_title=True)
+        # Add a table heading row
+        eqal_head = ['>=<', '>=<']
+        valu_head = ['Value', 'Waarde']
+        unit_head = ['Unit', 'Eenheid']
+        content = [(self.name_head[self.GUI_lang_index],
+                    self.parent_head[self.GUI_lang_index],
+                    self.kind_head[self.GUI_lang_index],
+                    eqal_head[self.GUI_lang_index],
+                    valu_head[self.GUI_lang_index],
+                    unit_head[self.GUI_lang_index])]
+        self.network_tree.append_from_list(content, fill_title=True)
         self.network_frame.append(self.network_tree)
-
-##        # When Remi Table is used then the following selection by row is O.K.
-##        # Then select a row in Table for viewing details of leftmost object
-##        self.network_tree.on_table_row_click.connect(self.Network_object_detail_view)
-##        self.network_tree.on_table_row_i_key_click.connect(self.Network_object_detail_view)
-##        self.network_tree.on_table_row_right_click.connect(self.Network_object_detail_view)
 
     def tab_cb(self, tab_name):
         self.user_interface.views_noteb.select_by_name(tab_name)
         return
 
-##    The following method is for use of gui.Table for display of a network; otherwise use TreeView.
-##    def Display_network_view(self):
-##        """ Display a network of all related things
-##            that are directly related to the object in focus in a gui.Table.
-##        """
-##        # Display self.network_model rows in self.network_tree (Table) view
-##        parents = []
-##        # Initialize the list of included names of things
-##        included = []
-##        for network_line in self.network_model:
-##            # Verify whether network_line[7],
-##            # being the parent (typically an intermediate relation),
-##            # is blank or is in the list of parents.
-##            # Determine whether hierarchy of sub_sub concepts shall be open or not
-##            # openness = False
-##            parent_name = network_line[7]
-##            if parent_name == '' or parent_name in parents:
-##                # Skip duplicate line
-##                # row_duplicate = False
-##                name = network_line[6]
-##                # Include only lines that are not already included yet
-##                if network_line not in included:
-##                    included.append(network_line)
-##                    # if parent_name == '':
-##                    #     openness = True
-##                    relation = False
-##                    color = '#ffff99'
-##                    term = name.partition(' ')
-##                    if term[0] in ['has', 'heeft', 'classifies', 'classificeert',
-##                                   'is', 'can', 'kan', 'shall', 'moet']:
-##                        relation = True
-##                        color = '#eeffdd'
-##                    row_widget = gui.TableRow()
-##                    for index, field in enumerate(network_line[5:]):
-##                        row_item = gui.TableItem(text=field,
-##                                                 style={'text-align': 'left',
-##                                                        'background-color': color})
-##                        if relation is False or index < 2:
-##                            row_widget.append(row_item, field)
-##                    self.network_tree.append(row_widget, name)
-##                    if name not in parents:
-##                        parents.append(name)
-
     def Display_network_view(self):
         """ Display a network of all related things
             that are directly related to the object in focus in a gui.TreeView.
+            network_model = related_uid, focus_uid, focus_name, phrase, related_name,
+                            kind_uid, related_name, focus_name, kind_name.
         """
         # Display self.network_model rows in self.network_tree TreeView
-        parents = []
+        parent_uids = []
+        remembered_name = ''
+        sub_level = 0
+        parent_text = ['has', 'heeft', 'classifies', 'classificeert',
+                       'is', 'can', 'kan', 'shall', 'moet']
         widget_dict = {}  # key, value = name, widget
         # Initialize the list of included names of things
-        included = []
+        # included = []
         for network_line in self.network_model:
-            # Verify whether network_line[7], being the parent (typically an intermediate relation),
+            child_uid = network_line[0]
+            child = self.uid_dict[child_uid]
+            # Verify whether the parent_uid (network_line[1]),
             # is blank or is in the list of parents.
             # Determine whether hierarchy of sub_sub concepts shall be open or not
             openness = 'false'
-            name = network_line[6]
+            parent_uid = network_line[1]
+            if parent_uid == '':
+                target_level = 0
+            else:
+                parent = self.uid_dict[parent_uid]
+                target_level = self.net_hierarchy[parent] + 1
+            child_name = network_line[6]
             parent_name = network_line[7]
-            # Debug print('net:', name, parent_name)
-            if parent_name == '' or parent_name in parents:
-                # Skip duplicate line
-                # row_duplicate = False
-                # Include only lines that are not already included yet
-                if network_line not in included:
-                    included.append(network_line)
-                    if parent_name == '':
-                        openness = 'true'
-                    relation = False
-                    color = '#ffff99'
-                    term = name.partition(' ')
-                    if term[0] in ['has', 'heeft', 'classifies', 'classificeert',
-                                   'is', 'can', 'kan', 'shall', 'moet']:
-                        relation = True
-                        color = '#eeffdd'
-                        openness = 'true'
-##                    For Remi using either Table or TreeView
-##                    row_widget = gui.TableRow()
-                    row_widget = gui.TreeItem(name, style={'text-align': 'left',
-                                                           'font-size': '14px',
-                                                           'background-color': color})
-                    row_widget.attributes['treeopen'] = openness
-                    if relation is not True and parent_name != '':
-                        # row_widget.onclick.connect(self.Network_object_detail_view)
-                        row_widget.uid = network_line[0]
-                    widget_dict[name] = row_widget
-##                    For Remi using either Table or TreeView
-##                    for index, field in enumerate(network_line[5:]):
-##                        row_item = gui.TableItem(text=field,
-##                                                 style={'text-align': 'left',
-##                                                        'background-color': color})
-##                        if relation is False or index < 2:
-##                            row_widget.append(row_item, field)
-                    if parent_name == '':
-                        self.network_tree.append(row_widget, name)
-                    else:
-                        widget_dict[parent_name].append(row_widget, name)
-                    if name not in parents:
-                        parents.append(name)
+            # Debug print('sub-target-pre:', sub_level, target_level,
+            #       parent_uid, parent_name, child_uid, child_name)
+            if parent_uid == '' or parent_uid in parent_uids:
+                if parent_uid == self.object_in_focus.uid:
+                    parent_uids.append(parent_uid)
+                    openness = 'true'
+                relation = False
+                color = '#ffff99'
+                # Indentation
+                # If child_name starts with a term that denotes a relation
+                # then store parent name and indent
+                term_in_name = child_name.partition(' ')
+                if term_in_name[0] in parent_text:
+                    remembered_name = parent_name
+                    relation = True
+                    color = '#eeffdd'
+                    openness = 'true'
+                    self.network_tree.begin_fold()
+                    sub_level += 1
+                elif sub_level > 0 and target_level > sub_level:
+                    self.network_tree.begin_fold()
+                    sub_level += 1
+                if target_level < sub_level:
+                    while target_level < sub_level:
+                        sub_level += -1
+                        self.network_tree.end_fold()
+                # Debug print('sub-target-post:', sub_level, target_level,
+                #       parent_uid, parent_name, child_uid, child_name)
+
+                net_row_widget = gui.TableRow()
+                net_row_widget.attributes['treeopen'] = openness
+                widget_dict[child_name] = net_row_widget
+                if relation is False and parent_name != '':
+                    # net_row_widget.onclick.connect(self.Network_object_detail_view)
+                    net_row_widget.uid = network_line[0]
+                for index, field in enumerate(network_line[6:]):
+                    row_item = gui.TableItem(text=field,
+                                             style={'text-align': 'left',
+                                                    'background-color': color})
+                    if relation is False:
+                        # If row is not a relation and parent is a relation name
+                        # then replace relation name with remembered parent name
+                        strings = field.partition(' ')
+                        if strings[0] in parent_text:
+                            row_item = gui.TableItem(text=remembered_name,
+                                                     style={'text-align': 'left',
+                                                            'background-color': color})
+                        net_row_widget.append(row_item, field)
+                    elif index < 1:
+                        # Relation line: only the first field to be displayed
+                        net_row_widget.append(row_item, field)
+                self.network_tree.append(net_row_widget, child_name)
+                if child_uid not in parent_uids:
+                    parent_uids.append(child_uid)
+            else:
+                # Parent not in parents
+                print('Parent name "{}" does not appear in network'.format(parent_name))
 
     def Define_and_display_taxonomy_of_kinds(self):
         # Destroy earlier taxon_frame
@@ -2504,7 +2576,7 @@ class Display_views():
         for taxon_line in self.taxon_model:
             uid = taxon_line[0]
             obj = self.uid_dict[uid]
-            target_level = self.hierarchy[obj] + 1
+            target_level = self.taxon_hierarchy[obj] + 1
             # Debug print('Taxon_model:', sub_level, target_level, taxon_line)
             name_of_super = taxon_line[2]
             # Debug print('Taxon_line', taxon_line)
@@ -2553,8 +2625,8 @@ class Display_views():
                         # If row (taxon_line[1]) is not a 'has as subtypes' etc.
                         # and super_name is a 'has as subtypes'
                         # then replace super_name by parent (=object_in_focus.name)
-                        parts = field.partition(' ')
-                        if parts[0] in super_texts:
+                        strings = field.partition(' ')
+                        if strings[0] in super_texts:
                             taxon_row_item = gui.TableItem(
                                 text=parent,
                                 style={'text-align': 'left',
@@ -2622,9 +2694,9 @@ class Display_views():
 
         self.summ_tree = SingleRowSelectionTable(
             width='100%',
-            style={"overflow": "auto", "background-color": "#eeffaa",
-                   "border-width": "2px", "border-style": "solid",
-                   "font-size": "12px", 'table-layout': 'auto',
+            style={'overflow': 'auto', 'background-color': '#eeffaa',
+                   'border-width': '2px', 'border-style': 'solid',
+                   'font-size': '12px', 'table-layout': 'auto',
                    'text-align': 'left'})
         # Summary table: UID, Name, Kind, Community, Aspect{1,n)
         self.summ_column_names[0:4] = ['UID', 'Name', 'Kind', 'Community']
@@ -2676,9 +2748,70 @@ class Display_views():
         except AttributeError:
             pass
 
-        self.Define_possibilities_sheet()
+        self.Define_possibilities_view()
+        self.Display_possibilities_view()
 
-        # Display possibilities_sheet
+    def Define_possibilities_view(self):
+        """ Define a possibilities_sheet for display of possibilities_model
+            (a list of possib_rows)
+            for display in a tab of Notebook.
+        """
+        # Determine tab text
+        possib_text = ['Possibilities for ', 'Mogelijkheden voor ']
+        self.possib_name = possib_text[self.GUI_lang_index] + self.object_in_focus.name
+        # Define frame and add to tabs
+        self.possib_frame = gui.VBox(width='100%', height='100%',
+                                     style='background-color:#eeffdd')
+        possib_head = ['Possible aspects per object of a particular kind',
+                       'Mogelijke aspecten per object van een bepaalde soort']
+        self.possib_frame.attributes['title'] = possib_head[self.GUI_lang_index]
+        self.user_interface.views_noteb.add_tab(self.possib_frame,
+                                                self.possib_name,
+                                                self.tab_cb(self.possib_name))
+        possib_button_text = ['Display details of left object',
+                              'Toon details van linker object']
+        possib_button_row = gui.HBox(height=20, width='100%')
+
+        possib_button = gui.Button(possib_button_text[self.GUI_lang_index],
+                                   width='20%', height=20)
+        possib_button.attributes['title'] = 'Press button after selection of left hand object'
+        possib_button.onclick.connect(self.Possibilities_detail_view)
+
+        close_possib_view = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                       width='15%', height=20)
+        close_possib_view.attributes['title'] = 'Press button when you want to remove this tag'
+        close_possib_view.onclick.connect(
+            self.user_interface.Close_tag,
+            self.user_interface.views_noteb,
+            self.possib_name)
+
+        possib_button_row.append(possib_button)
+        possib_button_row.append(close_possib_view)
+        self.possib_frame.append(possib_button_row)
+
+        self.possib_tree = SingleRowSelectionTable(
+            width='100%',
+            style={'overflow': 'auto', 'background-color': '#eeffaa',
+                   'border-width': '2px', 'border-style': 'solid',
+                   'font-size': '12px', 'table-layout': 'auto',
+                   'text-align': 'left'})
+        # Possib_model = obj.uid, obj.name, ext_name, parent, kind, community, aspect(0,n)
+        poss_headings = [[('Kind', 'Community')], [('Soort', 'Taalgemeenschap')]]
+        nr_of_cols = len(self.possib_column_names)
+
+        self.possib_tree = Treeview(self.possib_frame, columns=(headings[0:nr_of_cols]),
+                                    displaycolumns=display_cols, selectmode='browse', height=30)
+        poss_headings[0][0] += self.possib_column_names[6:]
+        poss_headings[1][0] += self.possib_column_names[6:]
+
+        self.possib_tree.append_from_list(poss_headings[self.GUI_lang_index], fill_title=True)
+        self.possib_frame.append(self.possib_tree)
+
+        self.uom_color = '#ccf'
+        self.sum_color = '#cfc'
+
+    def Display_possibilities_view(self):
+        ''' Create a table of possibilities for a given kind.'''
         # Display header row with units of measure
         self.possib_tree.insert('', index='end', values=self.possib_uom_names, tags='uom_tag')
         # Display self.possibilities_model rows in self.possib_tree
@@ -2695,68 +2828,6 @@ class Display_views():
                                         text=possib_line[1], open=True)
                 parents.append(possib_line[2])
 
-    def Define_possibilities_sheet(self):
-        """ Define a possibilities_sheet for display of possibilities_model
-            (a list of possib_rows)
-            for display in a tab of Notebook.
-        """
-        self.possib_frame = Frame(self.views_noteb)
-        self.possib_frame.grid(column=0, row=0, sticky=NSEW, rowspan=2)
-        self.possib_frame.columnconfigure(0, weight=1)
-        self.possib_frame.rowconfigure(0, weight=0)
-        self.possib_frame.rowconfigure(1, weight=1)
-
-        possib_text = ['Possibilities', 'Mogelijkheden']
-        self.views_noteb.add(self.possib_frame, text=possib_text[self.GUI_lang_index],
-                             sticky=NSEW)
-        self.views_noteb.insert("end", self.possib_frame, sticky=NSEW)
-
-        possib_head = ['Possible aspects per object of a particular kind',
-                       'Mogelijke aspecten per object van een bepaalde soort']
-        possib_label = Label(self.possib_frame, text=possib_head[self.GUI_lang_index])
-        headings = ['UID', 'Name', 'Ext_name', 'Parent', 'Kind', 'Community',
-                    'Aspect1', 'Aspect2', 'Aspect3', 'Aspect4', 'Aspect5',
-                    'Aspect6', 'Aspect7', 'Aspect8', 'Aspect9', 'Aspect10']
-        nr_of_cols = len(self.possib_column_names)
-        display_cols = headings[4:nr_of_cols]
-
-        self.possib_tree = Treeview(self.possib_frame, columns=(headings[0:nr_of_cols]),
-                                    displaycolumns=display_cols, selectmode='browse', height=30)
-
-        self.possib_tree.heading('UID', text='UID', anchor=W)
-        self.possib_tree.heading('Name', text=self.name_head[self.GUI_lang_index], anchor=W)
-        self.possib_tree.heading('Ext_name', text=self.name_head[self.GUI_lang_index], anchor=W)
-        self.possib_tree.heading('Parent', text=self.parent_head[self.GUI_lang_index], anchor=W)
-        self.possib_tree.heading('Kind', text=self.kind_head[self.GUI_lang_index], anchor=W)
-        self.possib_tree.heading('Community', text=self.comm_head[self.GUI_lang_index], anchor=W)
-
-        self.possib_tree.column('#0', minwidth=100, width=200)
-        self.possib_tree.column('Kind', minwidth=20, width=50)
-        self.possib_tree.column('Community', minwidth=20, width=50)
-        asp = 0
-        for column in self.possib_column_names[6:]:
-            asp += 1
-            Asp_name = 'Aspect' + str(asp)
-            self.possib_tree.heading(Asp_name, text=self.possib_column_names[asp + 4], anchor=W)
-            self.possib_tree.column(Asp_name, minwidth=20, width=50)
-
-        self.possib_tree.columnconfigure(0, weight=1)
-        self.possib_tree.columnconfigure(1, weight=1)
-        self.possib_tree.rowconfigure(0, weight=1)
-        self.possib_tree.rowconfigure(1, weight=1)
-
-        self.possib_tree.tag_configure('uom_tag', option=None, background='#ccf')
-        self.possib_tree.tag_configure('sum_tag', option=None, background='#cfc')
-
-        possib_Scroll = Scrollbar(self.possib_frame, orient=VERTICAL,
-                                  command=self.possib_tree.yview)
-        possib_label.grid(column=0, row=0, sticky=EW)
-        self.possib_tree.grid(column=0, row=1, sticky=NSEW)
-        possib_Scroll.grid(column=0, row=1, sticky=NS + E)
-        self.possib_tree.config(yscrollcommand=possib_Scroll.set)
-
-        self.possib_tree.bind(sequence='<Double-1>', func=self.Possibilities_detail_view)
-
     def Define_and_display_individual_model(self):
         # Destroy earlier indiv_frame
         try:
@@ -2764,83 +2835,91 @@ class Display_views():
         except AttributeError:
             pass
 
-        self.Define_composition_sheet()
+        self.Define_composition_view()
 
         # Display composition sheet
         self.Display_composition_view()
 
-    def Define_composition_sheet(self):
-        """ Define a sheet for display of an individual thing and its composition
+    def Define_composition_view(self):
+        """ Define a view for display of an individual thing and its composition
             (indiv_model, a list of indiv_rows)
             for display in a tab of Notebook.
         """
-        self.indiv_frame = Frame(self.views_noteb)
-        self.indiv_frame.grid(column=0, row=0, sticky=NSEW)  # pack(fill=BOTH, expand=1)
-        self.indiv_frame.columnconfigure(0, weight=1)
-        self.indiv_frame.rowconfigure(0, weight=1)
-        self.indiv_frame.rowconfigure(1, weight=1)
+        self.indiv_frame = gui.VBox(width='100%', height='100%',
+                                    style={'overflow': 'auto',
+                                           'background-color': '#eeffdd'})
+        indiv_text = ['Composition of ', 'Samenstelling van ']
+        self.indiv_name = indiv_text[self.GUI_lang_index] + self.object_in_focus.name
+        self.user_interface.views_noteb.add_tab(self.indiv_frame, self.indiv_name,
+                                                self.tab_cb(self.indiv_name))
+        self.indiv_button_row = gui.HBox(height=20, width='100%')
 
-        indiv_text = ['Composition', 'Samenstelling']
-        self.views_noteb.add(self.indiv_frame, text=indiv_text[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end", self.indiv_frame, sticky=NSEW)
+        indiv_button_text = ['Display details',
+                             'Toon details']
+        self.indiv_button = gui.Button(indiv_button_text[self.GUI_lang_index],
+                                       width='15%', height=20)
+        self.indiv_button.attributes['title'] = 'Select a row, ' \
+                                                'then display details of left hand object'
+        self.indiv_button.onclick.connect(self.Indiv_detail_view)
 
-        indiv_Head = ['Aspects per individual object', 'Aspecten per individueel object']
-        indiv_Lbl = Label(self.indiv_frame, text=indiv_Head[self.GUI_lang_index])
-        headings = ['UID', 'Name', 'Parent', 'Kind', 'Community', 'Aspect1', 'Aspect2', 'Aspect3',
-                    'Aspect4', 'Aspect5', 'Aspect6', 'Aspect7', 'Aspect8', 'Aspect9', 'Aspect10']
+        self.close_indiv = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                      width='15%', height=20)
+        self.close_indiv.attributes['title'] = 'Press button when you want to remove this tag'
+        self.close_indiv.onclick.connect(self.user_interface.Close_tag,
+                                         self.user_interface.views_noteb,
+                                         self.indiv_name)
+        self.indiv_button_row.append(self.close_indiv)
+        self.indiv_button_row.append(self.indiv_button)
+        self.indiv_frame.append(self.indiv_button_row)
+
+        self.indiv_tree = SingleRowSelectionTable(
+            width='100%',
+            style={'overflow': 'auto', 'background-color': '#eeffaa',
+                   'border-width': '2px', 'border-style': 'solid',
+                   'font-size': '12px', 'table-layout': 'auto',
+                   'text-align': 'left'})
+        indiv_headings = [[('Kind', 'Community')], [('Soort', 'Taalgemeenschap')]]
         nr_of_cols = len(self.indiv_column_names)
-        display_cols = headings[3:nr_of_cols]
 
-        self.indiv_tree = Treeview(self.indiv_frame, columns=(headings[0:nr_of_cols]),
-                                   displaycolumns=display_cols, selectmode='browse', height=30)
+        indiv_headings[0][0] += self.indiv_column_names[5:]
+        indiv_headings[1][0] += self.indiv_column_names[5:]
+        # Debug print('Indiv col name:', indiv_headings) 
+        self.indiv_tree.append_from_list(indiv_headings[self.GUI_lang_index], fill_title=True)
+        self.indiv_frame.append(self.indiv_tree)
 
-        self.indiv_tree.heading('#0', text='Object', anchor=W)
-        self.indiv_tree.heading('UID', text='UID', anchor=W)
-        self.indiv_tree.heading('Name', text=self.name_head[self.GUI_lang_index], anchor=W)
-        self.indiv_tree.heading('Parent', text=self.parent_head[self.GUI_lang_index], anchor=W)
-        self.indiv_tree.heading('Kind', text=self.kind_head[self.GUI_lang_index], anchor=W)
-        self.indiv_tree.heading('Community', text=self.comm_head[self.GUI_lang_index], anchor=W)
-
-        self.indiv_tree.column('#0', minwidth=100, width=200)
-        self.indiv_tree.column('Kind', minwidth=20, width=50)
-        self.indiv_tree.column('Community', minwidth=20, width=50)
-        asp = 0
-        for column in self.indiv_column_names[5:]:
-            asp += 1
-            Asp_name = 'Aspect' + str(asp)
-            self.indiv_tree.heading(Asp_name, text=self.indiv_column_names[asp + 4], anchor=W)
-            self.indiv_tree.column(Asp_name, minwidth=20, width=50)
-
-        self.indiv_tree.columnconfigure(0, weight=1)
-        self.indiv_tree.columnconfigure(1, weight=1)
-        self.indiv_tree.rowconfigure(0, weight=1)
-        self.indiv_tree.rowconfigure(1, weight=1)
-
-        self.indiv_tree.tag_configure('uom_tag', option=None, background='#ccf')
-        self.indiv_tree.tag_configure('sum_tag', option=None, background='#cfc')
-
-        indiv_Scroll = Scrollbar(self.indiv_frame, orient=VERTICAL, command=self.indiv_tree.yview)
-        indiv_Lbl.grid(column=0, row=0, sticky=EW)
-        self.indiv_tree.grid(column=0, row=1, sticky=NSEW)
-        indiv_Scroll.grid(column=0, row=1, sticky=NS + E)
-        self.indiv_tree.config(yscrollcommand=indiv_Scroll.set)
-
-        self.indiv_tree.bind(sequence='<Double-1>', func=self.Indiv_detail_view)
+        self.uom_color = '#ccf'
+        self.sum_color = '#cfc'
 
     def Display_composition_view(self):
         """ Display rows in indiv_model (composition of individual object)
             in composition sheet view.
+            indiv_model = obj.uid, obj.name, whole_name, kind_name, community_name,
+                          value(0:m).
         """
         # Display header row with units of measure
-        self.indiv_tree.insert('', index='end', values=self.indiv_uom_names, tags='uom_tag')
+        name = 'uom'
+        indiv_row_widget = gui.TableRow(style={'text-align': 'left',
+                                               'background-color': self.uom_color})
+        for index, field in enumerate(self.indiv_uom_names[3:]):
+            indiv_row_item = gui.TableItem(text=field,
+                                          style={'text-align': 'left',
+                                                 'background-color': self.uom_color})
+            indiv_row_widget.append(indiv_row_item, field)
+        self.indiv_tree.append(indiv_row_widget, name)
+        
         # Display self.indiv_model rows in self.indiv_tree
         indiv_parents = []
         for indiv_line in self.indiv_model:
             # Indiv_line[2] is the whole
             if indiv_line[2] == '' or indiv_line[2] in indiv_parents:
-                self.indiv_tree.insert(indiv_line[2], index='end',
-                                       values=indiv_line, tags='sum_tag', iid=indiv_line[1],
-                                       text=indiv_line[1], open=True)
+                indiv_name = indiv_line[1]
+                indiv_row_widget = gui.TableRow()
+                for index, field in enumerate(indiv_line[3:]):
+                    indiv_row_item = gui.TableItem(text=field,
+                                                  style={'text-align': 'left',
+                                                         'background-color': self.sum_color})
+                    indiv_row_widget.append(indiv_row_item, field)
+                self.indiv_tree.append(indiv_row_widget, indiv_name)
                 indiv_parents.append(indiv_line[1])
 
     def Define_expressions_sheet(self):
@@ -3039,99 +3118,86 @@ class Display_views():
         Open_output_file(self.expr_table, subject_name, lang_name, serialization)
 
     def Define_and_display_kind_view(self):
-        # Destroy earlier summary_frame
+        # Destroy earlier kind_frame
         try:
             self.kind_frame.destroy()
         except AttributeError:
             pass
 
-        self.Define_kind_model_sheet()
-
+        self.Define_kind_model_view()
         self.Display_kind_model_view()
 
-    def Define_kind_model_sheet(self):
-        """ Define a kind model view tab sheet for a kind in Notebook."""
-        self.kind_frame = Frame(self.views_noteb)
-        self.kind_frame.grid(column=0, row=0, sticky=NSEW)  # pack(fill=BOTH, expand=1)
-        self.kind_frame.columnconfigure(0, weight=1)
-        self.kind_frame.rowconfigure(0, weight=1)
-        self.kind_frame.rowconfigure(1, weight=1)
+    def Define_kind_model_view(self):
+        """ Define a kind model view tab for a kind in Notebook.
+            Kind_model = part_uid, part_kind_uid, aspect_uid,
+                         LineNr, Object, part, part of part, Kind, Aspect, Kind of aspect,
+                         >=<, Value, UoM, Status.
+        """
+        # Determine tab text
+        kind_text = ['Model of ', 'Model van ']
+        self.kind_name = kind_text[self.GUI_lang_index] + self.object_in_focus.name
+        # Define frame and add to tabs
+        self.kind_frame = gui.VBox(width='100%', height='100%',
+                                   style='background-color:#eeffdd')
+        self.user_interface.views_noteb.add_tab(self.kind_frame,
+                                                self.kind_name, self.tab_cb(self.kind_name))
+        lh_button_text = ['Display details of left object', 'Toon details van linker object']
+        kind_button_text = ['Display details of kind', 'Toon netwerk van de soort']
+        rh_button_text = ['Display details of aspect or file', 'Toon details van aspect of file']
 
-        comp = ['Model of a kind', 'Model van een soort']
-        self.views_noteb.add(self.kind_frame, text=comp[self.GUI_lang_index], sticky=NSEW)
-        self.views_noteb.insert("end", self.kind_frame, sticky=NSEW)
+        kind_button_row = gui.HBox(height=20, width='100%')
 
-        structure = ['Tree structure', 'Boomstructuur']
+        lh_button = gui.Button(lh_button_text[self.GUI_lang_index],
+                               width='20%', height=20)
+        lh_button.attributes['title'] = 'Press button after selection of left hand object'
+        lh_button.onclick.connect(self.Kind_detail_view_left)
 
-        kind_label = Label(self.kind_frame, text=structure[self.GUI_lang_index], justify='left')
-        heads = ['uid_1', 'uid_2', 'uid-3', 'inFocus', 'Level1', 'Level2', 'Level3', 'kind',
-                 'aspect', 'kAspect', '>=<', 'value', 'UoM', 'status']
-        display_heads = heads[3:]
-        self.kind_tree = Treeview(self.kind_frame, columns=(heads), displaycolumns=display_heads,
-                                  selectmode='browse', height=30, padding=2)
-        self.kind_treeHead = [('LineNr', 'Object', '', '', 'Kind', 'Aspect', 'Kind of aspect',
-                               '>=<', 'Value', 'UoM', 'Status'),
-                              ('RegelNr', 'Object', '', '', 'Soort', 'Aspect', 'Soort aspect',
-                               '>=<', 'Waarde', 'Eenheid', 'Status')]
-        col = -1
-        for head_field in display_heads:
-            col += + 1
-            self.kind_tree.heading(head_field, text=self.kind_treeHead[self.GUI_lang_index][col],
-                                   anchor=W)
+        kind_button = gui.Button(kind_button_text[self.GUI_lang_index], width='20%', height=20)
+        kind_button.attributes['title'] = 'Press button after selection of left hand object'
+        kind_button.onclick.connect(self.Kind_detail_view_middle)
 
-        self.kind_tree.column('#0', minwidth=40, width=50)
-        self.kind_tree.column('inFocus', minwidth=10, width=10)
-        self.kind_tree.column('Level1', minwidth=20, width=100)
-        self.kind_tree.column('Level2', minwidth=20, width=50)
-        self.kind_tree.column('Level3', minwidth=20, width=50)
-        self.kind_tree.column('kind', minwidth=20, width=100)
-        self.kind_tree.column('aspect', minwidth=20, width=100)
-        self.kind_tree.column('kAspect', minwidth=20, width=100)
-        self.kind_tree.column('>=<', minwidth=20, width=20)
-        self.kind_tree.column('value', minwidth=20, width=100)
-        self.kind_tree.column('UoM', minwidth=20, width=50)
-        self.kind_tree.column('status', minwidth=20, width=80)
+        rh_button = gui.Button(rh_button_text[self.GUI_lang_index], width='15%', height=20)
+        rh_button.attributes['title'] = 'Press button after selection of right hand object'
+        rh_button.onclick.connect(self.Kind_detail_view_right)
 
-        # self.kind_frame.grid(column=0, row=3, sticky=EW)
-        kind_label.grid(column=0, row=0, sticky=EW)
-        self.kind_tree.grid(column=0, row=1, sticky=NSEW)
-        # self.kind_tree.grid(column=0, row=2, sticky=NSEW)
+        close_kind_view = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                     width='15%', height=20)
+        close_kind_view.attributes['title'] = 'Press button when you want to remove this tag'
+        close_kind_view.onclick.connect(
+            self.user_interface.Close_tag,
+            self.user_interface.views_noteb,
+            self.kind_name)
 
-        self.kind_tree.columnconfigure(0, weight=1)
-        self.kind_tree.columnconfigure(1, weight=1)
-        self.kind_tree.columnconfigure(2, weight=1)
-        self.kind_tree.columnconfigure(3, weight=1)
-        self.kind_tree.columnconfigure(4, weight=1)
-        self.kind_tree.columnconfigure(5, weight=1)
-        self.kind_tree.columnconfigure(6, weight=1)
-        self.kind_tree.columnconfigure(7, weight=1)
-        self.kind_tree.columnconfigure(8, weight=1)
-        self.kind_tree.columnconfigure(9, weight=1)
-        self.kind_tree.columnconfigure(10, weight=1)
-        self.kind_tree.columnconfigure(11, weight=1)
+        kind_button_row.append(lh_button)
+        kind_button_row.append(kind_button)
+        kind_button_row.append(rh_button)
+        kind_button_row.append(close_kind_view)
+        self.kind_frame.append(kind_button_row)
 
-        self.kind_tree.columnconfigure(0, weight=1)
-        self.kind_tree.rowconfigure(0, weight=1)
-        self.kind_tree.rowconfigure(1, weight=1)
-
-        kind_scroll = Scrollbar(self.kind_frame, orient=VERTICAL, command=self.kind_tree.yview)
-        kind_scroll.grid(column=0, row=1, sticky=NS + E)
-        self.kind_tree.config(yscrollcommand=kind_scroll.set)
+        self.kind_tree = SingleRowSelectionTable(
+            width='100%',
+            style={'overflow': 'auto', 'background-color': '#eeffaa',
+                   'border-width': '2px', 'border-style': 'solid',
+                   'font-size': '12px', 'table-layout': 'auto',
+                   'text-align': 'left'})
+        kind_tree_head = [[('LineNr', 'Object', '', '', 'Kind', 'Aspect', 'Kind of aspect',
+                            '>=<', 'Value', 'UoM', 'Status')],
+                          [('RegelNr', 'Object', '', '', 'Soort', 'Aspect', 'Soort aspect',
+                           '>=<', 'Waarde', 'Eenheid', 'Status')]]
+        self.kind_tree.append_from_list(kind_tree_head[self.GUI_lang_index], fill_title=True)
+        self.kind_frame.append(self.kind_tree)
 
 ##        self.kind_tree.tag_configure('focus_tag', background='#9f9')  # hell green
 ##        self.kind_tree.tag_configure('head_tag', background='#bfb')
-##        self.kind_tree.tag_configure('val_tag', background='#dfd')  # light green
-##        self.kind_tree.tag_configure('available', background='yellow')
+        self.val_color = '#dfd'  # light green
+        self.available = '#fdf'  # yellow
 ##        self.kind_tree.tag_configure('missing', background='#fcc')  # red
 
-        self.kind_tree.bind(sequence='<Double-1>', func=self.Kind_detail_view_left)
-        self.kind_tree.bind(sequence='<Button-2>', func=self.Kind_detail_view_middle)
-        self.kind_tree.bind(sequence='<Button-3>', func=self.Kind_detail_view_right)
-
     def Display_kind_model_view(self):
-        """ Display a model view of a kind: Display kind_model in self.kind_tree:
-            self.kind_tree.insert('',index=0,iid='UIDInFocus',values=[nameInFocus,kindDat],
-            tags='focus_tag',open=True).
+        """ Display a model view of a kind: Display kind_model in self.kind_tree.
+            Kind_model = part_uid, part_kind_uid, aspect_uid,
+                         Line_type, Object, part, part of part, Kind, Aspect, Kind of aspect,
+                         >=<, Value, UoM, Status.
         """
         unknownVal = ['unknown value', 'onbekende waarde']
         # unknownKind = ['unknown kind', 'onbekende soort']
@@ -3139,73 +3205,104 @@ class Display_views():
         level1Part = ''
         level2Part = ''
 
-        for kindLine in self.kind_model:
+        for kind_line in self.kind_model:
             head = False
             head_line = []
-            # Debug print('kindLine:',kindLine)
+            line_type = kind_line[3]
+            name = kind_line[4]
+            # Debug print('kind_line:',kind_line)
             # If line_type == 1 then prepare header line for level 0 object
             # Note: line_type == 2 is skipped in this view
-            if kindLine[3] == 1:
-                head_line = kindLine[0:4]
-                head_line.append(kindLine[5])
+            if line_type == 1:
+                head_line.append(kind_line[4])
+                head_line.append(kind_line[5])
                 head_line.append('')
                 head_line.append('')
-                head_line.append(kindLine[9])
-                # nameInFocus = head_line[4]
-                level0Part = self.kind_tree.insert('', index='end', values=head_line,
-                                                   tags='focus_tag', open=True)
-                previusPart = level0Part
-            # In kind_treeview line_type 2 to 3 (indicated in kindLine[3])
+                head_line.append(kind_line[9])
+                kind_row_widget = gui.TableRow(style={'text-align': 'left',
+                                                      'background-color': self.val_color})
+                for index, field in enumerate(head_line):
+                    kind_row_item = gui.TableItem(text=field,
+                                                  style={'text-align': 'left',
+                                                         'background-color': self.available})
+                    kind_row_widget.append(kind_row_item, field)
+                self.kind_tree.append(kind_row_widget, name)
+                
+##                previusPart = level0Part
+            # In kind_treeview line_type 2 to 3 (indicated in kind_line[3])
             # are not displayed.
-            elif kindLine[3] > 3:
+            elif line_type > 3:
 
                 # Set value_tags at 'val_tag' or 'head_tag' for each field
                 value_tags = 11 * ['val_tag']
                 # If the line is a header line, then set value_tag to 'head_tag'
-                if kindLine[4] in self.comp_head or kindLine[4] in self.occ_head or \
-                   kindLine[4] in self.info_head or kindLine[8] in self.aspect_head or \
-                   kindLine[5] in self.part_occ_head or kindLine[4] in self.subs_head:
+                if kind_line[4] in self.comp_head or kind_line[4] in self.occ_head or \
+                   kind_line[4] in self.info_head or kind_line[8] in self.aspect_head or \
+                   kind_line[5] in self.part_occ_head or kind_line[4] in self.subs_head:
                     head = True
                     value_tags = 11 * ['head_tag']
                 # If the line is a value line (thus not a header line)
                 # and there is a name of a part
                 # then remember the part as a previous part
-                # elif kindLine[4] != '':
+                # elif kind_line[4] != '':
                 #     previusPart = level0Part
-                # elif kindLine[5] != '':
+                # elif kind_line[5] != '':
                 #     previusPart = level1Part
-                # elif kindLine[6] != '':
+                # elif kind_line[6] != '':
                 #     previusPart = level2Part
 
                 # Set tag background color depending on value
                 # If value is missing then bachgroumd color is yellow
-                if kindLine[9] == '' or kindLine[9] in unknownVal:
+                if kind_line[9] == '' or kind_line[9] in unknownVal:
                     value_tags[9] = 'missing'
                 else:
                     value_tags[9] = 'available'
-                if kindLine[7] in unknownVal:
+                if kind_line[7] in unknownVal:
                     value_tags[7] = 'missing'
                 # Insert line
                 # Debug print('Value tags:', value_tags)
                 # First argument (previousPart) was level0Part === correct ???
-                id = self.kind_tree.insert(previusPart, index='end', values=kindLine,
-                                           tags=value_tags, open=True)
+                kind_row_widget = gui.TableRow(style={'text-align': 'left',
+                                                      'background-color': self.val_color})
+                for index, field in enumerate(kind_line[4:]):
+                    kind_row_item = gui.TableItem(text=field,
+                                                  style={'text-align': 'left',
+                                                         'background-color': self.available})
+                    kind_row_widget.append(kind_row_item, field)
+                self.kind_tree.append(kind_row_widget, name)
 
                 # If the line is a header line, then continue to next line
                 if head is True:
                     continue
-                # If the line is a value line and there is a name of a part
-                #    then remember the part as a previous part
-                elif kindLine[4] != '':
-                    level1Part = id
-                    previusPart = level0Part
-                elif kindLine[5] != '':
-                    level2Part = id
-                    previusPart = level1Part
-                elif kindLine[6] != '':
-                    previusPart = level2Part
+##                # If the line is a value line and there is a name of a part
+##                #    then remember the part as a previous part
+##                elif kind_line[4] != '':
+##                    level1Part = id
+##                    previusPart = level0Part
+##                elif kind_line[5] != '':
+##                    level2Part = id
+##                    previusPart = level1Part
+##                elif kind_line[6] != '':
+##                    previusPart = level2Part
 
-    def Define_and_display_product_sheet(self):
+    def Select_kind_row(self, emitter, row, item):
+        ''' Determine the row values that are selected in the indo_view table.'''
+        # LineNr, Object, part, part of part, Kind, Aspect, Kind of aspect,
+        #                 >=<, Value, UoM, Status.
+        # Determine UID and Name of selected option
+        kind_row = list(row.children.values())
+        self.kind_uid = ''
+        kind_values = []
+        uids = []
+        if len(kind_row) > 0:
+            for field in kind_row:
+                kind_values.append(field.get_text())
+            for field in kind_row[1:7]:
+                uids.append(field.uid)
+            # Debug print('Kind data:', kind_values, uids)
+        return kind_values, uids
+
+    def Define_and_display_product_model_view(self):
         # Debug print('prod_model',self.prod_model)
         # Destroy earlier product_frame
         try:
@@ -3213,12 +3310,12 @@ class Display_views():
         except AttributeError:
             pass
 
-        self.Define_product_model_sheet()
+        self.Define_product_model_view()
         # Debug print('len prod model', len(self.prod_model))
         # Display prod_model in Composition_sheet view
         self.Display_product_model_view()
 
-    def Define_product_model_sheet(self):
+    def Define_product_model_view(self):
         """ Product_model view tab sheet in Notebook
             Preceded by a frame with a number of buttons corresponding with binds.
         """
@@ -3281,11 +3378,11 @@ class Display_views():
                    "border-width": "2px", "border-style": "solid",
                    "font-size": "12px", 'table-layout': 'auto',
                    'text-align': 'left'})
-        prod_treeHead = [[('', '', '', 'Kind', 'Aspect', 'Kind of aspect',
-                          '>=<', 'Value', 'UoM', 'Status')],
-                         [('', '', '', 'Soort', 'Aspect', 'Soort aspect',
-                          '>=<', 'Waarde', 'Eenheid', 'Status')]]
-        self.prod_tree.append_from_list(prod_treeHead[self.GUI_lang_index], fill_title=True)
+        prod_tree_head = [[('', '', '', 'Kind', 'Aspect', 'Kind of aspect',
+                            '>=<', 'Value', 'UoM', 'Status')],
+                          [('', '', '', 'Soort', 'Aspect', 'Soort aspect',
+                            '>=<', 'Waarde', 'Eenheid', 'Status')]]
+        self.prod_tree.append_from_list(prod_tree_head[self.GUI_lang_index], fill_title=True)
         self.prod_frame.append(self.prod_tree)
 
         self.focus_color = '#9f9'  # hell green
@@ -3880,21 +3977,23 @@ class Display_views():
             in the network_model that is displayed in the network_tree view.
         """
         widget_name = widget.get_value()
-        print('Selected for detail network:', widget_name, widget.uid)
+        # Debug print('Selected for detail network:', widget_name, widget.uid)
         # self.selected_obj = self.gel_net.uid_dict[widget.uid]
         tree_values = [widget.uid, widget_name]
         self.Determine_category_of_object_view(widget.uid, tree_values)
 
     def Determine_network_tree_values(self):
-        """ Determine the values on a selected focus row in a network treeview."""
-        cur_item = self.network_tree.focus()
+        """ Determine the values on a selected row in a network TreeTable."""
+        fields = list(row.children.values())
         tree_values = []
-        if cur_item != '':
-            item_dict = self.network_tree.item(cur_item)
-            tree_values = list(item_dict['values'])
+        if len(fields) > 0:
+            for field in fields:
+                value = field.get_text()
+                tree_values.append(value)
+            # Debug print('Selected row:', tree_values)
         else:
             self.Display_message(
-                'No item in focus. Fist select a row, then click a button.',
+                'No item found. Fist select a row, then click a button.',
                 'Geen object gevonden. Selecteer eerst een rij, click daarna op een knop.')
         return tree_values
 
@@ -3923,8 +4022,9 @@ class Display_views():
                 self.Define_and_display_documents()
 
     def Kind_detail_view_left(self, sel):
-        """ Find the selected left hand object from a user selection with left button
+        """ Find the selected left hand object from a user selection
             in the kind_table that is displayed in the kind_tree view.
+            And determine and display its details.
         """
         description_text = ['description', 'beschrijving']
         obj_descr_title = ['Information about ', 'Informatie over ']
@@ -3947,7 +4047,7 @@ class Display_views():
     def Kind_detail_view_middle(self, sel):
         """ Find the selected left supertype object from a user selection with middle button
             in the kind_table that is displayed in the kind_tree view.
-            Then display its taxonomy.
+            Then determine and display its taxonomy.
         """
         cur_item = self.kind_tree.focus()
         item_dict = self.kind_tree.item(cur_item)
@@ -3983,6 +4083,7 @@ class Display_views():
     def Kind_detail_view_right(self, sel):
         """ Find the selected kind of aspect or file from a user selection with right button
             in the kind_table that is displayed in the kind_tree view.
+            And determine and display the aspect or file content.
         """
         cur_item = self.kind_tree.focus()
         if cur_item == '':
@@ -4191,7 +4292,7 @@ class Display_views():
             Then create a detail view of the selected item
         """
         taxon_values = widget.get_text()
-        print('Taxon selected kind:', taxon_values)
+        # Debug print('Taxon selected kind:', taxon_values)
         kind_uid = widget.uid
         self.selected_obj = self.uid_dict[kind_uid]
 
@@ -4205,7 +4306,8 @@ class Display_views():
             as well as to the kind in the semantic network.
         '''
         if self.modification == 'classification started':
-            print('Taxon selected kind:', self.modified_object.name, self.selected_obj.name)
+            # Debug print('Taxon selected kind:', self.modified_object.name,
+            #             self.selected_obj.name)
             # Append selected classifier to an individual modified_object,
             # by adding a classification relation to that object
             self.Add_classification_relation()
@@ -4345,7 +4447,7 @@ class Display_views():
         except AttributeError:
             pass
 
-        self.Define_kind_model_sheet()
+        self.Define_kind_model_view()
         self.Display_kind_model_view()
 
         try:
@@ -4373,7 +4475,7 @@ class Display_views():
             self.prod_frame.destroy()
         except AttributeError:
             pass
-        self.Define_product_model_sheet()
+        self.Define_product_model_view()
         self.Display_product_model_view()
 
         try:
@@ -4390,7 +4492,7 @@ class Display_views():
         # Define Expressions view sheet
         self.Define_expressions_sheet()
 
-        # Expressions view: Display expressions from self.expr_table in Treeview:
+        # Display expressions from self.expr_table in Table:
         for expr_line in self.expr_table:
             self.expr_tree.insert('', index='end', values=expr_line, tags='val_tag')
 
@@ -4398,15 +4500,18 @@ class Display_views():
         ''' Determine the row values that are selected in the indo_view table.'''
         # Determine UID and Name of selected option
         info_row = list(row.children.values())
-        self.info = info_row[0].get_text()
-        self.kind_of_info = info_row[1].get_text()
-        self.info_uid = info_row[0].uid
-        self.info_text = info_row[0].description
-        self.directory = info_row[2].get_text()
-        self.object_uid = info_row[3].uid
-        self.object_name = info_row[3].get_text()
-        self.file_name = info_row[4].get_text()
-        print('Display info:', self.info_uid, self.info, self.kind_of_info, self.directory)
+        self.object_uid = ''
+        if len(info_row) > 0:
+            self.info = info_row[0].get_text()
+            self.kind_of_info = info_row[1].get_text()
+            self.info_uid = info_row[0].uid
+            self.info_text = info_row[0].description
+            self.directory_name = info_row[2].get_text()
+            self.object_uid = info_row[3].uid
+            self.object_name = info_row[3].get_text()
+            self.file_name = info_row[4].get_text()
+            # Debug print('Display info:', self.info_uid, self.info,
+            #       self.kind_of_info, self.directory)
 
     def Doc_detail_view(self, widget):
         """ Find the selected object from a user selection
@@ -4416,8 +4521,8 @@ class Display_views():
             - info_row('values') = [info.name, super_info_name, directory_name, obj.name,
                                     carrier.name, carrier_kind_name].
         """
-        info_row = widget.get_text()
-        print('Selected info_row:', info_row)
+        # info_row = widget.get_text()
+        # Debug print('Selected info_row:', info_row)
         # If info_kind is a description then display the description
         description_text = ['description', 'beschrijving']
         if self.kind_of_info in description_text:
@@ -4430,26 +4535,30 @@ class Display_views():
         else:
             # Verify whether file name (info_row[3]) is presented on a file
             # And verify whether the file name has a file extension (indicated by a dot(.))
-            parts = info_row[4].rsplit('.', maxsplit=1)
+            parts = self.file_name.rsplit('.', maxsplit=1)
             if len(parts) == 1:
                 self.Display_message(
-                    'File name {} does not have a file extension'.format(info_row[3]),
-                    'Filenaam {} bevat geen file extensie'.format(info_row[3]))
+                    'File name {} does not have a file extension'.format(self.object_name),
+                    'Filenaam {} bevat geen file extensie'.format(self.object_name))
             else:
                 # Open the file in the file format that is defined by its file extension
-                directory_name = info_row[2]
-                file_name = info_row[4]
-                if directory_name != '':
-                    if not directory_name.startswith(os.sep):
+                if self.directory_name != '':
+                    if not self.directory_name.startswith(os.sep):
                         # By default, we look in the app root dir.
                         # This assumes the app was started from the CommunicatorSource dir.
-                        directory_name = ".." + os.sep + directory_name
-                    file_path = os.path.join(directory_name, file_name)
+                        self.directory_name = ".." + os.sep + self.directory_name
+                    file_path = os.path.join(self.directory_name, self.file_name)
                     normalized_path = os.path.normpath(file_path)
+                    # Debug print('File path:', normalized_path)
                     open_file(normalized_path)
 
-    def messagebox(self, title, text):
-        return
+    def messagebox(self, box_title, text):
+        ''' Display the text in a pop-up message box with box tile.'''
+        self.message_box = gui.GenericDialog(title=box_title, message=text,
+                                             style={'width': '400px', 'display': 'block',
+                                                    'overflow': 'auto', 'text-align': 'left',
+                                                    'background-color': '#eeffdd'})
+        self.message_box.show(self.user_interface)
 
     def Object_detail_view(self, widget):
         """ Find the selected object from a user selection
@@ -4459,16 +4568,13 @@ class Display_views():
             - info_row('values') = [info.name, super_info_name, directory_name, obj.name,
                                     carrier.name, carrier_kind_name].
         """
-        info_row = widget.get_text()
-        print('Selected info_row for object:', info_row)
-        if len(info_row) > 1:
-            if info_row[1] != '':
-                self.selected_obj = self.uid_dict[str(info_row[1])]
-                # Debug print('Display product details of: {}'.format(self.selected_obj.name))
-                self.Define_and_display_kind_detail_view(self.selected_obj)
+        if self.object_uid != '':
+            self.selected_obj = self.uid_dict[self.object_uid]
+            # Debug print('Display product details of: {}'.format(self.selected_obj.name))
+            self.Define_and_display_kind_detail_view(self.selected_obj)
 
-                if len(self.info_model) > 0:
-                    self.Define_and_display_documents()
+            if len(self.info_model) > 0:
+                self.Define_and_display_documents()
 
     def Contextual_facts(self):
         print('Contextual_facts')
