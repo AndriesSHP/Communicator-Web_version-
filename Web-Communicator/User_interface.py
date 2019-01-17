@@ -204,11 +204,9 @@ class Communicator(App):
                                    style={'overflow': 'auto'})
         self.mess_frame.attributes['title'] = 'Display area for messages and warnings'
 
-##        self.log_head = gui.HBox(width='100%', height=20)
         self.log_label = gui.Label(log_head_text[self.GUI_lang_index],
                                    width='100%', height=20,
                                    style='background-color:#bbffff')
-##        self.log_head.append(self.log_label)
         self.log_messages = gui.ListView(width='100%', height='100%',
                                          style='background-color:#ddffff')
         self.mess_frame.append(self.log_label)
