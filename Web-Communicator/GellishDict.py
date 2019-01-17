@@ -10,7 +10,7 @@ class GellishDict(dict):
 
     def add_name_in_context(self, name_in_context, value_triple):
         if name_in_context not in self:
-            # self.key = name_in_context(tuple) = (lanuageUID, communityUID, name).
+            # self.key = name_in_context(tuple) = (languageUID, communityUID, name).
             # self.value = value_triple = (UID, naming_relation_type_UID, description)
             self[name_in_context] = value_triple
             print('add: ', name_in_context, self[name_in_context])
