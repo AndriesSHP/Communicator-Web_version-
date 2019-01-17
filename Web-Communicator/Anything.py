@@ -57,7 +57,7 @@ class Anything:
 
     def add_name_in_context(self, name_in_context):
         ''' add name or alias to collection of names:
-            name_in_context = (lanuageUID, communityUID, naming_relationUID, name).
+            name_in_context = (languageUID, communityUID, naming_relationUID, name).
         '''
         if name_in_context not in self.names_in_contexts:
             self.names_in_contexts.append(name_in_context)
