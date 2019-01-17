@@ -1,5 +1,6 @@
 import remi.gui as gui
 
+
 class SingleRowSelectionTable(gui.Table):
     ''' A subclass of gui.Table that has the feature
         that the last selected row is highlighted.
@@ -47,7 +48,7 @@ class MultiRowSelectionTable(gui.Table):
     def on_table_row_click(self, row, item):
         ''' Highlight selected row(s)
             and put the result of a muti_row selection
-            in the list "self.selected_row_list".
+            in the list "self.selected_row_list."
         '''
         if not self.multi_selection_enabled:
             self.remove_selection()
@@ -100,6 +101,7 @@ class TreeTable(SingleRowSelectionTable):
 
         modified_row.children[modified_row._render_children_list[self.fold_level + 1]]. \
             attributes['colspan'] = str(self.max_fold_levels - self.fold_level)
+        modified_row.on_row_item_click.connect(self.on_table_row_click)
 
         if self.fold_level > 0:
             self.current_fold_button[str(self.fold_level)].add_nested_row(modified_row)
