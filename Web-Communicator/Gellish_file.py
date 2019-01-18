@@ -5,7 +5,8 @@ import json
 import logging
 # import remi.gui as gui
 
-from Bootstrapping import ignores, subtypeRoleUID, supertypeRoleUID, subtypeName, supertypeName
+from Bootstrapping import ignores, subtypeRoleUID, supertypeRoleUID, subtypeName, supertypeName,\
+    basePhraseUID
 from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col,\
     intent_uid_col, intent_name_col, lh_uid_col, lh_name_col, lh_role_uid_col, lh_role_name_col,\
     idea_uid_col,\
@@ -15,7 +16,7 @@ from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_
 from Create_output_file import Create_gellish_expression, Open_output_file,\
     Convert_numeric_to_integer, Message
 from Mapping_tables_IB import keys_map, attributes_map, value_key_map, values_map
-from Anything import Anything
+from Anything import Anything, Relation
 # from Query import Query
 
 logger = logging.getLogger(__name__)
@@ -1089,11 +1090,11 @@ class Gellish_file:
         max_num_uid = 213000000
         for num_uid in range(self.num_coll_idea_uid, max_num_uid):
             idea_uid = str(num_uid)
-            if idea_uid in self.idea_uids:
+            if idea_uid in self.gel_net.idea_uids:
                 continue
             else:
                 self.num_coll_idea_uid = num_uid
-                self.idea_uids.append(idea_uid)
+                self.gel_net.idea_uids.append(idea_uid)
                 break
             self.Display_message(
                 'There is no uid for the idea available in the range {} to {}.'.
@@ -1103,23 +1104,26 @@ class Gellish_file:
 
         lang_uid = relating_obj.names_in_contexts[0][0]
         lang_name = self.gel_net.lang_uid_dict[lang_uid]
+        # lang_name = self.gel_net.lang_dict_EN[lang_uid]
         comm_uid = relating_obj.names_in_contexts[0][1]
         comm_name = self.gel_net.community_dict[comm_uid]
+        # comm_name = self.gel_net.comm_dict_EN[comm_uid]
         lang_comm = [lang_uid, lang_name, comm_uid, comm_name]
         lh_uid_name = [relating_obj.uid, relating_obj.name]
-        rel_uid_phrase_type = [rel_kind_uid, base_phrase[self.GUI_lang_index], rel_kind_uid]
+        rel_uid_phrase_type = [rel_kind_uid, base_phrase[self.gel_net.GUI_lang_index],
+                               rel_kind_uid]
         rh_role_uid_name = ['', '']
         # e.g. 43769, 'roofwindow'
         rh_uid_name = [related_obj.uid, related_obj.name]
         uom_uid_name = ['', '']
         description = ''
-        intent_uid_name = ['491285', statement[self.GUI_lang_index]]
-        rel_type = self.gel_net.uid_dict[rel_kind_uid]
+        intent_uid_name = ['491285', statement[self.gel_net.GUI_lang_index]]
+        rel_type_obj = self.gel_net.uid_dict[rel_kind_uid]
         gellish_expr = Create_gellish_expression(lang_comm, idea_uid, intent_uid_name,
                                                  lh_uid_name, rel_uid_phrase_type,
                                                  rh_role_uid_name, rh_uid_name,
                                                  uom_uid_name, description)
-        relation = Relation(relating_obj, rel_type, related_obj,
+        relation = Relation(relating_obj, rel_type_obj, related_obj,
                             basePhraseUID, '', gellish_expr)
         relating_obj.add_relation(relation)
         related_obj.add_relation(relation)
