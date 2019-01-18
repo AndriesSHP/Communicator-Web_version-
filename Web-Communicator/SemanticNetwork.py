@@ -519,7 +519,7 @@ class Semantic_Network():
             self.idea_uids.append(idea_uid)
             self.rels.append(relation)
 
-            # Add information to object depending in kind of relation (rel_type_uid)
+            # Add information to object depending on kind of relation (rel_type_uid)
             # If rel_type is a specialization relation (1146 or one of its subtypes),
             # then add subtype and supertype to lh and rh object
             if rel_type_uid in self.specialRelUIDs:

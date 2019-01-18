@@ -37,6 +37,7 @@ class Gellish_file:
         self.gel_net = gel_net
         self.expressions = []
         self.query_lines = []
+        self.num_coll_idea_uid = 212000000
 
         # Determine the directory, if present
         parts = path_and_name.rsplit('\\', maxsplit=1)
@@ -355,6 +356,7 @@ class Gellish_file:
             else:
                 self.source_id_dict[source_id] = 0
                 # If source_id indicates another language column or definition column,
+                # by being within the range for language_uids
                 # and that language does not exist yet, then create a language object
                 str_id = str(source_id)
                 if source_id >= 910036 and source_id < 912000:
@@ -1077,6 +1079,50 @@ class Gellish_file:
         if correct:
             self.expressions.append(db_row[:])
         return correct, db_row
+
+    def Add_a_relation_to_related_objects(self, relating_obj, related_obj,
+                                          rel_kind_uid, base_phrase):
+        """ Append the relation to both the related object and the relating object.
+        """
+        statement = ['statement', 'bewering']
+        # First determine the first available free idea uid in the range
+        max_num_uid = 213000000
+        for num_uid in range(self.num_coll_idea_uid, max_num_uid):
+            idea_uid = str(num_uid)
+            if idea_uid in self.idea_uids:
+                continue
+            else:
+                self.num_coll_idea_uid = num_uid
+                self.idea_uids.append(idea_uid)
+                break
+            self.Display_message(
+                'There is no uid for the idea available in the range {} to {}.'.
+                format(self.num_coll_idea_uid, max_num_uid),
+                'Er is geen uid voor het idee beschikbaar in de range {} tot {}.'.
+                format(self.num_coll_idea_uid, max_num_uid))
+
+        lang_uid = relating_obj.names_in_contexts[0][0]
+        lang_name = self.gel_net.lang_uid_dict[lang_uid]
+        comm_uid = relating_obj.names_in_contexts[0][1]
+        comm_name = self.gel_net.community_dict[comm_uid]
+        lang_comm = [lang_uid, lang_name, comm_uid, comm_name]
+        lh_uid_name = [relating_obj.uid, relating_obj.name]
+        rel_uid_phrase_type = [rel_kind_uid, base_phrase[self.GUI_lang_index], rel_kind_uid]
+        rh_role_uid_name = ['', '']
+        # e.g. 43769, 'roofwindow'
+        rh_uid_name = [related_obj.uid, related_obj.name]
+        uom_uid_name = ['', '']
+        description = ''
+        intent_uid_name = ['491285', statement[self.GUI_lang_index]]
+        rel_type = self.gel_net.uid_dict[rel_kind_uid]
+        gellish_expr = Create_gellish_expression(lang_comm, idea_uid, intent_uid_name,
+                                                 lh_uid_name, rel_uid_phrase_type,
+                                                 rh_role_uid_name, rh_uid_name,
+                                                 uom_uid_name, description)
+        relation = Relation(relating_obj, rel_type, related_obj,
+                            basePhraseUID, '', gellish_expr)
+        relating_obj.add_relation(relation)
+        related_obj.add_relation(relation)
 
 
 if __name__ == "__main__":

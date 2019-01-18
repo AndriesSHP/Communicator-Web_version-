@@ -4378,7 +4378,8 @@ class Display_views():
         # Add a classification expression to the list of expressions
         # of the classified object
         # First determine the first available free idea uid in the range
-        for num_uid in range(self.num_idea_uid, 212000000):
+        max_num_uid = 212000000
+        for num_uid in range(self.num_idea_uid, max_num_uid):
             idea_uid = str(num_uid)
             if idea_uid in self.idea_uids:
                 continue
@@ -4388,12 +4389,12 @@ class Display_views():
                 break
             self.Display_message(
                 'There is no uid for the idea available in the range {} to {}.'.
-                format(self.num_idea_uid, 212000000),
+                format(self.num_idea_uid, max_num_uid),
                 'Er is geen uid voor het idee beschikbaar in de range {} tot {}.'.
-                format(self.num_idea_uid, 212000000))
+                format(self.num_idea_uid, max_num_uid))
 
         lang_uid = self.modified_object.names_in_contexts[0][0]
-        lang_name = self.lang_uid_dict[lang_uid]
+        lang_name = self.gel_net.lang_uid_dict[lang_uid]
         comm_uid = self.modified_object.names_in_contexts[0][1]
         comm_name = self.gel_net.community_dict[comm_uid]
         lang_comm = [lang_uid, lang_name, comm_uid, comm_name]
@@ -4401,7 +4402,7 @@ class Display_views():
         rel_uid_phrase_type = ['1225', self.classification[self.GUI_lang_index], basePhraseUID]
         rh_role_uid_name = ['', '']
         # e.g. 43769, 'roofwindow'
-        rh_uid_name = [self.self.selected_obj.uid, self.self.selected_obj.name]
+        rh_uid_name = [self.selected_obj.uid, self.selected_obj.name]
         uom_uid_name = ['', '']
         description = ''
         intent_uid_name = ['491285', statement[self.GUI_lang_index]]
@@ -4410,10 +4411,10 @@ class Display_views():
                                                  lh_uid_name, rel_uid_phrase_type,
                                                  rh_role_uid_name, rh_uid_name,
                                                  uom_uid_name, description)
-        relation = Relation(self.modified_object, rel_type, self.self.selected_obj,
+        relation = Relation(self.modified_object, rel_type, self.selected_obj,
                             basePhraseUID, '', gellish_expr)
         self.modified_object.add_relation(relation)
-        self.self.selected_obj.add_relation(relation)
+        self.selected_obj.add_relation(relation)
 
     def Summ_detail_view(self, widget):
         """ Find the selected object from a user selection that is made
