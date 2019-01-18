@@ -487,7 +487,7 @@ if __name__ == "__main__":
                      '41': 'BV',
                      '42': 'cd',
                      '43': 'tv',
-                     '44': 'wc',}
+                     '44': 'wc'}
 
     lang = input("Enter language 'en' or 'nl': ")
     if lang == 'nl':
