@@ -426,7 +426,7 @@ class Occurrences_diagram():
                     for field in values:
                         item = gui.TableItem(text=field,
                                              style={'text-align': 'left',
-                                                     'background-color': self.occ_color})
+                                                    'background-color': self.occ_color})
                         table_row.append(item)
                     if left is True:
                         # Debug print('Sheet nr:', self.sheet_nr)
@@ -615,7 +615,7 @@ class Occurrences_diagram():
         x1, y1 = X + self.boxW2, Y + self.boxH2        # BottomRight of box
         width = x1 - x0
         height = y1 - y0
-        
+
         box = gui.SvgRectangle(x0, y0, width, height)
         box.set_stroke(width=2, color='black')
         box.set_fill(color='yellow')

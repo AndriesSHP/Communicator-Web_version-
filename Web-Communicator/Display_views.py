@@ -4,10 +4,7 @@ import operator
 import remi.gui as gui
 from remi_ext import TreeTable, SingleRowSelectionTable  # MultiRowSelectionTable
 
-from tkinter import Frame, Scrollbar, Button, NSEW, E, NS, S, EW, W, N, \
-    VERTICAL, HORIZONTAL, filedialog, messagebox, Tk
-#   Toplevel, LAST, CENTER, Canvas
-from tkinter.ttk import Label, Treeview
+from tkinter import filedialog, Tk
 
 from Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
 from Expr_Table_Def import lh_name_col, rel_type_name_col, rh_name_col, status_col, \
@@ -272,20 +269,20 @@ class Display_views():
                     # Find the relation with the supertype and add it to the product model
                     for supertype in sub.supertypes:
                         for super_rel_obj in supertype.relations:
-                            super_expr = super_rel_obj.expression
+                            super_ex = super_rel_obj.expression
                             if super_rel_obj.rel_type.uid in self.specialization_uids:
                                 # Verify whether the obj
-                                # is the supertype in the specialization relation 
+                                # is the supertype in the specialization relation
                                 if (super_rel_obj.lh_obj == sub
-                                        and super_expr[phrase_type_uid_col] == basePhraseUID) \
+                                        and super_ex[phrase_type_uid_col] == basePhraseUID) \
                                         or (super_rel_obj.rh_obj == sub
-                                            and super_expr[phrase_type_uid_col] == inversePhraseUID):
+                                            and super_ex[phrase_type_uid_col] == inversePhraseUID):
                                     if len(self.expr_table) < self.max_nr_of_rows \
-                                            and super_expr not in self.expr_table:
-                                        self.expr_table.append(super_expr)
+                                            and super_ex not in self.expr_table:
+                                        self.expr_table.append(super_ex)
                                     # Debug print('Additions:', sub.name,
-                                    #       obj.name, super_expr[phrase_type_uid_col])
-                                    self.Add_line_to_network_model(obj, super_rel_obj, super_expr)
+                                    #       obj.name, super_ex[phrase_type_uid_col])
+                                    self.Add_line_to_network_model(obj, super_rel_obj, super_ex)
                     self.Build_single_product_view(sub)
                 else:
                     self.Display_message(
@@ -371,7 +368,7 @@ class Display_views():
         """
         if expr[idea_uid_col] not in self.net_ideas:
             self.net_ideas.append(expr[idea_uid_col])
-        
+
             # If the left hand object is the current_focus,
             # then find the base phrase or inverse phrase for the relation
             # in the preferred language and language community
@@ -381,7 +378,8 @@ class Display_views():
                 # Determine the preferred name of the related object
                 kind_name, kind_uid = self.Determine_preferred_kind_name(rel_obj.rh_obj)
                 # Determine the preferred phrase for the kind of relation
-                # Debug print('Base phrases:', expr[rel_type_name_col], rel_obj.rel_type.base_phrases)
+                # Debug print('Base phrases:', expr[rel_type_name_col],
+                #      rel_obj.rel_type.base_phrases)
                 if expr[rel_type_name_col] in rel_obj.rel_type.base_phrases:
                     lang_name, comm_name, rel_type_phrase, full_def = \
                         self.user_interface.Determine_name_in_context(rel_obj.rel_type, 'base')
@@ -438,11 +436,10 @@ class Display_views():
                 if len(self.rels_in_network_model) == 0:
                     # Append the root line to the network
                     kind_name, kind_uid = self.Determine_preferred_kind_name(self.object_in_focus)
-                    root = [self.object_in_focus.uid, '', '',
-                            '', '', kind_uid,
-                            self.object_in_focus.name, '', kind_name]
-                    # Debug print('Root branch:', root)
-                    self.network_model.append(root)
+                    root_line = [self.object_in_focus.uid, '', '', '', '', kind_uid,
+                                 self.object_in_focus.name, '', kind_name]
+                    # Debug print('Root branch:', root_line)
+                    self.network_model.append(root_line)
                     self.net_hierarchy[self.object_in_focus] = 0
                     self.net_parents.append(self.object_in_focus)
 
@@ -1330,7 +1327,7 @@ class Display_views():
                 if obj_i == self.object_in_focus:
                     self.Add_line_to_network_model(obj_i, rel_obj, expr)
                 self.nr_of_aspects += 1
-                
+
                 status = expr[status_col]
                 role_name = ''
                 equality = '='
@@ -2432,7 +2429,7 @@ class Display_views():
         # included = []
         for network_line in self.network_model:
             child_uid = network_line[0]
-            child = self.uid_dict[child_uid]
+            # child = self.uid_dict[child_uid]
             # Verify whether the parent_uid (network_line[1]),
             # is blank or is in the list of parents.
             # Determine whether hierarchy of sub_sub concepts shall be open or not
@@ -2925,11 +2922,11 @@ class Display_views():
                    'font-size': '12px', 'table-layout': 'auto',
                    'text-align': 'left'})
         indiv_headings = [[('Kind', 'Community')], [('Soort', 'Taalgemeenschap')]]
-        nr_of_cols = len(self.indiv_column_names)
+        # nr_of_cols = len(self.indiv_column_names)
 
         indiv_headings[0][0] += tuple(self.indiv_column_names[5:])
         indiv_headings[1][0] += tuple(self.indiv_column_names[5:])
-        # Debug print('Indiv col name:', indiv_headings) 
+        # Debug print('Indiv col name:', indiv_headings)
         self.indiv_tree.append_from_list(indiv_headings[self.GUI_lang_index], fill_title=True)
         self.indiv_tree.on_table_row_click.connect(self.Determine_table_row_values)
         self.indiv_frame.append(self.indiv_tree)
@@ -2953,7 +2950,7 @@ class Display_views():
                                             'background-color': self.uom_color})
             row_widget.append(row_item, field)
         self.indiv_tree.append(row_widget, name)
-        
+
         # Display self.indiv_model rows in self.indiv_tree
         indiv_parents = []
         for indiv_line in self.indiv_model:
@@ -3003,15 +3000,15 @@ class Display_views():
         save_on_JSON_file = ['Save on JSON file', 'Opslaan op JSON file']
 
         self.expr_button_row = gui.HBox(height=20, width='100%')
-        
-        # Define button for display of details about lh_obj in selected row 
+
+        # Define button for display of details about lh_obj in selected row
         expr_detail = gui.Button(details[self.GUI_lang_index],
                                  width='15%', height=20)
         expr_detail.attributes['title'] = 'First select a row, the press this button for ' \
                                           'display of details of left hand object'
         expr_detail.onclick.connect(self.Expr_lh_obj_detail_view)
         self.expr_button_row.append(expr_detail)
-        
+
         # Define button for display of contextual facts
         context_button = gui.Button(expr_context_text[self.GUI_lang_index],
                                     width='15%', height=20)
@@ -3051,20 +3048,20 @@ class Display_views():
                    'font-size': '12px', 'table-layout': 'auto',
                    'text-align': 'left'})
 
-        col_heads = ('seq', 'Lang_UID', 'Language', 'CommUID', 'Community',
-                     'Reality', 'Intent_UID', 'Intent_Name', 'Lh_Card', 'Lh_UID',
-                     'Lh_Name', 'LhRole_UID', 'LhRole_Name', 'Validity_UID', 'Validity_context',
-                     'Idea_UID', 'Idea_Descr', 'Rel_UID', 'Kind_of_relation', 'Phrase_UID',
-                     'RhRole_UID', 'RhRole_Name', 'Rh_Card', 'Rh_UID', 'Rh_Name',
-                     'Partial_Def', 'Description', 'Uom_UID', 'UoM', 'Acc_UID',
-                     'Acc_Name', 'Pick_UID', 'Pick_Name', 'Remarks', 'Status',
-                     'Reason', 'Succ_UID', 'DateStartVal', 'DateStartAv', 'DateCC',
-                     'DateLatCh', 'Orignator_UID', 'Originator_Name', 'Author_UID', 'Author_Name',
-                     'Addr_UID', 'Addr_Name', 'References', 'Expr_UID', 'Coll_UID',
-                     'Coll_Name', 'File_Name', 'Lh_Comm', 'Rh_Comm', 'Rel_Comm')
+        # col_heads = ('seq', 'Lang_UID', 'Language', 'CommUID', 'Community',
+        #              'Reality', 'Intent_UID', 'Intent_Name', 'Lh_Card', 'Lh_UID',
+        #              'Lh_Name', 'LhRole_UID', 'LhRole_Name', 'Validity_UID', 'Validity_context',
+        #              'Idea_UID', 'Idea_Descr', 'Rel_UID', 'Kind_of_relation', 'Phrase_UID',
+        #              'RhRole_UID', 'RhRole_Name', 'Rh_Card', 'Rh_UID', 'Rh_Name',
+        #              'Partial_Def', 'Description', 'Uom_UID', 'UoM', 'Acc_UID',
+        #              'Acc_Name', 'Pick_UID', 'Pick_Name', 'Remarks', 'Status',
+        #              'Reason', 'Succ_UID', 'DateStartVal', 'DateStartAv', 'DateCC', 'DateLatCh',
+        #              'Orignator_UID', 'Originator_Name', 'Author_UID', 'Author_Name',
+        #              'Addr_UID', 'Addr_Name', 'References', 'Expr_UID', 'Coll_UID',
+        #              'Coll_Name', 'File_Name', 'Lh_Comm', 'Rh_Comm', 'Rel_Comm')
         displaycolumns = [('Lang_Name', 'Community', 'Lh_UID', 'Lh_Name', 'Idea_UID',
-                          'Rel_type_UID', 'Rel_type_Name', 'Rh_UID', 'Rh_Name',
-                          'Uom_UID', 'UoM', 'Remarks', 'Status')]
+                           'Rel_type_UID', 'Rel_type_Name', 'Rh_UID', 'Rh_Name',
+                           'Uom_UID', 'UoM', 'Remarks', 'Status')]
 
         self.expr_view_table.append_from_list(displaycolumns, fill_title=True)
         self.expr_view_table.on_table_row_click.connect(self.Determine_table_row_values)
@@ -3237,9 +3234,9 @@ class Display_views():
         """
         unknown_val = ['unknown', 'onbekend', 'unknown value', 'onbekende waarde']
         unknown_kind = ['unknown', 'onbekend', 'unknown kind', 'onbekende soort']
-        level0Part = ''
-        level1Part = ''
-        level2Part = ''
+##        level0Part = ''
+##        level1Part = ''
+##        level2Part = ''
 
         for kind_line in self.kind_model:
             head_line = []
@@ -3591,7 +3588,7 @@ class Display_views():
             # fore = 'black'
             data_row_widget = gui.TableRow(style={'text-align': 'left'})
             for field_value in line:
-                column_nr += + 1
+                column_nr += 1
                 field_str =str(field_value)
                 # span = 1
                 column_width = col_width[column_nr]
@@ -3702,8 +3699,8 @@ class Display_views():
         act_text = ['Activities about ', 'Activiteiten betreffende ']
         self.act_name = act_text[self.GUI_lang_index] + self.object_in_focus.name
         self.act_frame = gui.VBox(width='100%', height='80%',
-                                      style={'overflow': 'auto',
-                                             'background-color': '#eeffdd'})
+                                  style={'overflow': 'auto',
+                                         'background-color': '#eeffdd'})
         self.user_interface.views_noteb.add_tab(self.act_frame,
                                                 self.act_name, self.tab_cb(self.act_name))
         self.act_button_row = gui.HBox(height=20, width='100%')
@@ -3775,7 +3772,7 @@ class Display_views():
         self.io_color = '#eef'
 
         # Display the occurrence
-        parent_name = occ_line[2]
+        # parent_name = occ_line[2]
         child_name = occ_line[1]
         openness = 'true'
         act_row_widget = gui.TableRow()
@@ -3940,21 +3937,21 @@ class Display_views():
             in a selected network treeview row
             as the chosen object for display of details.
         """
-        tree_values = self.Determine_network_tree_values()
-        if len(tree_values) > 0:
-            chosen_object_uid = tree_values[0]
-            self.Determine_category_of_object_view(chosen_object_uid, tree_values)
-            self.Determine_category_of_object_view(chosen_object_uid, tree_values)
+        # tree_values = self.Determine_network_tree_values()
+        if len(self.row_values) > 0:
+            chosen_object_uid = self.row_values[0]
+            self.Determine_category_of_object_view(chosen_object_uid, self.row_values)
+            self.Determine_category_of_object_view(chosen_object_uid, self.row_values)
 
     def Prepare_rh_network_object_detail_view(self, widget):
         """ Set the uid of the right hand object
             in a selected network treeview row
             as the chosen object for display of details.
         """
-        tree_values = self.Determine_network_tree_values()
-        if len(tree_values) > 4:
-            chosen_object_uid = tree_values[4]
-            self.Determine_category_of_object_view(chosen_object_uid, tree_values)
+        # tree_values = self.Determine_network_tree_values()
+        if len(self.row_values) > 4:
+            chosen_object_uid = self.row_values[4]
+            self.Determine_category_of_object_view(chosen_object_uid, self.row_values)
 
     def Prepare_for_classification(self):
         """ Find the selected left classifier object from a user selection
@@ -3967,15 +3964,15 @@ class Display_views():
             The taxonomy of the selected kind is displayed for selection of the classifier.
         """
         # similar to def Prod_taxonomy(self, sel):
-        tree_values = self.Determine_network_tree_values()
-        if len(tree_values) > 0:
-            if tree_values[4] == '' or tree_values[4] == 'unknown':
+        # tree_values = self.Determine_network_tree_values()
+        if len(self.row_values) > 0:
+            if self.row_values[4] == '' or self.row_values[4] == 'unknown':
                 self.Display_message(
                     'Classifying kind of object is unknown.',
                     'Classificerende soort object is onbekend.')
             else:
-                kind_uid = str(tree_values[4])
-                individual_object_uid = str(tree_values[0])
+                kind_uid = str(self.row_values[4])
+                individual_object_uid = str(self.row_values[0])
                 self.Classification_of_individual_thing(individual_object_uid, kind_uid)
         else:
             self.Display_message(
@@ -4026,20 +4023,21 @@ class Display_views():
 ##        tree_values = [widget.uid, widget_name]
 ##        self.Determine_category_of_object_view(widget.uid, tree_values)
 
-    def Determine_network_tree_values(self):
-        """ Determine the values on a selected row in a network TreeTable."""
-        fields = list(row.children.values())
-        tree_values = []
-        if len(fields) > 0:
-            for field in fields:
-                value = field.get_text()
-                tree_values.append(value)
-            print('Selected row:', tree_values)
-        else:
-            self.Display_message(
-                'No item found. Fist select a row, then click a button.',
-                'Geen object gevonden. Selecteer eerst een rij, click daarna op een knop.')
-        return tree_values
+##    def Determine_network_tree_values(self):
+##        """ Determine the values on a selected row in a network TreeTable."""
+##        # fields = list(row.children.values())
+##        self.row_values
+##        tree_values = []
+##        if len(fields) > 0:
+##            for field in fields:
+##                value = field.get_text()
+##                tree_values.append(value)
+##            print('Selected row:', tree_values)
+##        else:
+##            self.Display_message(
+##                'No item found. Fist select a row, then click a button.',
+##                'Geen object gevonden. Selecteer eerst een rij, click daarna op een knop.')
+##        return tree_values
 
     def Determine_category_of_object_view(self, chosen_object_uid, row_values):
         """ Determine kind of chosen object and as a consequence models and views."""
@@ -4051,8 +4049,8 @@ class Display_views():
 
             # If info_kind is a description then display the destription in messagebox
             if len(row_values) > 8 and row_values[8] in description_text:
-                messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + self.selected_obj.name,
-                                    self.selected_obj.description)
+                self.messagebox(obj_descr_title[self.GUI_lang_index] + self.selected_obj.name,
+                                self.selected_obj.description)
             else:
                 self.Display_message(
                     'Display object details of: {}'.format(self.selected_obj.name),
@@ -4079,8 +4077,8 @@ class Display_views():
 
         # If info_kind is a description then display the destription in messagebox
         if row_values[7] in description_text:
-            messagebox.showinfo(obj_descr_title[self.GUI_lang_index] + self.selected_obj.name,
-                                self.selected_obj.description)
+            self.messagebox(obj_descr_title[self.GUI_lang_index] + self.selected_obj.name,
+                            self.selected_obj.description)
         else:
             print('Display kind details of: {}'.format(self.selected_obj.name))
             self.Define_and_display_kind_detail_view(self.selected_obj)
@@ -4176,9 +4174,9 @@ class Display_views():
                 # If info_kind is a description
                 # then display the destription in messagebox
                 if row_values[7] in description_text:
-                    messagebox.showinfo(obj_descr_title[self.GUI_lang_index]
-                                        + self.selected_obj.name,
-                                        self.selected_obj.description)
+                    self.messagebox(obj_descr_title[self.GUI_lang_index]
+                                    + self.selected_obj.name,
+                                    self.selected_obj.description)
                 else:
                     self.Display_message(
                         'Display of product details of: {}'.format(self.selected_obj.name),
@@ -4318,8 +4316,8 @@ class Display_views():
             in the taxon_model that is displayed in the taxon_tree view.
             Then create a detail view of the selected item
         """
-        taxon_values = widget.get_text()
-        # Debug print('Taxon selected kind:', taxon_values)
+        # taxon_values = widget.get_text()
+        # Debug print('Taxon selected kind:', self.row_values)
         kind_uid = widget.uid
         self.selected_obj = self.uid_dict[kind_uid]
 
@@ -4420,11 +4418,11 @@ class Display_views():
         """ Find the selected object from a user selection that is made
             in the summ_model that is displayed in the summ_table view.
         """
-        summ_row_values = self.row_values
-        obj_uid = self.row_widgets[0].uid
+        # summ_row_values = self.row_values
+        # obj_uid = self.row_widgets[0].uid
 
-        self.selected_obj = self.uid_dict[str(tree_values[0])]
-        # Debug print('Display of product details of:',tree_values[0], self.selected_obj.name)
+        self.selected_obj = self.uid_dict[str(self.row_values[0])]
+        # Debug print('Display of product details of:',self.row_values[0], self.selected_obj.name)
         # Create a detail view
         self.Define_and_display_individual_detail_view(self.selected_obj)
 

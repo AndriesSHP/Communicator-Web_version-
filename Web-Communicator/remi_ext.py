@@ -7,7 +7,7 @@ class SingleRowSelectionTable(gui.Table):
     '''
     def __init__(self, *arg, **kwargs):
         super(SingleRowSelectionTable, self).__init__(*arg, **kwargs)
-        
+
     @gui.decorate_event
     def on_table_row_click(self, row, item):
         ''' Highlight selected row.'''
