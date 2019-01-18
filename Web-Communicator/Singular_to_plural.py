@@ -10,7 +10,7 @@ class Plurality:
         self.foreign_comm_uid = 'foreign'
         self.gel_net = gel_net
         self.current_file = current_file
-        
+
     def convert_singular_to_plural(self, obj):
         ''' Tranform the English names_in_contexts of a kind
             in singular to the names_in_contexts of a kind in plural.
@@ -71,7 +71,7 @@ class Plurality:
         ex_us = ['bus', 'octopus']
         ex_fez = {'fez': 'fezzes', 'gas': 'gasses'}
         ex_roof = ['roof', 'belief', 'chef', 'chief', 'spoof']
-        consonants = []
+        # consonants = []
         vowels = ['a', 'e', 'i', 'o', 'u']
         unchanged = ['sheep', 'series', 'species', 'deer', 'fish', 'aircraft']
         ex_dict_photo = ['photo', 'piano', 'halo']
@@ -130,7 +130,7 @@ class Plurality:
 
         # Rule 8: If the singular noun ends in -us,
         # then the plural ending is frequently replacing -us by -i.
-        elif singular_name[-2:] == 'us' and not singular_name in ex_us:
+        elif singular_name[-2:] == 'us' and singular_name not in ex_us:
             plurality_name = singular_name[0:-2] + 'i'
 
         # Rule 9: If the singular noun ends in -is,
@@ -238,8 +238,8 @@ class Plurality:
         abbrev_quote_s = ['cd', 'tv', 'wc', 'BV']
         role_of_person = ['bekende', 'gepensioneerde', 'werkende']
         emphasis_not_on_last = ['bacterie', 'porie', 'chemicalie']
-        emphasis_on_last = ['bacterie', 'porie', 'chemicalie']
-        latin = []
+        # emphasis_on_last = []
+        # latin = []
         last_two = ['el', 'em', 'en', 'er', 'um']
         last_three = ['erd', 'aar']
         last_four = ['aard']
@@ -251,7 +251,7 @@ class Plurality:
         # Temporal emphasis_not_on_last_sylable (irrespective of ending with -ie)
         emphasis_not_on_last_sylable = True
         # Temporal title_or_profession
-        title_or_profession = True  # role of person?
+        # title_or_profession = True  # role of person?
 
         # Initialize option for two variants of plural names
         singular_name = name_in_context[2]
@@ -283,7 +283,7 @@ class Plurality:
         # Rule 4: If the end of the sigular terminates with a single -e
         # preceded by a consonant, except for a title_or_profession
         # then the plural is the singular followed by -s.
-        elif singular_name[-1] == 'e' and singular_name[-2] not in vowel :
+        elif singular_name[-1] == 'e' and singular_name[-2] not in vowel:
             if singular_name in role_of_person:
                 plurality_name = singular_name + 'n'
             else:
@@ -312,7 +312,7 @@ class Plurality:
             plurality_name = singular_name + 's'
 
         # Role 4c: If a title_or_profession and ending on -oor or -ier
-        # then the plural is the singular followed by -s. 
+        # then the plural is the singular followed by -s.
         # elif title_or_profession \
         elif len(singular_name) >= 3 and singular_name[-3:] in oor_or_ier:
             plurality_name = singular_name + 's'
@@ -463,9 +463,6 @@ if __name__ == "__main__":
                      '17': 'piano',
                      '18': 'oma',
                      '19': 'opa',
-                     '17': 'cd',
-                     '18': 'tv',
-                     '19': 'wc',
                      '20': 'idee',
                      '21': 'wee',
                      '22': 'trofee',
@@ -487,7 +484,10 @@ if __name__ == "__main__":
                      '38': 'telefoon',
                      '39': 'bankier',
                      '40': 'depot',
-                     '41': 'BV'}
+                     '41': 'BV',
+                     '42': 'cd',
+                     '43': 'tv',
+                     '44': 'wc',}
 
     lang = input("Enter language 'en' or 'nl': ")
     if lang == 'nl':
@@ -507,7 +507,7 @@ if __name__ == "__main__":
     plurality = Plurality(gel_net, current_file)
     # Test list or test names from manual input
     for uid in names:
-    # while name != 'end':
+        # while name != 'end':
         name = names[uid]
         # name = input("Enter name or 'end': ")
         # uid = name  # Only in case of manual input

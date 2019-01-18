@@ -3589,7 +3589,7 @@ class Display_views():
             data_row_widget = gui.TableRow(style={'text-align': 'left'})
             for field_value in line:
                 column_nr += 1
-                field_str =str(field_value)
+                field_str = str(field_value)
                 # span = 1
                 column_width = col_width[column_nr]
 
