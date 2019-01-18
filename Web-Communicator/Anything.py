@@ -189,5 +189,6 @@ class Relation(Anything):
 
     def __repr__(self):
         # return(self.uid, self.lh_uid, self.rel_type_uid, self.phrase_type_uid, self.rh_uid)
-        return("Idea %i %i (%i) %i %i" % (self.uid, self.lh_uid, self.rel_type_uid,
-                                          self.phrase_type_uid, self.rh_uid))
+        return("Idea: {} lh_uid: {} ({}) {} rh_uid: {}".
+               format(self.uid, self.lh_obj.uid, self.rel_type.uid,
+                      self.phrase_type_uid, self.rh_obj.uid))
