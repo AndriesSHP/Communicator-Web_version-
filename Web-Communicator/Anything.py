@@ -57,10 +57,30 @@ class Anything:
 
     def add_name_in_context(self, name_in_context):
         ''' add name or alias to collection of names:
-            name_in_context = (languageUID, communityUID, naming_relationUID, name).
+            name_in_context = (languageUID, communityUID, naming_relationUID, name, descr).
         '''
         if name_in_context not in self.names_in_contexts:
             self.names_in_contexts.append(name_in_context)
+
+    def add_must_phrase(self, name_in_context):
+        """ Test whether name_in_context is a phrase that starts with 'shall',
+            if yes, then add a base phrase or inverse phrase that starts with 'must'.
+            name_in_context = languageUID, communityUID, name, naming_relationUID, descr
+        """
+        new_phrase = ''
+        phrase = name_in_context[2]
+        phrase_parts = phrase.split(' ')
+        # If phrase is an English phrase that starts with 'shall'
+        # then a new phrase is added in which shall is replaced by must
+        if name_in_context[0] == '910036' and len(phrase_parts) > 2 \
+                and phrase_parts[0] == 'shall':
+            new_phrase = 'must' +  phrase[5:]
+            new_name_in_context = name_in_context[:]
+            new_name_in_context[2] = new_phrase
+            if new_name_in_context not in self.names_in_contexts:
+                self.names_in_contexts.append(new_name_in_context)
+                naming_rel_uid = new_name_in_context[3]
+        return new_phrase
 
     def add_relation(self, relation):
         ''' add relation object to collection of relations with self.'''
@@ -192,3 +212,43 @@ class Relation(Anything):
         return("Idea: {} lh_uid: {} ({}) {} rh_uid: {}".
                format(self.uid, self.lh_obj.uid, self.rel_type.uid,
                       self.phrase_type_uid, self.rh_obj.uid))
+
+
+if __name__ == "__main__":
+    # Test
+    from SemanticNetwork import Semantic_Network
+    language_uid_en = '910036'  # English
+    language_uid_nl = '910037'  # Dutch
+    community_uid = '492014'  # Gellish
+    test_phrases = {'1': 'rel',
+                    '2': 'shall have as part a',
+                    '3': 'shall be a part of a',
+                    '4': 'must be a part of a'}
+    GUI_lang_index = 0
+    net_name = 'Net'
+    gel_net = Semantic_Network(GUI_lang_index, net_name)
+    names = test_phrases
+    language_uid = language_uid_en
+    gel_net.lang_uid_dict[language_uid] = language_uid_en
+    naming_relation_uid = '6066'
+    base_naming_relation_uid = '6066'
+    inv_naming_relation_uid = '1986'
+    gel_net.total_base_phrases = []
+    gel_net.total_inverse_phrases = []
+    for uid in names:
+        name = names[uid]
+        obj = Anything(uid, name)
+        obj.category = 'kind of relation'
+        descr = 'something'
+        name_in_context = [language_uid, community_uid, name, naming_relation_uid, descr]
+        obj.add_name_in_context(name_in_context)
+
+        new_phrase = obj.add_must_phrase(name_in_context)
+
+        if naming_relation_uid == '6066':
+            gel_net.total_base_phrases.append(new_phrase)
+            naming_relation_uid = inv_naming_relation_uid
+        else:
+            gel_net.total_inverse_phrases.append(new_phrase)
+            naming_relation_uid = base_naming_relation_uid
+        print('Phrase/New phrase: {} / {}'.format(name_in_context, new_phrase))
