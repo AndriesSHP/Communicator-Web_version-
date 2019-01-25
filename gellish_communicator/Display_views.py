@@ -2346,13 +2346,15 @@ class Display_views():
         """ Define a network sheet for display of network_model (a list of network rows)
             for display in a tab of Notebook.
         """
+        self.row_values = []
+        self.row_uids = []
         network_text = ['Network of ', 'Netwerk van ']
         self.network_name = network_text[self.GUI_lang_index] + self.object_in_focus.name
         self.network_frame = gui.VBox(width='100%', height='80%',
                                       style={'overflow': 'auto',
                                              'background-color': '#eeffdd'})
-        self.user_interface.views_noteb.add_tab(self.network_frame,
-                                                self.network_name, self.tab_cb(self.network_name))
+        self.user_interface.views_noteb.add_tab(
+            self.network_frame, self.network_name, self.tab_cb(self.network_name))
 
         net_button_text = ['Display network of left object', 'Toon netwerk van linker object']
         lh_button_text = ['Display details of left object', 'Toon details van linker object']
@@ -2424,10 +2426,23 @@ class Display_views():
         ''' Determine the values in the row that is selected in the table.'''
         self.row_widgets = list(row.children.values())
         self.row_values = []
+        self.row_uids = []
         if len(self.row_widgets) > 0:
+            begin = False
             for widget in self.row_widgets:
-                self.row_values.append(widget.get_text())
-        print('Selected row values:', self.row_values)
+                value = widget.get_text()
+                if begin is False:
+                    if value != '':
+                        self.row_values.append(value)
+                        self.row_uids.append(widget.uid)
+                        begin = True
+                else:
+                    self.row_values.append(value)
+                    try:
+                        self.row_uids.append(widget.uid)
+                    except AttributeError:
+                        pass
+        print('Selected row values:', self.row_values, self.row_uids)
 
     def Display_network_view(self):
         """ Display a network of all related things
@@ -2435,7 +2450,7 @@ class Display_views():
             network_model = related_uid, focus_uid, focus_name, phrase, related_name,
                             kind_uid, related_name, focus_name, kind_name.
         """
-        # Display self.network_model rows in self.network_tree TreeView
+        # Display self.network_model rows in self.network_tree TreeTable
         parent_uids = []
         remembered_name = ''
         sub_level = 0
@@ -2494,23 +2509,30 @@ class Display_views():
                 if relation is False and parent_name != '':
                     net_row_widget.uid = network_line[0]
                 for index, field in enumerate(network_line[6:]):
-                    row_item = gui.TableItem(text=field,
-                                             style={'text-align': 'left',
-                                                    'background-color': color})
+                    display_text = field
                     if relation is False:
                         # If row is not a relation while parent is a relation name
                         # then replace relation name with remembered parent name
                         strings = field.partition(' ')
                         if strings[0] in parent_text:
-                            row_item = gui.TableItem(text=remembered_name,
-                                                     style={'text-align': 'left',
-                                                            'background-color': color})
+                            display_text = remembered_name
+                    row_item = gui.TableItem(text=display_text,
+                                             style={'text-align': 'left',
+                                                    'background-color': color})
+                    if index == 0:
+                        # Add the uid of the left hand object to the first widget
+                        row_item.uid = network_line[0]
+                    elif index == 1:
+                        # Add the uid of the kind to the first widget
+                        row_item.uid = network_line[1]
+                    elif index == 2:
+                        # Add the uid of the kind to the first widget
+                        row_item.uid = network_line[5]
+                    if relation is False:
                         net_row_widget.append(row_item, field)
                     elif index < 1:
                         # Relation line: only the first field to be displayed
                         net_row_widget.append(row_item, field)
-                    if index == 0:
-                        row_item.uid = network_line[0]
                 self.network_tree.append(net_row_widget, child_name)
                 if child_uid not in parent_uids:
                     parent_uids.append(child_uid)
@@ -3938,9 +3960,9 @@ class Display_views():
             for display of a new network view and other views.
         """
         # tree_values = self.Determine_network_tree_values()
-        if len(self.row_widgets[0]) > 0:
-            chosen_object_uid = self.row_widgets[0].uid
-            print('uid:', chosen_object_uid)
+        if len(self.row_uids) > 0:
+            chosen_object_uid = self.row_uids[0]
+            print('Chosen uid:', chosen_object_uid)
             # Build single product model (list with one element)
             obj_list = []
             obj = self.uid_dict[chosen_object_uid]
@@ -3954,21 +3976,22 @@ class Display_views():
             in a selected network treeview row
             as the chosen object for display of details.
         """
-        # tree_values = self.Determine_network_tree_values()
+        # row_values = self.Determine_network_tree_values()
         if len(self.row_values) > 0:
-            chosen_object_uid = self.row_values[0]
-            self.Determine_category_of_object_view(chosen_object_uid, self.row_values)
-            self.Determine_category_of_object_view(chosen_object_uid, self.row_values)
+            # Debug print('Row values:', self.row_values)
+            chosen_object_uid = self.row_uids[0]
+            # Debug print('Lh object uid:', chosen_object_uid)
+            self.Determine_kind_of_object_view(chosen_object_uid)
 
     def Prepare_rh_network_object_detail_view(self, widget):
         """ Set the uid of the right hand object
             in a selected network treeview row
             as the chosen object for display of details.
         """
-        # tree_values = self.Determine_network_tree_values()
-        if len(self.row_values) > 4:
-            chosen_object_uid = self.row_values[4]
-            self.Determine_category_of_object_view(chosen_object_uid, self.row_values)
+        # row_values = self.Determine_network_tree_values()
+        if len(self.row_values) > 2:
+            chosen_object_uid = self.row_uids[2]
+            self.Determine_kind_of_object_view(chosen_object_uid)
 
     def Prepare_for_classification(self):
         """ Find the selected left classifier object from a user selection
@@ -3981,7 +4004,7 @@ class Display_views():
             The taxonomy of the selected kind is displayed for selection of the classifier.
         """
         # similar to def Prod_taxonomy(self, sel):
-        # tree_values = self.Determine_network_tree_values()
+        # row_values = self.Determine_network_tree_values()
         if len(self.row_values) > 0:
             if self.row_values[4] == '' or self.row_values[4] == 'unknown':
                 self.Display_message(
@@ -4037,8 +4060,8 @@ class Display_views():
 ##        widget_name = widget.get_value()
 ##        # Debug print('Selected for detail network:', widget_name, widget.uid)
 ##        # self.selected_obj = self.gel_net.uid_dict[widget.uid]
-##        tree_values = [widget.uid, widget_name]
-##        self.Determine_category_of_object_view(widget.uid, tree_values)
+##        self.row_values = [widget.uid, widget_name]
+##        self.Determine_kind_of_object_view(widget.uid)
 
 ##    def Determine_network_tree_values(self):
 ##        """ Determine the values on a selected row in a network TreeTable."""
@@ -4056,29 +4079,29 @@ class Display_views():
 ##                'Geen object gevonden. Selecteer eerst een rij, click daarna op een knop.')
 ##        return tree_values
 
-    def Determine_category_of_object_view(self, chosen_object_uid, row_values):
+    def Determine_kind_of_object_view(self, chosen_object_uid):
         """ Determine kind of chosen object and as a consequence models and views."""
         description_text = ['description', 'beschrijving']
         obj_descr_title = ['Information about ', 'Informatie over ']
 
-        if chosen_object_uid != '':
+        if chosen_object_uid != '' and chosen_object_uid != 'unknown':
             self.selected_obj = self.uid_dict[str(chosen_object_uid)]
 
             # If info_kind is a description then display the destription in messagebox
-            if len(row_values) > 8 and row_values[8] in description_text:
+            if len(self.row_values) > 8 and self.row_values[8] in description_text:
                 self.messagebox(obj_descr_title[self.GUI_lang_index] + self.selected_obj.name,
                                 self.selected_obj.description)
             else:
                 self.Display_message(
                     'Display object details of: {}'.format(self.selected_obj.name),
-                    'Weergave van objectdetails van: {}'.format(self.selected_obj.name))
+                    'Toon details van object: {}'.format(self.selected_obj.name))
                 if self.selected_obj.category in self.gel_net.categories_of_kinds:
                     self.Define_and_display_kind_detail_view(self.selected_obj)
                 else:
                     self.Define_and_display_individual_detail_view(self.selected_obj)
-
-            if len(self.info_model) > 0:
-                self.Define_and_display_documents()
+##
+##            if len(self.info_model) > 0:
+##                self.Define_and_display_documents()
 
     def Kind_detail_view_left(self, widget):
         """ Find the selected left hand object from a user selection
