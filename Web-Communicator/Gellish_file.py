@@ -437,7 +437,7 @@ class Gellish_file:
                             'UID {} is al gebruikt in het netwerk'.
                             format(self.gel_net.new_idea_uid))
             elif idea_uid not in self.gel_net.idea_uids:
-                    self.gel_net.idea_uids.append(idea_uid)
+                self.gel_net.idea_uids.append(idea_uid)
             else:
                 Message(self.gel_net.GUI_lang_index,
                         'Duplicate idea UID {}. Latter idea ignored.'.format(idea_uid),
