@@ -856,7 +856,7 @@ class Display_views():
         """
         # Verify if the aspect of the individual object is classified
         # (thus no qualitative aspect found)
-        if qualifier is 'quantitative':
+        if qualifier == 'quantitative':
             # Normal individual aspect found (not a qualitative aspect such as a substance)
             # aspect_name = aspect.name
 
@@ -926,7 +926,7 @@ class Display_views():
                     lang_name, comm_name, value_name, descr = \
                         self.user_interface.Determine_name_in_context(value)
 
-        elif qualifier is 'qualitative':
+        elif qualifier == 'qualitative':
             # Qualitative aspect found (e.g. a substance such as PVC)
             equality = '='
             # Determine the first supertype of the qualitative aspect
