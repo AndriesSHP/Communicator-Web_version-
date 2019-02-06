@@ -24,6 +24,7 @@ REQUIRED = [
 # What packages are optional?
 EXTRAS = {
     'testing': [
+        'flake8',
         'pytest',
         'pytest-flake8',
     ],
