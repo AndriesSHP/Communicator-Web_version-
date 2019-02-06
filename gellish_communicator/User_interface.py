@@ -607,10 +607,3 @@ class Network():
 
     def build_network(self):
         print('Build network')
-
-
-if __name__ == "__main__":
-    sys.setrecursionlimit(100000)
-
-    net = Network()
-    start(Communicator, title="Gellish Communicator")

@@ -2,7 +2,7 @@ import os
 import operator
 
 import remi.gui as gui
-from tkinter import filedialog
+from tkinter import Tk, filedialog
 
 from gellish_communicator.Anything import Relation
 from gellish_communicator.Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
