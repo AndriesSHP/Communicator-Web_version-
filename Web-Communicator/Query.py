@@ -1,20 +1,10 @@
 #!/usr/bin/python3
-# import sys
-# import os
-# import csv
-# import sqlite3
-# import pickle
-# from tkinter import *
-# from tkinter.ttk import *
-
 from Expr_Table_Def import intent_name_col, lh_uid_col, lh_name_col, phrase_type_uid_col, \
     rel_type_uid_col, rel_type_name_col, rh_uid_col, rh_name_col, uom_uid_col, uom_name_col, \
     rh_role_uid_col, rh_role_name_col, idea_uid_col
-# from Anything import Anything, Object, Individual, Kind, Relation, RelationType
 from Bootstrapping import basePhraseUID, by_def_role_of_ind
-# from GellishDict import GellishDict
-from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer, \
-    Open_output_file
+from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer
+#    Open_output_file
 
 
 class Query:
@@ -443,7 +433,7 @@ class Query:
         # subject_name = ['query_spec', 'vraagspecificatie']
         file_lang_name = 'Nederlands'
         serialization = 'csv'
-        Open_output_file(self.gel_expressions, 'query', file_lang_name, serialization)
+        # Open_output_file(self.gel_expressions, 'query', file_lang_name, serialization)
 
     def Execute_query(self):
         """ Execute a query on the network to find the searched objects
