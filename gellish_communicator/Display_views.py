@@ -2,22 +2,38 @@ import os
 import operator
 
 import remi.gui as gui
-from remi_ext import TreeTable, SingleRowSelectionTable  # MultiRowSelectionTable
+from tkinter import filedialog
 
-from tkinter import filedialog, Tk
-
-from Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
-from Expr_Table_Def import lh_name_col, rel_type_name_col, rh_name_col, status_col, \
-    lh_uid_col, rel_type_uid_col, rh_uid_col, idea_uid_col, phrase_type_uid_col, \
-    uom_uid_col, uom_name_col, full_def_col, \
-    lh_role_uid_col, lh_role_name_col, rh_role_uid_col, rh_role_name_col, \
-    expr_col_ids, header3
-
-from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer, \
-    Open_output_file
-from Occurrences_diagrams import Occurrences_diagram
-from utils import open_file
-from Anything import Relation
+from gellish_communicator.Anything import Relation
+from gellish_communicator.Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
+from gellish_communicator.Create_output_file import (
+    Create_gellish_expression,
+    Convert_numeric_to_integer,
+    Open_output_file,
+)
+from gellish_communicator.Expr_Table_Def import (
+    lh_name_col,
+    rel_type_name_col,
+    rh_name_col,
+    status_col,
+    lh_uid_col,
+    rel_type_uid_col,
+    rh_uid_col,
+    idea_uid_col,
+    phrase_type_uid_col,
+    uom_uid_col,
+    uom_name_col,
+    full_def_col,
+    lh_role_uid_col,
+    lh_role_name_col,
+    rh_role_uid_col,
+    rh_role_name_col,
+    expr_col_ids,
+    header3,
+)
+from gellish_communicator.Occurrences_diagrams import Occurrences_diagram
+from gellish_communicator.remi_ext import TreeTable, SingleRowSelectionTable
+from gellish_communicator.utils import open_file
 
 class Display_views():
     """ Various models about object(s)

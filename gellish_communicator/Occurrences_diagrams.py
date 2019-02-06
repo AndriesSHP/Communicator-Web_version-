@@ -3,9 +3,12 @@
     The diagrams have a hierarchy,
     whereby the parts of an occurrence are presented on a next page
 '''
-import remi.gui as gui
-from remi_ext import SingleRowSelectionTable
 import math
+
+import remi.gui as gui
+
+from gellish_communicator.remi_ext import SingleRowSelectionTable
+
 
 class SvgPolygon(gui.SvgPolyline):
     def __init__(self, _maxlen=None, *args, **kwargs):
