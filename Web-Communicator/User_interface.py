@@ -35,11 +35,33 @@ class MyTabBox(gui.TabBox):
         for a, li, holder in self._tabs.values():
             li.style['float'] = "left"
             # Specify the size percentage
-            li.style['width'] = "%.0f%%" % (tab_w - 1)
+            li.style['width'] = "{}%".format(tab_w)  # "%.0f%%" % (tab_w - 1)
 
             # Specify the text height
-            a.style['height'] = "20px"
-            a.style['line-height'] = "10px"
+            a.style['height'] = "43px"
+            a.style['line-height'] = "13px"
+            a.style['color'] = "black"
+            a.style['background-color'] = "#ddffdd"
+            a.style['border-width'] = '1px'
+            a.style['border-style'] = 'solid'
+            a.style['margin'] = '1px'
+            a.style['padding'] = '2px'
+
+    def _on_tab_pressed(self, _a, _li, _holder):
+        # remove active on all tabs, and hide their contents
+        for a, li, holder in self._tabs.values():
+            a.remove_class('active')
+            holder.style['display'] = 'none'
+            a.style['background-color'] = "#ddffdd"
+
+        _a.add_class('active')
+        _holder.style['display'] = 'block'
+        _a.style['background-color'] = "#ffffdd"
+
+        # call other callbacks
+        cb = self._tab_cbs[_holder.identifier]
+        if cb is not None:
+            cb()
 
 
 class Communicator(App):
@@ -73,6 +95,7 @@ class Communicator(App):
         self.comm_pref_uids = ['492014', 'any']  # Default: 492014 = 'Gellish'
         self.file_path_names = []
         self.q_view = None
+        self.search_name = ['Search for subject', 'Zoek naar subject']
 
         super(Communicator, self).__init__(*args)
 
@@ -324,7 +347,7 @@ class Communicator(App):
         ''' Select one or more Gellish files in a dialog
             and import the files,
             after syntactic verification.
-            The merge the file content in the semantic network.
+            Then merge the file content in the semantic network.
         '''
         self.read_file_container = gui.Widget(style={'width': '220px', 'display': 'block',
                                                      'overflow': 'auto', 'text-align': 'center'})
@@ -336,7 +359,6 @@ class Communicator(App):
                                               style='background-color:#eeffdd')
         self.dialog.confirm_value.connect(self.on_fileselection_dialog_confirm)
         self.dialog.cancel_dialog.connect(self.on_dialog_cancel)
-
         self.dialog.show(self)
 
     def read_files(self):
@@ -422,7 +444,8 @@ class Communicator(App):
         self.query_the_network()
 
     def query_the_network(self):
-        ''' Query the semantic network '''
+        ''' Query the semantic network.'''
+        subject = 'subject'
         if self.gel_net is None:
             print('First create a semantic network. Then query again.')
         else:
@@ -431,11 +454,11 @@ class Communicator(App):
 
             if self.q_view is None:
                 # Create a query view object
-                self.q_view = Query_view(self.gel_net, self)
+                self.q_view = Query_view(self, subject)
                 # Specify a query window and enable spefiying a query via GUI
                 self.q_view.Define_query_window()
             else:
-                self.views_noteb.select_by_name('Search')
+                self.views_noteb.select_by_name(self.search_name[self.GUI_lang_index])
 
     def Set_reply_language(self, reply_lang_name):
         ''' Set the reply language (name, uid, reply_lang_pref_uids)
@@ -568,6 +591,8 @@ class Communicator(App):
             is_a = ['is a ', 'is een ']
             full_def = is_a[self.GUI_lang_index] + super_name + ' ' + part_def
         else:
+            if part_def == None:
+                part_def = ''
             full_def = part_def
 
         return lang_name, comm_name, obj_name, full_def
@@ -576,7 +601,7 @@ class Communicator(App):
         ''' Close the tab in tabbox in widget with the specified tab_name'''
         # tabbox.select_by_name(ref_widget_tab_name)
         tabbox.remove_tab_by_name(ref_widget_tab_name)
-        if ref_widget_tab_name == 'Search':
+        if ref_widget_tab_name in self.search_name:
             self.q_view = None
 
 
@@ -598,7 +623,7 @@ class Network():
     ''' Dummy class for testing only.'''
     def __init__(self):
         GUI_lang_index = 0
-        net_name = 'Sementic Newtork'
+        net_name = 'Semantic Newtork'
         self.gel_net = Semantic_network(GUI_lang_index, net_name)
 
     def build_network(self):
