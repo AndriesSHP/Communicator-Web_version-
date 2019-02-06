@@ -1,6 +1,6 @@
-from Anything import Anything
-from Gellish_file import Gellish_file
-from SemanticNetwork import Semantic_Network
+from gellish_communicator.Anything import Anything
+from gellish_communicator.Gellish_file import Gellish_file
+from gellish_communicator.SemanticNetwork import Semantic_Network
 
 
 class Plurality:

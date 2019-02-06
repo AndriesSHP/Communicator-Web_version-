@@ -1,18 +1,18 @@
-import remi.gui as gui
-from remi import start, App
-
 import sys
 import pickle
 import webbrowser
 
-import SystemUsers as SU
-from Gellish_file import Gellish_file
-from SemanticNetwork import Semantic_Network
-from Query import Query
-from QueryViews import Query_view
-from Display_views import Display_views
-from Create_output_file import Convert_numeric_to_integer
-from Bootstrapping import is_called_uid
+import remi.gui as gui
+from remi import App
+
+from gellish_communicator import SystemUsers as SU
+from gellish_communicator.Bootstrapping import is_called_uid
+from gellish_communicator.Create_output_file import Convert_numeric_to_integer
+from gellish_communicator.Display_views import Display_views
+from gellish_communicator.Gellish_file import Gellish_file
+from gellish_communicator.SemanticNetwork import Semantic_Network
+from gellish_communicator.Query import Query
+from gellish_communicator.QueryViews import Query_view
 
 
 class MyTabBox(gui.TabBox):
@@ -265,6 +265,10 @@ class Communicator(App):
         except EOFError:
             print("Input pickle file could not be read: {}".
                   format(fname))
+        except ModuleNotFoundError:
+            print(
+                f"Input pickle file {fname} is of an obsolete class."
+            )
         else:
             infile.close()
 
@@ -603,10 +607,3 @@ class Network():
 
     def build_network(self):
         print('Build network')
-
-
-if __name__ == "__main__":
-    sys.setrecursionlimit(100000)
-
-    net = Network()
-    start(Communicator, title="Gellish Communicator")

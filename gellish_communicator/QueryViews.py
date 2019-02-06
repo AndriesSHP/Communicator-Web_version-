@@ -1,15 +1,22 @@
-# import os
-import remi.gui as gui
-from remi_ext import SingleRowSelectionTable, MultiRowSelectionTable
 from operator import itemgetter
 
-from Bootstrapping import is_called_uid
-from Expr_Table_Def import lh_uid_col, lh_name_col, lh_role_uid_col, rel_type_uid_col, \
-    rh_uid_col, rh_name_col, rh_role_uid_col, uom_name_col
-# from Query import Query
-from Anything import Anything
-from Create_output_file import Convert_numeric_to_integer
-#   Create_gellish_expression, Open_output_file
+import remi.gui as gui
+
+from gellish_communicator.Anything import Anything
+from gellish_communicator.Bootstrapping import is_called_uid
+from gellish_communicator.Create_output_file import Convert_numeric_to_integer
+from gellish_communicator.Expr_Table_Def import (
+    lh_uid_col,
+    lh_name_col,
+    lh_role_uid_col,
+    rel_type_uid_col,
+    rh_uid_col,
+    rh_name_col,
+    rh_role_uid_col,
+    uom_name_col,
+)
+from gellish_communicator.remi_ext import MultiRowSelectionTable, SingleRowSelectionTable
+
 
 class Query_view():
     ''' Defines a query window

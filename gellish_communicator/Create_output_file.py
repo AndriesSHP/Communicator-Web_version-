@@ -1,20 +1,37 @@
-# import os
 import csv
 import datetime
 import json
+
 from rdflib import Graph, URIRef, RDFS
-#   Namespace, Literal, RDF, BNode
 from tkinter import filedialog
 
-from Bootstrapping import ini_out_path
-# from Expr_Table_Def import *
-from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col,\
-    intent_uid_col, intent_name_col, idea_uid_col, lh_uid_col, lh_name_col,\
-    rel_type_uid_col, rel_type_name_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col,\
-    rh_uid_col, rh_name_col, full_def_col, uom_uid_col, uom_name_col, status_col,\
-    expr_col_ids, header3, default_row
-#   lh_role_uid_col, lh_role_name_col, part_def_col
-from utils import open_file
+from gellish_communicator.Bootstrapping import ini_out_path
+from gellish_communicator.Expr_Table_Def import (
+    lang_uid_col,
+    lang_name_col,
+    comm_uid_col,
+    comm_name_col,
+    intent_uid_col,
+    intent_name_col,
+    idea_uid_col,
+    lh_uid_col,
+    lh_name_col,
+    rel_type_uid_col,
+    rel_type_name_col,
+    phrase_type_uid_col,
+    rh_role_uid_col,
+    rh_role_name_col,
+    rh_uid_col,
+    rh_name_col,
+    full_def_col,
+    uom_uid_col,
+    uom_name_col,
+    status_col,
+    expr_col_ids,
+    header3,
+    default_row,
+)
+from gellish_communicator.utils import open_file
 
 
 def Create_gellish_expression(lang_comm, idea_uid, intent_uid_name,

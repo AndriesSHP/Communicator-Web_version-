@@ -10,13 +10,16 @@ For the time being this project uses a separate repository.
 
 ## Getting started
 
-    pip install remi rdflib
-    cd Web-Communicator
-    python User_interface.py
+    make install
+    python main.py
 
 
 ## Tests
 
-There are no test yet, but `make test` will check the project for coding style
-(pep8) and superfluous imports. It uses flake8, which you can configure in
-`setup.cfg`.
+Run `make test`.
+
+This will:
+
+- Check the project for coding style and superfluous imports.
+  It uses flake8, which you can configure in `setup.cfg`.
+- Run unit tests, of which there currently is only one.

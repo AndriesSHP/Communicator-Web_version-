@@ -1,34 +1,94 @@
 #!/usr/bin/python3
-# import sys
 import os
-# import csv
-# import sqlite3
 import pickle
-# import remi.gui as gui
 
-from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col, \
-    lh_uid_col, lh_name_col, lh_role_uid_col, lh_role_name_col, idea_uid_col, \
-    rel_type_uid_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col, \
-    rh_uid_col, rh_name_col, part_def_col, uom_uid_col, uom_name_col
-#   intent_uid_col, intent_name_col, rel_type_name_col, full_def_col, status_col
-from Gellish_file import Gellish_file
-from Anything import Anything, Relation
-from Bootstrapping import boot_base_phrasesEN, boot_base_phrasesNL, \
-    boot_inverse_phrasesEN, boot_inverse_phrasesNL, boot_alias_uids, \
-    basePhraseUID, inversePhraseUID, binRelUID, classifUID, classifiedUID, \
-    indOrMixRelUID, indivRelUID, kindHierUID, kindKindUID, kindRelUID, mixedRelUID, \
-    specialRelUID, possAspUID, possessorUID, transRelUID, concPossAspUID, \
-    concComplRelUID, qualSubtypeUID, qualOptionsUID, concComplUID, concQuantUID, \
-    qualifUID, quantUID, informativeUID, occurrenceUID, composUID, componUID, \
-    concComposUID, concComponUID, involvUID, nextUID, shallUID, aliasUID, \
-    concWholeUID, concPosessorUID, transUID, specialUID, concBinRelKindsUID, \
-    kindAndMixRelUID, \
-    first_role_uid, second_role_uid, base_rel_type_uids, \
-    is_called_uid, by_def_role_of_ind, subtypeRoleUID, Dutch_uid, \
-    dict_file_names, dict_dirs, model_file_names, model_dirs, prod_file_names, prod_dirs, \
-    base_onto_file_name
-from GellishDict import GellishDict
-from Create_output_file import Convert_numeric_to_integer, Message
+from gellish_communicator.Anything import Anything, Relation
+from gellish_communicator.Bootstrapping import (
+    boot_base_phrasesEN,
+    boot_base_phrasesNL,
+    boot_inverse_phrasesEN,
+    boot_inverse_phrasesNL,
+    boot_alias_uids,
+    basePhraseUID,
+    inversePhraseUID,
+    binRelUID,
+    classifUID,
+    classifiedUID,
+    indOrMixRelUID,
+    indivRelUID,
+    kindHierUID,
+    kindKindUID,
+    kindRelUID,
+    mixedRelUID,
+    specialRelUID,
+    possAspUID,
+    possessorUID,
+    transRelUID,
+    concPossAspUID,
+    concComplRelUID,
+    qualSubtypeUID,
+    qualOptionsUID,
+    concComplUID,
+    concQuantUID,
+    qualifUID,
+    quantUID,
+    informativeUID,
+    occurrenceUID,
+    composUID,
+    componUID,
+    concComposUID,
+    concComponUID,
+    involvUID,
+    nextUID,
+    shallUID,
+    aliasUID,
+    concWholeUID,
+    concPosessorUID,
+    transUID,
+    specialUID,
+    concBinRelKindsUID,
+    kindAndMixRelUID,
+    first_role_uid,
+    second_role_uid,
+    base_rel_type_uids,
+    is_called_uid,
+    by_def_role_of_ind,
+    subtypeRoleUID,
+    Dutch_uid,
+    dict_file_names,
+    dict_dirs,
+    model_file_names,
+    model_dirs,
+    prod_file_names,
+    prod_dirs,
+    base_onto_file_name,
+)
+from gellish_communicator.Create_output_file import (
+    Convert_numeric_to_integer,
+    Message,
+)
+from gellish_communicator.Expr_Table_Def import (
+    lang_uid_col,
+    lang_name_col,
+    comm_uid_col,
+    comm_name_col,
+    lh_uid_col,
+    lh_name_col,
+    lh_role_uid_col,
+    lh_role_name_col,
+    idea_uid_col,
+    rel_type_uid_col,
+    phrase_type_uid_col,
+    rh_role_uid_col,
+    rh_role_name_col,
+    rh_uid_col,
+    rh_name_col,
+    part_def_col,
+    uom_uid_col,
+    uom_name_col,
+)
+from gellish_communicator.GellishDict import GellishDict
+from gellish_communicator.Gellish_file import Gellish_file
 
 
 class Semantic_Network():

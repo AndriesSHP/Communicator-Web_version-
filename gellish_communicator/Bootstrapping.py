@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Base ontology and domain dictionaries directories
-dict_dirs = ["../GellishDictionary"]
+dict_dirs = ["GellishDictionary"]
 
 # Base ontology file
 base_onto_file_name = "Formal language definition base-UTF-8-subset.csv"
@@ -32,7 +32,7 @@ dict_file_names = [
 ]
 
 # Knowledge, Requirements and Product type file paths
-model_dirs = ["../GellishData"]
+model_dirs = ["GellishData"]
 model_file_names = [
     "Taxonomic Dictionary+Knowledge about Roads-UTF-8.csv",
     # "Kennisboek WEGEN - v5-UTF-8.csv"
