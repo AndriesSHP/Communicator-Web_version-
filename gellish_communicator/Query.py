@@ -18,7 +18,6 @@ from gellish_communicator.Bootstrapping import basePhraseUID, by_def_role_of_ind
 from gellish_communicator.Create_output_file import (
     Convert_numeric_to_integer,
     Create_gellish_expression,
-    Open_output_file,
 )
 
 
@@ -443,12 +442,6 @@ class Query:
                     uom_uid_name, description)
                 # Debug print('Gellish_expr1:', gellish_expr)
                 self.gel_expressions.append(gellish_expr)
-
-        # Save gel_expressions in query_file
-        # subject_name = ['query_spec', 'vraagspecificatie']
-        file_lang_name = 'Nederlands'
-        serialization = 'csv'
-        Open_output_file(self.gel_expressions, 'query', file_lang_name, serialization)
 
     def Execute_query(self):
         """ Execute a query on the network to find the searched objects
