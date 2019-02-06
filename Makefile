@@ -1,9 +1,11 @@
 env:
 	virtualenv env
-	env/bin/pip install -r requirements/base.txt
-	env/bin/pip install -r requirements/testing.txt
+	env/bin/pip install .
+
+testenv: env
+	env/bin/pip install .[testing]
 
 install: env
 
-test: env
+test: testenv
 	env/bin/pytest
