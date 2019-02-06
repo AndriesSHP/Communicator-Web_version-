@@ -3,9 +3,8 @@ import datetime
 import json
 
 from rdflib import Graph, URIRef, RDFS
-from tkinter import filedialog
+import remi.gui as gui
 
-from gellish_communicator.Bootstrapping import ini_out_path
 from gellish_communicator.Expr_Table_Def import (
     lang_uid_col,
     lang_name_col,
@@ -76,7 +75,8 @@ def Open_output_file(expressions, subject_name, lang_name, serialization):
     else:
         header1 = ['Gellish', 'English', 'Version', '9.0', date, 'Results',
                    'about ' + subject_name]
-        res = 'Results-'
+        res = 'Query_results-'
+    ini_file_name = ''
     if serialization == 'csv':
         ini_file_name = res + subject_name + '.csv.csv'
     if serialization == 'xml':
@@ -90,23 +90,30 @@ def Open_output_file(expressions, subject_name, lang_name, serialization):
 
     # Select file name and directory
     # Ini_out_path from Bootstrapping
-    title = serialization + ' files'
-    extension = '*.' + serialization
-    output_file = filedialog.asksaveasfilename(filetypes=((title, extension),
-                                                          ("All files", "*.*")),
-                                               title="Enter a file name",
-                                               initialdir=ini_out_path,
-                                               initialfile=ini_file_name)
-    if output_file == '':
+##    title = serialization + ' files'
+##    extension = '*.' + serialization
+##    output_file = filedialog.asksaveasfilename(filetypes=((title, extension),
+##                                                          ("All files", "*.*")),
+##                                               title="Enter a file name",
+##                                               initialdir=ini_out_path,
+##                                               initialfile=ini_file_name)
+    output_file_name = ini_file_name
+    if output_file_name == '':
         output_file = 'Results.' + serialization
         if lang_name == 'Nederlands':
             print('***De filenaam voor opslaan is blanco of the file selectie is gecancelled. '
-                  'De file is opgeslagen met de naam ' + output_file)
+                  'De file met naam ' + output_file + ' is niet opgeslagen')
         else:
             print('***File name for saving is blank or file selection is cancelled. '
-                  'The file is saved under name ' + output_file)
-    Save_expressions_in_file(expressions, output_file, header1, serialization)
+                  'The file with name ' + output_file + 'is not saved')
+    else:
+        Save_expressions_in_file(expressions, output_file_name, header1, serialization)
 
+def fileupload_on_success(widget, filename):
+    print('File upload success: ' + filename)
+
+def fileupload_on_failed(widget, filename):
+    print('File upload failed: ' + filename)
 
 def Save_expressions_in_file(expressions, output_file, header1, serialization):
     '''Write expressions to an output file in an CSV or RDF serialization'''
@@ -114,20 +121,20 @@ def Save_expressions_in_file(expressions, output_file, header1, serialization):
     if serialization == 'csv':
         # Save the result_expr expressions in a CSV file, preceeded by three header lines.
         try:
-            f = open(output_file, mode='w', newline='', encoding='utf-8')
-            fileWriter = csv.writer(f, dialect='excel', delimiter=';')
+            f = open(output_file, mode='a', newline='', encoding='utf-8')
+            file_writer = csv.writer(f, dialect='excel', delimiter=';')
 
             # Write header rows and expressions
-            fileWriter.writerow(header1)
-            fileWriter.writerow(expr_col_ids)
-            fileWriter.writerow(header3)
+            file_writer.writerow(header1)
+            file_writer.writerow(expr_col_ids)
+            file_writer.writerow(header3)
             for expression in expressions:
-                fileWriter.writerow(expression)
+                file_writer.writerow(expression)
 
             f.close()
 
             # Open the written file in a CSV viewer (e.g. Excel)
-            open_file(output_file)
+            # open_file(output_file)
         except PermissionError:
             print('File {} cannot be opened. Probably already in use'.format(output_file))
             return
@@ -167,6 +174,10 @@ def Save_expressions_in_file(expressions, output_file, header1, serialization):
     print('Saved file: {}'.format(output_file))
     # Open written file in a viewer
     open_file(output_file)
+
+    output_file = gui.FileUploader('./', width=200, height=30, margin='10px')
+    output_file.onsuccess.connect(fileupload_on_success)
+    output_file.onfailed.connect(fileupload_on_failed)
 
 
 def Convert_numeric_to_integer(numeric_text):
