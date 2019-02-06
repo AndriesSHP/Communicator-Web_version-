@@ -402,7 +402,7 @@ class Gellish_file:
                 # Debug print('Empty row following idea {} skipped.'.format(idea_uid))
                 continue
             # Skip rows with status 'ignore' or equivalent
-            if self.status_col_in is not 0 and in_row[self.status_col_in] in ignores:
+            if self.status_col_in != 0 and in_row[self.status_col_in] in ignores:
                 # Debug print('Expression with status = "ignore etc." following idea {} skipped.'.
                 #      format(idea_uid))
                 continue
@@ -437,7 +437,7 @@ class Gellish_file:
                             'UID {} is al gebruikt in het netwerk'.
                             format(self.gel_net.new_idea_uid))
             elif idea_uid not in self.gel_net.idea_uids:
-                    self.gel_net.idea_uids.append(idea_uid)
+                self.gel_net.idea_uids.append(idea_uid)
             else:
                 Message(self.gel_net.GUI_lang_index,
                         'Duplicate idea UID {}. Latter idea ignored.'.format(idea_uid),
@@ -651,7 +651,7 @@ class Gellish_file:
             if in_row == []:
                 continue
             # Skip rows with status 'ignore' or equivalent
-            if self.status_col_in is not 0 and in_row[self.status_col_in] in ignores:
+            if self.status_col_in != 0 and in_row[self.status_col_in] in ignores:
                 continue
 
             # Rearrange the values in in_row in the sequence of the database
