@@ -265,6 +265,10 @@ class Communicator(App):
         except EOFError:
             print("Input pickle file could not be read: {}".
                   format(fname))
+        except ModuleNotFoundError:
+            print(
+                f"Input pickle file {fname} is of an obsolete class."
+            )
         else:
             infile.close()
 
