@@ -1,0 +1,2 @@
+-f versions.txt
+-e .[testing]
