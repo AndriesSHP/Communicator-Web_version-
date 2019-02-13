@@ -526,7 +526,7 @@ if __name__ == "__main__":
             obj.category = 'individual'
         elif uid == '49':
             obj.category = 'kind of relation'
-        
+
         new_obj = plurality.convert_singular_to_plural(obj)
         for relation in obj.relations:
             print('Single Expression:', obj.name, relation)

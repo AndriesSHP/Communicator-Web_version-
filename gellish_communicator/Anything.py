@@ -76,7 +76,7 @@ class Anything:
         # then a new phrase is added in which shall is replaced by must
         if name_in_context[0] == '910036' and len(phrase_parts) > 2 \
                 and phrase_parts[0] == 'shall':
-            new_phrase = 'must' +  phrase[5:]
+            new_phrase = 'must' + phrase[5:]
             new_name_in_context = name_in_context[:]
             new_name_in_context[2] = new_phrase
             if new_name_in_context not in self.names_in_contexts:
