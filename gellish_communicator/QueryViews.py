@@ -1,12 +1,21 @@
-import remi.gui as gui
-from remi_ext import SingleRowSelectionTable, MultiRowSelectionTable
 from operator import itemgetter
 
-from Bootstrapping import is_called_uid
-from Expr_Table_Def import lh_uid_col, lh_name_col, lh_role_uid_col, rel_type_uid_col, \
-    rh_uid_col, rh_name_col, rh_role_uid_col, uom_name_col
-from Anything import Anything
-from Create_output_file import Convert_numeric_to_integer
+import remi.gui as gui
+
+from gellish_communicator.Anything import Anything
+from gellish_communicator.Bootstrapping import is_called_uid
+from gellish_communicator.Create_output_file import Convert_numeric_to_integer
+from gellish_communicator.Expr_Table_Def import (
+    lh_uid_col,
+    lh_name_col,
+    lh_role_uid_col,
+    rel_type_uid_col,
+    rh_uid_col,
+    rh_name_col,
+    rh_role_uid_col,
+    uom_name_col,
+)
+from gellish_communicator.remi_ext import MultiRowSelectionTable, SingleRowSelectionTable
 
 
 class Query_view():
@@ -1302,22 +1311,22 @@ class Query_view():
         '''
         self.lh_obj_relation_types = []
         for lh_obj_rel in lh_object.relations:
-                expr = lh_obj_rel.expression
-                rel_type = self.gel_net.uid_dict[expr[rel_type_uid_col]]
-                if rel_type is None:
-                    self.user_interface.message_ui(
-                        'The kind of relation {} is not found.'.format(expr[rel_type_uid_col]),
-                        'De soort relatie {} is niet gevonden.'.format(expr[rel_type_uid_col]))
-                else:
-                    if rel_type not in self.lh_obj_relation_types:
-                        self.lh_obj_relation_types.append(rel_type)
+            expr = lh_obj_rel.expression
+            rel_type = self.gel_net.uid_dict[expr[rel_type_uid_col]]
+            if rel_type is None:
+                self.user_interface.message_ui(
+                    'The kind of relation {} is not found.'.format(expr[rel_type_uid_col]),
+                    'De soort relatie {} is niet gevonden.'.format(expr[rel_type_uid_col]))
+            else:
+                if rel_type not in self.lh_obj_relation_types:
+                    self.lh_obj_relation_types.append(rel_type)
 
-                        # Determine_subtypes of the relation type
-                        sub_rel_types, sub_rel_type_uids = \
-                            self.gel_net.Determine_subtypes(rel_type)
-                        for sub_rel_type in sub_rel_types:
-                            if sub_rel_type not in self.lh_obj_relation_types:
-                                self.lh_obj_relation_types.append(sub_rel_type)
+                    # Determine_subtypes of the relation type
+                    sub_rel_types, sub_rel_type_uids = \
+                        self.gel_net.Determine_subtypes(rel_type)
+                    for sub_rel_type in sub_rel_types:
+                        if sub_rel_type not in self.lh_obj_relation_types:
+                            self.lh_obj_relation_types.append(sub_rel_type)
 
     def Determine_aliases(self, obj):
         ''' Collect the names and translation that are known for obj

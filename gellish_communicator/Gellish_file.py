@@ -1,23 +1,58 @@
 # import os
-import sys
 import csv
 import json
 import logging
-# import remi.gui as gui
+import sys
 
-from Bootstrapping import ignores, subtypeRoleUID, supertypeRoleUID, subtypeName, supertypeName,\
-    basePhraseUID
-from Expr_Table_Def import lang_uid_col, lang_name_col, comm_uid_col, comm_name_col,\
-    intent_uid_col, intent_name_col, lh_uid_col, lh_name_col, lh_role_uid_col, lh_role_name_col,\
-    idea_uid_col,\
-    rel_type_uid_col, rel_type_name_col, phrase_type_uid_col, rh_role_uid_col, rh_role_name_col,\
-    rh_uid_col, rh_name_col, part_def_col, full_def_col, uom_uid_col, uom_name_col, status_col,\
-    file_name_col, expr_col_ids, default_row
-from Create_output_file import Create_gellish_expression, Open_output_file,\
-    Convert_numeric_to_integer, Message
-from Mapping_tables_IB import keys_map, attributes_map, value_key_map, values_map
-from Anything import Anything, Relation
-# from Query import Query
+from gellish_communicator.Anything import Anything, Relation
+from gellish_communicator.Bootstrapping import (
+    ignores,
+    subtypeRoleUID,
+    supertypeRoleUID,
+    subtypeName,
+    supertypeName,
+    basePhraseUID,
+)
+from gellish_communicator.Create_output_file import (
+    Create_gellish_expression,
+    Open_output_file,
+    Convert_numeric_to_integer,
+    Message,
+)
+from gellish_communicator.Expr_Table_Def import (
+    lang_uid_col,
+    lang_name_col,
+    comm_uid_col,
+    comm_name_col,
+    intent_uid_col,
+    intent_name_col,
+    lh_uid_col,
+    lh_name_col,
+    lh_role_uid_col,
+    lh_role_name_col,
+    idea_uid_col,
+    rel_type_uid_col,
+    rel_type_name_col,
+    phrase_type_uid_col,
+    rh_role_uid_col,
+    rh_role_name_col,
+    rh_uid_col,
+    rh_name_col,
+    part_def_col,
+    full_def_col,
+    uom_uid_col,
+    uom_name_col,
+    status_col,
+    file_name_col,
+    expr_col_ids,
+    default_row,
+)
+from gellish_communicator.Mapping_tables_IB import (
+    keys_map,
+    attributes_map,
+    value_key_map,
+    values_map,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -402,7 +437,7 @@ class Gellish_file:
                 # Debug print('Empty row following idea {} skipped.'.format(idea_uid))
                 continue
             # Skip rows with status 'ignore' or equivalent
-            if self.status_col_in is not 0 and in_row[self.status_col_in] in ignores:
+            if self.status_col_in != 0 and in_row[self.status_col_in] in ignores:
                 # Debug print('Expression with status = "ignore etc." following idea {} skipped.'.
                 #      format(idea_uid))
                 continue
@@ -437,7 +472,7 @@ class Gellish_file:
                             'UID {} is al gebruikt in het netwerk'.
                             format(self.gel_net.new_idea_uid))
             elif idea_uid not in self.gel_net.idea_uids:
-                    self.gel_net.idea_uids.append(idea_uid)
+                self.gel_net.idea_uids.append(idea_uid)
             else:
                 Message(self.gel_net.GUI_lang_index,
                         'Duplicate idea UID {}. Latter idea ignored.'.format(idea_uid),
@@ -651,7 +686,7 @@ class Gellish_file:
             if in_row == []:
                 continue
             # Skip rows with status 'ignore' or equivalent
-            if self.status_col_in is not 0 and in_row[self.status_col_in] in ignores:
+            if self.status_col_in != 0 and in_row[self.status_col_in] in ignores:
                 continue
 
             # Rearrange the values in in_row in the sequence of the database

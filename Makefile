@@ -1,6 +1,11 @@
 env:
 	virtualenv env
-	env/bin/pip install flake8
+	env/bin/pip install .
 
-test: env
-	env/bin/flake8
+testenv: env
+	env/bin/pip install .[testing]
+
+install: env
+
+test: testenv
+	env/bin/pytest

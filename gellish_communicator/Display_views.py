@@ -2,23 +2,39 @@ import os
 import operator
 
 import remi.gui as gui
-from remi_ext import TreeTable, SingleRowSelectionTable  # MultiRowSelectionTable
 
-## from tkinter import filedialog, Tk
+from gellish_communicator.Anything import Relation
+from gellish_communicator.Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
+from gellish_communicator.Create_output_file import (
+    Create_gellish_expression,
+    Convert_numeric_to_integer,
+    Open_output_file,
+)
+from gellish_communicator.Expr_Table_Def import (
+    lh_name_col,
+    rel_type_name_col,
+    rh_name_col,
+    status_col,
+    lh_uid_col,
+    rel_type_uid_col,
+    rh_uid_col,
+    idea_uid_col,
+    phrase_type_uid_col,
+    uom_uid_col,
+    uom_name_col,
+    full_def_col,
+    lh_role_uid_col,
+    lh_role_name_col,
+    rh_role_uid_col,
+    rh_role_name_col,
+    expr_col_ids,
+    header3,
+)
+from gellish_communicator.QueryViews import Query_view
+from gellish_communicator.Occurrences_diagrams import Occurrences_diagram
+from gellish_communicator.remi_ext import TreeTable, SingleRowSelectionTable
+from gellish_communicator.utils import open_file
 
-from Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
-from Expr_Table_Def import lh_name_col, rel_type_name_col, rh_name_col, status_col, \
-    lh_uid_col, rel_type_uid_col, rh_uid_col, idea_uid_col, phrase_type_uid_col, \
-    uom_uid_col, uom_name_col, full_def_col, \
-    lh_role_uid_col, lh_role_name_col, rh_role_uid_col, rh_role_name_col, \
-    expr_col_ids, header3
-
-from Create_output_file import Create_gellish_expression, Convert_numeric_to_integer, \
-    Open_output_file
-from Occurrences_diagrams import Occurrences_diagram
-from utils import open_file
-from Anything import Relation
-from QueryViews import Query_view
 
 class Display_views():
     """ Various models about object(s)
@@ -859,7 +875,7 @@ class Display_views():
         """
         # Verify if the aspect of the individual object is classified
         # (thus no qualitative aspect found)
-        if qualifier is 'quantitative':
+        if qualifier == 'quantitative':
             # Normal individual aspect found (not a qualitative aspect such as a substance)
             # aspect_name = aspect.name
 
@@ -929,7 +945,7 @@ class Display_views():
                     lang_name, comm_name, value_name, descr = \
                         self.user_interface.Determine_name_in_context(value)
 
-        elif qualifier is 'qualitative':
+        elif qualifier == 'qualitative':
             # Qualitative aspect found (e.g. a substance such as PVC)
             equality = '='
             # Determine the first supertype of the qualitative aspect
@@ -1269,9 +1285,9 @@ class Display_views():
         # Collect all relations in expr_table
         # and include line in network_model view
         for rel_obj in obj.relations:
-                expr = rel_obj.expression
-                if len(self.expr_table) < self.max_nr_of_rows and expr not in self.expr_table:
-                    self.expr_table.append(expr)
+            expr = rel_obj.expression
+            if len(self.expr_table) < self.max_nr_of_rows and expr not in self.expr_table:
+                self.expr_table.append(expr)
 
         # Search for expressions that are <can have as aspect a> kind of relation
         # or subtypes of that kind of relation
@@ -1733,111 +1749,112 @@ class Display_views():
         self.part_head_req = True
         # Search for kinds of parts of object_in_focus
         for rel_obj in obj.relations:
-                expr = rel_obj.expression
-                if expr[lh_uid_col] == obj.uid \
-                   and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs \
-                   and expr[phrase_type_uid_col] == '1986':
-                    part_uid = expr[rh_uid_col]
-                    part_name = expr[rh_name_col]
-                    # role_uid = expr[rh_role_uid_col]
-                    # role_name = expr[rh_role_name_col]
-                elif expr[rh_uid_col] == obj.uid \
-                        and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs \
-                        and expr[phrase_type_uid_col] == '6066':
-                    part_uid = expr[lh_uid_col]
-                    part_name = expr[lh_name_col]
-                    # role_uid = expr[lh_role_uid_col]
-                    # role_name = expr[lh_role_name_col]
+            # TODO: This for-loop is way too long.
+            expr = rel_obj.expression
+            if expr[lh_uid_col] == obj.uid \
+               and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs \
+               and expr[phrase_type_uid_col] == '1986':
+                part_uid = expr[rh_uid_col]
+                part_name = expr[rh_name_col]
+                # role_uid = expr[rh_role_uid_col]
+                # role_name = expr[rh_role_name_col]
+            elif expr[rh_uid_col] == obj.uid \
+                    and expr[rel_type_uid_col] in self.gel_net.subConcComposUIDs \
+                    and expr[phrase_type_uid_col] == '6066':
+                part_uid = expr[lh_uid_col]
+                part_name = expr[lh_name_col]
+                # role_uid = expr[lh_role_uid_col]
+                # role_name = expr[lh_role_name_col]
+            else:
+                continue
+
+            # There is an explicit kind of part found (part_uid);
+            # create part_header in kind_model, the first time only
+            # Debug print('Kind of part', part_name)
+            self.decomp_level += 1
+            if self.subtype_level == 0:
+                if self.part_head_req is True:
+                    self.line_nr += 1
+                    prod_head_4 = ['', '', '', self.line_nr,
+                                   self.comp_head[self.GUI_lang_index],
+                                   part2_head[self.GUI_lang_index],
+                                   part3_head[self.GUI_lang_index],
+                                   super_head[self.GUI_lang_index], '', '', '', '', '', '']
+                    if len(self.kind_model) < self.max_nr_of_rows:
+                        # Add header of part to kind_model
+                        self.kind_model.append(prod_head_4)
+                    self.part_head_req = False
+
+            # Add the compostion expression to the expr_table table and network_model
+            if len(self.expr_table) < self.max_nr_of_rows:
+                self.expr_table.append(expr)
+                if obj == self.object_in_focus:
+                    self.Add_line_to_network_model(obj, rel_obj, expr)
+
+            # Determine preferred name of object (= kind)
+            if len(obj.names_in_contexts) > 0:
+                lang_name, community_name, obj_name, descr_of_obj = \
+                    self.user_interface.Determine_name_in_context(obj)
+            else:
+                obj_name = obj.name
+
+            # Determine preferred name of (kind of) part
+            part = self.uid_dict[part_uid]
+            if len(part.names_in_contexts) > 0:
+                lang_name, community_name, part_name, descr_of_part = \
+                    self.user_interface.Determine_name_in_context(part)
+            else:
+                part_name = part.name
+                community_name = self.unknown[self.GUI_lang_index]
+
+            # Determine preferred name of first supertype of part
+            if len(part.supertypes) > 0:
+                if len(part.supertypes[0].names_in_contexts) > 0:
+                    lang_name, comm_kind_name, part_kind_name, descr_of_kind = \
+                        self.user_interface.Determine_name_in_context(part.supertypes[0])
                 else:
-                    continue
+                    part_kind_name = part.supertypes[0].name
+            else:
+                part_kind_name = self.unknown_kind[self.GUI_lang_index]
+                if part.category == 'anything':
+                    part.category = 'kind'
 
-                # There is an explicit kind of part found (part_uid);
-                # create part_header in kind_model, the first time only
-                # Debug print('Kind of part', part_name)
-                self.decomp_level += 1
-                if self.subtype_level == 0:
-                    if self.part_head_req is True:
-                        self.line_nr += 1
-                        prod_head_4 = ['', '', '', self.line_nr,
-                                       self.comp_head[self.GUI_lang_index],
-                                       part2_head[self.GUI_lang_index],
-                                       part3_head[self.GUI_lang_index],
-                                       super_head[self.GUI_lang_index], '', '', '', '', '', '']
-                        if len(self.kind_model) < self.max_nr_of_rows:
-                            # Add header of part to kind_model
-                            self.kind_model.append(prod_head_4)
-                        self.part_head_req = False
+            # Create row about possible kind of part in possibilities_model
+            self.possibility_row[0] = part.uid
+            self.possibility_row[1] = part_name
+            self.possibility_row[2] = \
+                part_name + of_text[self.GUI_lang_index] + obj_name + ')'
+            self.possibility_row[3] = obj_name  # parent
+            self.possibility_row[4] = part_kind_name
+            self.possibility_row[5] = community_name  # of part
+            # Add possibility for part to possibilities_model
+            if self.possibility_row not in self.possibilities_model:
+                self.possibilities_model.append(self.possibility_row[:])
 
-                # Add the compostion expression to the expr_table table and network_model
-                if len(self.expr_table) < self.max_nr_of_rows:
-                    self.expr_table.append(expr)
-                    if obj == self.object_in_focus:
-                        self.Add_line_to_network_model(obj, rel_obj, expr)
+            # Search for aspects of the kind of part
+            self.Find_kinds_of_aspects(part, role)
+            if self.nr_of_aspects > 0:
+                # Verify consistency between aspect values and implied aspect values.
+                # === to be completed ===
 
-                # Determine preferred name of object (= kind)
-                if len(obj.names_in_contexts) > 0:
-                    lang_name, community_name, obj_name, descr_of_obj = \
-                        self.user_interface.Determine_name_in_context(obj)
-                else:
-                    obj_name = obj.name
-
-                # Determine preferred name of (kind of) part
-                part = self.uid_dict[part_uid]
-                if len(part.names_in_contexts) > 0:
-                    lang_name, community_name, part_name, descr_of_part = \
-                        self.user_interface.Determine_name_in_context(part)
-                else:
-                    part_name = part.name
-                    community_name = self.unknown[self.GUI_lang_index]
-
-                # Determine preferred name of first supertype of part
-                if len(part.supertypes) > 0:
-                    if len(part.supertypes[0].names_in_contexts) > 0:
-                        lang_name, comm_kind_name, part_kind_name, descr_of_kind = \
-                            self.user_interface.Determine_name_in_context(part.supertypes[0])
-                    else:
-                        part_kind_name = part.supertypes[0].name
-                else:
-                    part_kind_name = self.unknown_kind[self.GUI_lang_index]
-                    if part.category == 'anything':
-                        part.category = 'kind'
-
-                # Create row about possible kind of part in possibilities_model
-                self.possibility_row[0] = part.uid
-                self.possibility_row[1] = part_name
-                self.possibility_row[2] = \
-                    part_name + of_text[self.GUI_lang_index] + obj_name + ')'
-                self.possibility_row[3] = obj_name  # parent
-                self.possibility_row[4] = part_kind_name
-                self.possibility_row[5] = community_name  # of part
-                # Add possibility for part to possibilities_model
-                if self.possibility_row not in self.possibilities_model:
-                    self.possibilities_model.append(self.possibility_row[:])
-
-                # Search for aspects of the kind of part
-                self.Find_kinds_of_aspects(part, role)
-                if self.nr_of_aspects > 0:
-                    # Verify consistency between aspect values and implied aspect values.
-                    # === to be completed ===
-
-                    # Debug print('*** Nr of aspects to be verified', self.nr_of_aspects)
-                    # Verify whether there are implied parts with aspect values
-                    if len(self.implied_parts_dict) > 0:
-                        for key, implied_tuple in self.implied_parts_dict:
-                            if part.uid == key[0]:
-                                self.Display_message(
-                                    'Object ({}) {} has part ({}) {}'
-                                    'with implied aspect ({}) {}.'.
-                                    format(obj.uid, obj.names_in_contexts[0][2], key[0],
-                                           implied_tuple(0), implied_tuple(1),
-                                           implied_tuple(2)),
-                                    'Object ({}) {} heeft als deel ({}) {}'
-                                    'met als geïmpliceerd aspect ({}) {}.'.
-                                    format(obj.uid, obj.names_in_contexts[0][2], key[0],
-                                           implied_tuple(0), implied_tuple(1),
-                                           implied_tuple(2)))
-                                del self.implied_parts_dict[key]
-                self.decomp_level += -1
+                # Debug print('*** Nr of aspects to be verified', self.nr_of_aspects)
+                # Verify whether there are implied parts with aspect values
+                if len(self.implied_parts_dict) > 0:
+                    for key, implied_tuple in self.implied_parts_dict:
+                        if part.uid == key[0]:
+                            self.Display_message(
+                                'Object ({}) {} has part ({}) {}'
+                                'with implied aspect ({}) {}.'.
+                                format(obj.uid, obj.names_in_contexts[0][2], key[0],
+                                       implied_tuple(0), implied_tuple(1),
+                                       implied_tuple(2)),
+                                'Object ({}) {} heeft als deel ({}) {}'
+                                'met als geïmpliceerd aspect ({}) {}.'.
+                                format(obj.uid, obj.names_in_contexts[0][2], key[0],
+                                       implied_tuple(0), implied_tuple(1),
+                                       implied_tuple(2)))
+                            del self.implied_parts_dict[key]
+            self.decomp_level += -1
 
         # If there are implied kinds of parts left, then create kind_model lines.
         if self.subtype_level == 0 and len(self.implied_parts_dict) > 0:
@@ -2697,13 +2714,13 @@ class Display_views():
                 parents.append(name)
 
     def Define_and_display_summary_sheet(self):
-            # Destroy earlier summary_frame
-            try:
-                self.summ_frame.destroy()
-            except AttributeError:
-                pass
-            self.Define_summary_sheet()
-            self.Display_summary_view()
+        # Destroy earlier summary_frame
+        try:
+            self.summ_frame.destroy()
+        except AttributeError:
+            pass
+        self.Define_summary_sheet()
+        self.Display_summary_view()
 
     def Define_summary_sheet(self):
         """ Define a summary_sheet for display of summ_model(a list of summary_rows)

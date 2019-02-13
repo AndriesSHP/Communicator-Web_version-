@@ -1,14 +1,16 @@
-# import os
-# import csv
-# from tkinter import filedialog
-# from tkinter import *
-# from tkinter.ttk import *
 import datetime
 
-# from Bootstrapping import *
-from Expr_Table_Def import idea_uid_col, \
-    lh_uid_col, rel_type_uid_col, rel_type_name_col, rh_uid_col
-from Create_output_file import Open_output_file, Save_expressions_in_file
+from gellish_communicator.Expr_Table_Def import (
+    idea_uid_col,
+    lh_uid_col,
+    rel_type_uid_col,
+    rel_type_name_col,
+    rh_uid_col,
+)
+from gellish_communicator.Create_output_file import (
+    Save_expressions_in_file,
+    Open_output_file,
+)
 
 
 class Anything:
