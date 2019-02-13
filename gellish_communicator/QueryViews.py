@@ -175,13 +175,13 @@ class Query_view():
         self.first_line_widget.append(self.reply_lang_label)
         self.first_line_widget.append(self.reply_lang_box)
         self.first_line_widget.append(confirm_button)
-        self.first_line_widget.append(search_close)
         if self.search_for == 'object':
             file_text = ['Search file', 'Zoek file']
             file_button = gui.Button(file_text[self.GUI_lang_index], width=100, height=20)
             file_button.attributes['title'] = 'Search for document that is related to object'
             file_button.onclick.connect(self.Search_file_with_document)
             self.first_line_widget.append(file_button)
+        self.first_line_widget.append(search_close)
         self.query_widget.append(self.first_line_widget)
 
         # Set default values in StringVar's
@@ -550,7 +550,7 @@ class Query_view():
     def set_front_end(self, widget, new_value):
         ''' Depending on user input determine whether the front end part of the found name
             should comply with the front end part of the search string.'''
-        front_end = self.front_end_match_var.get()
+        front_end = new_value
         if front_end:
             self.fe = 'fi'   # front end identical
         else:
@@ -1047,12 +1047,28 @@ class Query_view():
         # (being the unknown) and next UID.
         else:
             if self.search_string not in self.names_of_unknowns:
+                self.unknown_quid += 1
                 self.user_interface.message_ui(
-                    'String "{}" is not found in the dictionary. UID = {}. '.
+                    'String "{}" is not found in the dictionary. New UID = {}. '.
                     format(self.search_string, self.unknown_quid),
-                    'Term "{}" is niet gevonden in het woordenboek. UID = {}. '.
+                    'Term "{}" is niet gevonden in het woordenboek. Nieuw UID = {}. '.
                     format(self.search_string, self.unknown_quid))
                 found_uid = self.unknown_quid
+                self.names_of_unknowns.append(self.search_string)
+                # Create an option for a new object
+                unknown = Anything(str(self.unknown_quid), result_string)
+                self.unknowns.append(unknown)
+                option_nr = 1
+                option.append(option_nr)
+                option.append(whetherKnown)
+                option.append(self.GUI_lang_pref_uids[1])
+                option.append(self.comm_pref_uids[0])
+                option.append(self.search_string)
+                option.append(str(self.unknown_quid))
+                option.append(is_called_uid)
+                option.append(objectTypeKnown)
+                option.append(self.unknown_kind[self.GUI_lang_index])
+                options.append(option)
             else:
                 # Search in unknowns for object with name search_string
                 for obj in self.unknowns:
