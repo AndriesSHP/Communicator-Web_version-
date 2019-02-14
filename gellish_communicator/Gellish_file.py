@@ -101,7 +101,7 @@ class Gellish_file:
             Message(self.gel_net.GUI_lang_index,
                     'File name extension {} is not (yet) supported.'.format(name_ext[1]),
                     'Filenaam extensie {} wordt (nog) niet ondersteund.'.format(name_ext[1]))
-            self.extension = ''
+            self.extension = name_ext[1]
         else:
             # Allocate file extension to file
             self.extension = name_ext[1]
@@ -488,7 +488,7 @@ class Gellish_file:
                 # then append the dictionary with the terms available in the language column
                 # Debug print('Col_ids',lang_name_col_id)
                 for col_id in lang_name_col_id:
-                    # Only for rows with a specialization and alias relation
+                    # Only for rows with a specialization or alias relation
                     if db_row[rel_type_uid_col] in self.gel_net.specialRelUIDs \
                             or db_row[rel_type_uid_col] in self.gel_net.alias_uids:
                         # Check whether column value (name of object) is not blank,

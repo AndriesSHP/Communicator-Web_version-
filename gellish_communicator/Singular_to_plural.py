@@ -31,13 +31,19 @@ class Plurality:
         if obj.uid not in exception_uids and obj.category not in collections \
            and not (len(parts) > 1 and parts[0] == 'coll') \
            and obj.category not in individuals:
+            singular_name = obj.name
+            print('Name: {} ({})'.format(singular_name, obj.uid))
             # Determine the uid of the plural thing by concatination with 'coll:'
             # and create the object with a preliminar name
-            uid_plural = 'coll:' + obj.uid
-            singular_name = obj.name
             plurality_name = singular_name + 's'
-            self.coll = Anything(uid_plural, plurality_name)
-            self.coll.category = 'collection'
+            uid_plural = 'coll:' + obj.uid
+            if uid_plural not in self.gel_net.uid_dict:
+                self.coll = Anything(uid_plural, plurality_name)
+                self.coll.category = 'collection'
+                new_obj = True
+            else:
+                self.coll = self.gel_net.uid_dict[uid_plural]
+                new_obj = False
 
             # Find the name for the plural thing for every English name in context
             if len(obj.names_in_contexts) > 0:
@@ -52,14 +58,12 @@ class Plurality:
                     elif name_in_context[0] == '910037':
                         self.determine_dutch_plural(name_in_context)
 
-            # Debug print('Plurals:', plural.uid, plural.name, len(plural.names_in_contexts))
             for name_in_context in self.coll.names_in_contexts:
-                # Debug print('Plural:', plural.name, plural.uid, name_in_context)
-                print('UID and Name of plurality:', self.coll.uid, name_in_context[2])
+                print('Plurality: {} ({})'.format(name_in_context[2], self.coll.uid))
 
-            self.add_rel_between_single_and_collection(obj, self.coll)
-            for relation in obj.relations:
-                print('Expression:', obj.name, relation)
+            if new_obj is True:
+                self.add_rel_between_single_and_collection(obj, self.coll)
+        return self.coll
 
     def determine_english_plural(self, name_in_context):
         ''' Tranform the English names_in_contexts of a kind
@@ -490,18 +494,21 @@ if __name__ == "__main__":
                      '44': 'wc'}
 
     lang = input("Enter language 'en' or 'nl': ")
-    if lang == 'nl':
-        names = test_names_nl
-        language_uid = language_uid_nl
-    else:
-        names = test_names
-        language_uid = language_uid_en
     GUI_lang_index = 0
     net_name = 'Net'
     gel_net = Semantic_Network(GUI_lang_index, net_name)
+    if lang == 'nl':
+        names = test_names_nl
+        language_uid = language_uid_nl
+        gel_net.lang_uid_dict[language_uid] = language_uid_nl
+    else:
+        names = test_names
+        language_uid = language_uid_en
+        gel_net.lang_uid_dict[language_uid] = language_uid_en
     rel_kind_uid = '4843'
     rel_type = Anything(rel_kind_uid, 'is classifier of each element of')
     gel_net.uid_dict[rel_kind_uid] = rel_type
+    gel_net.community_dict[community_uid] = 'Gellish'
     path_and_name = ''
     current_file = Gellish_file(path_and_name, gel_net)
     plurality = Plurality(gel_net, current_file)
@@ -512,13 +519,17 @@ if __name__ == "__main__":
         # name = input("Enter name or 'end': ")
         # uid = name  # Only in case of manual input
         obj = Anything(uid, name)
+        descr = 'is a ...'
+        name_in_context = [language_uid, community_uid, name, naming_relation_uid, descr]
+        obj.add_name_in_context(name_in_context)
         if uid == '48':
             obj.category = 'individual'
         elif uid == '49':
             obj.category = 'kind of relation'
-        descr = 'something'
-        name_in_context = [language_uid, community_uid, name, naming_relation_uid, descr]
-        obj.add_name_in_context(name_in_context)
-        print('UID and Name of singular:', obj.uid, obj.name)  # obj.names_in_contexts)
 
-        plurality.convert_singular_to_plural(obj)
+        new_obj = plurality.convert_singular_to_plural(obj)
+        for relation in obj.relations:
+            print('Single Expression:', obj.name, relation)
+        for new_relation in new_obj.relations:
+            print('Plural Expression:', new_obj.name, new_relation)
+        print('Single/Plural:', name_in_context, new_obj.names_in_contexts)

@@ -1,6 +1,5 @@
-from operator import itemgetter
-
 import remi.gui as gui
+from operator import itemgetter
 
 from gellish_communicator.Anything import Anything
 from gellish_communicator.Bootstrapping import is_called_uid
@@ -19,14 +18,17 @@ from gellish_communicator.remi_ext import MultiRowSelectionTable, SingleRowSelec
 
 
 class Query_view():
-    ''' Defines a query window
+    """ Defines a query window
         for specification of searched/queries in the semantic network
         of dictionary, knowledge and information,
         including the display of a textual definition, synonyms and translations.
-    '''
-    def __init__(self, gel_net, user_interface):
-        self.gel_net = gel_net
+        Args:
+        search_for = either 'subject' or 'object' or 'kind of relation'.
+        relator_obj = either None or lh_obj
+    """
+    def __init__(self, user_interface, search_for, relator_obj=None):
         self.user_interface = user_interface
+        self.gel_net = user_interface.gel_net
         self.views = user_interface.views
         self.query = user_interface.query
         self.unknown_quid = user_interface.unknown_quid
@@ -37,6 +39,8 @@ class Query_view():
         self.GUI_lang_name = self.user_interface.GUI_lang_name
         self.GUI_lang_uid = self.user_interface.GUI_lang_uid
         self.GUI_lang_index = self.user_interface.GUI_lang_index
+        self.relator_obj = relator_obj
+        self.search_for = search_for  # 'subject' or 'object' or 'kind of relation'
 
         self.cs = 'cs'  # case sensitive - to search string
         self.fe = 'fi'  # front end identical
@@ -44,6 +48,7 @@ class Query_view():
         self.lh_options = []
         self.rh_options = []
         self.rel_options = []
+        self.uom_options = []
         self.unknowns = []  # List of unkown objects that are denoted by an unknown in a query
         self.names_of_unknowns = []
         self.unknown_kind = ['unknown kind', 'onbekende soort']
@@ -87,20 +92,24 @@ class Query_view():
             Initiate seach for information about selected option
             by selecting confirmation button.
         """
-        query_text = ["Search", "Zoek"]
+        search_text = ["Search for ", "Zoek naar "]
+        if self.search_for == 'object':
+            self.search_name = \
+                search_text[self.GUI_lang_index] + 'object related to ' + self.relator_obj.name
+        else:
+            self.search_name = search_text[self.GUI_lang_index] + self.search_for
         self.query_widget = gui.Widget(height='100%', width='100%',
                                        style={'display': 'block',
                                               'background-color': '#eeffdd'})
-        search_title = ['A table for searching and selecting objects '
-                        'from the semantic network (dictionary)',
-                        'Een tabel voor het zoeken en selecteren van objecten '
-                        'uit het semantische netwerk (woordenboek)']
-        self.query_widget.attributes['title'] = search_title[self.GUI_lang_index]
         self.user_interface.views_noteb.add_tab(self.query_widget,
-                                                query_text[self.GUI_lang_index],
+                                                self.search_name,
                                                 self.user_interface.tab_cb)
-
-        self.first_line_widget = gui.HBox(height=20, width=750, margin='4px',
+        self.query_widget.attributes['title'] = 'Specify a (part of a) name or uid ' \
+                                                'and select one of the presented options'
+        line_width = 750
+        if self.search_for == 'object':
+            line_width = 850
+        self.first_line_widget = gui.HBox(height=20, width=line_width, margin='4px',
                                           style={'position': 'static',
                                                  'background-color': '#eeffdd'})
         # Define a reply language with the language selector
@@ -145,14 +154,18 @@ class Query_view():
         confirm = ['Confirm', 'Bevestig']
         close = ['Close', 'Sluit']
         confirm_button = gui.Button(confirm[self.GUI_lang_index], width=100, height=20)
-        confirm_button.attributes['title'] = 'Confirm that selected option is searched for'
-        confirm_button.onclick.connect(self.Formulate_query_spec)
+        if self.search_for == 'subject':
+            confirm_button.attributes['title'] = 'Confirm that selected option is searched for'
+        else:
+            confirm_button.attributes['title'] = 'Confirm that options for expression ' \
+                                                 'of knowledge are selected'
+        confirm_button.onclick.connect(self.formulate_expression)
 
         search_close = gui.Button(close[self.GUI_lang_index], width=100, height=20)
         search_close.attributes['title'] = 'Close the search window'
         search_close.onclick.connect(self.user_interface.Close_tag,
                                      self.user_interface.views_noteb,
-                                     query_text[self.GUI_lang_index])  # self.query_widget,
+                                     self.search_name)
 
         # Widget locations in grid
         self.first_line_widget.append(case_sensitive_box)
@@ -162,42 +175,29 @@ class Query_view():
         self.first_line_widget.append(self.reply_lang_label)
         self.first_line_widget.append(self.reply_lang_box)
         self.first_line_widget.append(confirm_button)
+        if self.search_for == 'object':
+            file_text = ['Search file', 'Zoek file']
+            file_button = gui.Button(file_text[self.GUI_lang_index], width=100, height=20)
+            file_button.attributes['title'] = 'Search for document that is related to object'
+            file_button.onclick.connect(self.Search_file_with_document)
+            self.first_line_widget.append(file_button)
         self.first_line_widget.append(search_close)
         self.query_widget.append(self.first_line_widget)
 
-        # Define English and Dutch example values (initial options) for query
-        lhTermListEN = ['?', 'Paris', 'Eiffel tower', 'France']
-        relTermListEN = ['?', 'is related to (a)', 'is related to', 'is classified as a',
-                         'is located in', 'has as part']
-        rhTermListEN = ['?', 'city', 'tower', 'country']
-        uomTermListEN = ['', 'inch', 'mi', 's', 'degC', 'psi']
-
-        lhTermListNL = ['?', 'N51', 'Groningen', 'Parijs', 'Eiffeltoren', 'Frankrijk']
-        relTermListNL = ['?', 'is een soort', 'is gerelateerd aan (een)', 'is gerelateerd aan',
-                         'is geclassificeerd als een', 'bevindt zich in', 'heeft als deel']
-        rhTermListNL = ['?', 'isolatieplaat', 'weg', 'dorp', 'stad', 'toren', 'land']
-        uomTermListNL = ['', 'mm', 'm', 's', '°C', 'bar']
-
-        if self.GUI_lang_name == 'Nederlands' or 'Dutch':
-            lhTermListD = lhTermListNL
-            relTermListD = relTermListNL
-            rhTermListD = rhTermListNL
-            uomTermListD = uomTermListNL
-        else:
-            lhTermListD = lhTermListEN
-            relTermListD = relTermListEN
-            rhTermListD = rhTermListEN
-            uomTermListD = uomTermListEN
-
         # Set default values in StringVar's
-        self.q_lh_name_str = lhTermListD[0]
-        self.q_rel_name_str = relTermListD[0]
-        self.q_rh_name_str = rhTermListD[0]
-        self.q_uom_name_str = uomTermListD[0]
-        self.q_lh_uid_str = ''
-        self.q_rel_uid_str = ''
-        self.q_rh_uid_str = ''
-        self.q_uom_uid_str = ''
+        self.q_lh_name = ''
+        self.q_rel_name = ''
+        self.q_rh_name = ''
+        self.q_uom_name = ''
+        self.q_lh_uid = ''
+        self.q_rel_uid = ''
+        self.q_rh_uid = ''
+        self.q_uom_uid = ''
+        self.query.q_lh_uid = ''
+        self.query.q_rel_uid = ''
+        self.query.q_rh_uid = ''
+        self.query.q_uom_uid = ''
+        self.query.q_uom_name = ''
 
         lhCondQStr = []
         relCondQStr = []
@@ -214,60 +214,89 @@ class Query_view():
         # rh_term = ["Right hand term", "Rechter term"]
         # uom_term = ["Unit of measure", "Meeteenheid"]
 
-        # Query variables widgets definition
+        # Lh name label and uid label and uid widget
         self.third_line_widget = gui.HBox(height=20, width='100%',
                                           style='background-color:#eeffdd')
         self.label_frame = gui.HBox(height=20, width=300,
                                     style='background-color:#eeffdd')
-        lhNameLbl = gui.Label(lh_term[self.GUI_lang_index], height=20, width=160,
-                              style='background-color:#eeffdd')
-        lhNameLbl.attributes['title'] = 'Specify a text string as part of the name '\
-                                        'of an object to be searched'
-        lhUIDLbl = gui.Label('UID:', height=20, width=40,
-                             style='background-color:#eeffdd')
-        lhUIDLbl.attributes['title'] = 'A unique identifier of the searched object '\
-                                       '(specified or found)'
+        lh_name_label = gui.Label(lh_term[self.GUI_lang_index], height=20, width=160,
+                                  style='background-color:#eeffdd')
+        lh_name_label.attributes['title'] = 'Specify a text string as part of the name '\
+                                            'of an object to be searched'
+        lh_uid_label = gui.Label('UID:', height=20, width=40,
+                                 style='background-color:#eeffdd')
+        lh_uid_label.attributes['title'] = 'A unique identifier of the searched object '\
+                                           '(specified or found)'
 
-        self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid_str, height=20, width=100,
+        self.q_lh_uid_widget = gui.TextInput(self.q_lh_uid, height=20, width=100,
                                              style={'background-color': '#ffffc0',
                                                     "border-width": "1px",
                                                     "border-style": "solid"})
         self.q_lh_uid_widget.attributes['title'] = 'A unique identifier of the searched object '\
                                                    '(specified or found'
         self.q_lh_uid_widget.onkeyup.connect(self.Lh_uid_command)
-        self.label_frame.append(lhNameLbl)
-        self.label_frame.append(lhUIDLbl)
+        self.label_frame.append(lh_name_label)
+        self.label_frame.append(lh_uid_label)
         self.label_frame.append(self.q_lh_uid_widget)
         self.third_line_widget.append(self.label_frame)
         self.query_widget.append(self.third_line_widget)
 
-        self.fourth_line_widget = gui.HBox(height=60, width='100%',
+        # Lh_name (line 4)
+        self.fourth_line_widget = gui.HBox(height=84, width='100%',
                                            style={'background-color': '#eeffdd',
                                                   'justify-content': 'flex-start',
                                                   'align-items': 'flex-start'})
         self.query_widget.append(self.fourth_line_widget)
-        self.name_frame = gui.VBox(height=60, width=300,
+        self.name_frame = gui.VBox(height=85, width=300,
                                    style={'background-color': '#eeffdd',
                                           'justify-content': 'flex-start',
                                           'align-items': 'flex-start'})
-        self.q_lh_name_widget = gui.TextInput(height=20, width=300,
+        self.q_lh_name_widget = gui.TextInput(self.q_lh_name, height=20, width=300,
                                               style={'background-color': '#ffffb0',
-                                                     'border-width': '2px',
+                                                     'border-width': '1px',
                                                      'border-style': 'solid',
                                                      'justify-content': 'flex-start',
                                                      'align-items': 'flex-start'})
-        self.dummy_widget = gui.Label('', height=40, width=300,
-                                      style={'background-color': '#eeffdd'})
-
         self.q_lh_name_widget.attributes['title'] = 'Enter a text string that is (part of) '\
                                                     'a name of the searched object'
-        self.q_lh_name_widget.onkeyup.connect(self.Lh_search_cmd)
+        self.q_lh_name_widget.onkeyup.connect(self.lh_search_cmd)
         self.name_frame.append(self.q_lh_name_widget)
-        self.name_frame.append(self.dummy_widget)
+        # When knowledge is added specify kind of relation and right hand object
+        if self.search_for == 'object':
+            self.query.q_lh_uid = self.relator_obj.uid
+            self.query.q_lh_name = self.relator_obj.name
+            self.q_lh_uid_widget.set_value(self.relator_obj.uid)
+            self.q_lh_name_widget.set_value(self.relator_obj.name)
+            self.q_rel_name_widget = gui.TextInput(self.q_rel_name, height=20, width=300,
+                                                   style={'background-color': '#ffffb0',
+                                                          'border-width': '1px',
+                                                          'border-style': 'solid',
+                                                          'justify-content': 'flex-start'})
+            self.q_rel_name_widget.onkeyup.connect(self.rel_search_cmd)
+
+            self.q_rh_name_widget = gui.TextInput(self.q_rh_name, height=20, width=300,
+                                                  style={'background-color': '#ffffb0',
+                                                         'border-width': '1px',
+                                                         'border-style': 'solid',
+                                                         'justify-content': 'flex-start'})
+            self.q_rh_name_widget.onkeyup.connect(self.rh_search_cmd)
+
+            self.q_uom_name_widget = gui.TextInput(self.q_rh_name, height=20, width=300,
+                                                   style={'background-color': '#ffffb0',
+                                                          'border-width': '1px',
+                                                          'border-style': 'solid',
+                                                          'justify-content': 'flex-start'})
+            self.q_uom_name_widget.onkeyup.connect(self.uom_search_cmd)
+            self.name_frame.append(self.q_rel_name_widget)
+            self.name_frame.append(self.q_rh_name_widget)
+            self.name_frame.append(self.q_uom_name_widget)
+        else:
+            self.dummy_widget = gui.Label('', height=63, width=300,
+                                          style={'background-color': '#eeffdd'})
+            self.name_frame.append(self.dummy_widget)
         self.fourth_line_widget.append(self.name_frame)
 
         # Definition display widget
-        # self.fifth_line_widget = gui.HBox(height=60, width='100%')
         def_text = ['Definition of the selected object:',
                     'Definitie van het geselecteerde object:']
         def_label = gui.Label(def_text[self.GUI_lang_index], height=20, width='100%',
@@ -275,12 +304,19 @@ class Query_view():
         def_label.attributes['title'] = 'First select an object below, '\
                                         'then its definition will appear'
         # fullDefQStr = ''
-        self.full_def_widget = gui.TextInput(single_line=False, width='100%', height=60,
+        self.full_def_widget = gui.TextInput(single_line=False, width='100%', height=85,
                                              style={'justify-content': 'flex-start',
                                                     'align-items': 'flex-start',
                                                     'margin-left': '5px',
                                                     'border-width': '1px',
                                                     'border-style': 'solid'})
+        if self.search_for == 'object':
+            self.full_def_widget.attributes['title'] = \
+                'Enter the partial definitiom of the selected object, '\
+                'typically starting with "that ..."'
+        else:
+            self.full_def_widget.attributes['title'] = \
+                'Display of the definitiom of the selected object'
         self.third_line_widget.append(def_label)
         self.fourth_line_widget.append(self.full_def_widget)
 
@@ -305,6 +341,11 @@ class Query_view():
                                            'border-style': 'solid'})
         self.options_box.style['justify-content'] = 'flex-start'
         self.options_box.style['align-items'] = 'flex-start'
+        options_title = ['A table for searching and selecting objects '
+                         'from the semantic network (dictionary)',
+                         'Een tabel voor het zoeken en selecteren van objecten '
+                         'uit het semantische netwerk (woordenboek)']
+        self.options_box.attributes['title'] = options_title[self.GUI_lang_index]
         select_term = ["Select one of the following options:",
                        "Kies één van de volgende opties:"]
         self.options_heading = gui.Label(select_term[self.GUI_lang_index],
@@ -328,7 +369,7 @@ class Query_view():
                                     comm_col[self.GUI_lang_index],
                                     lang_col[self.GUI_lang_index])]
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
-        self.options_table.on_table_row_click.connect(self.Set_selected_q_lh_term)
+        self.options_table.on_table_row_click.connect(self.process_selected_option)
         self.options_widget = False
 
         # Aliases define alias label and alias box
@@ -399,6 +440,31 @@ class Query_view():
             'The reply language is {}'.format(self.user_interface.reply_lang_name),
             'De antwoordtaal is {}'.format(self.user_interface.reply_lang_name))
 
+    def Search_file_with_document(self, widget):
+        """ Select one file in a dialog and relate the file to the object."""
+        self.read_file_container = gui.Widget(style={'width': '220px', 'display': 'block',
+                                                     'overflow': 'auto', 'text-align': 'center'})
+        self.user_interface.container.append(self.read_file_container)
+        # Select one or more files to be imported
+        self.dialog = gui.FileSelectionDialog('File selection dialog',
+                                              'Select one file',
+                                              False, '.',
+                                              style='background-color:#eeffdd')
+        self.dialog.confirm_value.connect(self.on_fileselection_dialog_confirm)
+        self.dialog.cancel_dialog.connect(self.on_dialog_cancel)
+        self.dialog.show(self)
+
+    def on_fileselection_dialog_confirm(self, widget, filelist):
+        ''' A list() of filenames and folders is returned'''
+        print('Selected file: {}'.format(filelist))
+        self.file_path_names = filelist
+
+    def on_dialog_cancel(self, widget):
+        self.set_root_widget(self.user_interface.container)
+
+    def set_root_widget(self, root_widget):
+        self.user_interface.set_root_widget(root_widget)
+
     def Determine_reply_language(self, widget):
         ''' Get the user specified reply language and report it.'''
         reply_lang_name = self.reply_lang_box.get()
@@ -413,15 +479,11 @@ class Query_view():
             == OptionsTable: option_nr, whetherKnown, langUIDres, commUIDres,
                              result_string, resultUID, is_called_uid, kindKnown, kind
         """
+        self.search_for = 'subject'
         self.lh_options[:] = []
-        # Remove possible earlier options by making the options_table empty
         if self.options_widget is False:
-            self.options_box.append(self.options_heading)
-            self.options_box.append(self.options_table)
-            self.options_widget = True
-            self.sixth_line_left_box.append(self.options_box)
-            self.sixth_line_box.append(self.sixth_line_left_box)
-
+            self.add_options_table()
+        # Remove possible earlier options by making the options_table empty
         self.options_table.empty()
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
 
@@ -466,6 +528,17 @@ class Query_view():
         except KeyError:
             pass
 
+    def add_options_table(self):
+        """ Append heading and options_table to options_box
+            and append options_box to sixth_line_left_box
+            and that to sixth_line_box.
+        """
+        self.options_box.append(self.options_heading)
+        self.options_box.append(self.options_table)
+        self.options_widget = True
+        self.sixth_line_left_box.append(self.options_box)
+        self.sixth_line_box.append(self.sixth_line_left_box)
+
     def set_case(self, widget, new_value):
         ''' Depending on user input determine whether the search string is case sensitive'''
         case_sens = new_value  # self.case_sensitive_var.get()
@@ -477,13 +550,13 @@ class Query_view():
     def set_front_end(self, widget, new_value):
         ''' Depending on user input determine whether the front end part of the found name
             should comply with the front end part of the search string.'''
-        front_end = self.front_end_match_var.get()
+        front_end = new_value
         if front_end:
             self.fe = 'fi'   # front end identical
         else:
             self.fe = 'pi'   # part identical
 
-    def Lh_search_cmd(self, widget, new_value):
+    def lh_search_cmd(self, widget, new_value):
         """ Search or Query in semantic network
             An entry in QueryWindow can be just a name (lh_string)
             (for search on UID see Lh_uid_command)
@@ -497,152 +570,239 @@ class Query_view():
 
             Search in vocabulary for left hand term as part of building a question.
 
-            == OptionsTable: option_nr, whetherKnown, langUIDres, commUIDres,
-                             result_string, resultUID, is_called_uid, kindKnown,kind
+            == Options_table: option_nr, whetherKnown, langUIDres, commUIDres,
+                             result_string, resultUID, is_called_uid, kindKnown, kind
         """
-        # Tkinter options to be done: if event.keysym not in ['Shift_L', 'Shift_R']:
+        self.search_for = 'subject'
+
+        self.option_search_cmd(widget, new_value)
+
+##        self.string_commonality = self.cs + self.fe
+##
+##        self.query.q_lh_uid = 0
+##        # Delete previous items in the lh_options table
+##        self.lh_options[:] = []
+##        # If no options_table yet, then add options_table to sixth_line_left_box
+##        if self.options_widget is False:
+##            self.add_options_table()
+##        # Remove possible earlier options by making the options_table empty
+##        self.options_table.empty()
+##        self.options_table.append_from_list(self.options_table_head, fill_title=True)
+##
+##        # Determine lh_options for lh term in query
+##        self.search_string = new_value  # self.q_lh_name_widget.get()
+##        self.found_lh_uid, self.lh_options = self.Solve_unknown()
+##        # Debug print("  Found lh: ", self.lh_string, self.unknown_quid,
+##        #      self.lh_options[0:3])
+##
+##        # => lh_options: option_nr, whetherKnown, langUIDres, commUIDres, result_string,
+##        #                resultUID, is_called_uid, kindKnown, kind
+##        # Sort the list of options alphabetically by name,
+##        # and determine lang_names and display options
+##        if len(self.lh_options) > 0:
+##            if len(self.lh_options) > 1:
+##                # Sort options by name
+##                self.lh_options.sort(key=itemgetter(4))
+##            # Find lang_name and comm_name from uids for option display
+##            for option in self.lh_options:
+##                if option[2] == '':
+##                    lang_name = 'unknown'
+##                else:
+##                    if self.GUI_lang_index == 1:
+##                        lang_name = self.gel_net.lang_dict_NL[option[2]]
+##                    else:
+##                        lang_name = self.gel_net.lang_dict_EN[option[2]]
+##                if option[3] == '':
+##                    comm_name = 'unknown'
+##                else:
+##                    comm_name = self.gel_net.community_dict[option[3]]
+##
+##                # Display option in lh_options table
+##                uid = option[5]
+##                name = option[4]
+##                kind_name = option[8]
+##                opt = [uid, name, kind_name, comm_name, lang_name]
+##
+##                row_widget = gui.TableRow()
+##                for field in opt:
+##                    row_item = gui.TableItem(text=field,
+##                                             style={'text-align': 'left'})
+##                    row_widget.append(row_item, field)
+##                self.options_table.append(row_widget, opt[1])
+##
+##            # Display lh_object uid
+##            self.query.q_lh_uid = self.lh_options[0][5]
+
+        # Delete earlier definition text. Then replace by new definition text
+        full_def = ''
+        self.full_def_widget.set_text(full_def)
+##        int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
+##        if integer is False or int_q_lh_uid >= 100:
+##            # If lh_object is known then determine and display full definition
+##            self.query.q_lh_category = self.lh_options[0][8]
+##            obj = self.gel_net.uid_dict[self.query.q_lh_uid]
+##            # Determine the full definition of the obj in the preferred language
+##            lang_name, comm_name, preferred_name, full_def = \
+##                self.user_interface.Determine_name_in_context(obj)
+##        # Display full definition
+##        self.full_def_widget.set_text(full_def)
+
+    def option_search_cmd(self, widget, new_value):
+        """ Search in semantic network for a string in vocabulary for candidates
+            (lh_string, rel_string, rh_string, uom_string)
+            commonality = the extent in which the found string
+                          corresponds to the search string
+                          (default: csfi-case sensitive, front-end identical)
+            Search for string in vocabulary for candidates for right hand term
+            and build a question
+
+            == Options: option_nr, whetherKnown, langUIDres, commUIDres,
+                        result_string, resultUID, is_called_uid, kindKnown, kind
+        """
         self.string_commonality = self.cs + self.fe
 
-        self.query.q_lh_uid = 0
-        self.lh_options[:] = []
         # If no options_table yet, then add options_table to sixth_line_left_box
         if self.options_widget is False:
-            self.options_box.append(self.options_heading)
-            self.options_box.append(self.options_table)
-            self.options_widget = True
-            self.sixth_line_left_box.append(self.options_box)
-            self.sixth_line_box.append(self.sixth_line_left_box)
+            self.add_options_table()
+
         # Remove possible earlier options by making the options_table empty
         self.options_table.empty()
         self.options_table.append_from_list(self.options_table_head, fill_title=True)
 
-        # Determine lh_options for lh term in query
-        self.search_string = new_value  # self.q_lh_name_widget.get()
-        self.found_lh_uid, self.lh_options = self.Solve_unknown()
-        # Debug print("  Found lh: ", self.lh_string, self.unknown_quid,
-        #      self.lh_options[0:3])
+        # Determine options for term in expression
+        self.search_string = new_value
+        self.found_any_uid, self.any_options = self.Solve_unknown()
 
-        # => lh_options: option_nr, whetherKnown, langUIDres, commUIDres, result_string,
-        #                resultUID, is_called_uid, kindKnown, kind
-        # Sort the list of options alphabetically by name,
+        # == any_options: option_nr, whetherKnown, lang_uid, comm_uid,
+        #       result_string, result_uid, is_called_uid, kindKnown, kind
+        # If options are available,
+        # then sort the list of options,
         # and determine lang_names and display options
-        if len(self.lh_options) > 0:
-            if len(self.lh_options) > 1:
-                # Sort options by name
-                self.lh_options.sort(key=itemgetter(4))
-            # Find lang_name and comm_name from uids for option display
-            for option in self.lh_options:
-                if option[2] == '':
+        if len(self.any_options) > 0:
+            if len(self.any_options) > 1:
+                # Sort the list of options alphabetically by name
+                self.any_options.sort(key=itemgetter(4))
+            for option in self.any_options:
+                lang_uid = option[2]
+                comm_uid = option[3]
+                if lang_uid == 0:
                     lang_name = 'unknown'
                 else:
                     if self.GUI_lang_index == 1:
-                        lang_name = self.gel_net.lang_dict_NL[option[2]]
+                        lang_name = self.gel_net.lang_dict_NL[lang_uid]
                     else:
-                        lang_name = self.gel_net.lang_dict_EN[option[2]]
-                if option[3] == '':
+                        lang_name = self.gel_net.lang_dict_EN[lang_uid]
+                if comm_uid == 0:
                     comm_name = 'unknown'
                 else:
-                    comm_name = self.gel_net.community_dict[option[3]]
+                    comm_name = self.gel_net.community_dict[comm_uid]
 
-                # Display option in lh_options table
+                # Display option in options table
                 uid = option[5]
                 name = option[4]
                 kind_name = option[8]
                 opt = [uid, name, kind_name, comm_name, lang_name]
-
                 row_widget = gui.TableRow()
                 for field in opt:
                     row_item = gui.TableItem(text=field,
                                              style={'text-align': 'left'})
                     row_widget.append(row_item, field)
-                    self.options_table.append(row_widget, opt[1])
+                self.options_table.append(row_widget, opt[1])
 
-            # Display lh_object uid
-            self.query.q_lh_uid = self.lh_options[0][5]
+##            # Display any_object uid and name
+##            self.query.q_rh_uid = self.any_options[0][5]
+##            self.query.q_rh_name = self.any_options[0][4]
 
         # Delete earlier definition text. Then replace by new definition text
         full_def = ''
-        int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
-        if integer is False or int_q_lh_uid >= 100:
-            # If lh_object is known then determine and display full definition
-            self.query.q_lh_category = self.lh_options[0][8]
-            obj = self.gel_net.uid_dict[self.query.q_lh_uid]
-            # Determine the full definition of the obj in the preferred language
-            lang_name, comm_name, preferred_name, full_def = \
-                self.user_interface.Determine_name_in_context(obj)
-        # Display full definition
         self.full_def_widget.set_text(full_def)
+##        int_q_rh_uid, integer = Convert_numeric_to_integer(self.query.q_rh_uid)
+##        if integer is False or int_q_rh_uid >= 100:
+##            # If rh_object is known then determine and display full definition
+##            self.query.q_rh_category = self.rh_options[0][8]
+##            obj = self.gel_net.uid_dict[self.query.q_rh_uid]
+##            # Determine the full definition of the obj in the preferred language
+##            lang_name, comm_name, preferred_name, full_def = \
+##                self.user_interface.Determine_name_in_context(obj)
+##        # Display full definition
+##        self.full_def_widget.set_text(full_def)
 
-    def Rel_search_cmd(self, widget):
-        """ Search or Query in Ontology and Model
+    def rel_search_cmd(self, widget, new_value):
+        """ Search or Query in semantic network
             Entry in QueryWindow is a question with possible condition expressions
-            (lh_string, rel_string, rh_string):
+            (lh_string, rel_string, rh_string, uom_string):
 
-            lhCommonality = 'csfi'
-            lhCommonality = input('Lh-commonality
-                                  (default: csfi-case sensitive, front-end identical): ')
+            commonality = the extent in which the found string corresponds to the search string
+                          (default: csfi-case sensitive, front-end identical)
 
             Search in vocabulary for left hand, relation type and right hand terms
-            and build a question
+            for building an expression (question or assertion/statement)
 
             == Options: option_nr, whetherKnown, langUIDres, commUIDres,
-                        result_string, resultUID, is_called_uid, kindKnown,kind
+                        result_string, resultUID, is_called_uid, kindKnown, kind
         """
+        self.search_for = 'kind of relation'
 
-        # Debug print('Rel Entry:',event.char)
-        # Tkinter options to be done: if event.keysym not in ['Shift_L', 'Shift_R']:
+        self.option_search_cmd(widget, new_value)
 
-        # front_end = self.front_end_match_var.get()
-        # case_sens = self.case_sensitive_var.get()
+##        bin_rel_text = ['binary relation', 'binaire relatie']
+##        self.string_commonality = self.cs + self.fe
+##        # Delete previous list of rel_options in tree
+##        self.rel_options[:] = []
+##        # If no options_table yet, then add options_table to sixth_line_left_box
+##        if self.options_widget is False:
+##            self.add_options_table()
+##        # Remove possible earlier options by making the options_table empty
+##        self.options_table.empty()
+##        self.options_table.append_from_list(self.options_table_head, fill_title=True)
+##
+##        # Determine rel_options for rel term in query
+##        self.search_string = new_value  # self.q_rel_name_widget.get()
+##        self.found_rel_uid, self.rel_options = self.Solve_unknown()
+##
+####        x = self.rel_options_tree.get_children()
+####        for item in x:
+####            self.rel_options_tree.delete(item)
+####
+####        # Get relation type name (rel_string) from user interface
+####        # if event != '': rel_string = rel_string # + event.char
+####        rel_string = self.q_rel_name
+####        if rel_string == 'any':
+####            rel_string = bin_rel_text[self.GUI_lang_index]
+####        elif rel_string == '':
+####            rel_string = bin_rel_text[1]
+####        self.string_commonality = 'csfi'
+####        self.search_string = rel_string
+####        self.foundRel, self.rel_options = self.Solve_unknown()
+##        # Debug print('  OptRel:',self.rel_options)
+##
+##        # == rel_opions: option_nr,whetherKnown, langUIDres, commUIDres,
+##        #                result_string, resultUID, is_called_uid, kindKnown,kind
+##        # If rel_options are available, then sort the list and display in rel_options tree
+##        if len(self.rel_options) > 0:
+##            self.query.q_rel_uid = self.rel_options[0][5]
+##            int_q_rel_uid, integer = Convert_numeric_to_integer(self.query.q_rel_uid)
+##            if integer is False or int_q_rel_uid > 100:
+##                # obj = self.gel_net.uid_dict[self.query.q_rel_uid]
+##                self.q_rel_uid.set(str(self.query.q_rel_uid))
+##            if len(self.rel_options) > 1:
+##                # Sort the list of options alphabetically by name
+##                self.rel_options.sort(key=itemgetter(4))
+##            for option in self.rel_options:
+##                if option[2] == 0:
+##                    lang_name = 'unknown'
+##                else:
+##                    lang_name = self.gel_net.lang_uid_dict[option[2]]
+##                if option[3] == 0:
+##                    comm_name = 'unknown'
+##                else:
+##                    comm_name = self.gel_net.community_dict[option[3]]
+##                opt = [option[5], option[4], option[8], comm_name, lang_name]
+##                self.rel_options_tree.insert('', index='end', values=opt)
 
-        # Delete previous list of rel_options in tree
-        self.rel_options[:] = []
-        x = self.rel_options_tree.get_children()
-        for item in x:
-            self.rel_options_tree.delete(item)
-
-        # Get relation type name (rel_string) from user interface
-        # if event != '': rel_string = rel_string # + event.char
-        rel_string = self.q_rel_name
-        if rel_string == 'any':
-            if self.GUI_lang_index == 1:
-                rel_string = 'binaire relatie'
-            else:
-                rel_string = 'binary relation'
-        if rel_string == '':
-            rel_string = 'binary relation'
-        self.string_commonality = 'csfi'
-        self.search_string = rel_string
-        self.foundRel, self.rel_options = self.Solve_unknown()
-        # Debug print('  OptRel:',self.rel_options)
-
-        # == rel_opions: option_nr,whetherKnown, langUIDres, commUIDres,
-        #                result_string, resultUID, is_called_uid, kindKnown,kind
-        # If rel_options are available, then sort the list and display in rel_options tree
-        if len(self.rel_options) > 0:
-            self.query.q_rel_uid = self.rel_options[0][5]
-            int_q_rel_uid, integer = Convert_numeric_to_integer(self.query.q_rel_uid)
-            if integer is False or int_q_rel_uid > 100:
-                # obj = self.gel_net.uid_dict[self.query.q_rel_uid]
-                self.q_rel_uid_str.set(str(self.query.q_rel_uid))
-            if len(self.rel_options) > 1:
-                # Sort the list of options alphabetically by name
-                self.rel_options.sort(key=itemgetter(4))
-            for option in self.rel_options:
-                if option[2] == 0:
-                    lang_name = 'unknown'
-                else:
-                    lang_name = self.gel_net.lang_uid_dict[option[2]]
-                if option[3] == 0:
-                    comm_name = 'unknown'
-                else:
-                    comm_name = self.gel_net.community_dict[option[3]]
-                opt = [option[5], option[4], option[8], comm_name, lang_name]
-                self.rel_options_tree.insert('', index='end', values=opt)
-
-    def Rh_search_cmd(self, widget):
-        """ Search or Query in Ontology and Model
-            An entry in QueryWindow (lh_string, rel_string, rh_string)
+    def rh_search_cmd(self, widget, new_value):
+        """ Search or Query in semantic network
+            An entry in QueryWindow (lh_string, rel_string, rh_string, uom)
             is a question with possible condition expressions:
             rhCommonality = input('Rh-commonality
                                   (default: csfi-case sensitive, front-end identical): ')
@@ -650,46 +810,87 @@ class Query_view():
             and build a question
 
             == Options: option_nr, whetherKnown, langUIDres, commUIDres,
-                        result_string, resultUID, is_called_uid, kindKnown,kind
+                        result_string, resultUID, is_called_uid, kindKnown, kind
         """
-        # Debug print('Rh Entry:',event.char)
-        # Tkinter options to be done: if event.keysym not in ['Shift_L', 'Shift_R']:
+        self.search_for = 'object'
 
-        # Delete previous items in the rh_options in tree
-        self.rh_options[:] = []
-        x = self.rh_options_tree.get_children()
-        for item in x:
-            self.rh_options_tree.delete(item)
+##        # Delete previous items in the rh_options in options_table widget
+##        self.query.q_rh_uid = 0
+##        self.rh_options[:] = []
 
-        # Get the rh_string and search for options in the dictionary
-        rh_string = self.q_rh_name_widget.get()
-        self.search_string = rh_string
-        self.foundRh, self.rh_options = self.Solve_unknown()
-        # Debug print('  OptRh:',self.rh_options);
+        self.option_search_cmd(widget, new_value)
 
-        # == rh_options: option_nr, whetherKnown, langUIDres, commUIDres,
-        #                result_string, resultUID, is_called_uid, kindKnown,kind
-        # If rh_options are available,
-        # then sort the list and display them in the rh_options tree
-        if len(self.rh_options) > 0:
-            self.query.q_rh_uid = self.rh_options[0][5]
-            # obj = self.gel_net.uid_dict[self.query.q_rh_uid]
-            self.q_rh_uid_str.set(str(self.query.q_rh_uid))
-            self.query.q_rh_category = self.rh_options[0][8]
-            if len(self.rh_options) > 1:
-                # Sort the list of options alphabetically by name
-                self.rh_options.sort(key=itemgetter(4))
-            for option in self.rh_options:
-                if option[2] == 0:
-                    lang_name = 'unknown'
-                else:
-                    lang_name = self.gel_net.lang_uid_dict[option[2]]
-                if option[3] == 0:
-                    comm_name = 'unknown'
-                else:
-                    comm_name = self.gel_net.community_dict[option[3]]
-                opt = [option[5], option[4], option[8], comm_name, lang_name]
-                self.rh_options_tree.insert('', index='end', values=opt)
+##        self.string_commonality = self.cs + self.fe
+##        # If no options_table yet, then add options_table to sixth_line_left_box
+##        if self.options_widget is False:
+##            self.add_options_table()
+##        # Remove possible earlier options by making the options_table empty
+##        self.options_table.empty()
+##        self.options_table.append_from_list(self.options_table_head, fill_title=True)
+##
+##        # Determine rh_options for rh term in query
+##        self.search_string = new_value
+##        self.found_rh_uid, self.rh_options = self.Solve_unknown()
+##
+##        # == rh_options: option_nr, whetherKnown, langUIDres, commUIDres,
+##        #                result_string, resultUID, is_called_uid, kindKnown, kind
+##        # If rh_options are available,
+##        # then sort the list of options,
+##        # and determine lang_names and display options
+##        if len(self.rh_options) > 0:
+####            self.query.q_rh_uid = self.rh_options[0][5]
+####            self.q_rh_uid.set(str(self.query.q_rh_uid))
+####            self.query.q_rh_category = self.rh_options[0][8]
+##            if len(self.rh_options) > 1:
+##                # Sort the list of options alphabetically by name
+##                self.rh_options.sort(key=itemgetter(4))
+##            for option in self.rh_options:
+##                if option[2] == 0:
+##                    lang_name = 'unknown'
+##                else:
+##                    if self.GUI_lang_index == 1:
+##                        lang_name = self.gel_net.lang_dict_NL[option[2]]
+##                    else:
+##                        lang_name = self.gel_net.lang_dict_EN[option[2]]
+##                if option[3] == 0:
+##                    comm_name = 'unknown'
+##                else:
+##                    comm_name = self.gel_net.community_dict[option[3]]
+##
+##                # Display option in rh_options table
+##                uid = option[5]
+##                name = option[4]
+##                kind_name = option[8]
+##                opt = [uid, name, kind_name, comm_name, lang_name]
+##                row_widget = gui.TableRow()
+##                for field in opt:
+##                    row_item = gui.TableItem(text=field,
+##                                             style={'text-align': 'left'})
+##                    row_widget.append(row_item, field)
+##                self.options_table.append(row_widget, opt[1])
+##
+##            # Display rh_object uid
+##            self.query.q_rh_uid = self.rh_options[0][5]
+##            self.query.q_rh_name = self.rh_options[0][4]
+##
+##        # Delete earlier definition text. Then replace by new definition text
+##        full_def = ''
+##        int_q_rh_uid, integer = Convert_numeric_to_integer(self.query.q_rh_uid)
+##        if integer is False or int_q_rh_uid >= 100:
+##            # If rh_object is known then determine and display full definition
+##            self.query.q_rh_category = self.rh_options[0][8]
+##            obj = self.gel_net.uid_dict[self.query.q_rh_uid]
+##            # Determine the full definition of the obj in the preferred language
+##            lang_name, comm_name, preferred_name, full_def = \
+##                self.user_interface.Determine_name_in_context(obj)
+##        # Display full definition
+##        self.full_def_widget.set_text(full_def)
+
+    def uom_search_cmd(self, widget, new_value):
+        """ Search in semantic network for the unit of measure (uom)."""
+        self.search_for = 'uom'
+
+        self.option_search_cmd(widget, new_value)
 
     def Determine_selected_aspects(self, widget, row, item):
         ''' Determine one or more selected aspects and their values
@@ -709,8 +910,8 @@ class Query_view():
     def Solve_unknown(self):
         """ Determine the available options (UIDs and names) in the dictionary
             that match the search_string.
-            Collect options in lh, rel and rh optionsTables for display and selection.
-            - search_string = the string to be found in Gel_dict
+            Collect options in lh, rel, rh and uom optionsTables for display and selection.
+            - search_string = the string to be found in gel_dict
               with corresponding lang_uid and comm_uid.
             - self.string_commonality is one of:
               cipi, cspi, cii, csi, cifi, csfi
@@ -846,12 +1047,28 @@ class Query_view():
         # (being the unknown) and next UID.
         else:
             if self.search_string not in self.names_of_unknowns:
+                self.unknown_quid += 1
                 self.user_interface.message_ui(
-                    'String "{}" is not found in the dictionary. UID = {}. '.
+                    'String "{}" is not found in the dictionary. New UID = {}. '.
                     format(self.search_string, self.unknown_quid),
-                    'Term "{}" is niet gevonden in het woordenboek. UID = {}. '.
+                    'Term "{}" is niet gevonden in het woordenboek. Nieuw UID = {}. '.
                     format(self.search_string, self.unknown_quid))
                 found_uid = self.unknown_quid
+                self.names_of_unknowns.append(self.search_string)
+                # Create an option for a new object
+                unknown = Anything(str(self.unknown_quid), result_string)
+                self.unknowns.append(unknown)
+                option_nr = 1
+                option.append(option_nr)
+                option.append(whetherKnown)
+                option.append(self.GUI_lang_pref_uids[1])
+                option.append(self.comm_pref_uids[0])
+                option.append(self.search_string)
+                option.append(str(self.unknown_quid))
+                option.append(is_called_uid)
+                option.append(objectTypeKnown)
+                option.append(self.unknown_kind[self.GUI_lang_index])
+                options.append(option)
             else:
                 # Search in unknowns for object with name search_string
                 for obj in self.unknowns:
@@ -864,9 +1081,9 @@ class Query_view():
                     'De gevonden UID is blanco, hetgeen niet correct is.')
         return found_uid, options
 
-    def Set_selected_q_lh_term(self, window, row, item):
-        """ Put the lh_object that is selected from lh_options
-            in the query (q_lh_name_str and q_lh_uid_str)
+    def process_selected_option(self, window, row, item):
+        """ Put the object that is selected from any_options
+            in the query (q_lh_name and q_lh_uid, q_rel, q_rh and q_uom)
             and display its textual definition, name and uid.
             Then determine the kinds of relations
             that relate to that lh_object or its subtypes
@@ -874,45 +1091,70 @@ class Query_view():
             And determine the synonyms and translations of lh_object name.
         """
         blank = ''
-        # Determine UID and Name of selected option
+        # Determine UID and Name of the selected option
         values = list(row.children.values())
-        self.query.q_lh_uid = values[0].get_text()
-        # Debug print('LH_uid', self.query.q_lh_uid)
+        any_uid = values[0].get_text()
+##        self.query.q_lh_uid = values[0].get_text()
+        selected_name = values[1].get_text()
 
-        self.full_def_widget.set_text('')
+        # Delete earlier definition text in query view.
         full_def = ''
+        self.full_def_widget.set_text(full_def)
+
         # Determine the selected object via its uid
-        int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
+        int_any_uid, integer = Convert_numeric_to_integer(any_uid)
         # If object is unknown then display message
-        if integer is True and int_q_lh_uid < 100:
-            search_string = values[1].get_text()
+        if integer is True and int_any_uid < 100:
             self.user_interface.message_ui(
-                'Selected object with name "{}" is unknown'.format(search_string),
-                'Geselecteerd object met naam "{}" is onbekend'.format(search_string))
+                'Selected object with name "{}" is unknown'.format(selected_name),
+                'Geselecteerd object met naam "{}" is onbekend'.format(selected_name))
             return
-        # Find object
-        obj = self.gel_net.uid_dict[self.query.q_lh_uid]
+        # object is known: Find object
+        any_object = self.gel_net.uid_dict[any_uid]
+        any_object.name = selected_name
+
         # Determine the full definition and preferred_name
         # of the selected object in the preferred language
         lang_name, comm_name, preferred_name, full_def = \
-            self.user_interface.Determine_name_in_context(obj)
-        # Debug print('FullDef:',self.query.q_lh_uid, self.query.q_lh_name,
-        #      self.query.q_lh_category,full_def)
+            self.user_interface.Determine_name_in_context(any_object)
 
         # Display full definition
         self.full_def_widget.set_text(full_def)
 
         # Display selected UID and Name in selection fields
-        self.q_lh_uid_widget.set_text(self.query.q_lh_uid)
-        selected_name = preferred_name
-        self.q_lh_name_widget.set_text(selected_name)
+        self.q_lh_uid_widget.set_text(any_uid)
+        # selected_name = preferred_name
+        if self.search_for == 'subject':
+            self.q_lh_name_widget.set_text(selected_name)
+            self.query.q_lh_obj = any_object
+            self.query.q_lh_uid = any_uid
+            self.query.q_lh_name = selected_name
+            self.query.q_lh_category = any_object.category
+        elif self.search_for == 'kind of relation':
+            self.q_rel_name_widget.set_text(selected_name)
+            self.query.q_rel_uid = any_uid
+            self.query.q_rel_name = selected_name
+            self.query.q_rel_category = any_object.category
+        elif self.search_for == 'object':
+            self.q_rh_name_widget.set_text(selected_name)
+            self.query.q_rh_uid = any_uid
+            self.query.q_rh_name = selected_name
+            self.query.q_rh_category = any_object.category
+        elif self.search_for == 'uom':
+            self.q_uom_name_widget.set_text(selected_name)
+            self.query.q_uom_uid = any_uid
+            self.query.q_uom_name = selected_name
+            self.query.q_uom_category = any_object.category
 
-        self.q_aspects[:] = []
-        # If the lh_object is known,
-        # then determine the kinds of relations that relate to that lh_object
-        if integer is False or int_q_lh_uid >= 100:
+        if self.search_for == 'subject':
+            lh_object = any_object
+            # Determine possible aspects of found lh_object
+            self.q_aspects[:] = []
+
+            # Determine the kinds of relations that relate to that lh_object
+            # if integer is False or int_q_lh_uid >= 100:
             rel_options = []
-            lh_object = self.gel_net.uid_dict[self.query.q_lh_uid]
+            # lh_object = self.gel_net.uid_dict[self.query.q_lh_uid]
             # Determine list of subtypes of the lh_object
             sub_types, sub_type_uids = self.gel_net.Determine_subtypes(lh_object)
             sub_types.append(lh_object)
@@ -987,37 +1229,38 @@ class Query_view():
             rel_options.sort()
             self.gel_net.rel_terms = rel_options
 
-            # If alias_box not yet filled, the fill it
-            if self.aliases_widget is False:
-                self.alias_box.append(self.alias_label)
-                self.alias_box.append(self.aliases_table_widget)
-                self.aliases_widget = True
-                self.sixth_line_left_box.append(self.alias_box)
-            # Delete previous aliases in aliases_table and add title row
-            self.aliases_table_widget.empty()
-            self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
+        # For any_object:
+        # If alias_box not yet filled, the fill it
+        if self.aliases_widget is False:
+            self.alias_box.append(self.alias_label)
+            self.alias_box.append(self.aliases_table_widget)
+            self.aliases_widget = True
+            self.sixth_line_left_box.append(self.alias_box)
+        # Delete previous aliases in aliases_table and add title row
+        self.aliases_table_widget.empty()
+        self.aliases_table_widget.append_from_list(self.aliases_table_head, fill_title=True)
 
-            # Determine synonyms and translations of lh_object name in various languages
-            languages, alias_table = self.Determine_aliases(lh_object)
-            for language in languages:
-                # Add language_row to table
-                language_row = gui.TableRow()
-                language_item = gui.TableItem(text=language,
-                                              style={'text-align': 'left'})
-                language_row.append(language_item, language_item)
-                self.aliases_table_widget.append(language_row, language)
+        # Determine synonyms and translations of lh_object name in various languages
+        languages, alias_table = self.Determine_aliases(any_object)
+        for language in languages:
+            # Add language_row to table
+            language_row = gui.TableRow()
+            language_item = gui.TableItem(text=language,
+                                          style={'text-align': 'left'})
+            language_row.append(language_item, language_item)
+            self.aliases_table_widget.append(language_row, language)
 
-                # Add aliases rowa per language to the table
-                for alias_row in alias_table:
-                    if alias_row[0] == language:
-                        row_widget = gui.TableRow()
-                        row_item = gui.TableItem(text='')
-                        row_widget.append(row_item, language)
-                        for field in alias_row[1:]:
-                            row_item = gui.TableItem(text=field,
-                                                     style={'text-align': 'left'})
-                            row_widget.append(row_item, field)
-                        self.aliases_table_widget.append(row_widget, alias_row[1])
+            # Add aliases rowa per language to the table
+            for alias_row in alias_table:
+                if alias_row[0] == language:
+                    row_widget = gui.TableRow()
+                    row_item = gui.TableItem(text='')
+                    row_widget.append(row_item, language)
+                    for field in alias_row[1:]:
+                        row_item = gui.TableItem(text=field,
+                                                 style={'text-align': 'left'})
+                        row_widget.append(row_item, field)
+                    self.aliases_table_widget.append(row_widget, alias_row[1])
 
     def Determine_aspect_and_value_options(self, lh_obj_sub):
         ''' Determine in a search the characteristics of lh_object and its subtypes
@@ -1123,7 +1366,7 @@ class Query_view():
 
     def Set_selected_q_rel_term(self, ind):
         """ Put the selected relObject name and uid from relOptions
-            in query (self.q_rel_name_str and self.q_rel_uid_str).
+            in query (self.q_rel_name and self.q_rel_uid).
             Then determine the rh_objects
             that are related to the lh_object by such a relation or its subtypes
         """
@@ -1133,8 +1376,8 @@ class Query_view():
         # Determine UID and Name of selected option
         self.query.q_rel_uid = self.query.relSel[5]
         self.query.q_rel_name = self.query.relSel[4]
-        self.q_rel_uid_str.set(str(self.query.q_rel_uid))
-        self.q_rel_name_str.set(self.query.q_rel_name)
+        self.q_rel_uid.set(str(self.query.q_rel_uid))
+        self.q_rel_name.set(self.query.q_rel_name)
         if self.query.q_rel_name in self.gel_net.total_base_phrases:
             self.query.q_phrase_type_uid = '6066'
 
@@ -1176,7 +1419,9 @@ class Query_view():
             self.q_rh_name_widget.config(values=self.gel_net.rh_terms)
 
     def Set_selected_q_rh_term(self, ind):
-        """Put the selection of rhObject in self.q_rh_name_str and self.q_rh_uid_str"""
+        """ Put the selection of rhObject
+            in self.q_rh_name and self.q_rh_uid.
+        """
 
         item = self.rh_options_tree.selection()
         ind = self.rh_options_tree.index(item)
@@ -1184,12 +1429,17 @@ class Query_view():
         # Determine UID and Name of selected option
         self.query.q_rh_uid = self.query.rhSel[5]
         self.query.q_rh_name = self.query.rhSel[4]
-        self.q_rh_uid_str.set(str(self.query.q_rh_uid))
-        self.q_rh_name_str.set(self.query.q_rh_name)
+        self.q_rh_uid.set(str(self.query.q_rh_uid))
+        self.q_rh_name.set(self.query.q_rh_name)
 
-    def Formulate_query_spec(self, widget):
-        """Formulte a query_spec on the network for the relation type and its subtypes.
-           Store resulting query expressions in candids table with the same table definition.
+    def formulate_expression(self, widget):
+        """ Formulte one or more expressions
+            being a query_spec on the network, based on the selected option(s)
+            or new knowledge.
+            If a kind of relation is specified
+            then it includes a search for it and for its subtypes.
+            Store resulting expressions in candids table
+            with the same table definition.
         """
         # Make query_spec empty
         self.query.query_spec[:] = []
@@ -1197,8 +1447,7 @@ class Query_view():
 
         # LH: Get selected option (textString)
         # from the presented list of options (lh_options_tree) in QueryWindow
-        lh_uid_init = self.q_lh_uid_widget.get_text()
-        if lh_uid_init == '':
+        if self.query.q_lh_uid == '':
             self.user_interface.message_ui(
                 'Left hand option is not yet selected. Please try again.',
                 'Linker optie is nog niet geselecteerd. Probeer nogmaals.')
@@ -1206,128 +1455,115 @@ class Query_view():
 
         # Determine UID and Name of selected lh option
         # and formulate query expression (query_expr)
-        self.query.q_lh_uid = lh_uid_init
-        self.query.q_lh_name = self.q_lh_name_widget.get_text()
         self.query.query_expr = [self.query.q_lh_uid, self.query.q_lh_name]
 
-        # Delete earlier definition text in query view.
-        self.full_def_widget.set_text('')
-
-        # If lh_object is known then determine and display its full definition
         int_q_lh_uid, integer = Convert_numeric_to_integer(self.query.q_lh_uid)
-        if integer is False or int_q_lh_uid >= 100:
-            self.query.q_lh_obj = self.gel_net.uid_dict[self.query.q_lh_uid]
-            self.query.q_lh_category = self.lh_options[0][8]
 
-            # Determine the full definition of the selected object in the preferred language
-            lang_name, comm_name, preferred_name, full_def = \
-                self.user_interface.Determine_name_in_context(self.query.q_lh_obj)
-            # Debug print('Full def:', self.query.q_lh_uid, self.lh_string,
-            #             self.query.q_lh_category, full_def)
-            # Display full definition
-            self.full_def_widget.set_text(full_def)
+        if self.search_for in ['object', 'kind of relation', 'uom']:
+            # Search for related object
+            self.views.create_knowledge_expression()
+            return
 
-        # Rel: Selected relation type option
-        # Verify whether kind of relation is specified or only lh option is selected.
-        #   If yes then formulate query, else determine rel and rh part of query expression
-
-        # Initial rel_uid_init set to blank ('') to indicate the no query expression is specified
-        # (no extended search specification)
-        rel_uid_init = ''
-        if rel_uid_init != '':
-            # There is a kind of relation specified. Identify its uid and name
-            item = self.rel_options_tree.selection()
-            ind = self.rel_options_tree.index(item)
-            print('rel_ind', ind, self.rel_options)
-            self.query.relSel = self.rel_options[ind]
-
-            self.query.q_rel_uid = self.query.relSel[5]
-            self.query.q_rel_name = self.query.relSel[4]
-            self.q_rel_uid_str.set(str(self.query.q_rel_uid))
-            self.q_rel_name_str.set(self.query.q_rel_name)
-
-            int_q_rel_uid, integer = Convert_numeric_to_integer(self.query.q_rel_uid)
-            if integer is False or int_q_rel_uid >= 100:
-                self.query.q_rel_obj = self.gel_net.uid_dict[self.query.q_rel_uid]
-
-                # Determine phraseTypeUID of self.query.q_rel_name
-                self.query.q_phrase_type_uid = 0
-                if self.query.q_rel_name in self.gel_net.total_base_phrases:
-                    self.query.q_phrase_type_uid = '6066'   # base phrase
-                else:
-                    self.query.q_phrase_type_uid = '1986'   # inverse phrase
-
-                # Determine role_players_types because of q_rel_type
-                self.query.rolePlayersQTypes = self.query.q_rel_obj.role_players_types
-                self.query.rolePlayerQTypeLH = self.query.q_rel_obj.role_player_type_lh
-                self.query.rolePlayerQTypeRH = self.query.q_rel_obj.role_player_type_rh
-                # 6068 = binary relation between an individual thing and any (kind or individual)
-                if self.query.rolePlayersQTypes == 'individualsOrMixed':  # is related to (a)
-                    if self.query.q_rel_name in self.gel_net.total_base_phrases:
-                        self.query.rolePlayersQTypes = 'individualAndMixed'
-                        self.query.rolePlayerQTypeLH = 'individual'
-                        self.query.rolePlayerQTypeRH = 'mixed'
-                    else:
-                        self.query.rolePlayersQTypes = 'mixedAndIndividual'
-                        self.query.rolePlayerQTypeLH = 'mixed'
-                        self.query.rolePlayerQTypeRH = 'individual'
-                # Binary relation between an individual thing and a kind
-                elif self.query.rolePlayersQTypes == 'mixed':
-                    if self.query.q_rel_name in self.gel_net.total_base_phrases:
-                        self.query.rolePlayersQTypes = 'individualAndKind'
-                        self.query.rolePlayerQTypeLH = 'individual'
-                        self.query.rolePlayerQTypeRH = 'kind'
-                    else:
-                        self.query.rolePlayersQTypes = 'kindAndIndividual'
-                        self.query.rolePlayerQTypeLH = 'kind'
-                        self.query.rolePlayerQTypeRH = 'individual'
-                # 7071 = binary relation between a kind and any (kind or individual)
-                elif self.query.rolePlayersQTypes == 'kindsOrMixed':  # can be related to (a)
-                    if self.query.q_rel_name in self.gel_net.total_base_phrases:
-                        self.query.rolePlayersQTypes = 'kindsAndMixed'  # can be related to (a)
-                        self.query.rolePlayerQTypeLH = 'kind'
-                        self.query.rolePlayerQTypeRH = 'mixed'
-                    else:
-                        self.query.rolePlayersQTypes = 'mixedAndKind'  # is or can be related to a
-                        self.query.rolePlayerQTypeLH = 'mixed'
-                        self.query.rolePlayerQTypeRH = 'kind'
-                else:
-                    pass
-
-            # RH: Selected right hand option
-            # Verify whether a rh name is specified
-            rh_uid_init = self.q_rh_uid_widget.get()
-            if rh_uid_init == '':
-                self.user_interface.message_ui(
-                    'Right hand option ís not (yet) selected.',
-                    'Rechter optie is nog niet geselecteerd.')
-            else:
-                # There is a rh name specified. Determine its name and uid and identity
-                item = self.rh_options_tree.selection()
-                ind = self.rh_options_tree.index(item)
-                self.query.rhSel = self.rh_options[ind]
-
-                self.query.q_rh_uid = self.query.rhSel[5]
-                self.query.q_rh_name = self.query.rhSel[4]
-                self.q_rh_uid_str.set(str(self.query.q_rh_uid))
-                self.q_rh_name_str.set(self.query.q_rh_name)
-
-                int_q_rh_uid, integer = Convert_numeric_to_integer(self.query.q_rh_uid)
-                if integer is False or int_q_rh_uid >= 100:
-                    self.query.q_rh_obj = self.gel_net.uid_dict[self.query.q_rh_uid]
-
-                # Report final query
-                queryText = ['Query ', 'Vraag   ']
-                self.views.log_messages.insert(
-                    'end', '\n\n{}: {} ({}) {} ({}) {} ({})'.
-                    format(queryText[self.GUI_lang_index],
-                           self.query.q_lh_name, self.query.q_lh_uid,
-                           self.query.q_rel_name, self.query.q_rel_uid,
-                           self.query.q_rh_name, self.query.q_rh_uid))
-                self.query.query_expr = [self.query.q_lh_uid, self.query.q_lh_name,
-                                         self.query.q_rel_uid, self.query.q_rel_name,
-                                         self.query.q_rh_uid, self.query.q_rh_name,
-                                         self.query.q_phrase_type_uid]
+##        # Deleted region for specification of a query as an expression of [lh, rel_type, rh]
+##        # (no extended search specification)
+##        # Rel: Selected relation type option
+##        # Verify whether kind of relation is specified or only lh option is selected.
+##        #   If yes then formulate query, else determine rel and rh part of query expression
+##
+##        if rel_uid_init != '':
+##            # There is a kind of relation specified. Identify its uid and name
+##            item = self.rel_options_tree.selection()
+##            ind = self.rel_options_tree.index(item)
+##            print('rel_ind', ind, self.rel_options)
+##            self.query.relSel = self.rel_options[ind]
+##
+##            self.query.q_rel_uid = self.query.relSel[5]
+##            self.query.q_rel_name = self.query.relSel[4]
+##            self.q_rel_uid.set(str(self.query.q_rel_uid))
+##            self.q_rel_name.set(self.query.q_rel_name)
+##
+##            int_q_rel_uid, integer = Convert_numeric_to_integer(self.query.q_rel_uid)
+##            if integer is False or int_q_rel_uid >= 100:
+##                self.query.q_rel_obj = self.gel_net.uid_dict[self.query.q_rel_uid]
+##
+##                # Determine phraseTypeUID of self.query.q_rel_name
+##                self.query.q_phrase_type_uid = 0
+##                if self.query.q_rel_name in self.gel_net.total_base_phrases:
+##                    self.query.q_phrase_type_uid = '6066'   # base phrase
+##                else:
+##                    self.query.q_phrase_type_uid = '1986'   # inverse phrase
+##
+##                # Determine role_players_types because of q_rel_type
+##                self.query.rolePlayersQTypes = self.query.q_rel_obj.role_players_types
+##                self.query.rolePlayerQTypeLH = self.query.q_rel_obj.role_player_type_lh
+##                self.query.rolePlayerQTypeRH = self.query.q_rel_obj.role_player_type_rh
+##                # 6068 = binary relation between an individual thing and any (kind or individual)
+##                if self.query.rolePlayersQTypes == 'individualsOrMixed':  # is related to (a)
+##                    if self.query.q_rel_name in self.gel_net.total_base_phrases:
+##                        self.query.rolePlayersQTypes = 'individualAndMixed'
+##                        self.query.rolePlayerQTypeLH = 'individual'
+##                        self.query.rolePlayerQTypeRH = 'mixed'
+##                    else:
+##                        self.query.rolePlayersQTypes = 'mixedAndIndividual'
+##                        self.query.rolePlayerQTypeLH = 'mixed'
+##                        self.query.rolePlayerQTypeRH = 'individual'
+##                # Binary relation between an individual thing and a kind
+##                elif self.query.rolePlayersQTypes == 'mixed':
+##                    if self.query.q_rel_name in self.gel_net.total_base_phrases:
+##                        self.query.rolePlayersQTypes = 'individualAndKind'
+##                        self.query.rolePlayerQTypeLH = 'individual'
+##                        self.query.rolePlayerQTypeRH = 'kind'
+##                    else:
+##                        self.query.rolePlayersQTypes = 'kindAndIndividual'
+##                        self.query.rolePlayerQTypeLH = 'kind'
+##                        self.query.rolePlayerQTypeRH = 'individual'
+##                # 7071 = binary relation between a kind and any (kind or individual)
+##                elif self.query.rolePlayersQTypes == 'kindsOrMixed':  # can be related to (a)
+##                    if self.query.q_rel_name in self.gel_net.total_base_phrases:
+##                        self.query.rolePlayersQTypes = 'kindsAndMixed'  # can be related to (a)
+##                        self.query.rolePlayerQTypeLH = 'kind'
+##                        self.query.rolePlayerQTypeRH = 'mixed'
+##                    else:
+##                        self.query.rolePlayersQTypes = 'mixedAndKind'  # is or can be related to a
+##                        self.query.rolePlayerQTypeLH = 'mixed'
+##                        self.query.rolePlayerQTypeRH = 'kind'
+##                else:
+##                    pass
+##
+##            # RH: Selected right hand option
+##            # Verify whether a rh name is specified
+##            rh_uid_init = self.q_rh_uid_widget.get()
+##            if rh_uid_init == '':
+##                self.user_interface.message_ui(
+##                    'Right hand option ís not (yet) selected.',
+##                    'Rechter optie is nog niet geselecteerd.')
+##            else:
+##                # There is a rh name specified. Determine its name and uid and identity
+##                item = self.rh_options_tree.selection()
+##                ind = self.rh_options_tree.index(item)
+##                self.query.rhSel = self.rh_options[ind]
+##
+##                self.query.q_rh_uid = self.query.rhSel[5]
+##                self.query.q_rh_name = self.query.rhSel[4]
+##                self.q_rh_uid.set(str(self.query.q_rh_uid))
+##                self.q_rh_name.set(self.query.q_rh_name)
+##
+##                int_q_rh_uid, integer = Convert_numeric_to_integer(self.query.q_rh_uid)
+##                if integer is False or int_q_rh_uid >= 100:
+##                    self.query.q_rh_obj = self.gel_net.uid_dict[self.query.q_rh_uid]
+##
+##                # Report final query
+##                queryText = ['Query ', 'Vraag   ']
+##                self.views.log_messages.insert(
+##                    'end', '\n\n{}: {} ({}) {} ({}) {} ({})'.
+##                    format(queryText[self.GUI_lang_index],
+##                           self.query.q_lh_name, self.query.q_lh_uid,
+##                           self.query.q_rel_name, self.query.q_rel_uid,
+##                           self.query.q_rh_name, self.query.q_rh_uid))
+##                self.query.query_expr = [self.query.q_lh_uid, self.query.q_lh_name,
+##                                         self.query.q_rel_uid, self.query.q_rel_name,
+##                                         self.query.q_rh_uid, self.query.q_rh_name,
+##                                         self.query.q_phrase_type_uid]
 
         # Append query expression as first line in query_spec
         # query_expr = lh_uid, lh_name, rel_uid, rel_name, rh_uid_rh_name, phrase_type_uid

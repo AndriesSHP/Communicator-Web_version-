@@ -2,7 +2,6 @@ import os
 import operator
 
 import remi.gui as gui
-from tkinter import Tk, filedialog
 
 from gellish_communicator.Anything import Relation
 from gellish_communicator.Bootstrapping import ini_out_path, basePhraseUID, inversePhraseUID
@@ -32,8 +31,10 @@ from gellish_communicator.Expr_Table_Def import (
     header3,
 )
 from gellish_communicator.Occurrences_diagrams import Occurrences_diagram
+from gellish_communicator.QueryViews import Query_view
 from gellish_communicator.remi_ext import TreeTable, SingleRowSelectionTable
 from gellish_communicator.utils import open_file
+
 
 class Display_views():
     """ Various models about object(s)
@@ -43,7 +44,7 @@ class Display_views():
     def __init__(self, gel_net, user_interface):
         self.gel_net = gel_net
         self.user_interface = user_interface
-        self.root = user_interface.root
+##        self.root = user_interface.root
         self.GUI_lang_index = user_interface.GUI_lang_index
         self.uid_dict = gel_net.uid_dict
         self.container = user_interface.container
@@ -90,6 +91,7 @@ class Display_views():
         self.kinds = ['kind', 'kind of physical object', 'kind of occurrence',
                       'kind of aspect', 'kind of role', 'kind of relation', 'number']
         self.specialization_uids = ['1146', '1726', '5396', '1823']
+        self.classif_uids = ['1225', '1588']
 
         self.subs_head = ['Subtypes', 'Subtypen']
         self.comp_head = ['Part hierarchy', 'Compositie']
@@ -119,6 +121,7 @@ class Display_views():
         self.selected_obj = None
         self.modified_object = None
         self.modification = None
+        self.know_table = None
 
     def empty_models(self):
         """ Make models empty enabling the creation of new models."""
@@ -2322,6 +2325,9 @@ class Display_views():
         if len(self.expr_table) > 0:
             self.Define_and_display_expressions_view()
 
+        if len(self.network_model) > 0:
+            self.user_interface.views_noteb.select_by_name(self.network_name)
+
     def Display_message(self, text_en, text_nl):
         if self.GUI_lang_index == 1:
             self.user_interface.log_messages.append(text_nl)
@@ -2346,34 +2352,42 @@ class Display_views():
         """ Define a network sheet for display of network_model (a list of network rows)
             for display in a tab of Notebook.
         """
+        self.row_values = []
+        self.row_uids = []
         network_text = ['Network of ', 'Netwerk van ']
         self.network_name = network_text[self.GUI_lang_index] + self.object_in_focus.name
         self.network_frame = gui.VBox(width='100%', height='80%',
                                       style={'overflow': 'auto',
                                              'background-color': '#eeffdd'})
-        self.user_interface.views_noteb.add_tab(self.network_frame,
-                                                self.network_name, self.tab_cb(self.network_name))
+        self.user_interface.views_noteb.add_tab(
+            self.network_frame, self.network_name, self.tab_cb(self.network_name))
 
-        net_button_text = ['Display network of left object', 'Toon netwerk van linker object']
-        lh_button_text = ['Display details of left object', 'Toon details van linker object']
-        rh_button_text = ['Display details of kind', 'Toon details van soort']
+        net_button_text = ['Network of left object', 'Netwerk van linker object']
+        lh_button_text = ['Details of left object', 'Details van linker object']
+        rh_button_text = ['Details of kind', 'Details van soort']
+        know_button_text = ['Add knowledge', 'Voeg kennis toe']
         classif_button_text = ['Classify left individual object',
                                'Classificeer linker individueel object']
         self.close_button_text = ['Close', 'Sluit']
 
         self.network_button_row = gui.HBox(height=20, width='100%')
 
-        self.net_button = gui.Button(net_button_text[self.GUI_lang_index], width='20%', height=20)
+        self.net_button = gui.Button(net_button_text[self.GUI_lang_index], width='15%', height=20)
         self.net_button.attributes['title'] = 'Press button after selection of left hand object'
         self.net_button.onclick.connect(self.Prepare_lh_object_network_view)
 
-        self.lh_button = gui.Button(lh_button_text[self.GUI_lang_index], width='20%', height=20)
+        self.lh_button = gui.Button(lh_button_text[self.GUI_lang_index], width='15%', height=20)
         self.lh_button.attributes['title'] = 'Press button after selection of left hand object'
         self.lh_button.onclick.connect(self.Prepare_lh_network_object_detail_view)
 
         self.rh_button = gui.Button(rh_button_text[self.GUI_lang_index], width='15%', height=20)
         self.rh_button.attributes['title'] = 'Press button after selection of right hand object'
         self.rh_button.onclick.connect(self.Prepare_rh_network_object_detail_view)
+
+        self.know_button = gui.Button(know_button_text[self.GUI_lang_index], width='15%', height=20)
+        self.know_button.attributes['title'] = \
+            'Press button after selection of left hand object to add an expression of knowledge'
+        self.know_button.onclick.connect(self.add_knowledge)
 
         self.classif_button = gui.Button(classif_button_text[self.GUI_lang_index],
                                          width='20%', height=20)
@@ -2392,6 +2406,7 @@ class Display_views():
         self.network_button_row.append(self.net_button)
         self.network_button_row.append(self.lh_button)
         self.network_button_row.append(self.rh_button)
+        self.network_button_row.append(self.know_button)
         self.network_button_row.append(self.classif_button)
         self.network_button_row.append(self.close_network)
         self.network_frame.append(self.network_button_row)
@@ -2422,12 +2437,27 @@ class Display_views():
 
     def Determine_table_row_values(self, widget, row, item):
         ''' Determine the values in the row that is selected in the table.'''
+        self.row = row
         self.row_widgets = list(row.children.values())
         self.row_values = []
+        self.row_uids = []
         if len(self.row_widgets) > 0:
+            begin = False
             for widget in self.row_widgets:
-                self.row_values.append(widget.get_text())
-        print('Selected row values:', self.row_values)
+                value = widget.get_text()
+                if begin is False:
+                    if value != '':
+                        self.row_values.append(value)
+                        print('Value:', value)
+                        self.row_uids.append(widget.uid)
+                        begin = True
+                else:
+                    self.row_values.append(value)
+                    try:
+                        self.row_uids.append(widget.uid)
+                    except AttributeError:
+                        pass
+        print('Selected row values:', self.row_values, self.row_uids)
 
     def Display_network_view(self):
         """ Display a network of all related things
@@ -2435,7 +2465,7 @@ class Display_views():
             network_model = related_uid, focus_uid, focus_name, phrase, related_name,
                             kind_uid, related_name, focus_name, kind_name.
         """
-        # Display self.network_model rows in self.network_tree TreeView
+        # Display self.network_model rows in self.network_tree TreeTable
         parent_uids = []
         remembered_name = ''
         sub_level = 0
@@ -2494,23 +2524,30 @@ class Display_views():
                 if relation is False and parent_name != '':
                     net_row_widget.uid = network_line[0]
                 for index, field in enumerate(network_line[6:]):
-                    row_item = gui.TableItem(text=field,
-                                             style={'text-align': 'left',
-                                                    'background-color': color})
+                    display_text = field
                     if relation is False:
                         # If row is not a relation while parent is a relation name
                         # then replace relation name with remembered parent name
                         strings = field.partition(' ')
                         if strings[0] in parent_text:
-                            row_item = gui.TableItem(text=remembered_name,
-                                                     style={'text-align': 'left',
-                                                            'background-color': color})
+                            display_text = remembered_name
+                    row_item = gui.TableItem(text=display_text,
+                                             style={'text-align': 'left',
+                                                    'background-color': color})
+                    if index == 0:
+                        # Add the uid of the left hand object to the first widget
+                        row_item.uid = network_line[0]
+                    elif index == 1:
+                        # Add the uid of the kind to the first widget
+                        row_item.uid = network_line[1]
+                    elif index == 2:
+                        # Add the uid of the kind to the first widget
+                        row_item.uid = network_line[5]
+                    if relation is False:
                         net_row_widget.append(row_item, field)
                     elif index < 1:
                         # Relation line: only the first field to be displayed
                         net_row_widget.append(row_item, field)
-                    if index == 0:
-                        row_item.uid = network_line[0]
                 self.network_tree.append(net_row_widget, child_name)
                 if child_uid not in parent_uids:
                     parent_uids.append(child_uid)
@@ -3013,8 +3050,8 @@ class Display_views():
                                                 self.tab_cb(self.expr_name))
         details = ['Details of LH object', 'Details van linker object']
         expr_context_text = ['Contextual facts', 'Contextuele feiten']
-        save_on_CSV_file = ['Save on CSV file', 'Opslaan op CSV file']
-        save_on_JSON_file = ['Save on JSON file', 'Opslaan op JSON file']
+        save_on_CSV_file_text = ['Save on CSV file', 'Opslaan op CSV file']
+        save_on_JSON_file_text = ['Save on JSON file', 'Opslaan op JSON file']
 
         self.expr_button_row = gui.HBox(height=20, width='100%')
 
@@ -3034,18 +3071,18 @@ class Display_views():
         context_button.onclick.connect(self.Contextual_facts)
         self.expr_button_row.append(context_button)
 
-        save_CSV_button = gui.Button(save_on_CSV_file[self.GUI_lang_index],
+        save_CSV_button = gui.Button(save_on_CSV_file_text[self.GUI_lang_index],
                                      width='15%', height=20)
         save_CSV_button.attributes['title'] = 'First select a row, the press this button ' \
                                               'for storing expressions on CSV file'
-        save_CSV_button.onclick.connect(self.Save_on_CSV_file)
+        save_CSV_button.onclick.connect(self.save_on_CSV_file)
         self.expr_button_row.append(save_CSV_button)
 
-        save_JSON_button = gui.Button(save_on_JSON_file[self.GUI_lang_index],
+        save_JSON_button = gui.Button(save_on_JSON_file_text[self.GUI_lang_index],
                                       width='15%', height=20)
         save_JSON_button.attributes['title'] = 'First select a row, the press this button ' \
                                                'for storing expressions on JSON file'
-        save_JSON_button.onclick.connect(self.Save_on_JSON_file)
+        save_JSON_button.onclick.connect(self.save_on_JSON_file)
         self.expr_button_row.append(save_JSON_button)
 
         self.close_expr = gui.Button(self.close_button_text[self.GUI_lang_index],
@@ -3103,7 +3140,7 @@ class Display_views():
                 row_widget.append(row_item, field)
         return row_widget
 
-    def Save_on_CSV_file(self):
+    def save_on_CSV_file(self):
         """ Saving query results in a CSV file in Gellish Expression Format."""
         import csv
         import time
@@ -3119,48 +3156,63 @@ class Display_views():
         # Note: the r upfront the string (rawstring) is
         #       to avoid interpretation as a Unicode string (and thus giving an error)
         # ini_out_path from bootstrapping
-        ini_file_name = 'QueryResults.csv'
-        outputFile = filedialog.asksaveasfilename(filetypes=(("CSV files", "*.csv"),
-                                                             ("All files", "*.*")),
-                                                  title="Enter a file name",
-                                                  initialdir=ini_out_path,
-                                                  initialfile=ini_file_name,
-                                                  parent=self.expr_frame)
-        if outputFile == '':
-            outputFile = ini_file_name
-            self.Display_message(
-                'File name for saving is blank or file selection is cancelled. '
-                'If generated, the file is saved under the name <{}>'.
-                format(outputFile),
-                'De filenaam voor opslaan is blanco of the file opslag is gecancelled. '
-                'Indien de file is gemaakt, dan is hij opgeslagen met de naam <{}>'.
-                format(outputFile))
+        ini_file_name = 'Query_results.csv'
+        # directory
+        basedir = os.path.dirname(ini_out_path)
+        if not os.path.exists(basedir):
+            os.makedirs(basedir)
+##        output_file_name = filedialog.asksaveasfilename(
+##            filetypes=(("CSV files", "*.csv"),
+##                       ("All files", "*.*")),
+##            title="Enter a file name",
+##            initialdir=ini_out_path,
+##            initialfile=ini_file_name,
+##            parent=self.expr_frame)
+##        if output_file_name == '':
+##            output_file_name = ini_file_name
+##            self.Display_message(
+##                'File name for saving is blank or file selection is cancelled. '
+##                'If generated, the file is saved under the name <{}>'.
+##                format(output_file_name),
+##                'De filenaam voor opslaan is blanco of the file opslag is gecancelled. '
+##                'Indien de file is gemaakt, dan is hij opgeslagen met de naam <{}>'.
+##                format(output_file_name))
 
-        queryFile = open(outputFile, mode='w', newline='')
-        fileWriter = csv.writer(queryFile, dialect='excel', delimiter=';')
+        output_file_name = ini_file_name
+        query_file = open(output_file_name, mode='w', newline='')
+        file_writer = csv.writer(query_file, dialect='excel', delimiter=';')
 
         # Save the expr_table results in a CSV file, including three header lines
         # Write the three header lines and then the file content from expr_table
-        fileWriter.writerow(header1)
-        fileWriter.writerow(expr_col_ids)
-        fileWriter.writerow(header3)
+        file_writer.writerow(header1)
+        file_writer.writerow(expr_col_ids)
+        file_writer.writerow(header3)
         for expression in self.expr_table:
-            fileWriter.writerow(expression)
+            file_writer.writerow(expression)
 
-        queryFile.close()
+        query_file.close()
         self.Display_message(
-            'File {} is saved.'.format(outputFile),
-            'File {} is opgeslagen.'.format(outputFile))
+            'File {} is saved.'.format(output_file_name),
+            'File {} is opgeslagen.'.format(output_file_name))
 
+        self.output_file = gui.FileUploader(basedir, width=200, height=30, margin='10px')
+        self.output_file.onsuccess.connect(self.fileupload_on_success)
+        self.output_file.onfailed.connect(self.fileupload_on_failed)
         # Open written file in Excel
-        open_file(outputFile)
+        open_file(output_file_name)
 
-    def Save_on_JSON_file(self):
+    def save_on_JSON_file(self):
         """ Saving query results in a JSON file in Gellish Expression Format."""
         subject_name = 'Query results'
         lang_name = 'Nederlands'
         serialization = 'json'
         Open_output_file(self.expr_table, subject_name, lang_name, serialization)
+
+    def fileupload_on_success(self, widget, filename):
+        print('File upload success: ' + filename)
+
+    def fileupload_on_failed(self, widget, filename):
+        print('File upload failed: ' + filename)
 
     def Define_and_display_kind_view(self):
         # Destroy earlier kind_frame
@@ -3937,10 +3989,10 @@ class Display_views():
             as the chosen object
             for display of a new network view and other views.
         """
-        # tree_values = self.Determine_network_tree_values()
-        if len(self.row_widgets[0]) > 0:
-            chosen_object_uid = self.row_widgets[0].uid
-            print('uid:', chosen_object_uid)
+        # tree_values = self.Determine_table_row_values()
+        if len(self.row_uids) > 0:
+            chosen_object_uid = self.row_uids[0]
+            print('Chosen uid:', chosen_object_uid)
             # Build single product model (list with one element)
             obj_list = []
             obj = self.uid_dict[chosen_object_uid]
@@ -3954,42 +4006,173 @@ class Display_views():
             in a selected network treeview row
             as the chosen object for display of details.
         """
-        # tree_values = self.Determine_network_tree_values()
+        # row_values = self.Determine_table_row_values()
         if len(self.row_values) > 0:
-            chosen_object_uid = self.row_values[0]
-            self.Determine_category_of_object_view(chosen_object_uid, self.row_values)
-            self.Determine_category_of_object_view(chosen_object_uid, self.row_values)
+            # Debug print('Row values:', self.row_values)
+            chosen_object_uid = self.row_uids[0]
+            # Debug print('Lh object uid:', chosen_object_uid)
+            self.Determine_kind_of_object_view(chosen_object_uid)
 
     def Prepare_rh_network_object_detail_view(self, widget):
         """ Set the uid of the right hand object
             in a selected network treeview row
             as the chosen object for display of details.
         """
-        # tree_values = self.Determine_network_tree_values()
-        if len(self.row_values) > 4:
-            chosen_object_uid = self.row_values[4]
-            self.Determine_category_of_object_view(chosen_object_uid, self.row_values)
+        # row_values = self.Determine_table_row_values()
+        if len(self.row_values) > 2:
+            chosen_object_uid = self.row_uids[2]
+            self.Determine_kind_of_object_view(chosen_object_uid)
 
-    def Prepare_for_classification(self):
-        """ Find the selected left classifier object from a user selection
-            in the network that is displayed in the network_tree view.
-            When the classification button was used the taxonomy of the selected kind
-            is displayed and a search for a second classifier in the taxonomy
-            (the subtype hierarchy of the selected kind) is started.
+    def add_knowledge(self, widget):
+        """ After the add_knowledge button is used,
+            find the selected left hand object from a user selected row with row_values.
+            Then open a window for adding the expression of knowledge
+            about the selected left hand object.
+        """
+        # row_values and row_uids from self.Determine_table_row_values()
+        if len(self.row_values) > 0:
+            if self.row_values[2] == '' or self.row_values[2] == 'unknown':
+                self.Display_message(
+                    'Right hand kind of object is unknown.',
+                    'Rechter soort object is onbekend.')
+            else:
+                kind_uid = self.row_uids[2]
+                object_uid = self.row_uids[0]
+                self.add_knowledge_to_left_hand_object(object_uid, kind_uid)
+        else:
+            self.Display_message(
+                'Select an item, then click the classification button '
+                'for classying the object',
+                'Selecteer een object, click dan op de classifikatieknop '
+                'om het object te classificeren')
+
+    def add_knowledge_to_left_hand_object(self, object_uid, kind_uid):
+        """ Generate expressions of knowledge about object(_uid),
+            list them in a knowledge table,
+            and add them to the semantic network.
+        """
+        self.relator_obj = self.uid_dict[object_uid]
+        # Create a knowledge table(only the first time)
+        if self.know_table is None:
+            self.know_name = ['Specified knowledge', 'Gespecificeerde kennis']
+            self.know_frame = gui.VBox(width='100%', height='80%',
+                                       style={'overflow': 'auto',
+                                              'background-color': '#eeffdd'})
+            self.know_frame.attributes['title'] = self.know_name[self.GUI_lang_index]
+            self.user_interface.views_noteb.add_tab(
+                self.know_frame, self.know_name[self.GUI_lang_index],
+                self.tab_cb(self.know_name[self.GUI_lang_index]))
+            # Add button row
+            self.know_button_row = gui.HBox(height=20, width='100%')
+            self.know_frame.append(self.know_button_row)
+
+            self.delete_button_text = ['Delete selected row', 'Verwijder geselecteerde regel']
+            self.delete_know = gui.Button(self.delete_button_text[self.GUI_lang_index],
+                                          width='15%', height=20)
+            self.delete_know.attributes['title'] = 'Press button when you want to remove this tag'
+            self.delete_know.onclick.connect(self.delete_row)
+            self.know_button_row.append(self.delete_know)
+
+            self.close_know = gui.Button(self.close_button_text[self.GUI_lang_index],
+                                         width='15%', height=20)
+            self.close_know.attributes['title'] = 'Press button when you want to remove this tag'
+            self.close_know.onclick.connect(self.Close_tag,
+                                            self.user_interface.views_noteb,
+                                            self.know_name[self.GUI_lang_index])
+            self.know_button_row.append(self.close_know)
+
+            self.know_table = SingleRowSelectionTable(
+                width='100%',
+                style={'overflow': 'auto', 'background-color': '#eeffaa',
+                       'border-width': '2px', 'border-style': 'solid',
+                       'font-size': '12px', 'table-layout': 'auto',
+                       'text-align': 'left'})
+            self.know_table.on_table_row_click.connect(self.Determine_table_row_values)
+            self.head_row = gui.TableRow(height=20, width='100%')
+            lh_head = ('Left hand object', 'Linker object')
+            rel_head = ('Kind of relation', 'Soort relatie')
+            rh_head = ('Right hand object', 'Rechter object')
+            uom_head = ('Unit of measure', 'Meeteenheid')
+            descr_head = ('Description', 'Omschrijving')
+            head = [(lh_head[self.GUI_lang_index], rel_head[self.GUI_lang_index],
+                     rh_head[self.GUI_lang_index], uom_head[self.GUI_lang_index],
+                     descr_head[self.GUI_lang_index])]
+            self.know_table.append_from_list(head, fill_title=True)
+            self.know_frame.append(self.know_table)
+            self.row = None
+
+        # Determine objects for expression via query window
+        search_for = 'object'
+        self.know_view = Query_view(self.user_interface, search_for, self.relator_obj)
+        self.know_view.Define_query_window()
+        self.user_interface.views_noteb.select_by_name(self.know_view.search_name)
+
+    def delete_row(self, widget):
+        if self.row is not None:
+            self.know_table.remove_child(self.row)
+            self.row = None
+
+    def create_knowledge_expression(self):
+        """ Create a knowledge expression from selected options."""
+        # Create knowledge row widget
+        self.know_row_widget = gui.TableRow(height=20, width='100%')
+        # Add relator object name to TableRow
+        # self.lh_obj = self.know_view.query.q_lh_obj
+        lh_obj_name = self.know_view.query.q_lh_name
+        lh_obj_name_widget = gui.TableItem(lh_obj_name)
+        self.know_row_widget.append(lh_obj_name_widget)
+        lh_obj_descr = self.know_view.full_def_widget.get_text()
+
+        # Add rel_type name to TableRow
+        # self.rel_obj = self.know_view.query.q_rel_obj
+        rel_obj_name = self.know_view.query.q_rel_name  # selected name
+        rel_obj_name_widget = gui.TableItem(rel_obj_name)
+        self.know_row_widget.append(rel_obj_name_widget)
+
+        # Add rh_obj name to TableRow
+        # self.rh_obj = self.know_view.query.q_lh_obj
+        # Debug print('Rh_obj.name:', self.rh_obj.name)
+        rh_obj_name = self.know_view.query.q_rh_name
+        rh_obj_name_widget = gui.TableItem(rh_obj_name)
+        self.know_row_widget.append(rh_obj_name_widget)
+
+        # Add uom name to TableRow
+        # self.rh_obj = self.know_view.query.q_lh_obj
+        # Debug print('Rh_obj.name:', self.rh_obj.name)
+        uom_obj_name = self.know_view.query.q_uom_name
+        uom_obj_name_widget = gui.TableItem(uom_obj_name)
+        self.know_row_widget.append(uom_obj_name_widget)
+
+        # If the new kind of relation is a specialization or classification
+        # Then add a textual description to the left hand object
+        if self.know_view.query.q_rel_uid in self.specialization_uids \
+                or self.know_view.query.q_rel_uid in self.classif_uids:
+            is_a = ['is a ', 'is een ']
+            full_def = is_a[self.GUI_lang_index] + rh_obj_name + ' ' + lh_obj_descr
+            full_def_widget = gui.TableItem(full_def)
+            self.know_row_widget.append(full_def_widget)
+        self.know_table.append(self.know_row_widget)
+        self.user_interface.views_noteb.select_by_name(self.know_name[self.GUI_lang_index])
+
+    def Prepare_for_classification(self, widget):
+        """ After the classification button is used,
+            find the classifying kind of the selected left hand individual object
+            from a user selection in the network that is displayed in the network_tree view.
+            Then the taxonomy of the selected kind is displayed
+            for searching for a second classifier in the taxonomy
+            (the subtype hierarchy of the selected kind).
             The aspects of the individual object are used to create selection criteria for the
             subtypes in the hierarchy.
-            The taxonomy of the selected kind is displayed for selection of the classifier.
         """
-        # similar to def Prod_taxonomy(self, sel):
-        # tree_values = self.Determine_network_tree_values()
+        # row_values = self.Determine_table_row_values()
         if len(self.row_values) > 0:
-            if self.row_values[4] == '' or self.row_values[4] == 'unknown':
+            if self.row_values[2] == '' or self.row_values[2] == 'unknown':
                 self.Display_message(
                     'Classifying kind of object is unknown.',
                     'Classificerende soort object is onbekend.')
             else:
-                kind_uid = str(self.row_values[4])
-                individual_object_uid = str(self.row_values[0])
+                kind_uid = self.row_uids[2]
+                individual_object_uid = self.row_uids[0]
                 self.Classification_of_individual_thing(individual_object_uid, kind_uid)
         else:
             self.Display_message(
@@ -4037,8 +4220,8 @@ class Display_views():
 ##        widget_name = widget.get_value()
 ##        # Debug print('Selected for detail network:', widget_name, widget.uid)
 ##        # self.selected_obj = self.gel_net.uid_dict[widget.uid]
-##        tree_values = [widget.uid, widget_name]
-##        self.Determine_category_of_object_view(widget.uid, tree_values)
+##        self.row_values = [widget.uid, widget_name]
+##        self.Determine_kind_of_object_view(widget.uid)
 
 ##    def Determine_network_tree_values(self):
 ##        """ Determine the values on a selected row in a network TreeTable."""
@@ -4056,29 +4239,29 @@ class Display_views():
 ##                'Geen object gevonden. Selecteer eerst een rij, click daarna op een knop.')
 ##        return tree_values
 
-    def Determine_category_of_object_view(self, chosen_object_uid, row_values):
+    def Determine_kind_of_object_view(self, chosen_object_uid):
         """ Determine kind of chosen object and as a consequence models and views."""
         description_text = ['description', 'beschrijving']
         obj_descr_title = ['Information about ', 'Informatie over ']
 
-        if chosen_object_uid != '':
+        if chosen_object_uid != '' and chosen_object_uid != 'unknown':
             self.selected_obj = self.uid_dict[str(chosen_object_uid)]
 
             # If info_kind is a description then display the destription in messagebox
-            if len(row_values) > 8 and row_values[8] in description_text:
+            if len(self.row_values) > 8 and self.row_values[8] in description_text:
                 self.messagebox(obj_descr_title[self.GUI_lang_index] + self.selected_obj.name,
                                 self.selected_obj.description)
             else:
                 self.Display_message(
                     'Display object details of: {}'.format(self.selected_obj.name),
-                    'Weergave van objectdetails van: {}'.format(self.selected_obj.name))
+                    'Toon details van object: {}'.format(self.selected_obj.name))
                 if self.selected_obj.category in self.gel_net.categories_of_kinds:
                     self.Define_and_display_kind_detail_view(self.selected_obj)
                 else:
                     self.Define_and_display_individual_detail_view(self.selected_obj)
-
-            if len(self.info_model) > 0:
-                self.Define_and_display_documents()
+##
+##            if len(self.info_model) > 0:
+##                self.Define_and_display_documents()
 
     def Kind_detail_view_left(self, widget):
         """ Find the selected left hand object from a user selection
@@ -4627,6 +4810,13 @@ class Display_views():
 
         self.context_box.show(self.user_interface)
 
+    def Close_tag(self, widget, tabbox, ref_widget_tab_name):
+        ''' Close the tab in tabbox in widget with the specified tab_name'''
+        # tabbox.select_by_name(ref_widget_tab_name)
+        tabbox.remove_tab_by_name(ref_widget_tab_name)
+        if ref_widget_tab_name in self.know_name[self.GUI_lang_index]:
+            self.know_table = None
+
 
 class User_interface():
     def __init__(self):
@@ -4651,7 +4841,6 @@ class Semantic_network():
 
 
 if __name__ == "__main__":
-    root = Tk()
     user_interface = User_interface()
     gel_net = Semantic_network('name')
     views = Display_views(gel_net)
@@ -4661,4 +4850,3 @@ if __name__ == "__main__":
 
     views.user_interface.Define_notebook()
     views.Display_notebook_views()
-    root.mainloop()
