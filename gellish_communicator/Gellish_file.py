@@ -590,7 +590,7 @@ class Gellish_file:
         else:
             # A file with unknown content type
             Message(self.gel_net.GUI_lang_index,
-                    "File type '{}' is not standard. File with title '{}' processed".
+                    "File type '{}' is not standard. File with title '{}' is processed".
                     format(self.header[5], self.header[6]),
                     "File type '{}' is niet standaard. File met titel '{}' is verwerkt".
                     format(self.header[5], self.header[6]))
@@ -641,7 +641,8 @@ class Gellish_file:
 
         if len(self.header) > 7:
             params = ['prefix',
-                      'Lower_obj_uid', 'Upper_obj_uid', 'Lower_rel_uid', 'Upper_rel_uid']
+                      'Lower_obj_uid', 'Upper_obj_uid', 'Lower_rel_uid', 'Upper_rel_uid',
+                      'Obj_uid', 'Idea_uid']
             for value in self.header[7:]:
                 value_parts = value.partition('=')
                 if len(value_parts) > 1:
