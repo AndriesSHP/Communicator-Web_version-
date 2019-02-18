@@ -94,7 +94,7 @@ class Query_view():
         """
         search_text = ["Search for ", "Zoek naar "]
         if self.search_for == 'object':
-        	related_to = ['object related to ', 'object gerelateerd aan']
+            related_to = ['object related to ', 'object gerelateerd aan']
             self.search_name = search_text[self.GUI_lang_index] \
                 + related_to[self.GUI_lang_index] + self.relator_obj.name
         else:
