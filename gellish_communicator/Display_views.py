@@ -30,7 +30,6 @@ from gellish_communicator.Expr_Table_Def import (
     expr_col_ids,
     header3,
 )
-from gellish_communicator.QueryViews import Query_view
 from gellish_communicator.Occurrences_diagrams import Occurrences_diagram
 from gellish_communicator.QueryViews import Query_view
 from gellish_communicator.remi_ext import TreeTable, SingleRowSelectionTable
@@ -2386,7 +2385,7 @@ class Display_views():
         self.rh_button.onclick.connect(self.Prepare_rh_network_object_detail_view)
 
         self.know_button = gui.Button(know_button_text[self.GUI_lang_index],
-                                         width='15%', height=20)
+                                      width='15%', height=20)
         self.know_button.attributes['title'] = \
             'Press button after selection of left hand object to add an expression of knowledge'
         self.know_button.onclick.connect(self.add_knowledge)
