@@ -4,9 +4,7 @@ import json
 
 from rdflib import Graph, URIRef, RDFS
 import remi.gui as gui
-from tkinter import filedialog
 
-from gellish_communicator.Bootstrapping import ini_out_path
 from gellish_communicator.Expr_Table_Def import (
     lang_uid_col,
     lang_name_col,
@@ -92,13 +90,6 @@ def Open_output_file(expressions, subject_name, lang_name, serialization):
 
     # Select file name and directory
     # Ini_out_path from Bootstrapping
-##    title = serialization + ' files'
-##    extension = '*.' + serialization
-##    output_file = filedialog.asksaveasfilename(filetypes=((title, extension),
-##                                                          ("All files", "*.*")),
-##                                               title="Enter a file name",
-##                                               initialdir=ini_out_path,
-##                                               initialfile=ini_file_name)
     output_file_name = ini_file_name
     if output_file_name == '':
         output_file = 'Results.' + serialization

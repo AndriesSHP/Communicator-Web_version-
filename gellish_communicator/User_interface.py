@@ -595,10 +595,9 @@ class Communicator(App):
             is_a = ['is a ', 'is een ']
             full_def = is_a[self.GUI_lang_index] + super_name + ' ' + part_def
         else:
-            if part_def == None:
+            if part_def is None:
                 part_def = ''
             full_def = part_def
-
         return lang_name, comm_name, obj_name, full_def
 
     def Close_tag(self, widget, tabbox, ref_widget_tab_name):

@@ -8,10 +8,10 @@ from setuptools import find_packages, setup
 
 # Package meta-data.
 NAME = 'Gellish Communicator'
-DESCRIPTION = 'My short description for my project.'
-URL = 'https://github.com/me/myproject'
-EMAIL = 'me@example.com'
-AUTHOR = 'Awesome Soul'
+DESCRIPTION = 'A web version of the Gellish Communicator App using Remi GUI.'
+URL = 'https://github.com/AndriesSHP/Communicator-Web_version-'
+EMAIL = 'andries.vanrenssen@gellish.net'
+AUTHOR = 'Andries van Renssen'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.0.1'
 
@@ -24,6 +24,7 @@ REQUIRED = [
 # What packages are optional?
 EXTRAS = {
     'testing': [
+        'flake8',
         'pytest',
         'pytest-flake8',
     ],

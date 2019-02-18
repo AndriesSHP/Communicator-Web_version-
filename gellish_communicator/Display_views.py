@@ -32,6 +32,7 @@ from gellish_communicator.Expr_Table_Def import (
 )
 from gellish_communicator.QueryViews import Query_view
 from gellish_communicator.Occurrences_diagrams import Occurrences_diagram
+from gellish_communicator.QueryViews import Query_view
 from gellish_communicator.remi_ext import TreeTable, SingleRowSelectionTable
 from gellish_communicator.utils import open_file
 
@@ -4054,7 +4055,7 @@ class Display_views():
         """
         self.relator_obj = self.uid_dict[object_uid]
         # Create a knowledge table(only the first time)
-        if self.know_table == None:
+        if self.know_table is None:
             self.know_name = ['Specified knowledge', 'Gespecificeerde kennis']
             self.know_frame = gui.VBox(width='100%', height='80%',
                                        style={'overflow': 'auto',
@@ -4081,7 +4082,7 @@ class Display_views():
                                             self.user_interface.views_noteb,
                                             self.know_name[self.GUI_lang_index])
             self.know_button_row.append(self.close_know)
-        
+
             self.know_table = SingleRowSelectionTable(
                 width='100%',
                 style={'overflow': 'auto', 'background-color': '#eeffaa',
@@ -4101,7 +4102,6 @@ class Display_views():
             self.know_table.append_from_list(head, fill_title=True)
             self.know_frame.append(self.know_table)
             self.row = None
-        
         # Determine objects for expression via query window
         search_for = 'object'
         self.know_view = Query_view(self.user_interface, search_for, self.relator_obj)
@@ -4842,7 +4842,6 @@ class Semantic_network():
 
 
 if __name__ == "__main__":
-##    root = Tk()
     user_interface = User_interface()
     gel_net = Semantic_network('name')
     views = Display_views(gel_net)
@@ -4852,4 +4851,3 @@ if __name__ == "__main__":
 
     views.user_interface.Define_notebook()
     views.Display_notebook_views()
-##    root.mainloop()

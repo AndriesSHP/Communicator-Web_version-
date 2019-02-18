@@ -3,3 +3,4 @@
 __pycache__/
 # ignore the Python virtualenv
 env/
+Gellish_Communicator.egg-info/

@@ -445,8 +445,8 @@ class Query:
 
         # Save gel_expressions in query_file
         # subject_name = ['query_spec', 'vraagspecificatie']
-        file_lang_name = 'Nederlands'
-        serialization = 'csv'
+        # file_lang_name = 'Nederlands'
+        # serialization = 'csv'
         # Open_output_file(self.gel_expressions, 'query', file_lang_name, serialization)
 
     def Execute_query(self):
