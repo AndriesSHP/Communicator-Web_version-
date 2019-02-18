@@ -4043,10 +4043,10 @@ class Display_views():
                 self.add_knowledge_to_left_hand_object(object_uid, kind_uid)
         else:
             self.Display_message(
-                'Select an item, then click the classification button '
-                'for classying the object',
-                'Selecteer een object, click dan op de classifikatieknop '
-                'om het object te classificeren')
+                'Select an item, then click the "add knowledge" button '
+                'for adding knowledge about the object.',
+                'Selecteer een object, click dan op de "voeg kennis toe" knop '
+                'om kennis over het object toe te voegen.')
 
     def add_knowledge_to_left_hand_object(self, object_uid, kind_uid):
         """ Generate expressions of knowledge about object(_uid),
