@@ -1,5 +1,4 @@
-import remi.gui as gui
-from remi import start, App
+from remi import start
 import os
 
 from gellish_communicator.User_interface import Communicator
