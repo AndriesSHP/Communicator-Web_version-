@@ -23,3 +23,21 @@ This will:
 - Check the project for coding style and superfluous imports.
   It uses flake8, which you can configure in `setup.cfg`.
 - Run unit tests, of which there currently is only one.
+
+
+## Deployment
+
+### Heroku
+
+The project is [Heroku](https://heroku.com/)-enabled.
+
+Short Remi-specific-instructions [source](https://github.com/dddomodossola/remi/issues/280#issuecomment-465346938):
+
+- Download Heroku console [Heroku setup](https://devcenter.heroku.com/articles/getting-started-with-python#set-up)
+- Run `heroku login`
+- Open the [Heroku dashboard](https://dashboard.heroku.com/apps)
+- Create a new App named `gellish<X>`, where X can be anything (but `gellish` is taken)
+- In your copy of this repository, add the Heroku remote: `https://git.heroku.com/gellish<X>.git`
+- Run `git push heroku master`
+- Run `heroku ps:scale web=1`
+- Run `heroku open`
