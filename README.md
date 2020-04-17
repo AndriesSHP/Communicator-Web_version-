@@ -3,7 +3,7 @@ l[![Build Status](https://travis-ci.org/AndriesSHP/Communicator-Web_version-.svg
 # Communicator-Web_enabled version
 The Gellish Communicator project develops a reference application (the Gellish Communicator App) that supports the use any of the Formal Languages of the Gellish family of formalized natural languages, such as Formal English and Formal Dutch (Formeel Nederlands).
 This web_enabled version aims to develop a version of the Gellish Communicator App that can be used stand-alone as well as via the web. This is realized by using REMI GUI library (https://github.com/dddomodossola/remi) instead of Tkinter for its GUI.
-Remi GUI gets rendered in ordinary browsers, such as Safari or Edge. This allows to access the interface locally and remotely.
+Remi GUI gets rendered in ordinary browsers, such as Safari, Chrome or Edge. This allows to access the interface locally as well as remotely.
 For the time being this web_enabled project uses its own repository.
 
 
